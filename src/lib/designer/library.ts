@@ -37,13 +37,9 @@ export class DesignerLibrary {
     //    return null;
 
     let node = this.nodes[name].create();
-
-    // let node;
-    // if (path === undefined) {
-    //   node = this.nodes[name].create();
-    // } else {
-    //   //node = this.nodes[name].create(path);
-    // }
+    if (path !== undefined) {
+      node.texPath = path;
+    }
     node.typeName = name;
 
     return node;

@@ -14,6 +14,23 @@ import {
 import { buildShaderProgram } from "./gl";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
+import * as THREE from "three";
+
+const POTs: number[] = [
+  1,
+  2,
+  4,
+  8,
+  16,
+  32,
+  64,
+  128,
+  256,
+  512,
+  1024,
+  2048,
+  4096,
+];
 
 export class NodeInput {
   public node: DesignerNode;
@@ -308,8 +325,52 @@ export class DesignerNode implements IPropertyHolder {
       this.tex = null;
     }
 
-    var tex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tex);
+    let updateTexture = (
+      level: number,
+      internalFormat: number,
+      width: number,
+      height: number,
+      border: number,
+      format: number,
+      type: number,
+      pixels: ArrayBufferView
+    ) => {
+      var tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        level,
+        internalFormat,
+        width,
+        height,
+        border,
+        format,
+        type,
+        pixels
+      );
+
+      const isPot =
+        width === height &&
+        POTs.find((element) => element === width) !== undefined;
+      if (isPot) {
+        // set the filtering so we don't need mips
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      } else {
+        // NPOT textures
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      }
+
+      gl.bindTexture(gl.TEXTURE_2D, null);
+
+      this.tex = tex;
+    };
 
     const level = 0;
     const internalFormat = gl.RGBA;
@@ -317,31 +378,41 @@ export class DesignerNode implements IPropertyHolder {
     const format = gl.RGBA;
     const type = gl.UNSIGNED_BYTE;
     let data = null;
-    if (this.texPath !== "") {
-      // load texture
+    if (this.texPath !== undefined) {
+      // load texture into data
+      let img = new Image();
+      img.onload = () => {
+        const canvas = <HTMLCanvasElement>document.getElementById("editor");
+        const context = canvas.getContext("2d");
+        const imgData = Array.prototype.slice.call(
+          context.getImageData(0, 0, img.width, img.height).data
+        );
+
+        updateTexture(
+          level,
+          internalFormat,
+          img.width,
+          img.height,
+          border,
+          format,
+          type,
+          imgData
+        );
+      };
+
+      img.src = this.texPath;
+    } else {
+      updateTexture(
+        level,
+        internalFormat,
+        this.designer.width,
+        this.designer.height,
+        border,
+        format,
+        type,
+        data
+      );
     }
-
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      level,
-      internalFormat,
-      this.designer.width,
-      this.designer.height,
-      border,
-      format,
-      type,
-      data
-    );
-
-    // set the filtering so we don't need mips
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-
-    gl.bindTexture(gl.TEXTURE_2D, null);
-
-    this.tex = tex;
   }
 
   createRandomLibOld(): string {

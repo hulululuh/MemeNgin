@@ -1,3 +1,6 @@
+const path = require("path");
+const fs = require("fs");
+
 //import * as scene from "./scene";
 import { Designer } from "./designer";
 import { DesignerNode } from "./designer/designernode";
@@ -19,6 +22,7 @@ import { FrameGraphicsItem } from "./scene/framegraphicsitem";
 import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
 import { ItemClipboard } from "./clipboard";
 import { UndoStack } from "./undostack";
+import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 
 function hexToRgb(hex) {
@@ -437,15 +441,49 @@ export class Editor {
       const x = (ev.offsetX - self.graph.view.offset.x) / zoomFactor;
       const y = (ev.offsetY - self.graph.view.offset.y) / zoomFactor;
 
-      for (let idx = 0; idx < ev.dataTransfer.files.length; idx++) {
-        const filePath = ev.dataTransfer.files[idx].path;
+      let isValidImagePath = (filePath: string) => {
+        let isValid = filePath.length > 0;
+        if (isValid) {
+          // TODO: check the path indicates proper image path
+          let stats = fs.statSync(filePath);
+          isValid = stats.isFile();
+        }
+        return isValid;
+      };
 
-        let node = self.library.create("texture", filePath);
-        let nodeView = self.addNode(node, 0, 0);
-        nodeView.setCenter(x, y);
+      let viewNodes = [];
+      let nodes = [];
+      // for (let idx = 0; idx < ev.dataTransfer.files.length; idx++) {
+      for (let file of ev.dataTransfer.files) {
+        if (isValidImagePath(file.path)) {
+          let node = self.library.create("texture", file.path);
+          let nodeView = self.addNode(node, 0, 0);
+          nodeView.setCenter(x, y);
+
+          nodes.push(node);
+          viewNodes.push(nodeView);
+        }
 
         // import texture then make a node
         //self.assignNodeToTextureChannel(nodeView.id, "albedo");
+      }
+
+      if (nodes.length === viewNodes.length && nodes.length > 0) {
+        let action = new AddItemsAction(
+          self.graph,
+          self.designer,
+          [],
+          [],
+          [],
+          [],
+          viewNodes,
+          nodes
+        );
+        UndoStack.current.push(action);
+      } else {
+        console.log(
+          "something is dragged into editor, but it's not handled properly"
+        );
       }
     };
 
