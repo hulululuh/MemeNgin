@@ -14,7 +14,6 @@ import {
 import { buildShaderProgram } from "./gl";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
-import * as THREE from "three";
 
 const POTs: number[] = [
   1,
@@ -81,7 +80,8 @@ export class DesignerNode implements IPropertyHolder {
 
     // clear all inputs
     for (let input of this.inputs) {
-      gl.activeTexture(gl.TEXTURE0 + texIndex);
+      const texIdx = texIndex === undefined ? 0 : texIndex;
+      gl.activeTexture(gl.TEXTURE0 + texIdx);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
       gl.uniform1i(gl.getUniformLocation(this.shaderProgram, input), 0);
