@@ -15,6 +15,8 @@ import { buildShaderProgram } from "./gl";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
 
+const NativeImage = require("electron").nativeImage;
+
 const POTs: number[] = [
   1,
   2,
@@ -41,6 +43,7 @@ export class DesignerNode implements IPropertyHolder {
   public title: string;
   public typeName: string; // added when node is created from library
   public texPath: string;
+  public isTexture: boolean;
 
   public gl: WebGLRenderingContext;
   public designer: Designer;
@@ -94,6 +97,7 @@ export class DesignerNode implements IPropertyHolder {
 
     // pass inputs for rendering
     var texIndex = 0;
+
     for (let input of inputs) {
       gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, input.node.tex);
@@ -103,6 +107,23 @@ export class DesignerNode implements IPropertyHolder {
       );
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, input.name + "_connected"),
+        1
+      );
+      //console.log("bound texture " + texIndex);
+      texIndex++;
+    }
+
+    // pass baseTexture if it is texture node
+    if (this.isTexture && this.tex !== undefined) {
+      //gl.activeTexture(gl.TEXTURE0 + texIndex);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex);
+      gl.uniform1i(
+        gl.getUniformLocation(this.shaderProgram, "baseTexture"),
+        texIndex
+      );
+      gl.uniform1i(
+        gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
         1
       );
       //console.log("bound texture " + texIndex);
@@ -379,28 +400,22 @@ export class DesignerNode implements IPropertyHolder {
     const type = gl.UNSIGNED_BYTE;
     let data = null;
     if (this.texPath !== undefined) {
-      // load texture into data
-      let img = new Image();
-      img.onload = () => {
-        const canvas = <HTMLCanvasElement>document.getElementById("editor");
-        const context = canvas.getContext("2d");
-        const imgData = Array.prototype.slice.call(
-          context.getImageData(0, 0, img.width, img.height).data
-        );
-
+      const image = NativeImage.createFromPath(this.texPath);
+      if (image.isEmpty() === false) {
+        const imgSize = image.getSize();
         updateTexture(
           level,
           internalFormat,
-          img.width,
-          img.height,
+          imgSize.width,
+          imgSize.height,
           border,
           format,
           type,
-          imgData
+          Uint8Array.from(image.getBitmap())
         );
-      };
-
-      img.src = this.texPath;
+        this.isTexture = true;
+        this.requestUpdate();
+      }
     } else {
       updateTexture(
         level,
@@ -412,6 +427,7 @@ export class DesignerNode implements IPropertyHolder {
         type,
         data
       );
+      this.isTexture = false;
     }
   }
 
@@ -628,6 +644,11 @@ export class DesignerNode implements IPropertyHolder {
     for (let input of this.inputs) {
       code += "uniform sampler2D " + input + ";\n";
       code += "uniform bool " + input + "_connected;\n";
+    }
+
+    if (this.isTexture) {
+      code += "uniform sampler2D baseTexture;\n";
+      code += "uniform bool baseTexture_ready;\n";
     }
 
     return code;

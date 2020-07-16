@@ -247,6 +247,18 @@ export class Editor {
     this.undoStack.redo();
   }
 
+  // create empty scene
+  createEmptyScene() {
+    this.clearTextureChannels();
+
+    this.library = createV2Library();
+    this.setDesigner(new Designer());
+    this.setScene(new NodeScene(this.canvas));
+
+    // refresh everything
+    this.designer.invalidateAllNodes();
+  }
+
   // creates new texture
   // requires canvas to be already set
   createNewTexture() {
@@ -340,6 +352,7 @@ export class Editor {
       var graphNode = self.graph.getNodeById(dnode.id);
       if (!graphNode) return; // node could have been deleted
 
+      // something worng with fbo setup around here.
       self.designer.copyNodeTextureToImageCanvas(dnode, graphNode.imageCanvas);
 
       if (self.onpreviewnode) {
@@ -660,6 +673,11 @@ export class Editor {
     );
   }
 
+  createThumnail(dNode: DesignerNode, node: NodeGraphicsItem) {
+    var thumb = this.designer.generateImageFromNode(dNode);
+    node.setThumbnail(thumb);
+  }
+
   // adds node
   // x and y are screen space
   addNode(
@@ -679,12 +697,13 @@ export class Editor {
     this.graph.addNode(node);
     node.id = dNode.id;
 
-    // generate thumbnail
-    var thumb = this.designer.generateImageFromNode(dNode);
-    node.setThumbnail(thumb);
-
     var pos = this.graph.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);
+
+    // generate thumbnail right away
+    //if (dNode.isTexture === false) {
+    this.createThumnail(dNode, node);
+    //}
 
     return node;
   }
