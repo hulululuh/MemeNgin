@@ -116,7 +116,7 @@ export class DesignerNode implements IPropertyHolder {
     // pass baseTexture if it is texture node
     if (this.isTexture && this.tex !== undefined) {
       //gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.activeTexture(gl.TEXTURE0);
+      gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, this.tex);
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, "baseTexture"),
@@ -354,10 +354,24 @@ export class DesignerNode implements IPropertyHolder {
       border: number,
       format: number,
       type: number,
-      pixels: ArrayBufferView
+      pixels: ArrayBufferView,
+      isTexture: boolean
     ) => {
       var tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
+
+      if (isTexture === true) {
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+        // TODO: this should be fixed by using proper glAPI for texture format
+        for (var i = 0; i < width * height; i++) {
+          var pixelIdx = i * 4;
+          [pixels[pixelIdx], pixels[pixelIdx + 2]] = [
+            pixels[pixelIdx + 2],
+            pixels[pixelIdx],
+          ];
+        }
+      }
 
       gl.texImage2D(
         gl.TEXTURE_2D,
@@ -411,7 +425,8 @@ export class DesignerNode implements IPropertyHolder {
           border,
           format,
           type,
-          Uint8Array.from(image.getBitmap())
+          Uint8Array.from(image.getBitmap()),
+          true
         );
         this.isTexture = true;
         this.requestUpdate();
@@ -425,7 +440,8 @@ export class DesignerNode implements IPropertyHolder {
         border,
         format,
         type,
-        data
+        data,
+        false
       );
       this.isTexture = false;
     }

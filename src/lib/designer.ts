@@ -339,36 +339,39 @@ export class Designer {
   // it returns a thumbnail (an html image)
 
   generateImageFromNode(node: DesignerNode): HTMLImageElement {
-    //console.log("generating node "+node.exportName);
-    // process input nodes
-    var inputs: NodeInput[] = this.getNodeInputs(node);
-    for (let input of inputs) {
-      if (input.node.needsUpdate) {
-        this.generateImageFromNode(input.node);
+    // render to texture to design node, skip this part if this node is custom txture
+    if (node.isTexture === false || node.isTexture === undefined) {
+      console.log("generating node " + node.exportName);
+      // process input nodes
+      var inputs: NodeInput[] = this.getNodeInputs(node);
+      for (let input of inputs) {
+        if (input.node.needsUpdate) {
+          this.generateImageFromNode(input.node);
 
-        // remove from update list since thumbnail has now been generated
-        input.node.needsUpdate = false;
-        this.updateList.splice(this.updateList.indexOf(input.node), 1);
+          // remove from update list since thumbnail has now been generated
+          input.node.needsUpdate = false;
+          this.updateList.splice(this.updateList.indexOf(input.node), 1);
+        }
       }
+
+      var gl = this.gl;
+
+      // todo: move to node maybe
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        node.tex,
+        0
+      );
+
+      gl.viewport(0, 0, this.width, this.height);
+      node.render(inputs);
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
-
-    var gl = this.gl;
-
-    // todo: move to node maybe
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
-      gl.COLOR_ATTACHMENT0,
-      gl.TEXTURE_2D,
-      node.tex,
-      0
-    );
-
-    gl.viewport(0, 0, this.width, this.height);
-    node.render(inputs);
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     if (this.onnodetextureupdated) {
       this.onnodetextureupdated(node);

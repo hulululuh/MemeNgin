@@ -700,10 +700,7 @@ export class Editor {
     var pos = this.graph.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);
 
-    // generate thumbnail right away
-    //if (dNode.isTexture === false) {
     this.createThumnail(dNode, node);
-    //}
 
     return node;
   }

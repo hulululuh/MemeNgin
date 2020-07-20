@@ -11,7 +11,6 @@ export class TextureNode extends DesignerNode {
           vec4 col = vec4(0,1,0,1);
           if (baseTexture_ready) {
             col = texture(baseTexture, uv);
-            //col = vec4(1,0,1,1);
           } else {
             col = vec4(uv.x, uv.y, 0.0, 1.0);
           }
