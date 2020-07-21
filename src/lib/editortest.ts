@@ -599,6 +599,9 @@ export class Editor {
       if (self.onpreviewnode) {
         self.onpreviewnode(null, null);
       }
+
+      // clear selectd items
+      self.graph.selectedItems.splice(0, self.graph.selectedItems.length);
     };
 
     this.graph.oncopy = function(evt: ClipboardEvent) {
