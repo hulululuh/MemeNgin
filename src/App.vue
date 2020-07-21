@@ -21,20 +21,12 @@
     >
       <gl-row>
         <gl-col width="25">
-          <gl-component
-            title="2D View"
-            class="test-component"
-            :closable="false"
-          >
+          <gl-component title="2D View" class="test-component" :closable="false">
             <!-- <canvas width="100" height="100" id="_2dview" /> -->
             <preview2d ref="preview2d" />
           </gl-component>
 
-          <gl-component
-            title="3D View"
-            class="test-component"
-            :closable="false"
-          >
+          <gl-component title="3D View" class="test-component" :closable="false">
             <!-- <canvas width="100" height="100" id="_3dview" /> -->
             <preview3d ref="preview3d" />
           </gl-component>
@@ -52,7 +44,7 @@
               <!-- <a class="btn" href="#" @click="setShape('sphere')">S</a>
       <a class="btn" href="#" @click="setShape('cube')">C</a>
       <a class="btn" href="#" @click="setShape('plane')">P</a>
-							<a class="btn" href="#" @click="setShape('cylinder')">C</a>-->
+              <a class="btn" href="#" @click="setShape('cylinder')">C</a>-->
               <select class="enum" :value="resolution" @change="setResolution">
                 <option value="32">Resolution: 32x32</option>
                 <option value="64">Resolution: 64x64</option>
@@ -64,22 +56,13 @@
                 <option value="4096">Resolution: 4096x4096</option>
               </select>
               <span>RandomSeed:</span>
-              <input
-                type="number"
-                :value="randomSeed"
-                @change="setRandomSeed"
-              />
+              <input type="number" :value="randomSeed" @change="setRandomSeed" />
             </div>
-            <canvas
-              width="400"
-              height="400"
-              id="editor"
-              ondragover="event.preventDefault()"
-            />
+            <canvas width="400" height="400" id="editor" ondragover="event.preventDefault()" />
           </gl-component>
           <!-- <gl-component title="Library" height="30" :closable="false">
             <library-view :editor="this.editor" :library="this.library" />
-					</gl-component>-->
+          </gl-component>-->
         </gl-col>
 
         <gl-col width="20">
@@ -270,8 +253,8 @@ declare var __static: any;
     NodePropertiesView,
     LibraryMenu,
     preview2d: Preview2D,
-    preview3d: Preview3D,
-  },
+    preview3d: Preview3D
+  }
 })
 export default class App extends Vue {
   editor!: Editor;
@@ -382,13 +365,13 @@ export default class App extends Vue {
   mounted() {
     this.setupMenu();
 
-    document.addEventListener("mousemove", (evt) => {
+    document.addEventListener("mousemove", evt => {
       this.mouseX = evt.pageX;
       this.mouseY = evt.pageY;
     });
 
     const canv = <HTMLCanvasElement>document.getElementById("editor");
-    canv.ondrop = (evt) => {
+    canv.ondrop = evt => {
       evt.preventDefault();
 
       var itemJson = evt.dataTransfer.getData("text/plain");
@@ -474,15 +457,15 @@ export default class App extends Vue {
     this.editor.setSceneCanvas(canv);
 
     //this.designer = this.editor.designer;
-    this.editor.onnodeselected = (node) => {
+    this.editor.onnodeselected = node => {
       //this.selectedNode = node;
       this.propHolder = node;
     };
-    this.editor.oncommentselected = (comment) => {
+    this.editor.oncommentselected = comment => {
       this.propHolder = comment;
       console.log("comment selected");
     };
-    this.editor.onframeselected = (frame) => {
+    this.editor.onframeselected = frame => {
       this.propHolder = frame;
     };
     // this.editor.onnavigationselected = nav => {
@@ -615,11 +598,6 @@ export default class App extends Vue {
   }
 
   saveProject(saveAs: boolean = false) {
-    var data = this.editor.save();
-    console.log(data);
-    this.project.data = data;
-    this.project.data["appVersion"] = this.version;
-
     // if project has no name then it hasnt been saved yet
     if (this.project.path == null || saveAs) {
       dialog.showSaveDialog(
@@ -628,12 +606,19 @@ export default class App extends Vue {
           filters: [
             {
               name: "TextureLab Texture",
-              extensions: ["texture"],
-            },
+              extensions: ["texture"]
+            }
           ],
-          defaultPath: "material.texture",
+          defaultPath: "material.texture"
         },
         (path) => {
+          if (!path)
+            return;
+          var data = this.editor.save();
+          console.log(data);
+          this.project.data = data;
+          this.project.data["appVersion"] = this.version;
+
           //console.log(path);
           if (!path.endsWith(".texture")) path += ".texture";
 
@@ -645,6 +630,10 @@ export default class App extends Vue {
         }
       );
     } else {
+      var data = this.editor.save();
+      console.log(data);
+      this.project.data = data;
+      this.project.data["appVersion"] = this.version;
       ProjectManager.save(this.project.path, this.project);
     }
   }
@@ -657,10 +646,10 @@ export default class App extends Vue {
         filters: [
           {
             name: "TextureLab Texture",
-            extensions: ["texture"],
-          },
+            extensions: ["texture"]
+          }
         ],
-        defaultPath: "material",
+        defaultPath: "material"
       },
       (paths, bookmarks) => {
         let path = paths[0];
@@ -703,15 +692,15 @@ export default class App extends Vue {
         filters: [
           {
             name: "Unity Package",
-            extensions: ["unitypackage"],
-          },
+            extensions: ["unitypackage"]
+          }
         ],
         defaultPath:
           (this.project.name
             ? this.project.name.replace(".texture", "")
-            : "material") + ".unitypackage",
+            : "material") + ".unitypackage"
       },
-      (path) => {
+      path => {
         if (!path) return;
 
         fs.writeFile(path, buffer, function(err) {
@@ -730,15 +719,15 @@ export default class App extends Vue {
         filters: [
           {
             name: "Zip File",
-            extensions: ["zip"],
-          },
+            extensions: ["zip"]
+          }
         ],
         defaultPath:
           (this.project.name
             ? this.project.name.replace(".texture", "")
-            : "material") + ".zip",
+            : "material") + ".zip"
       },
-      async (path) => {
+      async path => {
         if (!path) {
           return;
         }
@@ -763,15 +752,15 @@ export default class App extends Vue {
         filters: [
           {
             name: "Zip File",
-            extensions: ["zip"],
-          },
+            extensions: ["zip"]
+          }
         ],
         defaultPath:
           (this.project.name
             ? this.project.name.replace(".texture", "")
-            : "material") + ".zip",
+            : "material") + ".zip"
       },
-      async (path) => {
+      async path => {
         if (!path) {
           return;
         }

@@ -340,7 +340,7 @@ export class Designer {
 
   generateImageFromNode(node: DesignerNode): HTMLImageElement {
     // render to texture to design node, skip this part if this node is custom txture
-    if (node.isTexture === false || node.isTexture === undefined) {
+    if (!node.isTexture) {
       console.log("generating node " + node.exportName);
       // process input nodes
       var inputs: NodeInput[] = this.getNodeInputs(node);
@@ -613,6 +613,10 @@ export class Designer {
       n["id"] = node.id;
       n["typeName"] = node.typeName;
       n["exportName"] = node.exportName;
+      n["isTexture"] = node.isTexture;
+      if (node.isTexture === true) {
+        n["texPath"] = node.texPath;
+      }
       //n["inputs"] = node.inputs;// not needed imo
 
       var props = {};
@@ -670,6 +674,10 @@ export class Designer {
       var n = lib.create(node["typeName"]);
       n.exportName = node["exportName"];
       n.id = node["id"];
+      n.isTexture = node["isTexture"];
+      if (n.isTexture) {
+        n.texPath = node["texPath"];
+      }
 
       // add node to it's properties will be initialized
       // todo: separate setting properties and inputs from setting shader in node

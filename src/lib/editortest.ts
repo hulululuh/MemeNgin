@@ -599,8 +599,7 @@ export class Editor {
       if (self.onpreviewnode) {
         self.onpreviewnode(null, null);
       }
-
-      // clear selectd items
+      // clear selected items
       self.graph.selectedItems.splice(0, self.graph.selectedItems.length);
     };
 

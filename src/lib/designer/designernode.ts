@@ -59,6 +59,11 @@ export class DesignerNode implements IPropertyHolder {
   // tells scene to update the texture next frame
   needsUpdate: boolean = true;
 
+  // constructor
+  constructor() {
+    this.isTexture = false;
+  }
+
   // callbacks
   onthumbnailgenerated: (DesignerNode, HTMLImageElement) => void;
 
