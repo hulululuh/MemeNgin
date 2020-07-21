@@ -359,6 +359,18 @@ export class DesignerNode implements IPropertyHolder {
     ) => {
       var tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
+      // bind a dummy texture to suppress WebGL warning.
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        1,
+        1,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([255, 0, 255, 255])
+      ); // red
 
       if (isTexture === true) {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
