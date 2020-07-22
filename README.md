@@ -3,11 +3,10 @@
 </h1>
 
 <p align="center">
-  Free, Cross-Platform, GPU-Accelerated Procedural Texture Generator.<br/>
-  <a href="https://njbrown.itch.io/fxmixer">DOWNLOAD AT ITCH.IO</a>
+  Free, Cross-Platform, GPU-Accelerated Image effect design tools.<br/>
 </p>
 
-![FxMixer](https://i.imgur.com/Sk30dcQ.png)
+![FxMixer]
 
 ## Building
 
@@ -37,7 +36,7 @@ npm run electron:serve
 
 ## Feedback
 
-Got ideas, suggestions or feedback? Reach out to me on [twitter](https://twitter.com/njbrown92)
+Got ideas, suggestions or feedback? Reach out to me on [e-mail](hulululuh@gmail.com)
 
 ## Built Using
 
@@ -45,7 +44,3 @@ Got ideas, suggestions or feedback? Reach out to me on [twitter](https://twitter
 - **[THREE.js](https://threejs.org/)**
 - **[Golden Layout](https://golden-layout.com/)** via **[vue-golden-layout](https://github.com/emedware/vue-golden-layout)**
 - **[Electron](https://electronjs.org)**
-
-## Licence
-
-[GPLv3](https://github.com/njbrown/texturelab/blob/master/LICENSE)
