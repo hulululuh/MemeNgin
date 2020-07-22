@@ -88,7 +88,7 @@ export class DesignerNode implements IPropertyHolder {
 
     // clear all inputs
     for (let input of this.inputs) {
-      const texIdx = texIndex === undefined ? 0 : texIndex;
+      const texIdx = !texIndex ? 0 : texIndex;
       gl.activeTexture(gl.TEXTURE0 + texIdx);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
@@ -119,7 +119,7 @@ export class DesignerNode implements IPropertyHolder {
     }
 
     // pass baseTexture if it is texture node
-    if (this.isTexture && this.tex !== undefined) {
+    if (this.isTexture && this.tex) {
       //gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, this.tex);
@@ -403,8 +403,7 @@ export class DesignerNode implements IPropertyHolder {
       );
 
       const isPot =
-        width === height &&
-        POTs.find((element) => element === width) !== undefined;
+        width === height && POTs.find((element) => element === width);
       if (isPot) {
         // set the filtering so we don't need mips
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -430,7 +429,7 @@ export class DesignerNode implements IPropertyHolder {
     const format = gl.RGBA;
     const type = gl.UNSIGNED_BYTE;
     let data = null;
-    if (this.texPath !== undefined) {
+    if (this.texPath) {
       const image = NativeImage.createFromPath(this.texPath);
       if (image.isEmpty() === false) {
         const imgSize = image.getSize();
