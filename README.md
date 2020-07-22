@@ -11,7 +11,7 @@
 ## Building
 
 ```
-git clone https://github.com/njbrown/fxmixer.git
+git clone git@github.com:hulululuh/fxmixer.git
 
 cd fxmixer
 
