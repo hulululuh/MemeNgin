@@ -466,15 +466,19 @@ export class Editor {
 
       let viewNodes = [];
       let nodes = [];
+
+      let offset = [0, 0];
       // for (let idx = 0; idx < ev.dataTransfer.files.length; idx++) {
       for (let file of ev.dataTransfer.files) {
         if (isValidImagePath(file.path)) {
           let node = self.library.create("texture", file.path);
           let nodeView = self.addNode(node, 0, 0);
-          nodeView.setCenter(x, y);
+          nodeView.setCenter(x + offset[0], y + offset[1]);
 
           nodes.push(node);
           viewNodes.push(nodeView);
+
+          offset = [offset[0] + 15, offset[1] + 15];
         }
 
         // import texture then make a node
