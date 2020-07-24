@@ -1,5 +1,4 @@
-const path = require("path");
-const fs = require("fs");
+import fs from "fs";
 
 //import * as scene from "./scene";
 import { Designer } from "./designer";

@@ -20,18 +20,6 @@
       ref="GL"
     >
       <gl-row>
-        <gl-col width="25">
-          <gl-component title="2D View" class="test-component" :closable="false">
-            <!-- <canvas width="100" height="100" id="_2dview" /> -->
-            <preview2d ref="preview2d" />
-          </gl-component>
-
-          <gl-component title="3D View" class="test-component" :closable="false">
-            <!-- <canvas width="100" height="100" id="_3dview" /> -->
-            <preview3d ref="preview3d" />
-          </gl-component>
-        </gl-col>
-
         <gl-col width="55" ref="canvas">
           <gl-component title="Editor" class="test-component" :closable="false">
             <library-menu
@@ -56,16 +44,41 @@
                 <option value="4096">Resolution: 4096x4096</option>
               </select>
               <span>RandomSeed:</span>
-              <input type="number" :value="randomSeed" @change="setRandomSeed" />
+              <input
+                type="number"
+                :value="randomSeed"
+                @change="setRandomSeed"
+              />
             </div>
-            <canvas width="400" height="400" id="editor" ondragover="event.preventDefault()" />
+            <canvas
+              width="400"
+              height="400"
+              id="editor"
+              ondragover="event.preventDefault()"
+            />
           </gl-component>
           <!-- <gl-component title="Library" height="30" :closable="false">
             <library-view :editor="this.editor" :library="this.library" />
           </gl-component>-->
         </gl-col>
 
+        <gl-col width="25">
+          <gl-component
+            title="2D View"
+            class="test-component"
+            :closable="false"
+          >
+            <!-- <canvas width="100" height="100" id="_2dview" /> -->
+            <preview2d ref="preview2d" />
+          </gl-component>
+        </gl-col>
+
         <gl-col width="20">
+          <!-- 
+          <gl-component title="3D View" class="test-component" :closable="false">
+            <canvas width="100" height="100" id="_3dview" /> 
+            <preview3d ref="preview3d" />
+          </gl-component>-->
           <gl-component title="Properties" :closable="false">
             <node-properties-view
               ref="properties"
@@ -218,7 +231,7 @@ import { Component, Prop, Vue, Watch, Model } from "vue-property-decorator";
 import EditorView from "@/views/Editor.vue";
 import LibraryView from "@/views/Library.vue";
 import LibraryMenu from "@/components/LibraryMenu.vue";
-import { Editor } from "@/lib/editortest";
+import { Editor } from "@/lib/editor";
 import { View3D } from "@/lib/view3d";
 import { createLibrary as createV1Library } from "@/lib/library/libraryv1";
 import NodePropertiesView from "./views/NodeProperties.vue";
@@ -253,8 +266,8 @@ declare var __static: any;
     NodePropertiesView,
     LibraryMenu,
     preview2d: Preview2D,
-    preview3d: Preview3D
-  }
+    preview3d: Preview3D,
+  },
 })
 export default class App extends Vue {
   editor!: Editor;
@@ -365,13 +378,13 @@ export default class App extends Vue {
   mounted() {
     this.setupMenu();
 
-    document.addEventListener("mousemove", evt => {
+    document.addEventListener("mousemove", (evt) => {
       this.mouseX = evt.pageX;
       this.mouseY = evt.pageY;
     });
 
     const canv = <HTMLCanvasElement>document.getElementById("editor");
-    canv.ondrop = evt => {
+    canv.ondrop = (evt) => {
       evt.preventDefault();
 
       var itemJson = evt.dataTransfer.getData("text/plain");
@@ -457,15 +470,15 @@ export default class App extends Vue {
     this.editor.setSceneCanvas(canv);
 
     //this.designer = this.editor.designer;
-    this.editor.onnodeselected = node => {
+    this.editor.onnodeselected = (node) => {
       //this.selectedNode = node;
       this.propHolder = node;
     };
-    this.editor.oncommentselected = comment => {
+    this.editor.oncommentselected = (comment) => {
       this.propHolder = comment;
       console.log("comment selected");
     };
-    this.editor.onframeselected = frame => {
+    this.editor.onframeselected = (frame) => {
       this.propHolder = frame;
     };
     // this.editor.onnavigationselected = nav => {
@@ -481,7 +494,7 @@ export default class App extends Vue {
     // this.view3d = new View3D();
     // this.view3d.setCanvas(_3dview);
     //this.editor.set3DScene(scene3D);
-    (this.$refs.preview3d as any).setEditor(this.editor);
+    //(this.$refs.preview3d as any).setEditor(this.editor);
 
     //this.editor.createNewTexture();
     this.newProject();
@@ -578,7 +591,7 @@ export default class App extends Vue {
   newProject() {
     // reset states of all components
     // load default scene
-    (this.$refs.preview3d as any).reset();
+    //(this.$refs.preview3d as any).reset();
     (this.$refs.preview2d as any).reset();
 
     // an empty scene
@@ -606,14 +619,13 @@ export default class App extends Vue {
           filters: [
             {
               name: "TextureLab Texture",
-              extensions: ["texture"]
-            }
+              extensions: ["texture"],
+            },
           ],
-          defaultPath: "material.texture"
+          defaultPath: "material.texture",
         },
         (path) => {
-          if (!path)
-            return;
+          if (!path) return;
           var data = this.editor.save();
           console.log(data);
           this.project.data = data;
@@ -646,10 +658,10 @@ export default class App extends Vue {
         filters: [
           {
             name: "TextureLab Texture",
-            extensions: ["texture"]
-          }
+            extensions: ["texture"],
+          },
         ],
-        defaultPath: "material"
+        defaultPath: "material",
       },
       (paths, bookmarks) => {
         let path = paths[0];
@@ -692,15 +704,15 @@ export default class App extends Vue {
         filters: [
           {
             name: "Unity Package",
-            extensions: ["unitypackage"]
-          }
+            extensions: ["unitypackage"],
+          },
         ],
         defaultPath:
           (this.project.name
             ? this.project.name.replace(".texture", "")
-            : "material") + ".unitypackage"
+            : "material") + ".unitypackage",
       },
-      path => {
+      (path) => {
         if (!path) return;
 
         fs.writeFile(path, buffer, function(err) {
@@ -719,15 +731,15 @@ export default class App extends Vue {
         filters: [
           {
             name: "Zip File",
-            extensions: ["zip"]
-          }
+            extensions: ["zip"],
+          },
         ],
         defaultPath:
           (this.project.name
             ? this.project.name.replace(".texture", "")
-            : "material") + ".zip"
+            : "material") + ".zip",
       },
-      async path => {
+      async (path) => {
         if (!path) {
           return;
         }
@@ -752,15 +764,15 @@ export default class App extends Vue {
         filters: [
           {
             name: "Zip File",
-            extensions: ["zip"]
-          }
+            extensions: ["zip"],
+          },
         ],
         defaultPath:
           (this.project.name
             ? this.project.name.replace(".texture", "")
-            : "material") + ".zip"
+            : "material") + ".zip",
       },
-      async path => {
+      async (path) => {
         if (!path) {
           return;
         }
