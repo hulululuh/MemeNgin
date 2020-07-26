@@ -370,19 +370,23 @@ export class SceneView {
   }
 
   changeView(targetOffset: Vector2, targetZoomFactor: number) {
-    // this.offset = targetOffset;
-    // this.zoomFactor = targetZoomFactor;
-    const start = { x: this.offset.x, y: this.offset.y, z: this.zoomFactor };
-    const end = { x: targetOffset.x, y: targetOffset.y, z: targetZoomFactor };
+    const doAnimate = true;
+    if (!doAnimate) {
+      this.offset = targetOffset;
+      this.zoomFactor = targetZoomFactor;
+    } else {
+      const start = { x: this.offset.x, y: this.offset.y, z: this.zoomFactor };
+      const end = { x: targetOffset.x, y: targetOffset.y, z: targetZoomFactor };
 
-    const tween = new TWEEN.Tween(start) // Create a new tween that modifies 'coords'.
-      .to(end, 100) // Move to (300, 200) in 1 second.
-      .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
-      .onUpdate(() => {
-        this.offset = new Vector2(start.x, start.y);
-        this.zoomFactor = start.z;
-      })
-      .start(); // Start the tween immediately.
+      const tween = new TWEEN.Tween(start)
+        .to(end, 100)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(() => {
+          this.offset = new Vector2(start.x, start.y);
+          this.zoomFactor = start.z;
+        })
+        .start();
+    }
   }
 
   clear(context: CanvasRenderingContext2D, style: string = "rgb(50,50,50)") {
