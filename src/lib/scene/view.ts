@@ -8,6 +8,15 @@
 
 // https://stackoverflow.com/questions/45528111/javascript-canvas-map-style-point-zooming/45528455#45528455
 
+import TWEEN from "@tweenjs/tween.js";
+
+// Setup the animation loop.
+function animate(time) {
+  requestAnimationFrame(animate);
+  TWEEN.update(time);
+}
+requestAnimationFrame(animate);
+
 // get local mouse position
 function _getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
@@ -257,11 +266,9 @@ export class SceneView {
   }
 
   reset() {
-    this.zoomFactor = 1;
-    this.offset = new Vector2(0, 0);
-
     this.mousePos = new Vector2(0, 0);
     this.globalMousePos = new Vector2(0, 0);
+    this.changeView(new Vector2(0, 0), 1);
   }
 
   getAbsPos() {
@@ -363,8 +370,19 @@ export class SceneView {
   }
 
   changeView(targetOffset: Vector2, targetZoomFactor: number) {
-    this.offset = targetOffset;
-    this.zoomFactor = targetZoomFactor;
+    // this.offset = targetOffset;
+    // this.zoomFactor = targetZoomFactor;
+    const start = { x: this.offset.x, y: this.offset.y, z: this.zoomFactor };
+    const end = { x: targetOffset.x, y: targetOffset.y, z: targetZoomFactor };
+
+    const tween = new TWEEN.Tween(start) // Create a new tween that modifies 'coords'.
+      .to(end, 100) // Move to (300, 200) in 1 second.
+      .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
+      .onUpdate(() => {
+        this.offset = new Vector2(start.x, start.y);
+        this.zoomFactor = start.z;
+      })
+      .start(); // Start the tween immediately.
   }
 
   clear(context: CanvasRenderingContext2D, style: string = "rgb(50,50,50)") {
