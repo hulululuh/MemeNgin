@@ -5,17 +5,19 @@
         :class="{ btn: true, toggled: !hasImage }"
         href="#"
         @click="saveTexture()"
-        ><i class="bx bx-save bx-sm"></i
-      ></a>
+      >
+        <i class="bx bx-save bx-sm"></i>
+      </a>
       <a
         :class="{ btn: true, toggled: isTiling }"
         href="#"
         @click="toggleNineTexures()"
-        ><i class="bx bx-grid bx-sm"></i
-      ></a>
-      <a class="btn" href="#" @click="centerTexture()"
-        ><i class="bx bx-exit-fullscreen bx-sm"></i
-      ></a>
+      >
+        <i class="bx bx-grid bx-sm"></i>
+      </a>
+      <a class="btn" href="#" @click="centerTexture()">
+        <i class="bx bx-exit-fullscreen bx-sm"></i>
+      </a>
     </div>
     <canvas id="_2dpreview" ref="canvas" style="display:block;"></canvas>
   </div>
@@ -82,8 +84,11 @@ export default {
       let canvas = this.$refs.canvas;
       let ctx = canvas.getContext("2d");
 
+      // ctx.beginPath();
+      // ctx.rect(20, 20, 150, 100);
+      // ctx.stroke();
+
       ctx.drawImage(this.image, 0, 0, canvas.width, canvas.height);
-      //ctx.fillText("Some Text!!!", 0, 0);
     },
     saveTexture() {
       // todo: save image as png
