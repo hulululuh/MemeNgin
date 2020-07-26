@@ -209,14 +209,12 @@ export class NodeScene {
       }
 
       // Zoom selected
-      if (
-        evt.key.toLowerCase() === "f" &&
-        self.hasFocus &&
-        self.selectedItems.length !== 0
-      ) {
-        self.zoomSelected(self.selectedItems);
-      } else {
-        self.view.reset();
+      if (evt.key.toLowerCase() === "f" && self.hasFocus) {
+        if (self.selectedItems.length !== 0) {
+          self.zoomSelected(self.selectedItems);
+        } else {
+          self.view.reset();
+        }
       }
 
       // Select all nodes

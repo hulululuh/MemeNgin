@@ -350,13 +350,21 @@ export class SceneView {
     const zoomMargin = 0.8;
     const zoomX = (this.canvas.width / box.width()) * zoomMargin;
     const zoomY = (this.canvas.height / box.height()) * zoomMargin;
-    this.zoomFactor = Math.min(zoomX, zoomY);
-    const center = this.sceneToCanvas(box.center());
-    this.offset = Vector2.subtract(
-      new Vector2(this.canvas.width / 2, this.canvas.height / 2),
-      center
+    const zoomFactor = Math.min(zoomX, zoomY);
+    const center = this.sceneToCanvas(box.center(), zoomFactor);
+
+    this.changeView(
+      Vector2.subtract(
+        new Vector2(this.canvas.width / 2, this.canvas.height / 2),
+        center
+      ),
+      zoomFactor
     );
-    console.log(box);
+  }
+
+  changeView(targetOffset: Vector2, targetZoomFactor: number) {
+    this.offset = targetOffset;
+    this.zoomFactor = targetZoomFactor;
   }
 
   clear(context: CanvasRenderingContext2D, style: string = "rgb(50,50,50)") {
@@ -417,8 +425,8 @@ export class SceneView {
     }
   }
 
-  sceneToCanvas(pos: Vector2): Vector2 {
-    return Vector2.mult(pos, this.zoomFactor);
+  sceneToCanvas(pos: Vector2, zoomFactor: number): Vector2 {
+    return Vector2.mult(pos, zoomFactor);
   }
 
   canvasToScene(pos: Vector2): Vector2 {
