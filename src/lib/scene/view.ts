@@ -385,7 +385,7 @@ export class SceneView {
           this.offset = new Vector2(start.x, start.y);
           this.zoomFactor = start.z;
         })
-        .start();
+        .start(TWEEN.now());
     }
   }
 

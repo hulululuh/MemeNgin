@@ -150,10 +150,10 @@ export class Editor {
     let newNode = this.designer.getNodeById(nodeId);
     this.textureChannels[channelName] = newNode;
 
-    // notify 3d view
-    if (this.ontexturechannelcleared) {
-      this.ontexturechannelassigned(nodeView.imageCanvas, channelName);
-    }
+    // // notify 3d view
+    // if (this.ontexturechannelcleared) {
+    //   this.ontexturechannelassigned(nodeView.imageCanvas, channelName);
+    // }
   }
 
   clearTextureChannel(nodeId: string) {
@@ -256,6 +256,25 @@ export class Editor {
 
     // refresh everything
     this.designer.invalidateAllNodes();
+
+    let offset = 100;
+    let spacing = 150;
+
+    // albedo
+    let node = this.library.create("output");
+    let nodeView = this.addNode(node, 0, 0);
+    // figure out why this doesnt work before adding addNode:
+    node.setProperty("color", new Color(1, 1, 1, 1));
+    nodeView.setCenter(800, offset + spacing * 0);
+    console.log(nodeView);
+    this.assignNodeToTextureChannel(nodeView.id, "albedo");
+
+    const dnode = this.designer.getNodeById(node.id);
+    const graphNode = this.graph.getNodeById(dnode.id);
+    // todo: move to double click
+    if (this.onpreviewnode) {
+      this.onpreviewnode(dnode, graphNode.imageCanvas.canvas);
+    }
   }
 
   // creates new texture
@@ -354,10 +373,10 @@ export class Editor {
       // something worng with fbo setup around here.
       self.designer.copyNodeTextureToImageCanvas(dnode, graphNode.imageCanvas);
 
-      if (self.onpreviewnode) {
-        if (dnode == self.selectedDesignerNode)
-          self.onpreviewnode(dnode, graphNode.imageCanvas.canvas);
-      }
+      // if (self.onpreviewnode) {
+      //   if (dnode == self.selectedDesignerNode)
+      //     self.onpreviewnode(dnode, graphNode.imageCanvas.canvas);
+      // }
 
       if (self.ontexturechannelupdated && graphNode.textureChannel) {
         self.ontexturechannelupdated(
@@ -509,28 +528,26 @@ export class Editor {
         self.selectedDesignerNode = dnode;
         //console.log(dnode);
 
-        if (true) {
-          if (self.preview2DCtx) {
-            self.preview2DCtx.drawImage(
-              node.imageCanvas.canvas,
-              0,
-              0,
-              self.preview2D.width,
-              self.preview2D.height
-            );
-          }
+        if (self.preview2DCtx) {
+          self.preview2DCtx.drawImage(
+            node.imageCanvas.canvas,
+            0,
+            0,
+            self.preview2D.width,
+            self.preview2D.height
+          );
+        }
 
-          // todo: move to double click
-          if (self.onpreviewnode) {
-            self.onpreviewnode(dnode, node.imageCanvas.canvas);
-          }
+        // // todo: move to double click
+        // if (self.onpreviewnode) {
+        //   self.onpreviewnode(dnode, node.imageCanvas.canvas);
+        // }
 
-          //console.log(this.scene3D);
-          if (self.scene3D) {
-            //console.log("setting height texture");
-            //self.scene3D.setHeightTexture(node.thumbnail);
-            self.updateDisplayNode(node);
-          }
+        //console.log(this.scene3D);
+        if (self.scene3D) {
+          //console.log("setting height texture");
+          //self.scene3D.setHeightTexture(node.thumbnail);
+          self.updateDisplayNode(node);
         }
       }
 
@@ -556,9 +573,9 @@ export class Editor {
 
       self.designer.removeNode(node.id);
 
-      if (self.onpreviewnode) {
-        self.onpreviewnode(null, null);
-      }
+      // if (self.onpreviewnode) {
+      //   self.onpreviewnode(null, null);
+      // }
     };
 
     this.graph.onitemsdeleting = function(
@@ -599,9 +616,9 @@ export class Editor {
       cons: ConnectionGraphicsItem[],
       nodes: NodeGraphicsItem[]
     ) {
-      if (self.onpreviewnode) {
-        self.onpreviewnode(null, null);
-      }
+      // if (self.onpreviewnode) {
+      //   self.onpreviewnode(null, null);
+      // }
       // clear selected items
       self.graph.selectedItems.splice(0, self.graph.selectedItems.length);
     };

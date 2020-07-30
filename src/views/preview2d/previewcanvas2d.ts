@@ -308,6 +308,12 @@ export class DragZoom {
         this.drawImage(1, 1);
       }
 
+      // draw text
+      const ctx = this.context;
+      ctx.fillStyle = "white";
+      ctx.font = "80px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Meanwhile in Mexico...", 0, IMAGE_RENDER_SIZE * 0.4);
       //   this.context.lineWidth = 5;
       //   this.context.strokeRect(
       //     -IMAGE_RENDER_SIZE * 0.5,
@@ -327,16 +333,6 @@ export class DragZoom {
       -IMAGE_RENDER_SIZE * 0.5 + offsetY * IMAGE_RENDER_SIZE,
       IMAGE_RENDER_SIZE,
       IMAGE_RENDER_SIZE
-    );
-
-    const ctx = this.context;
-    ctx.fillStyle = "white";
-    ctx.font = "80px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(
-      "Meanwhile in Mexico...",
-      0,
-      IMAGE_RENDER_SIZE * 0.4 + offsetY
     );
   }
 

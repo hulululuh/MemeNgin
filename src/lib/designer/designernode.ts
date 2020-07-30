@@ -38,12 +38,19 @@ export class NodeInput {
   public name: string;
 }
 
+export enum NodeType {
+  Procedural,
+  Texture,
+  Text,
+  Logic,
+}
+
 export class DesignerNode implements IPropertyHolder {
   public id: string = Guid.newGuid();
   public title: string;
   public typeName: string; // added when node is created from library
   public texPath: string;
-  public isTexture: boolean;
+  public nodeType: NodeType;
 
   public gl: WebGLRenderingContext;
   public designer: Designer;
@@ -61,7 +68,7 @@ export class DesignerNode implements IPropertyHolder {
 
   // constructor
   constructor() {
-    this.isTexture = false;
+    this.nodeType = NodeType.Procedural;
   }
 
   // callbacks
@@ -119,7 +126,7 @@ export class DesignerNode implements IPropertyHolder {
     }
 
     // pass baseTexture if it is texture node
-    if (this.isTexture && this.tex) {
+    if (this.nodeType === NodeType.Texture && this.tex) {
       //gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, this.tex);
@@ -360,7 +367,7 @@ export class DesignerNode implements IPropertyHolder {
       format: number,
       type: number,
       pixels: ArrayBufferView,
-      isTexture: boolean
+      nodetype: NodeType
     ) => {
       var tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -377,7 +384,7 @@ export class DesignerNode implements IPropertyHolder {
         new Uint8Array([255, 0, 255, 255])
       ); // red
 
-      if (isTexture === true) {
+      if (nodetype === NodeType.Texture) {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 
         // TODO: this should be fixed by using proper glAPI for texture format
@@ -428,6 +435,7 @@ export class DesignerNode implements IPropertyHolder {
     const border = 0;
     const format = gl.RGBA;
     const type = gl.UNSIGNED_BYTE;
+    const nodetype = this.nodeType;
     let data = null;
     if (this.texPath) {
       const image = NativeImage.createFromPath(this.texPath);
@@ -442,9 +450,9 @@ export class DesignerNode implements IPropertyHolder {
           format,
           type,
           Uint8Array.from(image.getBitmap()),
-          true
+          nodetype
         );
-        this.isTexture = true;
+        this.nodeType = NodeType.Texture;
         this.requestUpdate();
       }
     } else {
@@ -457,9 +465,8 @@ export class DesignerNode implements IPropertyHolder {
         format,
         type,
         data,
-        false
+        nodetype
       );
-      this.isTexture = false;
     }
   }
 
@@ -678,7 +685,7 @@ export class DesignerNode implements IPropertyHolder {
       code += "uniform bool " + input + "_connected;\n";
     }
 
-    if (this.isTexture) {
+    if (this.nodeType === NodeType.Texture) {
       code += "uniform sampler2D baseTexture;\n";
       code += "uniform bool baseTexture_ready;\n";
     }

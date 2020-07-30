@@ -1,4 +1,4 @@
-import { DesignerNode, NodeInput } from "./designer/designernode";
+import { DesignerNode, NodeType, NodeInput } from "./designer/designernode";
 import { DesignerNodeConn } from "./designer/designerconnection";
 import { DesignerLibrary } from "./designer/library";
 import { Guid } from "./utils";
@@ -340,7 +340,7 @@ export class Designer {
 
   generateImageFromNode(node: DesignerNode): HTMLImageElement {
     // render to texture to design node, skip this part if this node is custom txture
-    if (!node.isTexture) {
+    if (node.nodeType !== NodeType.Texture) {
       console.log("generating node " + node.exportName);
       // process input nodes
       var inputs: NodeInput[] = this.getNodeInputs(node);
@@ -613,8 +613,8 @@ export class Designer {
       n["id"] = node.id;
       n["typeName"] = node.typeName;
       n["exportName"] = node.exportName;
-      n["isTexture"] = node.isTexture;
-      if (node.isTexture === true) {
+      n["nodeType"] = node.nodeType;
+      if (node.nodeType === NodeType.Texture) {
         n["texPath"] = node.texPath;
       }
       //n["inputs"] = node.inputs;// not needed imo
@@ -674,8 +674,8 @@ export class Designer {
       var n = lib.create(node["typeName"]);
       n.exportName = node["exportName"];
       n.id = node["id"];
-      n.isTexture = node["isTexture"];
-      if (n.isTexture) {
+      n.nodeType = node["nodeType"];
+      if (n.nodeType === NodeType.Texture) {
         n.texPath = node["texPath"];
       }
 

@@ -8,6 +8,7 @@ import { BlendNode } from "./v1/blend";
 import { InvertNode } from "./v1/invert";
 import { WarpNode } from "./v1/warp";
 import { ColorNode, ColorizeNode } from "./v1/color";
+import { TextNode } from "./v1/text";
 import { SimplexNoiseNode } from "./v1/simplexnoise";
 import { MaskNode } from "./v1/mask";
 import { Transform2DNode } from "./v1/transform2d";
@@ -50,6 +51,7 @@ export function createLibrary() {
   lib.addNode("warp", "Warp", WarpNode);
   lib.addNode("color", "Color", ColorNode);
   lib.addNode("colorize", "Colorize", ColorizeNode);
+  lib.addNode("text", "Text", TextNode);
   lib.addNode("simplexnoise", "Simplex Noise", SimplexNoiseNode);
   lib.addNode("mask", "Mask", MaskNode);
   lib.addNode("transform2d", "Transform2D", Transform2DNode);
