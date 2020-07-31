@@ -3,14 +3,14 @@ import { Color } from "@/lib/designer/color";
 import { Gradient } from "@/lib/designer/gradient";
 
 export class GradientMapNode extends DesignerNode {
-	public init() {
-		this.title = "GradientMap";
+  public init() {
+    this.title = "GradientMap";
 
-		this.addInput("inputImage");
+    this.addInput("inputImage");
 
-		this.addGradientProperty("gradient", "Gradient", Gradient.default());
+    this.addGradientProperty("gradient", "Gradient", Gradient.default());
 
-		var source = `
+    var source = `
         float grayscale(vec3 col)
         {
             return (col.r + col.g + col.b) / 3.0;
@@ -26,6 +26,6 @@ export class GradientMapNode extends DesignerNode {
         }
           `;
 
-		this.buildShader(source);
-	}
+    this.buildShader(source);
+  }
 }

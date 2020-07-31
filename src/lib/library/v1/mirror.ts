@@ -10,7 +10,7 @@ export class MirrorNode extends DesignerNode {
       "Left To Right",
       "Right To Left",
       "Top To Bottom",
-      "Bottom To Top"
+      "Bottom To Top",
     ]);
     this.addFloatProperty("offset", "Offset", 0.5, 0, 1, 0.01);
     this.addBoolProperty("clamp", "Clamp", true);

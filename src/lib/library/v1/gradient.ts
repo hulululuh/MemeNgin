@@ -19,7 +19,7 @@ export class GradientNode extends DesignerNode {
       "Left To Right",
       "Right To Left",
       "Top To Bottom",
-      "Bottom To Top"
+      "Bottom To Top",
     ]);
 
     var source = `
@@ -121,7 +121,7 @@ export class TriGradientNode extends DesignerNode {
       "Left To Right",
       "Right To Left",
       "Top To Bottom",
-      "Bottom To Top"
+      "Bottom To Top",
     ]);
 
     var source = `

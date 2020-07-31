@@ -11,13 +11,13 @@ if (process.env.NODE_ENV != "production") {
       remote
         .getCurrentWindow()
         .webContents.inspectElement(rightClickPosition.x, rightClickPosition.y);
-    }
+    },
   });
   menu.append(menuItem);
 
   window.addEventListener(
     "contextmenu",
-    e => {
+    (e) => {
       e.preventDefault();
       rightClickPosition = { x: e.x, y: e.y };
       menu.popup();

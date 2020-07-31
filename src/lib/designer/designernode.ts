@@ -450,7 +450,7 @@ export class DesignerNode implements IPropertyHolder {
           format,
           type,
           Uint8Array.from(image.getBitmap()),
-          nodetype
+          NodeType.Texture
         );
         this.nodeType = NodeType.Texture;
         this.requestUpdate();

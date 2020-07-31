@@ -1,5 +1,10 @@
 <template>
-  <form class="properties" @submit.prevent="cancelSubmit" :key="node.id" v-if="node != null">
+  <form
+    class="properties"
+    @submit.prevent="cancelSubmit"
+    :key="node.id"
+    v-if="node != null"
+  >
     <accordion header="Base Properties" v-if="isInstanceNode">
       <texture-channel :node="getNode" :editor="editor" />
     </accordion>

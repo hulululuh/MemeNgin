@@ -18,7 +18,7 @@ export class BlendNode extends DesignerNode {
       "Min",
       "Switch",
       "Overlay",
-      "Screen"
+      "Screen",
     ]);
     this.addFloatProperty("opacity", "Opacity", 1.0, 0.0, 1.0, 0.01);
 

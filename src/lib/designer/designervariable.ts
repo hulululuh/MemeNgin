@@ -7,7 +7,7 @@ export enum DesignerVariableType {
   Int = 2,
   Bool = 3,
   Enum = 4,
-  Color = 5
+  Color = 5,
   //Gradient
 }
 

@@ -7,7 +7,7 @@ import electron from "electron";
 
 var TextureType = {
   Default: 0,
-  NormalMap: 1
+  NormalMap: 1,
 };
 
 var exporter = {
@@ -18,7 +18,7 @@ var exporter = {
 
   // shaders
   metalGlossProgram: null,
-  normalProgram: null
+  normalProgram: null,
 };
 
 export async function unityZipExport(editor, materialName) {
@@ -82,14 +82,14 @@ export async function unityZipExport(editor, materialName) {
 function generateMetallicGloss(exporter, mTex, rTex) {
   renderToImage(exporter, exporter.metalGlossProgram, [
     { name: "u_metallicMap", tex: mTex },
-    { name: "u_roughnessMap", tex: rTex }
+    { name: "u_roughnessMap", tex: rTex },
   ]);
 }
 
 // inverts normal map
 function fixNormalMap(exporter, tex) {
   renderToImage(exporter, exporter.normalProgram, [
-    { name: "u_normalMap", tex: tex }
+    { name: "u_normalMap", tex: tex },
   ]);
 }
 
@@ -277,7 +277,7 @@ function createVertexBuffers(exporter) {
       1.0,
       0.0,
       1.0,
-      1.0
+      1.0,
     ]),
     gl.STATIC_DRAW
   );
@@ -304,7 +304,7 @@ function createVertexBuffers(exporter) {
       0.0,
       1.0,
       1.0,
-      0.0
+      0.0,
     ]),
     gl.STATIC_DRAW
   );

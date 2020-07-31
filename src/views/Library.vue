@@ -111,7 +111,7 @@ export default class LibraryView extends Vue {
 
   get filteredList() {
     var kw = this.filter;
-    var list = Object.values(this.items).filter(function (item) {
+    var list = Object.values(this.items).filter(function(item) {
       return item.name.toLowerCase().includes(kw.toLowerCase());
     });
     return list;
