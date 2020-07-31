@@ -280,9 +280,9 @@ export function unityExport(editor, materialName) {
   }
 
   if (editor.hasTextureChannel("normal")) {
-    var guid = newGuid();
+    let guid = newGuid();
 
-    var normalCanvas = editor.getChannelCanvasImage("normal");
+    let normalCanvas = editor.getChannelCanvasImage("normal");
     exporter.canvas.width = normalCanvas.width();
     exporter.canvas.height = normalCanvas.height();
 
@@ -310,7 +310,7 @@ export function unityExport(editor, materialName) {
     editor.hasTextureChannel("metalness") ||
     editor.hasTextureChannel("roughness")
   ) {
-    var guid = newGuid();
+    let guid = newGuid();
 
     //var normalCanvas = viewer.normalCanvas;
     // resize canvas

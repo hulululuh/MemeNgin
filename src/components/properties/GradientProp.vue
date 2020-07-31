@@ -224,7 +224,7 @@ export class GradientWidget {
       self.onMouseMove(evt)
     );
 
-    this.canvas.oncontextmenu = function (evt: PointerEvent) {
+    this.canvas.oncontextmenu = function(evt: PointerEvent) {
       evt.preventDefault();
     };
 
@@ -290,7 +290,7 @@ export class GradientWidget {
       var input = document.createElement("input");
       input.type = "color";
       input.value = hitHandle.gradientPoint.color.toHex();
-      input.onchange = function (ev: Event) {
+      input.onchange = function(ev: Event) {
         console.log("onchange");
         console.log(ev);
         console.log(hitHandle);
