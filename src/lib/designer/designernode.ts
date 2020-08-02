@@ -54,7 +54,7 @@ export class DesignerNode implements IPropertyHolder {
 
   public gl: WebGLRenderingContext;
   public designer: Designer;
-  tex: WebGLTexture;
+  public tex: WebGLTexture;
   //program:WebGLShader;
   source: string; // shader code
   shaderProgram: WebGLProgram;
@@ -80,7 +80,7 @@ export class DesignerNode implements IPropertyHolder {
   // a connection is removed
   //
   // all output connected nodes are invalidated as well
-  private requestUpdate() {
+  protected requestUpdate() {
     this.designer.requestUpdate(this);
   }
 
@@ -347,88 +347,88 @@ export class DesignerNode implements IPropertyHolder {
     this.shaderProgram = buildShaderProgram(this.gl, vertSource, fragSource);
   }
 
+  protected static updateTexture<T>(
+    level: number,
+    internalFormat: number,
+    width: number,
+    height: number,
+    border: number,
+    format: number,
+    type: number,
+    pixels: ArrayBufferView,
+    nodetype: NodeType,
+    gl: WebGLRenderingContext
+  ): WebGLTexture {
+    let tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    // bind a dummy texture to suppress WebGL warning.
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      1,
+      1,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array([255, 0, 255, 255])
+    ); // red
+
+    if (nodetype === NodeType.Texture) {
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+      // TODO: this should be fixed by using proper glAPI for texture format
+      for (var i = 0; i < width * height; i++) {
+        var pixelIdx = i * 4;
+        [pixels[pixelIdx], pixels[pixelIdx + 2]] = [
+          pixels[pixelIdx + 2],
+          pixels[pixelIdx],
+        ];
+      }
+    }
+
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      level,
+      internalFormat,
+      width,
+      height,
+      border,
+      format,
+      type,
+      pixels
+    );
+
+    const isPot = width === height && POTs.find((element) => element === width);
+    if (isPot) {
+      // set the filtering so we don't need mips
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    } else {
+      // NPOT textures
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    }
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+    return tex;
+  }
+
   // creates opengl texture for this node
   // gets the height from the scene
   // if the texture is already created, delete it and recreate it
-  createTexture() {
+  public createTexture() {
     var gl = this.gl;
 
     if (this.tex) {
       gl.deleteTexture(this.tex);
       this.tex = null;
     }
-
-    let updateTexture = (
-      level: number,
-      internalFormat: number,
-      width: number,
-      height: number,
-      border: number,
-      format: number,
-      type: number,
-      pixels: ArrayBufferView,
-      nodetype: NodeType
-    ) => {
-      var tex = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, tex);
-      // bind a dummy texture to suppress WebGL warning.
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        1,
-        1,
-        0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        new Uint8Array([255, 0, 255, 255])
-      ); // red
-
-      if (nodetype === NodeType.Texture) {
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-
-        // TODO: this should be fixed by using proper glAPI for texture format
-        for (var i = 0; i < width * height; i++) {
-          var pixelIdx = i * 4;
-          [pixels[pixelIdx], pixels[pixelIdx + 2]] = [
-            pixels[pixelIdx + 2],
-            pixels[pixelIdx],
-          ];
-        }
-      }
-
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        level,
-        internalFormat,
-        width,
-        height,
-        border,
-        format,
-        type,
-        pixels
-      );
-
-      const isPot =
-        width === height && POTs.find((element) => element === width);
-      if (isPot) {
-        // set the filtering so we don't need mips
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-      } else {
-        // NPOT textures
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      }
-
-      gl.bindTexture(gl.TEXTURE_2D, null);
-
-      this.tex = tex;
-    };
 
     const level = 0;
     const internalFormat = gl.RGBA;
@@ -437,37 +437,18 @@ export class DesignerNode implements IPropertyHolder {
     const type = gl.UNSIGNED_BYTE;
     const nodetype = this.nodeType;
     let data = null;
-    if (this.texPath) {
-      const image = NativeImage.createFromPath(this.texPath);
-      if (image.isEmpty() === false) {
-        const imgSize = image.getSize();
-        updateTexture(
-          level,
-          internalFormat,
-          imgSize.width,
-          imgSize.height,
-          border,
-          format,
-          type,
-          Uint8Array.from(image.getBitmap()),
-          NodeType.Texture
-        );
-        this.nodeType = NodeType.Texture;
-        this.requestUpdate();
-      }
-    } else {
-      updateTexture(
-        level,
-        internalFormat,
-        this.designer.width,
-        this.designer.height,
-        border,
-        format,
-        type,
-        data,
-        nodetype
-      );
-    }
+    this.tex = DesignerNode.updateTexture(
+      level,
+      internalFormat,
+      this.designer.width,
+      this.designer.height,
+      border,
+      format,
+      type,
+      data,
+      nodetype,
+      this.gl
+    );
   }
 
   createRandomLibOld(): string {
