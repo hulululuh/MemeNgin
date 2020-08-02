@@ -101,7 +101,7 @@ export class Transform2DGraphicsItem extends GraphicsItem {
       ctx.strokeStyle = "rgba(250, 250, 250)";
       //this.roundRect(ctx, this.x, this.y, width, height, 1);
       // ctx.rect(item.left, item.top, item.getWidth(), item.getHeight());
-      var rect = item.getRect();
+      let rect = item.getRect();
       rect.expand(15);
       ctx.rect(rect.left, rect.top, rect.width, rect.height);
 

@@ -50,12 +50,12 @@ export class ItemClipboard {
     data.connections = this.getConnections(data.nodes, designer, nodeList);
 
     // FRAMES
-    var frames = [];
+    let frames = [];
     for (let item of items) {
       if (!(item instanceof FrameGraphicsItem)) continue;
       let frame = <FrameGraphicsItem>item;
 
-      var n: any = {};
+      let n: any = {};
       n["x"] = frame.left;
       n["y"] = frame.top;
       n["width"] = frame.getWidth();
@@ -71,7 +71,7 @@ export class ItemClipboard {
     data.frames = frames;
 
     // COMMENTS
-    var comments = [];
+    let comments = [];
     for (let item of items) {
       if (!(item instanceof CommentGraphicsItem)) continue;
       let comment = <CommentGraphicsItem>item;
@@ -88,7 +88,7 @@ export class ItemClipboard {
     data.comments = comments;
 
     // NAVIGATIONS
-    var navs = [];
+    let navs = [];
     for (let item of items) {
       if (!(item instanceof NavigationGraphicsItem)) continue;
       let nav = <NavigationGraphicsItem>item;
@@ -179,7 +179,7 @@ export class ItemClipboard {
     //NODES AND CONNECTIONS
 
     // old : new
-    var nodeIdMap = {};
+    let nodeIdMap = {};
     // add them to designer then add them to scene
     for (let n of data.nodes) {
       console.log(n.typeName);
@@ -195,7 +195,7 @@ export class ItemClipboard {
       }
 
       // create scene version
-      var node = new NodeGraphicsItem(dNode.title);
+      let node = new NodeGraphicsItem(dNode.title);
       for (let input of dNode.getInputs()) {
         node.addSocket(input, input, SocketType.In);
       }
@@ -205,7 +205,7 @@ export class ItemClipboard {
       focusItems.push(node);
 
       // generate thumbnail
-      var thumb = designer.generateImageFromNode(dNode);
+      let thumb = designer.generateImageFromNode(dNode);
       node.setThumbnail(thumb);
 
       node.setCenter(n.x, n.y);
@@ -225,12 +225,12 @@ export class ItemClipboard {
       let rightId = nodeIdMap[c.rightNodeId];
 
       // create connection
-      var con = new ConnectionGraphicsItem();
+      let con = new ConnectionGraphicsItem();
       con.id = Guid.newGuid(); // brand new connection
 
       // get nodes
-      var leftNode = scene.getNodeById(leftId);
-      var rightNode = scene.getNodeById(rightId);
+      let leftNode = scene.getNodeById(leftId);
+      let rightNode = scene.getNodeById(rightId);
 
       // get sockets
       con.socketA = leftNode.getOutSocketByName(c.leftNodeOutput);
@@ -293,13 +293,13 @@ export class ItemClipboard {
     items.forEach((i) => {
       let node = designer.getNodeById(i.id);
 
-      var n = {};
+      let n = {};
       n["id"] = node.id;
       n["typeName"] = node.typeName;
       n["exportName"] = node.exportName;
       //n["inputs"] = node.inputs;// not needed imo
 
-      var props = {};
+      let props = {};
       for (let prop of node.properties) {
         props[prop.name] = prop.getValue();
       }
@@ -328,7 +328,7 @@ export class ItemClipboard {
         ItemClipboard.getNodeById(con.leftNode.id, nodeList) &&
         ItemClipboard.getNodeById(con.rightNode.id, nodeList)
       ) {
-        var c = {};
+        let c = {};
         c["id"] = con.id;
         c["leftNodeId"] = con.leftNode.id;
         c["leftNodeOutput"] = con.leftNodeOutput;

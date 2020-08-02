@@ -49,8 +49,8 @@ export default class GradientPropertyView extends Vue {
 
     let erd = new elementResizeDetectorMaker();
     erd.listenTo(this.$refs.inputHolder, (element) => {
-      var width = element.offsetWidth;
-      var height = element.offsetHeight;
+      let width = element.offsetWidth;
+      let height = element.offsetHeight;
 
       this.widget.resize(width, height);
     });
@@ -211,7 +211,7 @@ export class GradientWidget {
   }
 
   bindEvents() {
-    var self = this;
+    let self = this;
     this.canvas.onmousedown = (evt) => this.onMouseDown(evt);
 
     //this.canvas.onmouseup = evt => this.onMouseUp(evt);
@@ -247,11 +247,11 @@ export class GradientWidget {
 
     // if no box is hit then add one and make it the drag target
     if (self.hitHandle == null && evt.button == 0) {
-      var t = self.lastMouseDown.x / self.width;
-      var col = self.gradient.sample(t);
-      var p = self.gradient.addPoint(t, col);
+      let t = self.lastMouseDown.x / self.width;
+      let col = self.gradient.sample(t);
+      let p = self.gradient.addPoint(t, col);
 
-      var handle = self.createGradientHandleFromPoint(p);
+      let handle = self.createGradientHandleFromPoint(p);
 
       self.handles.push(handle);
 
@@ -276,7 +276,7 @@ export class GradientWidget {
   onMouseUp(evt: MouseEvent) {
     let self = this;
 
-    var hitPos = getMousePos(self.canvas, evt);
+    let hitPos = getMousePos(self.canvas, evt);
     if (
       self.lastMouseDown.x == hitPos.x &&
       self.lastMouseDown.y == hitPos.y &&
@@ -287,7 +287,7 @@ export class GradientWidget {
       self.hitHandle = null;
 
       // show color picker
-      var input = document.createElement("input");
+      let input = document.createElement("input");
       input.type = "color";
       input.value = hitHandle.gradientPoint.color.toHex();
       input.onchange = function(ev: Event) {
@@ -326,16 +326,16 @@ export class GradientWidget {
 
   onMouseMove(evt: MouseEvent) {
     let self = this;
-    //var hitPos = getMousePos(self.canvas, evt);
+    //let hitPos = getMousePos(self.canvas, evt);
     //console.log(self);
-    var hitPos = getMousePos(self.canvas, evt);
+    let hitPos = getMousePos(self.canvas, evt);
     if (self.hitHandle) {
       // cap hit pos
       let x = clamp(hitPos.x, 0, self.width);
       self.hitHandle.colorBox.setCenterX(x);
 
       // recalc gradient t
-      var t = x / self.width;
+      let t = x / self.width;
       self.hitHandle.gradientPoint.t = t;
 
       // resort handles
@@ -366,10 +366,10 @@ export class GradientWidget {
 
   setGradient(grad: Gradient) {
     this.handles = Array();
-    var handleSize = this.handleSize;
+    let handleSize = this.handleSize;
 
     for (let p of grad.points) {
-      var handle = this.createGradientHandleFromPoint(p);
+      let handle = this.createGradientHandleFromPoint(p);
       this.handles.push(handle);
     }
 
@@ -379,15 +379,15 @@ export class GradientWidget {
   }
 
   createGradientHandleFromPoint(p: GradientPoint): GradientHandle {
-    var handleSize = this.handleSize;
+    let handleSize = this.handleSize;
 
-    var handle = new GradientHandle();
+    let handle = new GradientHandle();
     handle.gradientPoint = p;
     // eval point locations
-    var box = handle.colorBox;
+    let box = handle.colorBox;
     box.width = handleSize;
     box.height = handleSize;
-    var x = p.t * this.width;
+    let x = p.t * this.width;
     box.setCenterX(x);
     box.y = this.height - handleSize;
 
@@ -399,11 +399,11 @@ export class GradientWidget {
   }
 
   redrawCanvas() {
-    var ctx = this.ctx;
+    let ctx = this.ctx;
 
     ctx.clearRect(0, 0, this.width, this.height);
 
-    var grad = ctx.createLinearGradient(0, 0, this.width, 0);
+    let grad = ctx.createLinearGradient(0, 0, this.width, 0);
     for (let point of this.gradient.points) {
       grad.addColorStop(point.t, point.color.toHex());
     }
@@ -415,9 +415,9 @@ export class GradientWidget {
   }
 
   drawHandles() {
-    var ctx = this.ctx;
+    let ctx = this.ctx;
     for (let handle of this.handles) {
-      var colBox = handle.colorBox;
+      let colBox = handle.colorBox;
       // background
       ctx.beginPath();
       ctx.fillStyle = handle.gradientPoint.color.toHex();
@@ -451,7 +451,7 @@ export class GradientWidget {
 // https://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
 // https://stackoverflow.com/questions/17130395/real-mouse-position-in-canvas
 function getMousePos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect();
+  let rect = canvas.getBoundingClientRect();
   return {
     x: evt.clientX - rect.left,
     y: evt.clientY - rect.top,

@@ -133,7 +133,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
   }
 
   private buildColor(color: Color, alpha: number) {
-    var col =
+    let col =
       "rgba(" +
       color.r * 255 +
       "," +

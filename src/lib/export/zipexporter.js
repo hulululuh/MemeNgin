@@ -1,12 +1,12 @@
 import AdmZip from "adm-zip";
 import electron from "electron";
 
-var TextureType = {
+let TextureType = {
   Default: 0,
-  NormalMap: 1
+  NormalMap: 1,
 };
 
-var exporter = {
+let exporter = {
   canvas: null,
   gl: null,
   posBuffer: null,
@@ -14,7 +14,7 @@ var exporter = {
 
   // shaders
   metalGlossProgram: null,
-  normalProgram: null
+  normalProgram: null,
 };
 
 export async function zipExport(editor, materialName) {
@@ -46,14 +46,14 @@ export async function zipExport(editor, materialName) {
 function generateMetallicGloss(exporter, mTex, rTex) {
   renderToImage(exporter, exporter.metalGlossProgram, [
     { name: "u_metallicMap", tex: mTex },
-    { name: "u_roughnessMap", tex: rTex }
+    { name: "u_roughnessMap", tex: rTex },
   ]);
 }
 
 // inverts normal map
 function fixNormalMap(exporter, tex) {
   renderToImage(exporter, exporter.normalProgram, [
-    { name: "u_normalMap", tex: tex }
+    { name: "u_normalMap", tex: tex },
   ]);
 }
 
@@ -104,8 +104,8 @@ const METALLICGLOSS_FRAG = `precision mediump float;
 // creates canvas and context
 // creates shaders for converting the the textures
 function initGLAndResources(exporter) {
-  var canvas = document.createElement("canvas");
-  var gl = canvas.getContext("webgl");
+  let canvas = document.createElement("canvas");
+  let gl = canvas.getContext("webgl");
 
   exporter.canvas = canvas;
   exporter.gl = gl;
@@ -121,13 +121,13 @@ function initGLAndResources(exporter) {
 }
 
 function getShaderSource(id) {
-  var shaderScript = document.getElementById(id);
+  let shaderScript = document.getElementById(id);
   if (!shaderScript) {
     return null;
   }
 
-  var str = "";
-  var k = shaderScript.firstChild;
+  let str = "";
+  let k = shaderScript.firstChild;
   while (k) {
     if (k.nodeType == 3) {
       str += k.textContent;
@@ -139,7 +139,7 @@ function getShaderSource(id) {
 }
 
 function compileShader(gl, source, shaderType) {
-  var shader = gl.createShader(shaderType);
+  let shader = gl.createShader(shaderType);
 
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
@@ -153,10 +153,10 @@ function compileShader(gl, source, shaderType) {
 }
 
 function buildShaderProgram(gl, vertSource, fragSource) {
-  var vertexShader = compileShader(gl, vertSource, gl.VERTEX_SHADER);
-  var fragmentShader = compileShader(gl, fragSource, gl.FRAGMENT_SHADER);
+  let vertexShader = compileShader(gl, vertSource, gl.VERTEX_SHADER);
+  let fragmentShader = compileShader(gl, fragSource, gl.FRAGMENT_SHADER);
 
-  var shaderProgram = gl.createProgram();
+  let shaderProgram = gl.createProgram();
   gl.attachShader(shaderProgram, vertexShader);
   gl.attachShader(shaderProgram, fragmentShader);
   gl.linkProgram(shaderProgram);
@@ -170,13 +170,13 @@ function buildShaderProgram(gl, vertSource, fragSource) {
   return shaderProgram;
 }
 
-//var texCoordBuffer = new WebGLBuffer;
-//var posBuffer = new WebGLBuffer;
+//let texCoordBuffer = new WebGLBuffer;
+//let posBuffer = new WebGLBuffer;
 
 // render quad using shader and texture inputs
 // returns HtmlImageElement
 function renderToImage(exporter, program, inputs) {
-  var gl = exporter.gl;
+  let gl = exporter.gl;
 
   gl.viewport(0, 0, exporter.canvas.width, exporter.canvas.height);
 
@@ -188,9 +188,9 @@ function renderToImage(exporter, program, inputs) {
   gl.useProgram(program);
 
   // pass textures
-  var texIndex = 0;
-  for (var i in inputs) {
-    var input = inputs[i];
+  let texIndex = 0;
+  for (let i in inputs) {
+    let input = inputs[i];
     if (input.tex) {
       gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, input.tex);
@@ -203,8 +203,8 @@ function renderToImage(exporter, program, inputs) {
   }
 
   // bind mesh
-  var posLoc = gl.getAttribLocation(program, "a_pos");
-  var texCoordLoc = gl.getAttribLocation(program, "a_texCoord");
+  let posLoc = gl.getAttribLocation(program, "a_pos");
+  let texCoordLoc = gl.getAttribLocation(program, "a_texCoord");
 
   // provide texture coordinates for the rectangle.
   gl.bindBuffer(gl.ARRAY_BUFFER, exporter.posBuffer);
@@ -222,10 +222,10 @@ function renderToImage(exporter, program, inputs) {
 }
 
 function createVertexBuffers(exporter) {
-  var gl = exporter.gl;
+  let gl = exporter.gl;
 
   // provide texture coordinates for the rectangle.
-  var texCoordBuffer = gl.createBuffer();
+  let texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
   gl.bufferData(
     gl.ARRAY_BUFFER,
@@ -241,12 +241,12 @@ function createVertexBuffers(exporter) {
       1.0,
       0.0,
       1.0,
-      1.0
+      1.0,
     ]),
     gl.STATIC_DRAW
   );
 
-  var posBuffer = gl.createBuffer();
+  let posBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
   gl.bufferData(
     gl.ARRAY_BUFFER,
@@ -268,7 +268,7 @@ function createVertexBuffers(exporter) {
       0.0,
       1.0,
       1.0,
-      0.0
+      0.0,
     ]),
     gl.STATIC_DRAW
   );
@@ -280,7 +280,7 @@ function createVertexBuffers(exporter) {
 }
 
 function canvasToBase64(canvas) {
-  var data = canvas.toDataURL();
+  let data = canvas.toDataURL();
   // todo: maybe script header?
   // https://code-examples.net/en/q/6f412f
   data = data.replace(/^data:image\/(png|jpg);base64,/, "");

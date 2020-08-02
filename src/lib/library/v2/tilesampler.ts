@@ -1,31 +1,24 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class TileSampler extends DesignerNode {
-	public init() {
-		this.title = "Tile Sampler";
+  public init() {
+    this.title = "Tile Sampler";
 
-		this.addInput("image");
-		this.addInput("mask");
-		this.addInput("size");
-		this.addInput("intensity");
+    this.addInput("image");
+    this.addInput("mask");
+    this.addInput("size");
+    this.addInput("intensity");
 
-		this.addIntProperty("rows", "Row Count", 8, 0, 15, 1);
-		this.addIntProperty("columns", "Column Count", 8, 0, 15, 1);
-		this.addFloatProperty("rot", "Rotation", 0, 0, 360, 0.1);
-		this.addFloatProperty("rotRand", "Random Rotation", 0, 0, 1.0, 0.01);
-		this.addFloatProperty("posRand", "Random Position", 0, 0, 1.0, 0.01);
-		this.addFloatProperty(
-			"intensityRand",
-			"Random Intensity",
-			0,
-			0,
-			1.0,
-			0.01
-		);
-		this.addFloatProperty("scale", "Scale", 1, 0, 4, 0.1);
-		this.addFloatProperty("scaleRand", "Scale random", 0, 0, 1, 0.1);
+    this.addIntProperty("rows", "Row Count", 8, 0, 15, 1);
+    this.addIntProperty("columns", "Column Count", 8, 0, 15, 1);
+    this.addFloatProperty("rot", "Rotation", 0, 0, 360, 0.1);
+    this.addFloatProperty("rotRand", "Random Rotation", 0, 0, 1.0, 0.01);
+    this.addFloatProperty("posRand", "Random Position", 0, 0, 1.0, 0.01);
+    this.addFloatProperty("intensityRand", "Random Intensity", 0, 0, 1.0, 0.01);
+    this.addFloatProperty("scale", "Scale", 1, 0, 4, 0.1);
+    this.addFloatProperty("scaleRand", "Scale random", 0, 0, 1, 0.1);
 
-		var source = `
+    let source = `
 
         mat3 transMat(vec2 t)
         {
@@ -161,6 +154,6 @@ export class TileSampler extends DesignerNode {
         }
         `;
 
-		this.buildShader(source);
-	}
+    this.buildShader(source);
+  }
 }

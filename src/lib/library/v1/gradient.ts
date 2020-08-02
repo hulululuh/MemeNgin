@@ -22,7 +22,7 @@ export class GradientNode extends DesignerNode {
       "Bottom To Top",
     ]);
 
-    var source = `
+    let source = `
         #define POINTS_MAX 32
 
         // assumes points are sorted
@@ -124,7 +124,7 @@ export class TriGradientNode extends DesignerNode {
       "Bottom To Top",
     ]);
 
-    var source = `
+    let source = `
           #define POINTS_MAX 32
   
           // assumes points are sorted

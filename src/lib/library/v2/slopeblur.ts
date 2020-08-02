@@ -2,16 +2,16 @@ import { DesignerNode } from "../../designer/designernode";
 
 // multiple pass warp
 export class SlopeBlur extends DesignerNode {
-	public init() {
-		this.title = "Slope Blur";
+  public init() {
+    this.title = "Slope Blur";
 
-		this.addInput("image");
-		this.addInput("slope");
+    this.addInput("image");
+    this.addInput("slope");
 
-		this.addFloatProperty("intensity", "Intensity", 1, 0, 5, 0.1);
-		this.addIntProperty("quality", "Quality", 5, 0, 10, 1);
+    this.addFloatProperty("intensity", "Intensity", 1, 0, 5, 0.1);
+    this.addIntProperty("quality", "Quality", 5, 0, 10, 1);
 
-		var source = `
+    let source = `
         vec2 calcSlope(vec2 uv)
         {
             vec3 sl = vec3(0.0,0.0,0.0);
@@ -51,6 +51,6 @@ export class SlopeBlur extends DesignerNode {
         }
         `;
 
-		this.buildShader(source);
-	}
+    this.buildShader(source);
+  }
 }

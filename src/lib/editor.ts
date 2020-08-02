@@ -25,7 +25,7 @@ import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 
 function hexToRgb(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
         r: parseInt(result[1], 16),
@@ -364,10 +364,10 @@ export class Editor {
 
   setDesigner(designer: Designer) {
     this.designer = designer;
-    var self = this;
+    let self = this;
 
     designer.onnodetextureupdated = function(dnode) {
-      var graphNode = self.graph.getNodeById(dnode.id);
+      let graphNode = self.graph.getNodeById(dnode.id);
       if (!graphNode) return; // node could have been deleted
 
       // something worng with fbo setup around here.
@@ -401,7 +401,7 @@ export class Editor {
             console.log(self.selectedDesignerNode);
             console.log("onthumbnailgenerated generated for: "+node.title);
             // refresh right node image
-            var graphNode = self.graph.getNodeById(node.id);
+            let graphNode = self.graph.getNodeById(node.id);
             graphNode.setThumbnail(thumb);
             self.updateDisplayNode(graphNode);
 
@@ -431,33 +431,33 @@ export class Editor {
 
     this.graph = scene;
 
-    var self = this;
+    let self = this;
     this.graph.onconnectioncreated = function(con: ConnectionGraphicsItem) {
       // get node from graph
-      var leftNode = con.socketA.node;
-      var rightNode = con.socketB.node;
+      let leftNode = con.socketA.node;
+      let rightNode = con.socketB.node;
 
       // get node from designer and connect them
-      var leftDNode = self.designer.getNodeById(leftNode.id);
-      var rightDNode = self.designer.getNodeById(rightNode.id);
+      let leftDNode = self.designer.getNodeById(leftNode.id);
+      let rightDNode = self.designer.getNodeById(rightNode.id);
 
       // make connection
       // switch from `title` to `name`
       self.designer.addConnection(leftDNode, rightDNode, con.socketB.title);
 
       // refresh right node image
-      //var thumb = self.designer.generateImageFromNode(rightDNode);
+      //let thumb = self.designer.generateImageFromNode(rightDNode);
       //rightNode.setThumbnail(thumb);
     };
 
     this.graph.onconnectiondestroyed = function(con: ConnectionGraphicsItem) {
       // get node from graph
-      var leftNode = con.socketA.node;
-      var rightNode = con.socketB.node;
+      let leftNode = con.socketA.node;
+      let rightNode = con.socketB.node;
 
       // get node from designer and connect them
-      var leftDNode = self.designer.getNodeById(leftNode.id);
-      var rightDNode = self.designer.getNodeById(rightNode.id);
+      let leftDNode = self.designer.getNodeById(leftNode.id);
+      let rightDNode = self.designer.getNodeById(rightNode.id);
 
       // remove connection
       // switch from `title` to `name`
@@ -524,7 +524,7 @@ export class Editor {
 
     this.graph.onnodeselected = function(node: NodeGraphicsItem) {
       if (node != null) {
-        var dnode = self.designer.getNodeById(node.id);
+        let dnode = self.designer.getNodeById(node.id);
         self.selectedDesignerNode = dnode;
         //console.log(dnode);
 
@@ -549,9 +549,8 @@ export class Editor {
           //self.scene3D.setHeightTexture(node.thumbnail);
           self.updateDisplayNode(node);
         }
-      }
-
       if (self.onnodeselected) self.onnodeselected(dnode);
+    }
     };
 
     this.graph.oncommentselected = function(item: CommentGraphicsItem) {
@@ -645,12 +644,12 @@ export class Editor {
     // property changes
     /*
         this.propGen.onnodepropertychanged = function(dnode:DesignerNode, prop:Property) {
-            //var node = self.graph.getNodeById(node.id);
+            //let node = self.graph.getNodeById(node.id);
             //self.graph.refreshNode()
             
             // todo: do this properly
-            var thumb = self.designer.generateImageFromNode(dnode);
-            var node = self.graph.getNodeById(dnode.id);
+            let thumb = self.designer.generateImageFromNode(dnode);
+            let node = self.graph.getNodeById(dnode.id);
             node.thumbnail = thumb;
 
             //console.log(node.thumbnail);
@@ -696,7 +695,7 @@ export class Editor {
   }
 
   createThumnail(dNode: DesignerNode, node: NodeGraphicsItem) {
-    var thumb = this.designer.generateImageFromNode(dNode);
+    let thumb = this.designer.generateImageFromNode(dNode);
     node.setThumbnail(thumb);
   }
 
@@ -711,7 +710,7 @@ export class Editor {
     this.designer.addNode(dNode);
 
     // create node from designer
-    var node = new NodeGraphicsItem(dNode.title);
+    let node = new NodeGraphicsItem(dNode.title);
     for (let input of dNode.getInputs()) {
       node.addSocket(input, input, SocketType.In);
     }
@@ -719,7 +718,7 @@ export class Editor {
     this.graph.addNode(node);
     node.id = dNode.id;
 
-    var pos = this.graph.view.canvasToSceneXY(screenX, screenY);
+    let pos = this.graph.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);
 
     this.createThumnail(dNode, node);
@@ -729,7 +728,7 @@ export class Editor {
 
   createComment(): CommentGraphicsItem {
     let comment = new CommentGraphicsItem(this.graph.view);
-    var pos = this.graph.view.sceneCenter;
+    let pos = this.graph.view.sceneCenter;
     comment.setCenter(pos.x, pos.y);
 
     this.graph.addComment(comment);
@@ -739,7 +738,7 @@ export class Editor {
 
   createFrame(): FrameGraphicsItem {
     let frame = new FrameGraphicsItem(this.graph.view);
-    var pos = this.graph.view.sceneCenter;
+    let pos = this.graph.view.sceneCenter;
     frame.setCenter(pos.x, pos.y);
 
     this.graph.addFrame(frame);
@@ -749,7 +748,7 @@ export class Editor {
 
   createNavigation(): NavigationGraphicsItem {
     let nav = new NavigationGraphicsItem();
-    var pos = this.graph.view.sceneCenter;
+    let pos = this.graph.view.sceneCenter;
     nav.setCenter(pos.x, pos.y);
 
     this.graph.addNavigation(nav);
@@ -799,7 +798,7 @@ export class Editor {
   }
 
   setDisplayChannelNode(channel: DisplayChannel, nodeId: string) {
-    var node = this.graph.getNodeById(nodeId);
+    let node = this.graph.getNodeById(nodeId);
     if (channel == DisplayChannel.Albedo) {
       this.displayNodes.albedoNode = nodeId;
     }
@@ -821,8 +820,8 @@ export class Editor {
 
   exposeVariable(node: DesignerNode, prop: Property, varDisplayName: string) {
     // create new variable
-    var varName = Guid.newGuid();
-    var dvar = this.designer.addVariable(
+    let varName = Guid.newGuid();
+    let dvar = this.designer.addVariable(
       varName,
       varDisplayName,
       this.evalDesignerVariableType(prop)
@@ -838,7 +837,7 @@ export class Editor {
 
     // copy property props
 
-    // refresh var ui
+    // refresh let ui
     // this.varGen.refreshUi();
   }
 
@@ -880,10 +879,10 @@ export class Editor {
       library = createV2Library();
     }
     // load scene
-    var d = Designer.load(data, library);
+    let d = Designer.load(data, library);
 
     // load graph
-    var g = NodeScene.load(d, data["scene"], this.canvas);
+    let g = NodeScene.load(d, data["scene"], this.canvas);
 
     //todo: properly destroy existing graph
 
@@ -898,7 +897,7 @@ export class Editor {
 
     // load editor data
     if (data["editor"] != null) {
-      var e = data["editor"];
+      let e = data["editor"];
       // console.log("loading editor data");
       // console.log(e.displayNodes);
 
@@ -921,7 +920,7 @@ export class Editor {
   }
 
   save(): any {
-    var data = this.designer.save();
+    let data = this.designer.save();
     data["scene"] = this.graph.save();
 
     let textureChannels = {};

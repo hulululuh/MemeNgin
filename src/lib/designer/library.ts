@@ -17,7 +17,7 @@ export class DesignerLibrary {
     displayName: string,
     type: { new (): T }
   ) {
-    var factory = new DesignerNodeFactory();
+    let factory = new DesignerNodeFactory();
     factory.name = name;
     factory.displayName = displayName;
     factory.create = (): DesignerNode => {

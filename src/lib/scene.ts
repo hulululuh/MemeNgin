@@ -161,7 +161,7 @@ export class NodeScene {
     // this.navigations.push(nav);
 
     // bind event listeners
-    var self = this;
+    let self = this;
     this._mouseMove = function(evt: MouseEvent) {
       self.onMouseMove(evt);
     };
@@ -560,8 +560,8 @@ export class NodeScene {
   clearAndDrawGrid() {
     //this.context.scale(2,2);
     // this.context.fillStyle = "rgb(120, 120, 120)";
-    // var topCorner = this.view.canvasToSceneXY(0, 0);
-    // var bottomCorner = this.view.canvasToSceneXY(
+    // let topCorner = this.view.canvasToSceneXY(0, 0);
+    // let bottomCorner = this.view.canvasToSceneXY(
     //   this.canvas.clientWidth,
     //   this.canvas.clientHeight
     // );
@@ -637,7 +637,7 @@ export class NodeScene {
       ctx.strokeStyle = "rgba(255, 255, 255)";
       //this.roundRect(ctx, this.x, this.y, width, height, 1);
       // ctx.rect(item.left, item.top, item.getWidth(), item.getHeight());
-      var rect = item.getRect();
+      let rect = item.getRect();
       rect.expand(15);
       ctx.rect(rect.left, rect.top, rect.width, rect.height);
 
@@ -670,7 +670,7 @@ export class NodeScene {
   // mouse events
   onMouseDown(evt: MouseEvent) {
     //todo: look at double event calling
-    var pos = this.getScenePos(evt);
+    let pos = this.getScenePos(evt);
     let mouseX = pos.x;
     let mouseY = pos.y;
 
@@ -787,7 +787,7 @@ export class NodeScene {
 
   // https://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another
   moveNodeToTop(node: NodeGraphicsItem) {
-    var index = this.nodes.indexOf(node);
+    let index = this.nodes.indexOf(node);
     if (index === -1) {
       console.log("Attempting to push node that doesnt exist in node list");
     }
@@ -796,7 +796,7 @@ export class NodeScene {
   }
 
   onMouseUp(evt: MouseEvent) {
-    var pos = this.getScenePos(evt);
+    let pos = this.getScenePos(evt);
     let mouseX = pos.x;
     let mouseY = pos.y;
 
@@ -840,7 +840,7 @@ export class NodeScene {
     // 			closeSock.node != this.hitSocket.node
     // 		) {
     // 			// close socket
-    // 			var con: ConnectionGraphicsItem = new ConnectionGraphicsItem();
+    // 			let con: ConnectionGraphicsItem = new ConnectionGraphicsItem();
     // 			// out socket should be on the left, socketA
     // 			if (this.hitSocket.socketType == SocketType.Out) {
     // 				// out socket
@@ -891,7 +891,7 @@ export class NodeScene {
   }
 
   onMouseMove(evt: MouseEvent) {
-    var pos = this.getScenePos(evt);
+    let pos = this.getScenePos(evt);
 
     if (this.hitItem) {
       let mouseEvent = new MouseMoveEvent();
@@ -938,7 +938,7 @@ export class NodeScene {
 
     // // handle dragged node
     // if (this.draggedNode != null) {
-    // 	//var diff = this.view.canvasToSceneXY(evt.movementX, evt.movementY);
+    // 	//let diff = this.view.canvasToSceneXY(evt.movementX, evt.movementY);
     // 	//console.log("move: ",evt.movementX,evt.movementY);
     // 	//this.draggedNode.move(evt.movementX, evt.movementY);
 
@@ -952,7 +952,7 @@ export class NodeScene {
   // x and y are scene space
   getHitNode(x: number, y: number): NodeGraphicsItem {
     // for (let node of this.nodes) {
-    for (var index = this.nodes.length - 1; index >= 0; index--) {
+    for (let index = this.nodes.length - 1; index >= 0; index--) {
       let node = this.nodes[index];
       if (node.isPointInside(x, y)) return node;
     }
@@ -1033,7 +1033,7 @@ export class NodeScene {
 
   // returns the scene pos from the mouse event
   getScenePos(evt: MouseEvent) {
-    var canvasPos = _getMousePos(this.canvas, evt);
+    let canvasPos = _getMousePos(this.canvas, evt);
     return this.view.canvasToSceneXY(canvasPos.x, canvasPos.y);
   }
 
@@ -1041,12 +1041,12 @@ export class NodeScene {
 
   // only save position data to associative array
   save(): any {
-    var data: any = {};
+    let data: any = {};
 
     // NODES
-    var nodes = {};
+    let nodes = {};
     for (let node of this.nodes) {
-      var n: any = {};
+      let n: any = {};
       n["id"] = node.id;
       n["x"] = node.centerX();
       n["y"] = node.centerY();
@@ -1056,7 +1056,7 @@ export class NodeScene {
     data["nodes"] = nodes;
 
     // FRAMES
-    var frames = [];
+    let frames = [];
     for (let frame of this.frames) {
       let n: any = {};
       n["x"] = frame.left;
@@ -1074,7 +1074,7 @@ export class NodeScene {
     data["frames"] = frames;
 
     // COMMENTS
-    var comments = [];
+    let comments = [];
     for (let comment of this.comments) {
       let n: any = {};
       n["x"] = comment.left;
@@ -1088,7 +1088,7 @@ export class NodeScene {
     data["comments"] = comments;
 
     // NAVIGATIONS
-    var navs = [];
+    let navs = [];
     for (let nav of this.navigations) {
       let n: any = {};
       n["x"] = nav.left;
@@ -1106,12 +1106,12 @@ export class NodeScene {
     data: any,
     canvas: HTMLCanvasElement
   ): NodeScene {
-    var s = new NodeScene(canvas);
+    let s = new NodeScene(canvas);
 
     // add nodes one by one
     for (let dNode of designer.nodes) {
       // create node from designer
-      var node = new NodeGraphicsItem(dNode.title);
+      let node = new NodeGraphicsItem(dNode.title);
       for (let input of dNode.getInputs()) {
         node.addSocket(input, input, SocketType.In);
       }
@@ -1120,19 +1120,19 @@ export class NodeScene {
       node.id = dNode.id;
 
       // get position
-      var x = data["nodes"][node.id].x;
-      var y = data["nodes"][node.id].y;
+      let x = data["nodes"][node.id].x;
+      let y = data["nodes"][node.id].y;
       node.setCenter(x, y);
     }
 
     // add connection one by one
     for (let dcon of designer.conns) {
-      var con = new ConnectionGraphicsItem();
+      let con = new ConnectionGraphicsItem();
       con.id = dcon.id;
 
       // get nodes
-      var leftNode = s.getNodeById(dcon.leftNode.id);
-      var rightNode = s.getNodeById(dcon.rightNode.id);
+      let leftNode = s.getNodeById(dcon.leftNode.id);
+      let rightNode = s.getNodeById(dcon.rightNode.id);
 
       // get sockets
       con.socketA = leftNode.getOutSocketByName(dcon.leftNodeOutput);
@@ -1186,7 +1186,7 @@ export class NodeScene {
 // https://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
 // https://stackoverflow.com/questions/17130395/real-mouse-position-in-canvas
 function _getMousePos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect();
+  let rect = canvas.getBoundingClientRect();
   return {
     x: evt.clientX - rect.left,
     y: evt.clientY - rect.top,

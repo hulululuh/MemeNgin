@@ -13,7 +13,7 @@ import {
 import { DesignerLibrary } from "../designer/library";
 
 export function createLibrary() {
-  var lib = new DesignerLibrary();
+  let lib = new DesignerLibrary();
   lib.versionName = "v0";
   lib.addNode("shape", "Shape", TestShapeNode);
   lib.addNode("gradient", "Gradient", TestGradientNode);

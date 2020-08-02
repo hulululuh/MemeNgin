@@ -1,7 +1,7 @@
 const IMAGE_RENDER_SIZE = 1000;
 
 function _getMousePos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect();
+  let rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left, evt.clientY - rect.top);
 }
 
@@ -114,7 +114,7 @@ export class DragZoom {
     this.context = this.canvas.getContext("2d");
     this.image = null;
 
-    var self = this;
+    let self = this;
     canvas.addEventListener("mousemove", function(evt: MouseEvent) {
       self.onMouseMove(evt);
     });
@@ -208,16 +208,16 @@ export class DragZoom {
       this.offset.y -= diff.y * factor;
     }
 
-    // var lastX = this.mouseX;
-    // var lastY = this.mouseY;
-    // var pos = this.getScenePos(evt);
+    // let lastX = this.mouseX;
+    // let lastY = this.mouseY;
+    // let pos = this.getScenePos(evt);
     // this.mouseX = pos.x;
     // this.mouseY = pos.y;
 
     // if (this.panning) {
     //     // convert to scene space first
-    //     //var lastPt = this.contextExtra.transformedPoint(lastX, lastY);
-    //     //var pt = this.contextExtra.transformedPoint(this.mouseX, this.mouseY);
+    //     //let lastPt = this.contextExtra.transformedPoint(lastX, lastY);
+    //     //let pt = this.contextExtra.transformedPoint(this.mouseX, this.mouseY);
     //     //this.context.translate(pt.x - lastPt.x, pt.y - lastPt.y);
     //     //console.log(pt.x - this.panStart.x, pt.y - this.panStart.y);
     //     console.log(this.mouseX - this.panStart.x, this.mouseY - this.panStart.y);
@@ -230,8 +230,8 @@ export class DragZoom {
     // no panning while zooming
     if (this.panning) return;
 
-    var pos = _getMousePos(this.canvas, evt);
-    var delta = (<any>evt).wheelDelta > 0 ? 1.1 : 1.0 / 1.1;
+    let pos = _getMousePos(this.canvas, evt);
+    let delta = (<any>evt).wheelDelta > 0 ? 1.1 : 1.0 / 1.1;
 
     // offset from mouse pos
     // find offset from previous zoom then move offset by that value
@@ -252,9 +252,9 @@ export class DragZoom {
   }
 
   zoom(x: number, y: number, level: number) {
-    // var scaleFactor = 1.01;
-    // var pt = this.contextExtra.transformedPoint(x,y);
-    // var factor = Math.pow(scaleFactor, level);
+    // let scaleFactor = 1.01;
+    // let pt = this.contextExtra.transformedPoint(x,y);
+    // let factor = Math.pow(scaleFactor, level);
   }
 
   draw() {

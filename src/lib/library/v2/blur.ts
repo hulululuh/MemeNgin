@@ -4,15 +4,15 @@ import { DesignerNode } from "../../designer/designernode";
 // https://www.shadertoy.com/view/4tSyzy
 // https://stackoverflow.com/questions/2157920/why-define-pi-4atan1-d0
 export class BlurV2 extends DesignerNode {
-	public init() {
-		this.title = "Blur";
+  public init() {
+    this.title = "Blur";
 
-		this.addInput("image");
+    this.addInput("image");
 
-		this.addFloatProperty("intensity", "Intensity", 1, 0, 10, 0.1);
-		this.addIntProperty("samples", "Samples", 50, 0, 100, 1);
+    this.addFloatProperty("intensity", "Intensity", 1, 0, 10, 0.1);
+    this.addIntProperty("samples", "Samples", 50, 0, 100, 1);
 
-		var source = `
+    let source = `
         #define pow2(x) (x * x)
 
         const float pi = atan(1.0) * 4.0;
@@ -55,6 +55,6 @@ export class BlurV2 extends DesignerNode {
         }
         `;
 
-		this.buildShader(source);
-	}
+    this.buildShader(source);
+  }
 }

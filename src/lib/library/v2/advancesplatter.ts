@@ -1,18 +1,18 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class AdvanceSplatterV2 extends DesignerNode {
-	public init() {
-		this.title = "Advance Splatter";
+  public init() {
+    this.title = "Advance Splatter";
 
-		this.addInput("image");
-		this.addInput("mask");
-		this.addInput("size");
-		this.addInput("intensity");
+    this.addInput("image");
+    this.addInput("mask");
+    this.addInput("size");
+    this.addInput("intensity");
 
-		this.addIntProperty("count", "Count", 50, 0, 1000, 1);
-		this.addFloatProperty("rot", "Rotation", 0, 0, 360, 0.1);
+    this.addIntProperty("count", "Count", 50, 0, 1000, 1);
+    this.addFloatProperty("rot", "Rotation", 0, 0, 360, 0.1);
 
-		var source = `
+    let source = `
         // https://github.com/glslify/glsl-inverse/blob/master/index.glsl
         // mat3 inverse(mat3 m) {
         //     float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
@@ -125,6 +125,6 @@ export class AdvanceSplatterV2 extends DesignerNode {
         }
         `;
 
-		this.buildShader(source);
-	}
+    this.buildShader(source);
+  }
 }

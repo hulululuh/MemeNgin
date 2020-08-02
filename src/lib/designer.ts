@@ -104,7 +104,7 @@ export class Designer {
   }
 
   update() {
-    var updateQuota = 10000000000000;
+    let updateQuota = 10000000000000;
     // fetch random node from update list (having all in sockets that have been updated) and update it
     // todo: do only on per update loop
     while (this.updateList.length != 0) {
@@ -174,14 +174,14 @@ export class Designer {
 
   // creates node and adds it to scene
   createNode(name: string): DesignerNode {
-    var node = this.library.create(name);
+    let node = this.library.create(name);
 
     this.addNode(node);
     return node;
   }
 
   createFBO() {
-    var gl = this.gl;
+    let gl = this.gl;
 
     this.fbo = gl.createFramebuffer();
 
@@ -189,8 +189,8 @@ export class Designer {
   }
 
   createVertexBuffers() {
-    var gl = this.gl;
-    //var texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
+    let gl = this.gl;
+    //let texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     this.texCoordBuffer = gl.createBuffer();
@@ -329,7 +329,7 @@ export class Designer {
   }
 
   generateImage(name: string): HTMLImageElement {
-    var node: DesignerNode = this.getNodeByName(name);
+    let node: DesignerNode = this.getNodeByName(name);
     return this.generateImageFromNode(node);
   }
 
@@ -343,7 +343,7 @@ export class Designer {
     if (node.nodeType !== NodeType.Texture) {
       console.log("generating node " + node.exportName);
       // process input nodes
-      var inputs: NodeInput[] = this.getNodeInputs(node);
+      let inputs: NodeInput[] = this.getNodeInputs(node);
       for (let input of inputs) {
         if (input.node.needsUpdate) {
           this.generateImageFromNode(input.node);
@@ -354,7 +354,7 @@ export class Designer {
         }
       }
 
-      var gl = this.gl;
+      let gl = this.gl;
 
       // todo: move to node maybe
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
@@ -377,7 +377,7 @@ export class Designer {
       this.onnodetextureupdated(node);
     }
 
-    var thumb = this.generateThumbnailFromNode(node);
+    let thumb = this.generateThumbnailFromNode(node);
     if (this.onthumbnailgenerated) {
       this.onthumbnailgenerated(node, thumb);
     }
@@ -389,7 +389,7 @@ export class Designer {
   // ensure the node is updated before calling this function
   // this function doesnt try to update child nodes
   generateThumbnailFromNode(node: DesignerNode) {
-    var gl = this.gl;
+    let gl = this.gl;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -397,8 +397,8 @@ export class Designer {
     gl.useProgram(this.thumbnailProgram);
 
     // bind mesh
-    var posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
-    var texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
+    let posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
+    let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
@@ -420,8 +420,8 @@ export class Designer {
     gl.disableVertexAttribArray(posLoc);
     gl.disableVertexAttribArray(texCoordLoc);
 
-    //var img:HTMLImageElement = <HTMLImageElement>document.createElement("image");
-    //var img:HTMLImageElement = new Image(this.width, this.height);
+    //let img:HTMLImageElement = <HTMLImageElement>document.createElement("image");
+    //let img:HTMLImageElement = new Image(this.width, this.height);
     //img.src = this.canvas.toDataURL("image/png");
 
     // note: this called right after clears the image for some reason
@@ -434,7 +434,7 @@ export class Designer {
   // used as an alternative to move textures since toDataUrl is
   // so computationally expensive
   copyNodeTextureToImageCanvas(node: DesignerNode, canvas: ImageCanvas) {
-    var gl = this.gl;
+    let gl = this.gl;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -442,8 +442,8 @@ export class Designer {
     gl.useProgram(this.thumbnailProgram);
 
     // bind mesh
-    var posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
-    var texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
+    let posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
+    let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
@@ -472,7 +472,7 @@ export class Designer {
   }
 
   createThumbmailProgram() {
-    var prog = buildShaderProgram(
+    let prog = buildShaderProgram(
       this.gl,
       `precision mediump float;
 
@@ -509,7 +509,7 @@ export class Designer {
   }
 
   getNodeInputs(node: DesignerNode): NodeInput[] {
-    var inputs: NodeInput[] = new Array();
+    let inputs: NodeInput[] = new Array();
 
     for (let con of this.conns) {
       if (con.rightNode == node) {
@@ -530,7 +530,7 @@ export class Designer {
   ): DesignerVariable {
     //todo: throw exception if variable already exists?
 
-    var variable = new DesignerVariable();
+    let variable = new DesignerVariable();
     variable.type = varType;
     variable.id = Guid.newGuid();
 
@@ -562,10 +562,10 @@ export class Designer {
     node: DesignerNode,
     nodePropName: string
   ) {
-    var variable = this.findVariable(varName);
+    let variable = this.findVariable(varName);
     if (variable == null) return; //todo: throw exception?
 
-    var map = new DesignerNodePropertyMap();
+    let map = new DesignerNodePropertyMap();
     map.node = node;
     map.propertyName = nodePropName;
 
@@ -575,7 +575,7 @@ export class Designer {
   //todo: remove property map
 
   public setVariable(name: string, value: any) {
-    var variable = this.findVariable(name);
+    let variable = this.findVariable(name);
     if (variable) {
       //todo: throw exception for invalid types being set
       variable.property.setValue(value);
@@ -607,9 +607,9 @@ export class Designer {
   }
 
   public save(): any {
-    var nodes = new Array();
+    let nodes = new Array();
     for (let node of this.nodes) {
-      var n = {};
+      let n = {};
       n["id"] = node.id;
       n["typeName"] = node.typeName;
       n["exportName"] = node.exportName;
@@ -619,7 +619,7 @@ export class Designer {
       }
       //n["inputs"] = node.inputs;// not needed imo
 
-      var props = {};
+      let props = {};
       for (let prop of node.properties) {
         props[prop.name] = prop.getValue();
       }
@@ -628,9 +628,9 @@ export class Designer {
       nodes.push(n);
     }
 
-    var connections = new Array();
+    let connections = new Array();
     for (let con of this.conns) {
-      var c = {};
+      let c = {};
       c["id"] = con.id;
       c["leftNodeId"] = con.leftNode.id;
       c["leftNodeOutput"] = con.leftNodeOutput;
@@ -640,14 +640,14 @@ export class Designer {
       connections.push(c);
     }
 
-    var variables = new Array();
+    let variables = new Array();
     for (let dvar of this.variables) {
-      var v = {};
+      let v = {};
       v["id"] = dvar.id;
       v["type"] = dvar.type;
       v["property"] = dvar.property;
 
-      var nodeIds = new Array();
+      let nodeIds = new Array();
       for (let n of dvar.nodes) {
         nodeIds.push({
           nodeId: n.node.id,
@@ -659,7 +659,7 @@ export class Designer {
       console.log(v);
     }
 
-    var data = {};
+    let data = {};
     data["nodes"] = nodes;
     data["connections"] = connections;
     data["variables"] = variables;
@@ -668,10 +668,10 @@ export class Designer {
 
   static load(data: any, lib: DesignerLibrary): Designer {
     console.log(data);
-    var d = new Designer();
-    var nodes = data["nodes"];
+    let d = new Designer();
+    let nodes = data["nodes"];
     for (let node of nodes) {
-      var n = lib.create(node["typeName"]);
+      let n = lib.create(node["typeName"]);
       n.exportName = node["exportName"];
       n.id = node["id"];
       n.nodeType = node["nodeType"];
@@ -684,29 +684,29 @@ export class Designer {
       d.addNode(n);
 
       // add properties
-      var properties = node["properties"];
-      for (var prop in properties) {
+      let properties = node["properties"];
+      for (let prop in properties) {
         n.setProperty(prop, properties[prop]);
       }
     }
 
-    var connections = data["connections"];
+    let connections = data["connections"];
     for (let con of connections) {
-      //var c = d.addConnection()
-      var left = d.getNodeById(con.leftNodeId);
-      var right = d.getNodeById(con.rightNodeId);
+      //let c = d.addConnection()
+      let left = d.getNodeById(con.leftNodeId);
+      let right = d.getNodeById(con.rightNodeId);
 
       // todo: support left index
       d.addConnection(left, right, con.rightNodeInput);
     }
     /*
         for(let dvar of this.variables) {
-            var v = {};
+            let v = {};
             v["id"] = dvar.id;
             v["type"] = dvar.type;
             v["property"] = dvar.property;
 
-            var nodeIds = new Array();
+            let nodeIds = new Array();
             for(let n of dvar.nodes) {
                 nodeIds.push({
                     nodeId:n.node.id,
@@ -719,11 +719,11 @@ export class Designer {
         }
         */
     if (data.variables) {
-      var variables = <DesignerVariable[]>data.variables;
+      let variables = <DesignerVariable[]>data.variables;
       for (let v of variables) {
         //this.addVariable(v.name, v.displayName, )
 
-        var dvar = d.addVariable(
+        let dvar = d.addVariable(
           v.property.name,
           v.property.displayName,
           v.type

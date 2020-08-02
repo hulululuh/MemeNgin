@@ -44,9 +44,18 @@
                 <option value="4096">Resolution: 4096x4096</option>
               </select>
               <span>RandomSeed:</span>
-              <input type="number" :value="randomSeed" @change="setRandomSeed" />
+              <input
+                type="number"
+                :value="randomSeed"
+                @change="setRandomSeed"
+              />
             </div>
-            <canvas width="400" height="400" id="editor" ondragover="event.preventDefault()" />
+            <canvas
+              width="400"
+              height="400"
+              id="editor"
+              ondragover="event.preventDefault()"
+            />
           </gl-component>
           <!-- <gl-component title="Library" height="30" :closable="false">
             <library-view :editor="this.editor" :library="this.library" />
@@ -54,7 +63,11 @@
         </gl-col>
 
         <gl-col width="25">
-          <gl-component title="2D View" class="test-component" :closable="false">
+          <gl-component
+            title="2D View"
+            class="test-component"
+            :closable="false"
+          >
             <!-- <canvas width="100" height="100" id="_2dview" /> -->
             <preview2d ref="preview2d" />
           </gl-component>
@@ -244,7 +257,7 @@ const electron = require("electron");
 const remote = electron.remote;
 const { dialog, app, BrowserWindow, Menu } = remote;
 
-declare var __static: any;
+declare let __static: any;
 
 @Component({
   components: {
@@ -374,10 +387,10 @@ export default class App extends Vue {
     canv.ondrop = (evt) => {
       evt.preventDefault();
 
-      var itemJson = evt.dataTransfer.getData("text/plain");
+      let itemJson = evt.dataTransfer.getData("text/plain");
       let item = JSON.parse(itemJson);
       let rect = canv.getBoundingClientRect();
-      var pos = this.editor.graph.view.canvasToSceneXY(
+      let pos = this.editor.graph.view.canvasToSceneXY(
         evt.clientX - rect.left,
         evt.clientY - rect.top
       );
@@ -539,7 +552,7 @@ export default class App extends Vue {
     // editor
     if (item.config.title == "Editor") {
       let container = item.container;
-      item.container.on("resize", function () {
+      item.container.on("resize", function() {
         const canvas = <HTMLCanvasElement>document.getElementById("editor");
         canvas.width = container.width;
         canvas.height = container.height - 32;
@@ -613,7 +626,7 @@ export default class App extends Vue {
         },
         (path) => {
           if (!path) return;
-          var data = this.editor.save();
+          let data = this.editor.save();
           console.log(data);
           this.project.data = data;
           this.project.data["appVersion"] = this.version;
@@ -629,7 +642,7 @@ export default class App extends Vue {
         }
       );
     } else {
-      var data = this.editor.save();
+      let data = this.editor.save();
       console.log(data);
       this.project.data = data;
       this.project.data["appVersion"] = this.version;
@@ -702,7 +715,7 @@ export default class App extends Vue {
       (path) => {
         if (!path) return;
 
-        fs.writeFile(path, buffer, function (err) {
+        fs.writeFile(path, buffer, function(err) {
           if (err) alert("Error exporting texture: " + err);
         });
 

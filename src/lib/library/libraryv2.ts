@@ -37,7 +37,7 @@ import { SlopeBlur } from "./v2/slopeblur";
 import { TileSampler } from "./v2/tilesampler";
 
 export function createLibrary() {
-  var lib = new DesignerLibrary();
+  let lib = new DesignerLibrary();
   lib.versionName = "v2";
   lib.addNode("brickgenerator", "Brick Generator", BrickGeneratorNode);
   lib.addNode("normalmap", "Normal Map", NormalMapNode);

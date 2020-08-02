@@ -14,7 +14,12 @@
         :style="'background-color: ' + colorValue"
         @click="togglePicker()"
       ></span>
-      <sketch :value="colors" @input="updateFromPicker" v-if="displayPicker" ref="sketch" />
+      <sketch
+        :value="colors"
+        @input="updateFromPicker"
+        v-if="displayPicker"
+        ref="sketch"
+      />
     </span>
   </div>
 </template>
@@ -97,7 +102,7 @@ export default class ColorPicker extends Vue {
   // 			hex: color,
   // 		};
   // 	} else if (color.slice(0, 4) == "rgba") {
-  // 		var rgba = color.replace(/^rgba?\(|\s+|\)$/g, "").split(","),
+  // 		let rgba = color.replace(/^rgba?\(|\s+|\)$/g, "").split(","),
   // 			hex =
   // 				"#" +
   // 				(

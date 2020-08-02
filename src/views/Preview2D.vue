@@ -29,7 +29,7 @@ const electron = require("electron");
 const remote = electron.remote;
 const { dialog, app, BrowserWindow, Menu } = remote;
 import fs from "fs";
-var nativeImage = electron.nativeImage;
+let nativeImage = electron.nativeImage;
 
 export default {
   // props: {

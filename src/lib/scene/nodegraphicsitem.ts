@@ -180,8 +180,8 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   getInSockets() {
-    var array = new Array();
-    for (var sock of this.sockets) {
+    let array = new Array();
+    for (let sock of this.sockets) {
       if (sock.socketType == SocketType.In) array.push(sock);
     }
 
@@ -189,7 +189,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   getInSocketByName(name: string): SocketGraphicsItem {
-    for (var sock of this.sockets) {
+    for (let sock of this.sockets) {
       if (sock.socketType == SocketType.In)
         if (sock.title == name)
           //todo: separate title from name
@@ -200,8 +200,8 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   getOutSockets() {
-    var array = new Array();
-    for (var sock of this.sockets) {
+    let array = new Array();
+    for (let sock of this.sockets) {
       if (sock.socketType == SocketType.Out) array.push(sock);
     }
 
@@ -221,7 +221,7 @@ export class NodeGraphicsItem extends GraphicsItem {
       }
     }
 
-    for (var sock of this.sockets) {
+    for (let sock of this.sockets) {
       if (sock.socketType == SocketType.Out)
         if (sock.title == name)
           //todo: separate title from name
@@ -233,7 +233,7 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   // adds socket to node
   public addSocket(name: string, id: string, type: SocketType) {
-    var sock = new SocketGraphicsItem();
+    let sock = new SocketGraphicsItem();
     sock.id = id;
     sock.title = name;
     sock.node = this;

@@ -63,7 +63,7 @@ export class FloatProperty extends Property {
   }
 
   public clone(): Property {
-    var prop = new FloatProperty(
+    let prop = new FloatProperty(
       this.name,
       this.displayName,
       this.value,
@@ -112,7 +112,7 @@ export class IntProperty extends Property {
   }
 
   public clone(): Property {
-    var prop = new IntProperty(
+    let prop = new IntProperty(
       this.name,
       this.displayName,
       this.value,
@@ -152,7 +152,7 @@ export class BoolProperty extends Property {
   }
 
   public clone(): Property {
-    var prop = new BoolProperty(this.name, this.displayName, this.value);
+    let prop = new BoolProperty(this.name, this.displayName, this.value);
 
     return prop;
   }
@@ -187,7 +187,7 @@ export class EnumProperty extends Property {
   }
 
   public clone(): Property {
-    var prop = new EnumProperty(
+    let prop = new EnumProperty(
       this.name,
       this.displayName,
       this.values.slice(0)
@@ -224,7 +224,7 @@ export class ColorProperty extends Property {
     else if (typeof val == "string") this.value = Color.parse(val);
     else if (typeof val == "object") {
       console.log("setting value", val);
-      var value = new Color();
+      let value = new Color();
       value.r = val.r || 0;
       value.g = val.g || 0;
       value.b = val.b || 0;
@@ -235,7 +235,7 @@ export class ColorProperty extends Property {
   }
 
   public clone(): Property {
-    var prop = new ColorProperty(this.name, this.displayName, this.value);
+    let prop = new ColorProperty(this.name, this.displayName, this.value);
 
     return prop;
   }
@@ -272,7 +272,7 @@ export class StringProperty extends Property {
   }
 
   public clone(): Property {
-    var prop = new StringProperty(this.name, this.displayName, this.value);
+    let prop = new StringProperty(this.name, this.displayName, this.value);
 
     return prop;
   }
@@ -302,7 +302,7 @@ export class GradientProperty extends Property {
   }
 
   public clone(): Property {
-    var prop = new GradientProperty(
+    let prop = new GradientProperty(
       this.name,
       this.displayName,
       this.value.clone()

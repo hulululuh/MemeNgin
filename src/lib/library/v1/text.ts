@@ -33,17 +33,17 @@ let Load = (fntPath: string, texPath: string, text: string) => {
     console.log(geometry.layout.descender);
 
     // the texture atlas containing our glyphs
-    var textureLoader = new THREE.TextureLoader();
+    let textureLoader = new THREE.TextureLoader();
     textureLoader.load(texPath, function(texture) {
       // we can use a simple ThreeJS material
-      var material = new THREE.MeshBasicMaterial({
+      let material = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true,
         color: 0xaaffff,
       });
 
       // now do something with our mesh!
-      var mesh = new THREE.Mesh(geometry, material);
+      let mesh = new THREE.Mesh(geometry, material);
 
       return texture;
     });
@@ -82,7 +82,7 @@ export class TextNode extends DesignerNode {
 
     this.addFloatProperty("rot", "Rotation", 0, 0.0, 360.0, 0.01);
 
-    var source = `
+    let source = `
         vec4 process(vec2 uv)
         {
             return vec4(1.0, 0.0, 0.0, 1.0);

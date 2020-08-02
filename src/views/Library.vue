@@ -49,7 +49,7 @@ import path from "path";
 import { AddItemsAction } from "../lib/actions/additemsaction";
 import { UndoStack } from "../lib/undostack";
 
-declare var __static: any;
+declare let __static: any;
 
 // this abstracts library nodes and other items such as comments
 export enum LibraryItemType {
@@ -110,8 +110,8 @@ export default class LibraryView extends Vue {
   }
 
   get filteredList() {
-    var kw = this.filter;
-    var list = Object.values(this.items).filter(function(item) {
+    let kw = this.filter;
+    let list = Object.values(this.items).filter(function(item) {
       return item.name.toLowerCase().includes(kw.toLowerCase());
     });
     return list;
@@ -121,9 +121,9 @@ export default class LibraryView extends Vue {
     let action: AddItemsAction = null;
 
     if (type == LibraryItemType.Node) {
-      var dnode = this.library.create(nodeName);
-      var canvas = this.editor.canvas;
-      var n = this.editor.addNode(dnode, canvas.width / 2, canvas.height / 2);
+      let dnode = this.library.create(nodeName);
+      let canvas = this.editor.canvas;
+      let n = this.editor.addNode(dnode, canvas.width / 2, canvas.height / 2);
       n.setCenter(200, 200);
 
       action = new AddItemsAction(

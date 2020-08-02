@@ -16,7 +16,7 @@ export class Gradient {
   }
 
   addPoint(t: number, color: Color): GradientPoint {
-    var point = new GradientPoint();
+    let point = new GradientPoint();
     point.t = t;
     point.color = color;
 
@@ -47,17 +47,17 @@ export class Gradient {
     // here at least two points are available
     if (t < this.points[0].t) return this.points[0].color.clone();
 
-    var last = this.points.length - 1;
+    let last = this.points.length - 1;
     if (t > this.points[last].t) return this.points[last].color.clone();
 
     // find two points and lerp
-    for (var i = 0; i < this.points.length - 1; i++) {
+    for (let i = 0; i < this.points.length - 1; i++) {
       if (this.points[i + 1].t > t) {
-        var p1 = this.points[i];
-        var p2 = this.points[i + 1];
+        let p1 = this.points[i];
+        let p2 = this.points[i + 1];
 
-        var lerpPos = (t - p1.t) / (p2.t - p1.t);
-        var color = new Color();
+        let lerpPos = (t - p1.t) / (p2.t - p1.t);
+        let color = new Color();
         color.copy(p1.color);
         color.lerp(p2.color, lerpPos);
 

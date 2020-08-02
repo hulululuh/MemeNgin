@@ -226,7 +226,7 @@ export class SocketGraphicsItem extends GraphicsItem {
         closeSock.node != this.hitSocket.node
       ) {
         // close socket
-        var con: ConnectionGraphicsItem = new ConnectionGraphicsItem();
+        let con: ConnectionGraphicsItem = new ConnectionGraphicsItem();
         // out socket should be on the left, socketA
         if (this.hitSocket.socketType == SocketType.Out) {
           // out socket

@@ -46,17 +46,17 @@ export class ImageCanvas {
   }
 
   toImage(): HTMLImageElement {
-    var img: HTMLImageElement = <HTMLImageElement>(
+    let img: HTMLImageElement = <HTMLImageElement>(
       document.createElement("image")
     );
-    //var img:HTMLImageElement = new Image(this.width, this.height);
+    //let img:HTMLImageElement = new Image(this.width, this.height);
     img.src = this.canvas.toDataURL("image/png");
 
     return img;
   }
 
   createTexture(gl: WebGLRenderingContext): WebGLTexture {
-    var texture = gl.createTexture();
+    let texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);

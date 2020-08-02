@@ -11,7 +11,7 @@ export class TextureNode extends DesignerNode {
   }
 
   public createTexture() {
-    var gl = this.gl;
+    let gl = this.gl;
 
     if (this.tex) {
       gl.deleteTexture(this.tex);
@@ -50,7 +50,7 @@ export class TextureNode extends DesignerNode {
   public init() {
     this.title = "Texture";
 
-    var source = `
+    let source = `
         vec4 process(vec2 uv)
         {
           vec4 col = vec4(0,1,0,1);

@@ -74,12 +74,12 @@ export class CommentGraphicsItem extends GraphicsItem
     ctx.font = fontHeight + "px 'Open Sans'";
     let size = ctx.measureText(this.text);
 
-    var maxWidth = 0;
-    var lines = this.text.split("\n");
+    let maxWidth = 0;
+    let lines = this.text.split("\n");
     // console.log(lines);
     // console.log(ctx);
     // console.log(ctx.font);
-    for (var i = 0; i < lines.length; ++i) {
+    for (let i = 0; i < lines.length; ++i) {
       let size = ctx.measureText(lines[i]);
       //console.log("INITIAL WITH: " + size.width);
       maxWidth = Math.max(maxWidth, size.width);
@@ -93,7 +93,7 @@ export class CommentGraphicsItem extends GraphicsItem
   }
 
   private buildColor(color: Color, alpha: number) {
-    var col =
+    let col =
       "rgba(" +
       color.r * 255 +
       "," +
@@ -149,7 +149,7 @@ export class CommentGraphicsItem extends GraphicsItem
     let textY = this.y + fontHeight;
 
     let lineHeight = fontHeight;
-    //var lines = this.text.split("\n");
+    //let lines = this.text.split("\n");
     ctx.font = fontHeight + "px 'Open Sans'";
     ctx.textAlign = "left";
     ctx.lineWidth = 1;

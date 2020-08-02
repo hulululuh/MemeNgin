@@ -19,7 +19,7 @@ requestAnimationFrame(animate);
 
 // get local mouse position
 function _getMousePos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect();
+  let rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left, evt.clientY - rect.top);
 }
 
@@ -233,7 +233,7 @@ export class SceneView {
     this.canvas = canvas;
     this.context = this.canvas.getContext("2d");
 
-    var self = this;
+    let self = this;
     canvas.addEventListener("mousemove", function(evt: MouseEvent) {
       self.onMouseMove(evt);
     });
@@ -276,7 +276,7 @@ export class SceneView {
   }
 
   isMouseOverCanvas() {
-    var rect = this.canvas.getBoundingClientRect();
+    let rect = this.canvas.getBoundingClientRect();
     //console.log(rect);
     if (this.globalMousePos.x < rect.left) return false;
     if (this.globalMousePos.y < rect.top) return false;
@@ -326,8 +326,8 @@ export class SceneView {
     // no panning while zooming
     if (this.panning) return;
 
-    var pos = _getMousePos(this.canvas, evt);
-    var delta = (<any>evt).wheelDelta > 0 ? 1.1 : 1.0 / 1.1;
+    let pos = _getMousePos(this.canvas, evt);
+    let delta = (<any>evt).wheelDelta > 0 ? 1.1 : 1.0 / 1.1;
 
     // offset from mouse pos
     // find offset from previous zoom then move offset by that value
