@@ -73,6 +73,8 @@ export enum DisplayChannel {
 }
 
 export class Editor {
+  private static instance: Editor;
+
   canvas: HTMLCanvasElement;
 
   library: DesignerLibrary;
@@ -113,9 +115,17 @@ export class Editor {
   ) => void;
 
   constructor() {
+    Editor.instance = this;
     this.displayNodes = new DisplayNodes();
     this.selectedDesignerNode = null;
     this.undoStack = new UndoStack();
+  }
+
+  static getInstance() {
+    if (!Editor.instance) {
+      Editor.instance = new Editor();
+    }
+    return Editor.instance;
   }
 
   getImageWidth() {
@@ -549,8 +559,8 @@ export class Editor {
           //self.scene3D.setHeightTexture(node.thumbnail);
           self.updateDisplayNode(node);
         }
-      if (self.onnodeselected) self.onnodeselected(dnode);
-    }
+        if (self.onnodeselected) self.onnodeselected(dnode);
+      }
     };
 
     this.graph.oncommentselected = function(item: CommentGraphicsItem) {
@@ -695,6 +705,7 @@ export class Editor {
   }
 
   createThumnail(dNode: DesignerNode, node: NodeGraphicsItem) {
+    if (!dNode.readyToUpdate()) return;
     let thumb = this.designer.generateImageFromNode(dNode);
     node.setThumbnail(thumb);
   }
@@ -721,7 +732,9 @@ export class Editor {
     let pos = this.graph.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);
 
-    this.createThumnail(dNode, node);
+    if (dNode.readyToUpdate()) {
+      this.createThumnail(dNode, node);
+    }
 
     return node;
   }

@@ -86,16 +86,16 @@ export class NodeGraphicsItem extends GraphicsItem {
 
     // thumbnail if any
     if (this.thumbnail) {
-      //ctx.drawImage(this.thumbnail,this.x, this.y, this.width, this.height);
+      ctx.drawImage(this.thumbnail, this.x, this.y, this.width, this.height);
+    } else {
+      ctx.drawImage(
+        this.imageCanvas.canvas,
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      );
     }
-
-    ctx.drawImage(
-      this.imageCanvas.canvas,
-      this.x,
-      this.y,
-      this.width,
-      this.height
-    );
 
     // title
     if (!renderState.hovered) {

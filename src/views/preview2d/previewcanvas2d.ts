@@ -313,7 +313,7 @@ export class DragZoom {
       ctx.fillStyle = "white";
       ctx.font = "80px Arial";
       ctx.textAlign = "center";
-      ctx.fillText("Meanwhile in Mexico...", 0, IMAGE_RENDER_SIZE * 0.4);
+      //ctx.fillText("Meanwhile in Mexico...", 0, IMAGE_RENDER_SIZE * 0.4);
       //   this.context.lineWidth = 5;
       //   this.context.strokeRect(
       //     -IMAGE_RENDER_SIZE * 0.5,

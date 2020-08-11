@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { DesignerNode, NodeType, NodeInput } from "./designer/designernode";
 import { DesignerNodeConn } from "./designer/designerconnection";
 import { DesignerLibrary } from "./designer/library";
@@ -18,10 +19,12 @@ import {
   DesignerVariableType,
   DesignerNodePropertyMap,
 } from "./designer/designervariable";
+import { Editor } from "./editor";
 
 export class Designer {
   canvas: HTMLCanvasElement;
   gl: WebGLRenderingContext;
+  renderer: THREE.WebGLRenderer;
   public texCoordBuffer: WebGLBuffer;
   public posBuffer: WebGLBuffer;
   vertexShaderSource: string;
@@ -57,9 +60,15 @@ export class Designer {
     this.randomSeed = 32;
 
     this.canvas = <HTMLCanvasElement>document.createElement("canvas");
-    //document.body.appendChild(this.canvas);
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      context: this.gl,
+    });
+    this.renderer.setSize(this.width, this.height);
+
     this.gl = this.canvas.getContext("webgl2");
 
     this.nodes = new Array();
@@ -100,7 +109,7 @@ export class Designer {
   init() {
     this.createVertexBuffers();
     this.createFBO();
-    this.createThumbmailProgram();
+    this.createThumbnailProgram();
   }
 
   update() {
@@ -110,6 +119,12 @@ export class Designer {
     while (this.updateList.length != 0) {
       for (let node of this.updateList) {
         if (this.haveAllUpdatedLeftNodes(node)) {
+          if (node.hasBaseTexture() && !node.readyToUpdate()) {
+            this.updateList.splice(this.updateList.indexOf(node), 1);
+            node.needsUpdate = false;
+            continue;
+          }
+
           // update this node's texture and thumbnail
 
           // a note about this:
@@ -159,6 +174,15 @@ export class Designer {
       if (con.leftNode == node) {
         this.requestUpdate(con.rightNode);
       }
+    }
+  }
+
+  requestUpdateThumbnail(dNode: DesignerNode) {
+    const editor = Editor.getInstance();
+    const node = editor.graph.nodes.find((i) => i.id === dNode.id);
+
+    if (dNode && node) {
+      editor.createThumnail(dNode, node);
     }
   }
 
@@ -339,13 +363,21 @@ export class Designer {
   // it returns a thumbnail (an html image)
 
   generateImageFromNode(node: DesignerNode): HTMLImageElement {
+    if (node.nodeType === NodeType.Text) {
+      return this.createImageFromTexture(this.gl, node.tex, 1024, 1024);
+    }
+
     // render to texture to design node, skip this part if this node is custom txture
-    if (node.nodeType !== NodeType.Texture) {
+    // render to texture
+    if (!node.hasBaseTexture()) {
       console.log("generating node " + node.exportName);
       // process input nodes
       let inputs: NodeInput[] = this.getNodeInputs(node);
       for (let input of inputs) {
         if (input.node.needsUpdate) {
+          // if (input.node.hasBaseTexture() && !input.node.readyToUpdate())
+          //   continue;
+
           this.generateImageFromNode(input.node);
 
           // remove from update list since thumbnail has now been generated
@@ -353,7 +385,6 @@ export class Designer {
           this.updateList.splice(this.updateList.indexOf(input.node), 1);
         }
       }
-
       let gl = this.gl;
 
       // todo: move to node maybe
@@ -385,12 +416,47 @@ export class Designer {
     return thumb;
   }
 
+  createImageFromTexture(gl, texture, width, height) {
+    // Create a framebuffer backed by the texture
+    var framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_2D,
+      texture,
+      0
+    );
+
+    // Read the contents of the framebuffer
+    var data = new Uint8Array(width * height * 4);
+    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+    gl.deleteFramebuffer(framebuffer);
+
+    // Create a 2D canvas to store the result
+    var canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    var context = canvas.getContext("2d");
+
+    // Copy the pixels to a 2D canvas
+    var imageData = context.createImageData(width, height);
+    imageData.data.set(data);
+    context.putImageData(imageData, 0, 0);
+
+    var img = new Image();
+    img.src = canvas.toDataURL();
+    return img;
+  }
+
   // renders node's texture to an image object
   // ensure the node is updated before calling this function
   // this function doesnt try to update child nodes
   generateThumbnailFromNode(node: DesignerNode) {
     let gl = this.gl;
 
+    //gl.clearColor(1, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // bind shader
@@ -412,6 +478,8 @@ export class Designer {
     // send texture
     gl.uniform1i(gl.getUniformLocation(this.thumbnailProgram, "tex"), 0);
     gl.activeTexture(gl.TEXTURE0);
+
+    // TODO: check from here
     gl.bindTexture(gl.TEXTURE_2D, node.tex);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -420,6 +488,8 @@ export class Designer {
     gl.disableVertexAttribArray(posLoc);
     gl.disableVertexAttribArray(texCoordLoc);
 
+    return null;
+
     //let img:HTMLImageElement = <HTMLImageElement>document.createElement("image");
     //let img:HTMLImageElement = new Image(this.width, this.height);
     //img.src = this.canvas.toDataURL("image/png");
@@ -427,7 +497,7 @@ export class Designer {
     // note: this called right after clears the image for some reason
     //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //return img;
-    return null;
+    //return null;
   }
 
   // render's node's texture then draws it on the given canvas
@@ -471,7 +541,7 @@ export class Designer {
     canvas.copyFromCanvas(this.canvas, true);
   }
 
-  createThumbmailProgram() {
+  createThumbnailProgram() {
     let prog = buildShaderProgram(
       this.gl,
       `precision mediump float;
@@ -616,6 +686,8 @@ export class Designer {
       n["nodeType"] = node.nodeType;
       if (node.nodeType === NodeType.Texture) {
         n["texPath"] = node.texPath;
+      } else if (node.nodeType === NodeType.Text) {
+        //n["fontPath"]
       }
       //n["inputs"] = node.inputs;// not needed imo
 

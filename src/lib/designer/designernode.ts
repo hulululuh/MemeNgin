@@ -55,6 +55,7 @@ export class DesignerNode implements IPropertyHolder {
   public gl: WebGLRenderingContext;
   public designer: Designer;
   public tex: WebGLTexture;
+  public isTextureReady: boolean;
   //program:WebGLShader;
   source: string; // shader code
   shaderProgram: WebGLProgram;
@@ -69,6 +70,21 @@ export class DesignerNode implements IPropertyHolder {
   // constructor
   constructor() {
     this.nodeType = NodeType.Procedural;
+    this.isTextureReady = false;
+  }
+
+  public hasBaseTexture(): boolean {
+    return (
+      this.nodeType === NodeType.Text || this.nodeType === NodeType.Texture
+    );
+  }
+
+  public readyToUpdate() {
+    if (this.hasBaseTexture()) {
+      return this.isTextureReady && this.tex;
+    } else {
+      return true;
+    }
   }
 
   // callbacks
@@ -80,14 +96,18 @@ export class DesignerNode implements IPropertyHolder {
   // a connection is removed
   //
   // all output connected nodes are invalidated as well
-  protected requestUpdate() {
+  public requestUpdate() {
     this.designer.requestUpdate(this);
+  }
+
+  public requestUpdateThumbnail() {
+    this.designer.requestUpdateThumbnail(this);
   }
 
   public render(inputs: NodeInput[]) {
     let gl = this.gl;
     // bind texture to fbo
-    //gl.clearColor(0,0,1,1);
+    //gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // bind shader
@@ -127,7 +147,7 @@ export class DesignerNode implements IPropertyHolder {
     }
 
     // pass baseTexture if it is texture node
-    if (this.nodeType === NodeType.Texture && this.tex) {
+    if (this.hasBaseTexture() && this.isTextureReady) {
       //gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, this.tex);
@@ -299,6 +319,8 @@ export class DesignerNode implements IPropertyHolder {
         this.buildShader(this.source);
         */
   }
+
+  protected onTextureReady() {}
 
   // #source gets appended to fragment shader
   buildShader(source: string) {
@@ -667,7 +689,7 @@ export class DesignerNode implements IPropertyHolder {
       code += "uniform bool " + input + "_connected;\n";
     }
 
-    if (this.nodeType === NodeType.Texture) {
+    if (this.hasBaseTexture()) {
       code += "uniform sampler2D baseTexture;\n";
       code += "uniform bool baseTexture_ready;\n";
     }

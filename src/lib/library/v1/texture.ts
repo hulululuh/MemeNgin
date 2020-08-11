@@ -41,14 +41,16 @@ export class TextureNode extends DesignerNode {
           NodeType.Texture,
           this.gl
         );
-        this.nodeType = NodeType.Texture;
+        this.isTextureReady = true;
         this.requestUpdate();
       }
     }
   }
 
   public init() {
-    this.title = "Texture";
+    this.title = "Image Texture";
+
+    this.addStringProperty("path", "Path");
 
     let source = `
         vec4 process(vec2 uv)
