@@ -52,7 +52,7 @@ export default class StringPropertyView extends Vue {
 
   @Emit()
   propertyChanged() {
-    this.$emit("propertyChanged", this.prop.name);
+    this.$emit("propertyChanged", this.prop);
     return this.prop.name;
   }
 

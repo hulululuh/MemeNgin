@@ -91,7 +91,7 @@ export class DesignerNode implements IPropertyHolder {
 
   // callbacks
   onthumbnailgenerated: (DesignerNode, HTMLImageElement) => void;
-  onnodepropertychanged?: (propName: string) => void;
+  onnodepropertychanged?: (prop: Property) => void;
 
   // an update is requested when:
   // a property is changed

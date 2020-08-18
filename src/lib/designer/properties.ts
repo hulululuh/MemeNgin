@@ -33,7 +33,7 @@ export class Property {
 export interface IPropertyHolder {
   properties: Property[];
   setProperty(name: string, value: any);
-  onnodepropertychanged?: (propName: string) => void;
+  onnodepropertychanged?: (prop: Property) => void;
 }
 
 export class FloatProperty extends Property {

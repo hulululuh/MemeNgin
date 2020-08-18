@@ -14,7 +14,7 @@
           @blur="blur"
         />
       </div>
-      <div style="width:10%;" float="right;">
+      <div style="width:8%;" float="right;">
         <button class="block" @click="onclick">...</button>
       </div>
     </div>
@@ -48,7 +48,7 @@ export default class FilePropertyView extends Vue {
 
   @Emit()
   propertyChanged() {
-    this.$emit("propertyChanged", this.prop.name, this.prop);
+    this.$emit("propertyChanged", this.prop);
     return this.prop.name;
   }
 

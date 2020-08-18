@@ -1,10 +1,5 @@
 <template>
-  <form
-    class="properties"
-    @submit.prevent="cancelSubmit"
-    :key="node.id"
-    v-if="node != null"
-  >
+  <form class="properties" @submit.prevent="cancelSubmit" :key="node.id" v-if="node != null">
     <accordion header="Base Properties" v-if="isInstanceNode">
       <texture-channel :node="getNode" :editor="editor" />
     </accordion>
@@ -71,9 +66,9 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
   @Prop()
   editor: Editor;
 
-  propertyChanged(propName: string) {
+  propertyChanged(prop: Property) {
     if (this.node.onnodepropertychanged) {
-      this.node.onnodepropertychanged(propName);
+      this.node.onnodepropertychanged(prop);
     }
     // if (this.editor.onnodepropertychanged)
     //   this.editor.onnodepropertychanged(self.node, prop);

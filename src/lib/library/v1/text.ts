@@ -7,7 +7,7 @@ import { fdatasync, promises } from "fs";
 import { ResolvedKeybinding } from "custom-electron-titlebar/lib/common/keyCodes";
 import { Designer } from "@/lib/designer";
 import { Vector3 } from "three";
-import { StringProperty } from "@/lib/designer/properties";
+import { Property, StringProperty } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
 const loadFont = require("load-bmfont");
 
@@ -150,8 +150,8 @@ export class TextNode extends DesignerNode {
     super();
     this.nodeType = NodeType.Text;
 
-    this.onnodepropertychanged = (propName: string) => {
-      if (propName === "text") {
+    this.onnodepropertychanged = (prop: Property) => {
+      if (prop.name === "text") {
         this.createTexture();
       }
       // else if (propName === "size") {

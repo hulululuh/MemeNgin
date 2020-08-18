@@ -1,7 +1,7 @@
 import { DesignerNode, NodeType } from "../../designer/designernode";
 import { Color } from "@/lib/designer/color";
 import { SphereBufferGeometry } from "@/lib/geometry/sphere";
-import { FileProperty } from "@/lib/designer/properties";
+import { Property, FileProperty } from "@/lib/designer/properties";
 const NativeImage = require("electron").nativeImage;
 
 export class TextureNode extends DesignerNode {
@@ -10,12 +10,8 @@ export class TextureNode extends DesignerNode {
     super();
     this.nodeType = NodeType.Texture;
 
-    this.onnodepropertychanged = (propName: string) => {
-      if (propName === "file") {
-        let prop = this.properties.find((x) => {
-          return x.name == "file";
-        });
-
+    this.onnodepropertychanged = (prop: Property) => {
+      if (prop.name === "file") {
         if (prop) {
           this.texPath = (prop as FileProperty).value;
           this.createTexture();
