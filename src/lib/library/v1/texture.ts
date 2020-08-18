@@ -25,11 +25,24 @@ export class TextureNode extends DesignerNode {
     const type = gl.UNSIGNED_BYTE;
     const nodetype = this.nodeType;
     let data = null;
+
     if (this.texPath) {
       const image = NativeImage.createFromPath(this.texPath);
       if (image.isEmpty() === false) {
-        const imgSize = image.getSize();
         this.tex = DesignerNode.updateTexture(
+          level,
+          internalFormat,
+          this.designer.width,
+          this.designer.height,
+          border,
+          format,
+          type,
+          data,
+          NodeType.Procedural,
+          this.gl
+        );
+        const imgSize = image.getSize();
+        this.baseTex = DesignerNode.updateTexture(
           level,
           internalFormat,
           imgSize.width,
@@ -49,7 +62,6 @@ export class TextureNode extends DesignerNode {
 
   public init() {
     this.title = "Image Texture";
-
     this.addStringProperty("path", "Path");
 
     let source = `

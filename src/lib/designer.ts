@@ -24,7 +24,12 @@ import { Editor } from "./editor";
 export class Designer {
   canvas: HTMLCanvasElement;
   gl: WebGLRenderingContext;
-  renderer: THREE.WebGLRenderer;
+
+  // scene for render to texture
+  rttRenderer: THREE.WebGLRenderer;
+  rttCamera: THREE.OrthographicCamera;
+  rttScene: THREE.Scene;
+
   public texCoordBuffer: WebGLBuffer;
   public posBuffer: WebGLBuffer;
   vertexShaderSource: string;
@@ -62,14 +67,25 @@ export class Designer {
     this.canvas = <HTMLCanvasElement>document.createElement("canvas");
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+    this.gl = this.canvas.getContext("webgl2");
 
-    this.renderer = new THREE.WebGLRenderer({
+    this.rttRenderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       context: this.gl,
     });
-    this.renderer.setSize(this.width, this.height);
+    this.rttRenderer.setSize(this.width, this.height);
 
-    this.gl = this.canvas.getContext("webgl2");
+    this.rttScene = new THREE.Scene();
+
+    this.rttCamera = new THREE.OrthographicCamera(
+      this.width / -2,
+      this.width / 2,
+      this.height / 2,
+      this.height / -2,
+      -1000,
+      1000
+    );
+    this.rttCamera.position.z = 100;
 
     this.nodes = new Array();
     this.conns = new Array();
@@ -119,11 +135,11 @@ export class Designer {
     while (this.updateList.length != 0) {
       for (let node of this.updateList) {
         if (this.haveAllUpdatedLeftNodes(node)) {
-          if (node.hasBaseTexture() && !node.readyToUpdate()) {
-            this.updateList.splice(this.updateList.indexOf(node), 1);
-            node.needsUpdate = false;
-            continue;
-          }
+          // if (node.hasBaseTexture() && !node.readyToUpdate()) {
+          //   this.updateList.splice(this.updateList.indexOf(node), 1);
+          //   node.needsUpdate = false;
+          //   continue;
+          // }
 
           // update this node's texture and thumbnail
 
@@ -363,13 +379,14 @@ export class Designer {
   // it returns a thumbnail (an html image)
 
   generateImageFromNode(node: DesignerNode): HTMLImageElement {
-    if (node.nodeType === NodeType.Text) {
-      return this.createImageFromTexture(this.gl, node.tex, 1024, 1024);
-    }
-
-    // render to texture to design node, skip this part if this node is custom txture
-    // render to texture
-    if (!node.hasBaseTexture()) {
+    // Procedural : Render >> Get fbo texture then use it as thumbnail
+    // Text : bind text layout as baseTex >> Render >> Get fbo texture then use it as thumbnail
+    // Texture : textures already loaded into node.tex (skip the rendering)
+    if (
+      node.nodeType === NodeType.Procedural ||
+      node.nodeType === NodeType.Text ||
+      node.nodeType === NodeType.Texture
+    ) {
       console.log("generating node " + node.exportName);
       // process input nodes
       let inputs: NodeInput[] = this.getNodeInputs(node);
@@ -403,6 +420,9 @@ export class Designer {
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
+    // else if (node.nodeType === NodeType.Text) {
+    //   return this.createImageFromTexture(this.gl, node.tex, 1024, 1024);
+    // }
 
     if (this.onnodetextureupdated) {
       this.onnodetextureupdated(node);

@@ -55,6 +55,7 @@ export class DesignerNode implements IPropertyHolder {
   public gl: WebGLRenderingContext;
   public designer: Designer;
   public tex: WebGLTexture;
+  public baseTex: WebGLTexture;
   public isTextureReady: boolean;
   //program:WebGLShader;
   source: string; // shader code
@@ -81,7 +82,7 @@ export class DesignerNode implements IPropertyHolder {
 
   public readyToUpdate() {
     if (this.hasBaseTexture()) {
-      return this.isTextureReady && this.tex;
+      return this.isTextureReady;
     } else {
       return true;
     }
@@ -89,6 +90,7 @@ export class DesignerNode implements IPropertyHolder {
 
   // callbacks
   onthumbnailgenerated: (DesignerNode, HTMLImageElement) => void;
+  onnodepropertychanged?: (propName: string) => void;
 
   // an update is requested when:
   // a property is changed
@@ -147,10 +149,17 @@ export class DesignerNode implements IPropertyHolder {
     }
 
     // pass baseTexture if it is texture node
-    if (this.hasBaseTexture() && this.isTextureReady) {
+    if (this.hasBaseTexture()) {
+      if (!this.readyToUpdate()) {
+        return;
+      }
+
+      //const baseTex = this.nodeType === NodeType.Text ? this.baseTex : this.tex;
+      const baseTex = this.baseTex;
+
       //gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.bindTexture(gl.TEXTURE_2D, this.tex);
+      gl.bindTexture(gl.TEXTURE_2D, baseTex);
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, "baseTexture"),
         texIndex
@@ -319,8 +328,6 @@ export class DesignerNode implements IPropertyHolder {
         this.buildShader(this.source);
         */
   }
-
-  protected onTextureReady() {}
 
   // #source gets appended to fragment shader
   buildShader(source: string) {

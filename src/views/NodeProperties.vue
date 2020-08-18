@@ -70,6 +70,9 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
   editor: Editor;
 
   propertyChanged(propName: string) {
+    if (this.node.onnodepropertychanged) {
+      this.node.onnodepropertychanged(propName);
+    }
     // if (this.editor.onnodepropertychanged)
     //   this.editor.onnodepropertychanged(self.node, prop);
   }

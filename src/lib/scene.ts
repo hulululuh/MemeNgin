@@ -198,32 +198,26 @@ export class NodeScene {
     // window.addEventListener("click", self._mouseClick);
 
     self._keyDown = function(evt: KeyboardEvent) {
-      // Delete selected nodes
-      if (
-        evt.key == "Delete" &&
-        self.hasFocus &&
-        self.selectedItems.length !== 0
-      ) {
-        //self.deleteNode(self.selectedNode);
-        self.deleteItems(self.selectedItems);
-      }
-
-      // Zoom selected
-      if (evt.key.toLowerCase() === "f" && self.hasFocus) {
-        if (self.selectedItems.length !== 0) {
-          self.zoomSelected(self.selectedItems);
-        } else {
-          self.view.reset();
+      if (self.hasFocus) {
+        // Delete selected nodes
+        if (evt.key == "Delete" && self.selectedItems.length !== 0) {
+          //self.deleteNode(self.selectedNode);
+          self.deleteItems(self.selectedItems);
         }
-      }
 
-      // Select all nodes
-      if (
-        (evt.ctrlKey || evt.metaKey) &&
-        evt.key.toLowerCase() === "a" &&
-        self.hasFocus
-      ) {
-        self.selectedItems = self.nodes;
+        // Zoom selected
+        if (evt.key.toLowerCase() === "f") {
+          if (self.selectedItems.length !== 0) {
+            self.zoomSelected(self.selectedItems);
+          } else {
+            self.view.reset();
+          }
+        }
+
+        // Select all nodes
+        if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === "a") {
+          self.selectedItems = self.nodes;
+        }
       }
 
       // Library menu
