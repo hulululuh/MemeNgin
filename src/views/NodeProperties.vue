@@ -36,6 +36,7 @@ import { DesignerNode } from "@/lib/designer/designernode";
 import { Property, IPropertyHolder } from "@/lib/designer/properties";
 import GradientPropertyView from "@/components/properties/GradientProp.vue";
 import StringPropertyView from "@/components/properties/StringProp.vue";
+import FilePropertyView from "@/components/properties/FileProp.vue";
 import {
   IProperyUi,
   PropertyChangeComplete,
@@ -57,6 +58,7 @@ class PropHolder {
     color: ColorPropertyView,
     gradient: GradientPropertyView,
     string: StringPropertyView,
+    file: FilePropertyView,
 
     textureChannel: TextureChannelPropertyView,
     Accordion,

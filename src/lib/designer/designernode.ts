@@ -8,6 +8,7 @@ import {
   EnumProperty,
   ColorProperty,
   StringProperty,
+  FileProperty,
   GradientProperty,
   IPropertyHolder,
 } from "./properties";
@@ -817,6 +818,17 @@ export class DesignerNode implements IPropertyHolder {
     defaultVal: string = ""
   ): StringProperty {
     let prop = new StringProperty(id, displayName, defaultVal);
+
+    this.properties.push(prop);
+    return prop;
+  }
+
+  addFileProperty(
+    id: string,
+    displayName: string,
+    defaultVal: string = ""
+  ): FileProperty {
+    let prop = new FileProperty(id, displayName, defaultVal);
 
     this.properties.push(prop);
     return prop;

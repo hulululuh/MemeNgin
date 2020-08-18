@@ -10,6 +10,7 @@ export enum PropertyType {
   Enum = "enum",
   String = "string",
   Gradient = "gradient",
+  File = "file",
 }
 
 export class Property {
@@ -279,6 +280,36 @@ export class StringProperty extends Property {
   }
 
   public copyValuesFrom(prop: StringProperty) {
+    this.value = prop.value;
+  }
+}
+
+export class FileProperty extends Property {
+  value: string;
+  public constructor(name: string, displayName: string, value: string = "") {
+    super();
+    this.name = name;
+    this.displayName = displayName;
+    this.value = value;
+    this.type = PropertyType.File;
+  }
+
+  public getValue(): any {
+    return this.value;
+  }
+
+  public setValue(val: any) {
+    // todo: validate
+    this.value = val;
+  }
+
+  public clone(): Property {
+    let prop = new FileProperty(this.name, this.displayName, this.value);
+
+    return prop;
+  }
+
+  public copyValuesFrom(prop: FileProperty) {
     this.value = prop.value;
   }
 }

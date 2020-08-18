@@ -1,6 +1,7 @@
 import { DesignerNode, NodeType } from "../../designer/designernode";
 import { Color } from "@/lib/designer/color";
 import { SphereBufferGeometry } from "@/lib/geometry/sphere";
+import { FileProperty } from "@/lib/designer/properties";
 const NativeImage = require("electron").nativeImage;
 
 export class TextureNode extends DesignerNode {
@@ -8,6 +9,22 @@ export class TextureNode extends DesignerNode {
   constructor() {
     super();
     this.nodeType = NodeType.Texture;
+
+    this.onnodepropertychanged = (propName: string) => {
+      if (propName === "file") {
+        let prop = this.properties.find((x) => {
+          return x.name == "file";
+        });
+
+        if (prop) {
+          this.texPath = (prop as FileProperty).value;
+          this.createTexture();
+        }
+      }
+      // else if (propName === "size") {
+      //   //this.createTexture();
+      // }
+    };
   }
 
   public createTexture() {
@@ -62,7 +79,8 @@ export class TextureNode extends DesignerNode {
 
   public init() {
     this.title = "Image Texture";
-    this.addStringProperty("path", "Path");
+    this.addFileProperty("file", "path");
+    //this.addStringProperty("path", "Path");
 
     let source = `
         vec4 process(vec2 uv)
