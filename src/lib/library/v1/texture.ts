@@ -75,8 +75,12 @@ export class TextureNode extends DesignerNode {
 
   public init() {
     this.title = "Image Texture";
-    this.addFileProperty("file", "path");
-    //this.addStringProperty("path", "Path");
+    let fileProp = this.addFileProperty("file", "path");
+
+    // this happens when we drop image file into canvas
+    if (this.texPath !== "") {
+      fileProp.setValue(this.texPath);
+    }
 
     let source = `
         vec4 process(vec2 uv)

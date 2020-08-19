@@ -12,6 +12,7 @@
           style="width:100%"
           @focus="focus"
           @blur="blur"
+          disabled
         />
       </div>
       <div style="width:8%;" float="right;">
