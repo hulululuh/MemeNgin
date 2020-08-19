@@ -30,6 +30,7 @@ import { IPropertyHolder } from "../../lib/designer/properties";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
 import { UndoStack } from "@/lib/undostack";
 import { remote } from "electron";
+import fs from "fs";
 const dialog = remote.dialog;
 
 //const { dialog } = require("electron").remote;
@@ -64,8 +65,10 @@ export default class FilePropertyView extends Vue {
       filters: [{ name: "Images", extensions: ["jpg", "png"] }],
     });
 
-    this.propHolder.setProperty(this.prop.name, result[0]);
-    this.propertyChanged();
+    if (result && fs.existsSync(result[0])) {
+      this.propHolder.setProperty(this.prop.name, result[0]);
+      this.propertyChanged();
+    }
   }
 
   focus() {
