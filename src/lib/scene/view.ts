@@ -268,7 +268,8 @@ export class SceneView {
   reset() {
     this.mousePos = new Vector2(0, 0);
     this.globalMousePos = new Vector2(0, 0);
-    this.changeView(new Vector2(0, 0), 1);
+    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+    this.changeView(center, 1);
   }
 
   getAbsPos() {

@@ -58,6 +58,10 @@ export class DesignerNode implements IPropertyHolder {
   public tex: WebGLTexture;
   public baseTex: WebGLTexture;
   public isTextureReady: boolean;
+
+  public isInput: boolean;
+  public isResult: boolean;
+
   //program:WebGLShader;
   source: string; // shader code
   shaderProgram: WebGLProgram;
@@ -73,6 +77,8 @@ export class DesignerNode implements IPropertyHolder {
   constructor() {
     this.nodeType = NodeType.Procedural;
     this.isTextureReady = false;
+    this.isInput = false;
+    this.isResult = false;
   }
 
   public hasBaseTexture(): boolean {
@@ -328,6 +334,14 @@ export class DesignerNode implements IPropertyHolder {
 
         this.buildShader(this.source);
         */
+  }
+
+  public setAsInput() {
+    this.isInput = true;
+  }
+
+  public setAsResult() {
+    this.isResult = true;
   }
 
   // #source gets appended to fragment shader
