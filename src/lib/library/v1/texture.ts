@@ -5,6 +5,8 @@ import { Property, FileProperty } from "@/lib/designer/properties";
 const NativeImage = require("electron").nativeImage;
 
 export class TextureNode extends DesignerNode {
+  protected img: Electron.NativeImage;
+
   // constructor
   constructor() {
     super();
@@ -14,7 +16,11 @@ export class TextureNode extends DesignerNode {
       if (prop.name === "file") {
         if (prop) {
           this.texPath = (prop as FileProperty).value;
-          this.createTexture();
+          if (this.texPath) {
+            this.img = NativeImage.createFromPath(this.texPath);
+            const imgSize = this.img.getSize();
+            this.resize(imgSize.width, imgSize.height);
+          }
         }
       }
       // else if (propName === "size") {
@@ -39,14 +45,22 @@ export class TextureNode extends DesignerNode {
     const nodetype = this.nodeType;
     let data = null;
 
-    if (this.texPath) {
-      const image = NativeImage.createFromPath(this.texPath);
+    if (!this.img && this.texPath) {
+      this.img = NativeImage.createFromPath(this.texPath);
+    }
+
+    if (this.img) {
+      const image = this.img;
+      const imgSize = image.getSize();
       if (image.isEmpty() === false) {
+        this.width = imgSize.width;
+        this.height = imgSize.height;
+
         this.tex = DesignerNode.updateTexture(
           level,
           internalFormat,
-          this.designer.width,
-          this.designer.height,
+          imgSize.width,
+          imgSize.height,
           border,
           format,
           type,
@@ -54,7 +68,6 @@ export class TextureNode extends DesignerNode {
           NodeType.Procedural,
           this.gl
         );
-        const imgSize = image.getSize();
         this.baseTex = DesignerNode.updateTexture(
           level,
           internalFormat,

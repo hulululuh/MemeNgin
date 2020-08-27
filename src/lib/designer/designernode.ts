@@ -15,6 +15,7 @@ import {
 import { buildShaderProgram } from "./gl";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
+import { Editor } from "../editor";
 
 const NativeImage = require("electron").nativeImage;
 
@@ -62,6 +63,9 @@ export class DesignerNode implements IPropertyHolder {
   public isInput: boolean;
   public isResult: boolean;
 
+  public width: number;
+  public height: number;
+
   //program:WebGLShader;
   source: string; // shader code
   shaderProgram: WebGLProgram;
@@ -79,6 +83,24 @@ export class DesignerNode implements IPropertyHolder {
     this.isTextureReady = false;
     this.isInput = false;
     this.isResult = false;
+    this.width = 1024;
+    this.height = 1024;
+  }
+
+  public getWidth(): number {
+    if (this.width) {
+      return this.width;
+    } else {
+      return this.designer.width;
+    }
+  }
+
+  public getHeight(): number {
+    if (this.height) {
+      return this.height;
+    } else {
+      return this.designer.height;
+    }
   }
 
   public hasBaseTexture(): boolean {
@@ -113,10 +135,30 @@ export class DesignerNode implements IPropertyHolder {
     this.designer.requestUpdateThumbnail(this);
   }
 
+  public resize(width: number, height: number) {
+    const sizeChanged = this.width !== width || this.height !== height;
+
+    if (sizeChanged) {
+      this.width = width;
+      this.height = height;
+
+      // find a corresponding NodeGraphicsItem
+      const gNodes = Editor.getInstance().graph.nodes.find(
+        (x) => x.id === this.id
+      );
+      if (gNodes) {
+        gNodes.setVirtualSize(width, height);
+      }
+      this.createTexture();
+      this.requestUpdate();
+    }
+  }
+
   public render(inputs: NodeInput[]) {
     let gl = this.gl;
+
     // bind texture to fbo
-    //gl.clearColor(0, 0, 0, 1);
+    //gl.clearColor(1, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // bind shader
@@ -136,6 +178,8 @@ export class DesignerNode implements IPropertyHolder {
         0
       );
     }
+
+    this.designer.setTextureSize(this.getWidth(), this.getHeight());
 
     // pass inputs for rendering
     texIndex = 0;
@@ -161,12 +205,8 @@ export class DesignerNode implements IPropertyHolder {
         return;
       }
 
-      //const baseTex = this.nodeType === NodeType.Text ? this.baseTex : this.tex;
-      const baseTex = this.baseTex;
-
-      //gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.bindTexture(gl.TEXTURE_2D, baseTex);
+      gl.bindTexture(gl.TEXTURE_2D, this.baseTex);
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, "baseTexture"),
         texIndex
@@ -188,8 +228,8 @@ export class DesignerNode implements IPropertyHolder {
     // texture size
     gl.uniform2f(
       gl.getUniformLocation(this.shaderProgram, "_textureSize"),
-      this.designer.width,
-      this.designer.height
+      this.getWidth(),
+      this.getHeight()
     );
 
     // pass properties
@@ -356,8 +396,11 @@ export class DesignerNode implements IPropertyHolder {
         out vec2 v_texCoord;
             
         void main() {
-            gl_Position = vec4(a_pos,1.0);
-            v_texCoord = a_texCoord;
+            // gl_Position = vec4(a_pos, 1.0);
+            // v_texCoord = a_texCoord;
+            
+            gl_Position = vec4(a_pos * 2.0, 1.0);
+            v_texCoord = (gl_Position.xy + 1.0) / 2.0;
         }`;
 
     let fragSource: string = `#version 300 es
@@ -464,6 +507,11 @@ export class DesignerNode implements IPropertyHolder {
     return tex;
   }
 
+  public static getNearestPOT(num: number): number {
+    const pow = Math.floor(Math.log2(num));
+    return Math.pow(2, pow);
+  }
+
   // creates opengl texture for this node
   // gets the height from the scene
   // if the texture is already created, delete it and recreate it
@@ -485,8 +533,8 @@ export class DesignerNode implements IPropertyHolder {
     this.tex = DesignerNode.updateTexture(
       level,
       internalFormat,
-      this.designer.width,
-      this.designer.height,
+      this.getWidth(),
+      this.getHeight(),
       border,
       format,
       type,

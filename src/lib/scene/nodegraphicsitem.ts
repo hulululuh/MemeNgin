@@ -39,6 +39,26 @@ export class NodeGraphicsItem extends GraphicsItem {
     this.hit = false;
   }
 
+  // resize graphics node by given image size
+  public setVirtualSize(width: number, height: number) {
+    let wScaled = 100;
+    let hScaled = 100;
+
+    if (width !== height) {
+      const scale = Math.min(width, height);
+      const ratio = 100 / scale;
+      wScaled = width * ratio;
+      hScaled = height * ratio;
+    }
+
+    // create node from designer
+    if (this.getWidth() !== wScaled || this.getHeight() !== hScaled) {
+      this.setSize(wScaled, hScaled);
+      this.imageCanvas.resize(wScaled, hScaled);
+      this.sortSockets();
+    }
+  }
+
   public setScene(scene: NodeScene) {
     this.scene = scene;
 

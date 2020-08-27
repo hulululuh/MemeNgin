@@ -178,8 +178,8 @@ export class TextNode extends DesignerNode {
     this.tex = DesignerNode.updateTexture(
       level,
       internalFormat,
-      this.designer.width,
-      this.designer.height,
+      this.getWidth(),
+      this.getHeight(),
       border,
       format,
       type,

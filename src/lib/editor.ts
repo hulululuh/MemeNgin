@@ -733,6 +733,8 @@ export class Editor {
 
     // create node from designer
     let node = new NodeGraphicsItem(dNode.title);
+    node.setVirtualSize(dNode.getWidth(), dNode.getHeight());
+
     for (let input of dNode.getInputs()) {
       node.addSocket(input, input, SocketType.In);
     }

@@ -102,10 +102,10 @@ export class Designer {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
 
-    for (let node of this.nodes) {
-      node.createTexture();
-      this.requestUpdate(node);
-    }
+    // for (let node of this.nodes) {
+    //   node.createTexture();
+    //   this.requestUpdate(node);
+    // }
   }
 
   public randomizeSeed() {
@@ -312,6 +312,7 @@ export class Designer {
     rightNode: DesignerNode,
     rightIndex: string
   ) {
+    // make connection
     let con = new DesignerNodeConn();
     con.leftNode = leftNode;
 
@@ -320,8 +321,8 @@ export class Designer {
 
     this.conns.push(con);
 
-    // right node needs to be updated
-    this.requestUpdate(rightNode);
+    // fit the size to parent node - try resize
+    rightNode.resize(leftNode.width, leftNode.height);
 
     return con;
   }
@@ -402,6 +403,11 @@ export class Designer {
           this.updateList.splice(this.updateList.indexOf(input.node), 1);
         }
       }
+
+      if (inputs.length > 0) {
+        node.resize(inputs[0].node.width, inputs[0].node.height);
+      }
+
       let gl = this.gl;
 
       // todo: move to node maybe
@@ -415,7 +421,7 @@ export class Designer {
         0
       );
 
-      gl.viewport(0, 0, this.width, this.height);
+      gl.viewport(0, 0, node.getWidth(), node.getHeight());
       node.render(inputs);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -568,13 +574,13 @@ export class Designer {
 
         attribute vec3 a_pos;
         attribute vec2 a_texCoord;
-            
+
         // the texCoords passed in from the vertex shader.
         varying vec2 v_texCoord;
             
         void main() {
-            gl_Position = vec4(a_pos,1.0);
-            v_texCoord = a_texCoord;
+          gl_Position = vec4(a_pos * 2.0, 1.0);
+          v_texCoord = (gl_Position.xy + 1.0) / 2.0;
         }`,
       `precision mediump float;
         varying vec2 v_texCoord;
@@ -583,6 +589,7 @@ export class Designer {
         vec4 process(vec2 uv);
         
         void main() {
+            gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
             gl_FragColor = texture2D(tex,v_texCoord);
         }`
     );
