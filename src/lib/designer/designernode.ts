@@ -150,8 +150,8 @@ export class DesignerNode implements IPropertyHolder {
         gNodes.setVirtualSize(width, height);
       }
       this.createTexture();
-      this.requestUpdate();
     }
+    this.requestUpdate();
   }
 
   public render(inputs: NodeInput[]) {

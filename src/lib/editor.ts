@@ -745,9 +745,9 @@ export class Editor {
     let pos = this.graph.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);
 
-    if (dNode.readyToUpdate()) {
-      this.createThumnail(dNode, node);
-    }
+    // if (dNode.readyToUpdate()) {
+    //   this.createThumnail(dNode, node);
+    // }
 
     return node;
   }
