@@ -142,6 +142,18 @@ export class DesignerNode implements IPropertyHolder {
       this.width = width;
       this.height = height;
 
+      // if the result node size has changed, we should resize 2d canvas also
+      if (this.isResult) {
+        let event = new CustomEvent("resizeImage", {
+          detail: {
+            width: this.getWidth(),
+            height: this.getHeight(),
+          },
+        });
+
+        document?.dispatchEvent(event);
+      }
+
       // find a corresponding NodeGraphicsItem
       const gNodes = Editor.getInstance().graph.nodes.find(
         (x) => x.id === this.id
@@ -149,9 +161,9 @@ export class DesignerNode implements IPropertyHolder {
       if (gNodes) {
         gNodes.setVirtualSize(width, height);
       }
-      this.createTexture();
+      //this.createTexture();
     }
-    this.requestUpdate();
+    //this.requestUpdate();
   }
 
   public render(inputs: NodeInput[]) {

@@ -20,6 +20,8 @@ export class TextureNode extends DesignerNode {
             this.img = NativeImage.createFromPath(this.texPath);
             const imgSize = this.img.getSize();
             this.resize(imgSize.width, imgSize.height);
+            this.createTexture();
+            this.requestUpdate();
           }
         }
       }

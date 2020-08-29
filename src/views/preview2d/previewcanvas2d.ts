@@ -157,12 +157,23 @@ export class DragZoom {
   }
 
   // puts image in center and set appropriate zoom level
-  centerImage() {
+  centerImage(zoomFactor = 0.4) {
     this.offset = new Vector2(
       this.canvas.width * 0.5,
       this.canvas.height * 0.5
     );
-    this.zoomFactor = 0.4;
+    this.zoomFactor = zoomFactor;
+
+    const ctx = this.context;
+
+    ctx.setTransform(
+      this.zoomFactor,
+      0,
+      0,
+      this.zoomFactor,
+      this.offset.x,
+      this.offset.y
+    );
   }
 
   setImage(image: HTMLCanvasElement) {
@@ -264,9 +275,6 @@ export class DragZoom {
     ctx.fillStyle = "rgb(50,50,50)";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    //ctx.scale(this.zoomFactor, this.zoomFactor);
-    //ctx.translate(this.offset.x, this.offset.y);
-
     ctx.setTransform(
       this.zoomFactor,
       0,
@@ -275,9 +283,6 @@ export class DragZoom {
       this.offset.x,
       this.offset.y
     );
-
-    // ctx.translate(this.offset.x, this.offset.y);
-    // ctx.scale(this.zoomFactor, this.zoomFactor);
 
     // highlight rect if mouse over
     const scenePos = this.canvasToScene(this.mousePos);
@@ -307,42 +312,24 @@ export class DragZoom {
         this.drawImage(0, 1);
         this.drawImage(1, 1);
       }
-
-      // draw text
-      const ctx = this.context;
-      ctx.fillStyle = "white";
-      ctx.font = "80px Arial";
-      ctx.textAlign = "center";
-      //ctx.fillText("Meanwhile in Mexico...", 0, IMAGE_RENDER_SIZE * 0.4);
-      //   this.context.lineWidth = 5;
-      //   this.context.strokeRect(
-      //     -IMAGE_RENDER_SIZE * 0.5,
-      //     -IMAGE_RENDER_SIZE * 0.5,
-      //     IMAGE_RENDER_SIZE,
-      //     IMAGE_RENDER_SIZE
-      //   );
     }
   }
 
   drawImage(offsetX: number, offsetY: number) {
-    const x = -IMAGE_RENDER_SIZE * 0.5 + offsetX * IMAGE_RENDER_SIZE;
-    const y = -IMAGE_RENDER_SIZE * 0.5 + offsetY * IMAGE_RENDER_SIZE;
-    this.context.drawImage(
-      this.image,
-      -IMAGE_RENDER_SIZE * 0.5 + offsetX * IMAGE_RENDER_SIZE,
-      -IMAGE_RENDER_SIZE * 0.5 + offsetY * IMAGE_RENDER_SIZE,
-      IMAGE_RENDER_SIZE,
-      IMAGE_RENDER_SIZE
-    );
+    const w = this.image.width;
+    const h = this.image.height;
+
+    const x = -w * 0.5 + offsetX * w;
+    const y = -h * 0.5 + offsetY * h;
+
+    this.context.drawImage(this.image, x, y, w, h);
   }
 
   // converts from canvas(screen) coords to the scene(world) coords
   canvasToScene(pos: Vector2): Vector2 {
-    //return new Vector2(pos.x * (1.0 / this.zoomFactor) - this.offset.x, pos.y * (1.0 / this.zoomFactor) - this.offset.y);
     return new Vector2(
       (pos.x - this.offset.x) * (1.0 / this.zoomFactor),
       (pos.y - this.offset.y) * (1.0 / this.zoomFactor)
     );
-    //return new Vector2(pos.x *  this.zoomFactor - this.offset.x, pos.y * this.zoomFactor - this.offset.y);
   }
 }

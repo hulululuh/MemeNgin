@@ -55,6 +55,12 @@ export default {
 
     requestAnimationFrame(draw);
     this.dragZoom = dragZoom;
+
+    document.addEventListener("resizeImage", (event) => {
+      this.dragZoom.width = event.detail.width;
+      this.dragZoom.height = event.detail.height;
+      this.resizeImage(event.detail.width, event.detail.height);
+    });
   },
   methods: {
     setEditor(editor) {
@@ -70,13 +76,18 @@ export default {
       };
     },
     resize(width, height) {
-      //console.log("resize");
+      fitCanvasToContainer(this.$refs.canvas);
+      this.dragZoom.onResize(width, height);
+    },
+    resizeImage(width, height) {
       fitCanvasToContainer(this.$refs.canvas);
 
-      this.dragZoom.onResize(width, height);
+      const margin = 0.1;
+      const ratioW = ((1.0 - margin) * this.$refs.canvas.width) / width;
+      const ratioH = ((1.0 - margin) * this.$refs.canvas.height) / height;
 
-      // repaint
-      //this.paint();
+      const zoomFactor = Math.min(1.0, Math.min(ratioW, ratioH));
+      this.dragZoom.centerImage(zoomFactor);
     },
     paint() {
       if (!this.image) return;

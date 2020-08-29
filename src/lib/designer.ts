@@ -323,6 +323,8 @@ export class Designer {
 
     // fit the size to parent node - try resize
     rightNode.resize(leftNode.width, leftNode.height);
+    rightNode.createTexture();
+    rightNode.requestUpdate();
 
     return con;
   }
@@ -406,6 +408,8 @@ export class Designer {
 
       if (inputs.length > 0) {
         node.resize(inputs[0].node.width, inputs[0].node.height);
+        node.createTexture();
+        node.requestUpdate();
       }
 
       let gl = this.gl;
