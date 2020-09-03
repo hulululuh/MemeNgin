@@ -22,6 +22,8 @@ import {
 import { Editor } from "./editor";
 
 export class Designer {
+  public static dummyTex: WebGLTexture;
+
   canvas: HTMLCanvasElement;
   gl: WebGLRenderingContext;
 
@@ -126,6 +128,7 @@ export class Designer {
     this.createVertexBuffers();
     this.createFBO();
     this.createThumbnailProgram();
+    this.createDummyTexture();
   }
 
   update() {
@@ -224,6 +227,8 @@ export class Designer {
     let gl = this.gl;
 
     this.fbo = gl.createFramebuffer();
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 
     // gotta create at least a renderbuffer
   }
@@ -494,16 +499,16 @@ export class Designer {
 
     // bind mesh
     let posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
-    let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
+    //let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-    gl.enableVertexAttribArray(texCoordLoc);
-    gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+    // gl.enableVertexAttribArray(texCoordLoc);
+    // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
 
     // send texture
     gl.uniform1i(gl.getUniformLocation(this.thumbnailProgram, "tex"), 0);
@@ -516,7 +521,7 @@ export class Designer {
 
     // cleanup
     gl.disableVertexAttribArray(posLoc);
-    gl.disableVertexAttribArray(texCoordLoc);
+    //gl.disableVertexAttribArray(texCoordLoc);
 
     return null;
 
@@ -543,16 +548,16 @@ export class Designer {
 
     // bind mesh
     let posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
-    let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
+    //let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-    gl.enableVertexAttribArray(texCoordLoc);
-    gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+    // gl.enableVertexAttribArray(texCoordLoc);
+    // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
 
     // send texture
     gl.uniform1i(gl.getUniformLocation(this.thumbnailProgram, "tex"), 0);
@@ -563,11 +568,10 @@ export class Designer {
 
     // cleanup
     gl.disableVertexAttribArray(posLoc);
-    gl.disableVertexAttribArray(texCoordLoc);
+    //gl.disableVertexAttribArray(texCoordLoc);
 
     // force rendering to be complete
     //gl.flush();
-
     canvas.copyFromCanvas(this.canvas, true);
   }
 
@@ -577,7 +581,7 @@ export class Designer {
       `precision mediump float;
 
         attribute vec3 a_pos;
-        attribute vec2 a_texCoord;
+        //attribute vec2 a_texCoord;
 
         // the texCoords passed in from the vertex shader.
         varying vec2 v_texCoord;
@@ -593,12 +597,32 @@ export class Designer {
         vec4 process(vec2 uv);
         
         void main() {
-            gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
-            gl_FragColor = texture2D(tex,v_texCoord);
+            gl_FragColor = texture2D(tex, v_texCoord);
+            //gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
         }`
     );
 
     this.thumbnailProgram = prog;
+  }
+
+  createDummyTexture() {
+    let gl = this.canvas.getContext("webgl2");
+    if (!Designer.dummyTex) {
+      Designer.dummyTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, Designer.dummyTex);
+      // bind a dummy texture to suppress WebGL warning.
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        1,
+        1,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([0, 0, 0, 255])
+      ); // red
+    }
   }
 
   getNodeByName(exportName: string): DesignerNode {

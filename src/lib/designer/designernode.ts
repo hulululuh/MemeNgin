@@ -176,49 +176,51 @@ export class DesignerNode implements IPropertyHolder {
     // bind shader
     gl.useProgram(this.shaderProgram);
 
-    let texIndex;
+    let texIndex = 0;
     // clear all inputs
     for (let input of this.inputs) {
-      const texIdx = !texIndex ? 0 : texIndex;
-      gl.activeTexture(gl.TEXTURE0 + texIdx);
+      //const texIdx = !texIndex ? 0 : texIndex;
+      gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
-      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, input), 0);
+      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, input), texIndex);
 
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, input + "_connected"),
-        0
+        1
       );
+      texIndex++;
     }
 
     this.designer.setTextureSize(this.getWidth(), this.getHeight());
 
-    // pass inputs for rendering
     texIndex = 0;
-
+    // pass inputs for rendering
     for (let input of inputs) {
-      gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.bindTexture(gl.TEXTURE_2D, input.node.tex);
-      gl.uniform1i(
-        gl.getUniformLocation(this.shaderProgram, input.name),
-        texIndex
-      );
-      gl.uniform1i(
-        gl.getUniformLocation(this.shaderProgram, input.name + "_connected"),
-        1
-      );
-      //console.log("bound texture " + texIndex);
-      texIndex++;
+      if (input.node) {
+        let tex = input.node.tex ? input.node.tex : Designer.dummyTex;
+        gl.activeTexture(gl.TEXTURE0 + texIndex);
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.uniform1i(
+          gl.getUniformLocation(this.shaderProgram, input.name),
+          texIndex
+        );
+        gl.uniform1i(
+          gl.getUniformLocation(this.shaderProgram, input.name + "_connected"),
+          1
+        );
+        console.log("bound texture " + texIndex);
+        texIndex++;
+      } else {
+        return;
+      }
     }
 
     // pass baseTexture if it is texture node
     if (this.hasBaseTexture()) {
-      if (!this.readyToUpdate()) {
-        return;
-      }
-
+      let tex = this.isTextureReady ? this.baseTex : Designer.dummyTex;
       gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.bindTexture(gl.TEXTURE_2D, this.baseTex);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, "baseTexture"),
         texIndex
@@ -227,7 +229,7 @@ export class DesignerNode implements IPropertyHolder {
         gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
         1
       );
-      //console.log("bound texture " + texIndex);
+      console.log("bound texture " + texIndex);
       texIndex++;
     }
 
@@ -319,21 +321,21 @@ export class DesignerNode implements IPropertyHolder {
 
     // bind mesh
     let posLoc = gl.getAttribLocation(this.shaderProgram, "a_pos");
-    let texCoordLoc = gl.getAttribLocation(this.shaderProgram, "a_texCoord");
+    //let texCoordLoc = gl.getAttribLocation(this.shaderProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.designer.posBuffer);
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.designer.texCoordBuffer);
-    gl.enableVertexAttribArray(texCoordLoc);
-    gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, this.designer.texCoordBuffer);
+    // gl.enableVertexAttribArray(texCoordLoc);
+    // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
     gl.disableVertexAttribArray(posLoc);
-    gl.disableVertexAttribArray(texCoordLoc);
+    //gl.disableVertexAttribArray(texCoordLoc);
 
     // render
   }
@@ -402,7 +404,7 @@ export class DesignerNode implements IPropertyHolder {
         precision highp float;
 
         in vec3 a_pos;
-        in vec2 a_texCoord;
+        //in vec2 a_texCoord;
             
         // the texCoords passed in from the vertex shader.
         out vec2 v_texCoord;

@@ -1,18 +1,19 @@
 import * as THREE from "three";
+import * as loadFont from "load-bmfont";
 
 import { DesignerNode, NodeType } from "../../designer/designernode";
 import { remote, app } from "electron";
 import path from "path";
-import { fdatasync, promises } from "fs";
-import { ResolvedKeybinding } from "custom-electron-titlebar/lib/common/keyCodes";
+// import { fdatasync, promises } from "fs";
+// import { ResolvedKeybinding } from "custom-electron-titlebar/lib/common/keyCodes";
 import { Designer } from "@/lib/designer";
-import { Vector3 } from "three";
 import { Property, StringProperty } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
-const loadFont = require("load-bmfont");
+//const loadFont = require("load-bmfont");
 
 // "three-bmfont-text" demands globalThis.THREE, if there is better way to handle this.
 globalThis.THREE = require("three");
+//import { createGeometry } from "three-bmfont-text";
 const createGeometry = require("three-bmfont-text");
 
 function fetchFont(
