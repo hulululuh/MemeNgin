@@ -62,7 +62,8 @@ export default class FilePropertyView extends Vue {
   onclick() {
     let result = dialog.showOpenDialog({
       properties: ["openFile"],
-      filters: [{ name: "Images", extensions: ["jpg", "png"] }],
+      filters: [{ name: "Images", extensions: this.prop.extensions }],
+      //filters: [{ name: "Images", extensions: ["jpg", "png"] }],
     });
 
     if (result && fs.existsSync(result[0])) {

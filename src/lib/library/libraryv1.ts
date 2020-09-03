@@ -24,6 +24,7 @@ import { CheckerBoardNode } from "./v1/checkerboard";
 import { DirectionalWarpNode } from "./v1/directionalwarp";
 import { MirrorNode } from "./v1/mirror";
 import { BrightnessContrastNode } from "./v1/brightnesscontrast";
+import { ColorGradeNode } from "./v1/colorgrade";
 import { WaveNode } from "./v1/wave";
 import { CopyNode } from "./v1/copy";
 import { GradientNode, TriGradientNode } from "./v1/gradient";
@@ -67,6 +68,7 @@ export function createLibrary() {
     "Brightness Contrast",
     BrightnessContrastNode
   );
+  lib.addNode("colorgrade", "Color Grade", ColorGradeNode);
   lib.addNode("wave", "Wave", WaveNode);
   lib.addNode("copy", "Copy", CopyNode);
   lib.addNode("gradient", "Gradient", GradientNode);

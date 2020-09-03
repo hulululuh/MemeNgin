@@ -5398,6 +5398,11 @@ globule@^1.0.0:
     lodash "~4.17.10"
     minimatch "~3.0.2"
 
+glsl-lut@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/glsl-lut/-/glsl-lut-1.1.1.tgz#3cedc71e670f2a5c4c54890313f672b9f85e7361"
+  integrity sha512-FBlEzcGnIK5LYwGKELdkQt7dzQHD/6jndH7+pr0ARsuu9/omAsRX+LqGQ8wOZHoclJezLh4d9eK8Rvntgsuu9A==
+
 golden-layout@^1.5.9:
   version "1.5.9"
   resolved "https://registry.yarnpkg.com/golden-layout/-/golden-layout-1.5.9.tgz#a39bc1f6a67e6f886b797c016dd924e9426ba77f"
@@ -8379,6 +8384,11 @@ parse-bmfont-xml@^1.1.4:
   dependencies:
     xml-parse-from-string "^1.0.0"
     xml2js "^0.4.5"
+
+parse-cube-lut@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/parse-cube-lut/-/parse-cube-lut-1.0.1.tgz#5399036ec7becc74110a535a92384f1d2ec24307"
+  integrity sha1-U5kDbse+zHQRClNakjhPHS7CQwc=
 
 parse-headers@^2.0.0:
   version "2.0.3"

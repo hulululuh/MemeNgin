@@ -900,9 +900,10 @@ export class DesignerNode implements IPropertyHolder {
   addFileProperty(
     id: string,
     displayName: string,
-    defaultVal: string = ""
+    defaultVal: string = "",
+    extensions: string[] = ["*"]
   ): FileProperty {
-    let prop = new FileProperty(id, displayName, defaultVal);
+    let prop = new FileProperty(id, displayName, defaultVal, extensions);
 
     this.properties.push(prop);
     return prop;

@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 //import * as scene from "./scene";
 import { Designer } from "./designer";
@@ -70,6 +71,11 @@ export enum DisplayChannel {
   Roughness,
   Normal,
   Height,
+}
+
+export enum FileType {
+  Texture,
+  LUT,
 }
 
 export class Editor {
@@ -503,6 +509,18 @@ export class Editor {
         return isValid;
       };
 
+      let getFileType = (filePath: string) => {
+        const ext = path.extname(filePath).toLowerCase();
+
+        if (ext === ".png" || ext === ".jpg" || ext === ".jpeg") {
+          return FileType.Texture;
+        } else if (ext === ".cube") {
+          return FileType.LUT;
+        } else {
+          return undefined;
+        }
+      };
+
       let viewNodes = [];
       let nodes = [];
 
@@ -510,7 +528,13 @@ export class Editor {
       // for (let idx = 0; idx < ev.dataTransfer.files.length; idx++) {
       for (let file of ev.dataTransfer.files) {
         if (isValidImagePath(file.path)) {
-          let node = self.library.create("texture", file.path);
+          const fileType = getFileType(file.path);
+          let node;
+          if (fileType === FileType.Texture) {
+            node = self.library.create("texture", file.path);
+          } else if (fileType === FileType.LUT) {
+            node = self.library.create("colorgrade", file.path);
+          }
           let nodeView = self.addNode(node, 0, 0);
           nodeView.setCenter(x + offset[0], y + offset[1]);
 

@@ -2,6 +2,7 @@ import { DesignerNode, NodeType } from "../../designer/designernode";
 import { Color } from "@/lib/designer/color";
 import { SphereBufferGeometry } from "@/lib/geometry/sphere";
 import { Property, FileProperty } from "@/lib/designer/properties";
+//import * as NativeImage from "@electron/nativeImage";
 const NativeImage = require("electron").nativeImage;
 
 export class TextureNode extends DesignerNode {
@@ -90,7 +91,7 @@ export class TextureNode extends DesignerNode {
 
   public init() {
     this.title = "Image Texture";
-    let fileProp = this.addFileProperty("file", "path");
+    let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);
 
     // this happens when we drop image file into canvas
     if (this.texPath !== "") {

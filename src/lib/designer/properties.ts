@@ -286,11 +286,18 @@ export class StringProperty extends Property {
 
 export class FileProperty extends Property {
   value: string;
-  public constructor(name: string, displayName: string, value: string = "") {
+  extensions: string[];
+  public constructor(
+    name: string,
+    displayName: string,
+    value: string = "",
+    extensions: string[] = ["*"]
+  ) {
     super();
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.extensions = extensions;
     this.type = PropertyType.File;
   }
 
