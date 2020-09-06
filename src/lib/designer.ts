@@ -25,7 +25,7 @@ export class Designer {
   public static dummyTex: WebGLTexture;
 
   canvas: HTMLCanvasElement;
-  gl: WebGLRenderingContext;
+  gl: WebGL2RenderingContext;
 
   // scene for render to texture
   rttRenderer: THREE.WebGLRenderer;

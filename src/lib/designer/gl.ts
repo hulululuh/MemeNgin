@@ -1,5 +1,5 @@
 export function createTexture(
-  gl: WebGLRenderingContext,
+  gl: WebGL2RenderingContext,
   width: number,
   height: number
 ): WebGLTexture {

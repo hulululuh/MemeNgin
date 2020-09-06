@@ -35,6 +35,24 @@ const POTs: number[] = [
   4096,
 ];
 
+export enum TexPrecision {
+  lowp,
+  midiump,
+  highp,
+}
+
+new Map([
+  ["1", ["test"]],
+  ["2", ["test2"]],
+]);
+
+// TypeScript
+const PrecisionName = new Map<TexPrecision, string>([
+  [TexPrecision.lowp, "lowp"],
+  [TexPrecision.midiump, "midiump"],
+  [TexPrecision.highp, "highp"],
+]);
+
 export class NodeInput {
   public node: DesignerNode;
   public name: string;
@@ -54,7 +72,7 @@ export class DesignerNode implements IPropertyHolder {
   public texPath: string;
   public nodeType: NodeType;
 
-  public gl: WebGLRenderingContext;
+  public gl: WebGL2RenderingContext;
   public designer: Designer;
   public tex: WebGLTexture;
   public baseTex: WebGLTexture;
@@ -101,6 +119,14 @@ export class DesignerNode implements IPropertyHolder {
     } else {
       return this.designer.height;
     }
+  }
+
+  public getBaseTextureType(): number {
+    return this.gl.TEXTURE_2D;
+  }
+
+  public getTexturePrecision(): TexPrecision {
+    return TexPrecision.highp;
   }
 
   public hasBaseTexture(): boolean {
@@ -166,7 +192,7 @@ export class DesignerNode implements IPropertyHolder {
     //this.requestUpdate();
   }
 
-  public render(inputs: NodeInput[]) {
+  public render(inputs: NodeInput[], optional?: Function) {
     let gl = this.gl;
 
     // bind texture to fbo
@@ -178,49 +204,45 @@ export class DesignerNode implements IPropertyHolder {
 
     let texIndex = 0;
     // clear all inputs
-    for (let input of this.inputs) {
-      //const texIdx = !texIndex ? 0 : texIndex;
+    for (const input of this.inputs) {
       gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
-      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, input), texIndex);
+      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, input), 0);
 
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, input + "_connected"),
-        1
+        0
       );
-      texIndex++;
     }
 
     this.designer.setTextureSize(this.getWidth(), this.getHeight());
 
     texIndex = 0;
     // pass inputs for rendering
-    for (let input of inputs) {
-      if (input.node) {
-        let tex = input.node.tex ? input.node.tex : Designer.dummyTex;
-        gl.activeTexture(gl.TEXTURE0 + texIndex);
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.uniform1i(
-          gl.getUniformLocation(this.shaderProgram, input.name),
-          texIndex
-        );
-        gl.uniform1i(
-          gl.getUniformLocation(this.shaderProgram, input.name + "_connected"),
-          1
-        );
-        console.log("bound texture " + texIndex);
-        texIndex++;
-      } else {
-        return;
-      }
+    //for (const input of inputs) {
+    for (let i = 0; i < inputs.length; i++) {
+      const input = inputs[i];
+      const tex = input.node.tex ? input.node.tex : Designer.dummyTex;
+      gl.activeTexture(gl.TEXTURE0 + texIndex);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.uniform1i(
+        gl.getUniformLocation(this.shaderProgram, input.name),
+        texIndex
+      );
+      gl.uniform1i(
+        gl.getUniformLocation(this.shaderProgram, input.name + "_connected"),
+        1
+      );
+      console.log("bound texture " + texIndex);
+      texIndex++;
     }
 
     // pass baseTexture if it is texture node
     if (this.hasBaseTexture()) {
-      let tex = this.isTextureReady ? this.baseTex : Designer.dummyTex;
+      const tex = this.isTextureReady ? this.baseTex : Designer.dummyTex;
       gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.bindTexture(this.getBaseTextureType(), tex);
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, "baseTexture"),
         texIndex
@@ -245,6 +267,11 @@ export class DesignerNode implements IPropertyHolder {
       this.getWidth(),
       this.getHeight()
     );
+
+    // optioanl parameter setup from child class
+    if (optional) {
+      optional();
+    }
 
     // pass properties
     for (let prop of this.properties) {
@@ -459,7 +486,7 @@ export class DesignerNode implements IPropertyHolder {
     type: number,
     pixels: ArrayBufferView,
     nodetype: NodeType,
-    gl: WebGLRenderingContext
+    gl: WebGL2RenderingContext
   ): WebGLTexture {
     let tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -774,7 +801,13 @@ export class DesignerNode implements IPropertyHolder {
     }
 
     if (this.hasBaseTexture()) {
-      code += "uniform sampler2D baseTexture;\n";
+      const textureType = this.getBaseTextureType();
+      if (textureType === this.gl.TEXTURE_3D) {
+        const precision = "lowp";
+        code += "uniform " + precision + " sampler3D baseTexture;\n";
+      } else if (textureType === this.gl.TEXTURE_2D) {
+        code += "uniform sampler2D baseTexture;\n";
+      }
       code += "uniform bool baseTexture_ready;\n";
     }
 

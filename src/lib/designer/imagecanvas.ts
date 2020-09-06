@@ -55,7 +55,7 @@ export class ImageCanvas {
     return img;
   }
 
-  createTexture(gl: WebGLRenderingContext): WebGLTexture {
+  createTexture(gl: WebGL2RenderingContext): WebGLTexture {
     let texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 

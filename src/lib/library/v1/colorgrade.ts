@@ -1,9 +1,15 @@
-import { DesignerNode, NodeType } from "../../designer/designernode";
+import {
+  DesignerNode,
+  NodeType,
+  NodeInput,
+  TexPrecision,
+} from "../../designer/designernode";
 //import { parseCubeLUT } from "parse-cube-lut";
 //import { fs } from "fs";
 var parseCubeLUT = require("parse-cube-lut");
 import * as fs from "fs";
 import { Property, FileProperty } from "@/lib/designer/properties";
+import { getTotalHeight } from "custom-electron-titlebar/lib/common/dom";
 const NativeImage = require("electron").nativeImage;
 
 export class ColorGradeNode extends DesignerNode {
@@ -17,13 +23,51 @@ export class ColorGradeNode extends DesignerNode {
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "file") {
         this.texPath = (prop as FileProperty).value;
+
+        this.resize(this.getWidth(), this.getHeight());
         this.createLut();
+        this.requestUpdate();
       }
     };
   }
 
+  public getBaseTextureType(): number {
+    return this.gl.TEXTURE_3D;
+  }
+
+  public getTexturePrecision(): TexPrecision {
+    return TexPrecision.lowp;
+  }
+
   // call createLut instead
-  public createTexture() {}
+  public createTexture() {
+    let gl = this.gl;
+
+    if (this.tex) {
+      gl.deleteTexture(this.tex);
+      this.tex = null;
+    }
+
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const border = 0;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    const nodetype = NodeType.Procedural;
+    let data = null;
+    this.tex = DesignerNode.updateTexture(
+      level,
+      internalFormat,
+      this.getWidth(),
+      this.getHeight(),
+      border,
+      format,
+      type,
+      data,
+      nodetype,
+      this.gl
+    );
+  }
 
   public createLut() {
     if (this.texPath) {
@@ -37,17 +81,13 @@ export class ColorGradeNode extends DesignerNode {
       const pow = Math.floor((dimAsPOT * 3 + 1) / 2);
       const layoutSize = Math.pow(2, pow);
       const numLutPixels = layoutSize * layoutSize;
-      lut.size;
-      lut.data;
 
       console.log(lut);
 
-      let gl = this.gl;
+      // create fbo texture
+      this.createTexture();
 
-      if (this.tex) {
-        gl.deleteTexture(this.tex);
-        this.tex = null;
-      }
+      let gl = this.gl;
 
       const level = 0;
       const internalFormat = gl.RGB;
@@ -55,31 +95,46 @@ export class ColorGradeNode extends DesignerNode {
       const format = gl.RGB;
       const type = gl.UNSIGNED_BYTE;
       const nodetype = this.nodeType;
-      let data = new Uint8Array(numLutPixels * 3);
 
-      // TODO: find a better(cheaper) way to do this
+      this.baseTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_3D, this.baseTex);
+
+      let lutData = new Uint8Array(lut.size * lut.size * lut.size * 3).fill(
+        255
+      );
+
       for (let i = 0; i < lut.data.length; i++) {
         const pos = i * 3;
-        data[pos + 0] = lut.data[i][0] * 255;
-        data[pos + 1] = lut.data[i][1] * 255;
-        data[pos + 2] = lut.data[i][2] * 255;
+        lutData[pos + 0] = lut.data[i][0] * 255;
+        lutData[pos + 1] = lut.data[i][1] * 255;
+        lutData[pos + 2] = lut.data[i][2] * 255;
       }
 
-      this.baseTex = DesignerNode.updateTexture(
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+
+      gl.texImage3D(
+        gl.TEXTURE_3D,
         level,
         internalFormat,
-        layoutSize,
-        layoutSize,
+        lut.size,
+        lut.size,
+        lut.size,
         border,
         format,
         type,
-        data,
-        nodetype,
-        this.gl
+        lutData
       );
 
+      // set the filtering so we don't need mips
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE);
+
+      gl.bindTexture(gl.TEXTURE_3D, null);
+
       this.isTextureReady = true;
-      this.requestUpdate();
     }
   }
 
@@ -90,31 +145,29 @@ export class ColorGradeNode extends DesignerNode {
     // this happens when we drop image file into canvas
     if (this.texPath !== "") {
       fileProp.setValue(this.texPath);
+
+      this.resize(this.getWidth(), this.getHeight());
       this.createLut();
+      this.requestUpdate();
     }
 
     this.addInput("image");
-    this.addFloatProperty("contrast", "Contrast", 0.0, -1, 1, 0.1);
-    this.addFloatProperty("brightness", "Brightness", 0.0, -1, 1, 0.1);
 
     let source = `
-
-        vec3 lookup(vec3 col, sampler2D lut) {
-          return vec3(texture(lut, col.rg));
-        }
-
         vec4 process(vec2 uv)
         {
-            vec4 col = texture(image, uv);
+          vec4 col = vec4(1.0, 1.0, 0.0, 1.0);
 
-            if (baseTexture_ready) {
-              //col = vec4(lookup(col.rgb, baseTexture), col.a);
-              col = texture(baseTexture, uv);
+          if (baseTexture_ready) {
+            if (image_connected) {
+              col = texture(image, uv);
+              col = vec4(texture(baseTexture, col.rgb).rgb, col.a);
             }
-
-            col = vec4(uv, 0.0, 1.0);
-
-            return col;
+            else {
+              col = vec4(texture(baseTexture, vec3(uv, (uv.x + uv.y)/2.0)).rgb, 1.0);
+            }
+          }
+          return col;
         }
         `;
 
