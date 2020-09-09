@@ -602,6 +602,12 @@ export class NodeScene {
       hovered: false, // mouse over
       selected: false, // selected node
     };
+
+    // draw selection rects under node
+    if (this.selectedItems.length > 0) {
+      this.drawSelectedItems(this.selectedItems, this.context);
+    }
+
     for (let item of this.nodes) {
       // check for selection ( only do this when not dragging anything )
       //if (item == this.selectedNode) nodeState.selected = true;
@@ -618,28 +624,30 @@ export class NodeScene {
     for (let nav of this.navigations) nav.draw(this.context);
 
     if (this.selection) this.selection.draw(this.context);
-
-    if (this.selectedItems.length > 0) {
-      this.drawSelectedItems(this.selectedItems, this.context);
-    }
   }
 
+  // TODO: setup color palette
+  // https://colorhunt.co/palette/196113
+  // https://www.rapidtables.com/convert/color/hex-to-rgb.html
   drawSelectedItems(items: GraphicsItem[], ctx: CanvasRenderingContext2D) {
     for (let item of items) {
       ctx.beginPath();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "rgba(255, 255, 255)";
       //this.roundRect(ctx, this.x, this.y, width, height, 1);
       // ctx.rect(item.left, item.top, item.getWidth(), item.getHeight());
       let rect = item.getRect();
       rect.expand(15);
+
+      //ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.fillStyle = "rgba(50, 130, 184, 0.3)";
+      ctx.lineWidth = 0;
+      ctx.rect(rect.left, rect.top, rect.width, rect.height);
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(187, 225, 250)";
+      ctx.lineWidth = 3;
       ctx.rect(rect.left, rect.top, rect.width, rect.height);
 
       ctx.stroke();
-
-      ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-      ctx.rect(rect.left, rect.top, rect.width, rect.height);
-      ctx.fill();
     }
   }
 
