@@ -71,9 +71,14 @@ export class Designer {
     this.canvas.height = this.height;
     this.gl = this.canvas.getContext("webgl2");
 
+    const gl = this.gl;
+    gl.blendEquation(gl.FUNC_ADD);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
     this.rttRenderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       context: this.gl,
+      alpha: true
     });
     this.rttRenderer.setSize(this.width, this.height);
 

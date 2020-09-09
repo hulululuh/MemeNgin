@@ -1,4 +1,4 @@
-import { DesignerNode } from "../../designer/designernode";
+import { DesignerNode, NodeInput } from "../../designer/designernode";
 
 export class BlendNode extends DesignerNode {
   public init() {
@@ -21,6 +21,14 @@ export class BlendNode extends DesignerNode {
       "Screen",
     ]);
     this.addFloatProperty("opacity", "Opacity", 1.0, 0.0, 1.0, 0.01);
+    this.addFloatProperty(
+      "alphaThreshold",
+      "Alpha Threshold",
+      0.01,
+      0.0,
+      1.0,
+      0.001
+    );
 
     let source = `
 
@@ -62,9 +70,18 @@ export class BlendNode extends DesignerNode {
                 col.rgb = colA.rgb;
             }
             if (prop_type==7) { // overlay
-                if (colB.r < 0.5) col.r = colB.r * colA.r; else col.r = screen(colB.r, colA.r);
-                if (colB.g < 0.5) col.g = colB.g * colA.g; else col.g = screen(colB.g, colA.g);
-                if (colB.b < 0.5) col.b = colB.b * colA.b; else col.b = screen(colB.b, colA.b);
+                // if (colB.r < 0.5) col.r = colB.r * colA.r; else col.r = screen(colB.r, colA.r);
+                // if (colB.g < 0.5) col.g = colB.g * colA.g; else col.g = screen(colB.g, colA.g);
+                // if (colB.b < 0.5) col.b = colB.b * colA.b; else col.b = screen(colB.b, colA.b);
+            
+                float final_alpha = colA.a + colB.a * (1.0 - colA.a);
+                
+                if (colA.a <= prop_alphaThreshold)
+                    col = colB;
+                else
+                    col = vec4(mix(colB.rgb * colB.a, colA.rgb * colA.a, colA.a)/ final_alpha, final_alpha);
+                
+                return col;
             }
             if (prop_type==8) { // screen
                 col.r = screen(colA.r, colB.r);

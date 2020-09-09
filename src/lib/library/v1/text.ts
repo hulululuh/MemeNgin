@@ -7,7 +7,11 @@ import path from "path";
 // import { fdatasync, promises } from "fs";
 // import { ResolvedKeybinding } from "custom-electron-titlebar/lib/common/keyCodes";
 import { Designer } from "@/lib/designer";
-import { Property, StringProperty } from "@/lib/designer/properties";
+import {
+  Property,
+  StringProperty,
+  ColorProperty,
+} from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
 //const loadFont = require("load-bmfont");
 
@@ -106,9 +110,11 @@ function fetchFont(
         rttScene.add(cube);
 
         rttRenderer.setRenderTarget(renderTarget);
-        //rttRenderer.setClearColor(new THREE.Color(1.0, 1.0, 1.0));
-        rttRenderer.setClearColor(new THREE.Color(0.0, 0.0, 0.0));
-        rttRenderer.clear();
+        //rttRenderer.setClearColor(new THREE.Color(1.0, 1.0, 1.0), 0.0);
+        //rttRenderer.setClearColor(new THREE.Color(0.0, 1.0, 0.0), 0.0);
+
+        //rttRenderer.setClearColor(new THREE.Color(0.0, 0.0, 0.0), 0.0);
+        //rttRenderer.clear(true, true, false);
         rttRenderer.render(rttScene, rttCamera);
 
         const texProps = rttRenderer.properties.get(renderTarget.texture);
@@ -154,6 +160,8 @@ export class TextNode extends DesignerNode {
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "text") {
         this.createTexture();
+      } else if (prop.name === "color") {
+        let col = (prop as ColorProperty).value;
       }
       // else if (propName === "size") {
       //   //this.createTexture();

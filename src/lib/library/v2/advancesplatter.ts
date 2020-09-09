@@ -80,7 +80,7 @@ export class AdvanceSplatterV2 extends DesignerNode {
         // https://stackoverflow.com/questions/38986208/webgl-loop-index-cannot-be-compared-with-non-constant-expression
         vec4 process(vec2 uv)
         {
-            vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+            vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
             for(int i = 0; i<MAX_ITER; i++)
             {
                 if (i >= prop_count)

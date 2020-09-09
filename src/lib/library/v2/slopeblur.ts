@@ -34,7 +34,7 @@ export class SlopeBlur extends DesignerNode {
             float intensity = prop_intensity;
             int iterations = int(ceil(float(prop_quality) * prop_intensity));
             
-            vec3 color = vec3(0.0);
+            vec4 color = vec4(0.0);
             for(int i = 0;i<iterations;i++){
                 vec2 slopeValue  = calcSlope(uv) * _textureSize.xy;
                 
@@ -42,12 +42,20 @@ export class SlopeBlur extends DesignerNode {
                 // blur should follow the path of the previous slope
                 uv += slopeValue * (intensity / _textureSize.x) * (intensity / float(iterations));
                     
-                color += texture(image, uv).rgb;
-            }
-            
-            vec3 final = color / float(iterations);
+                //color += texture(image, uv).rgb;
 
-            return vec4(vec3(final),1.0);
+                vec4 texel = texture(image, uv);
+
+                color += vec4(texel.rgb * texel.a, texel.a);
+            }
+
+            color = color / float(iterations);
+
+            return color;
+            
+            // vec3 final = color / float(iterations);
+
+            // return vec4(vec3(final),1.0);
         }
         `;
 

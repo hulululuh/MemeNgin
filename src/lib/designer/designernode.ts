@@ -196,7 +196,6 @@ export class DesignerNode implements IPropertyHolder {
     let gl = this.gl;
 
     // bind texture to fbo
-    //gl.clearColor(1, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // bind shader
@@ -241,8 +240,11 @@ export class DesignerNode implements IPropertyHolder {
     // pass baseTexture if it is texture node
     if (this.hasBaseTexture()) {
       const tex = this.isTextureReady ? this.baseTex : Designer.dummyTex;
+      const textureType = this.isTextureReady
+        ? this.getBaseTextureType()
+        : gl.TEXTURE_2D;
       gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.bindTexture(this.getBaseTextureType(), tex);
+      gl.bindTexture(textureType, tex);
       gl.uniform1i(
         gl.getUniformLocation(this.shaderProgram, "baseTexture"),
         texIndex
@@ -456,10 +458,35 @@ export class DesignerNode implements IPropertyHolder {
         uniform vec2 _textureSize;
 
         out vec4 fragColor;
+
+        vec4 backgroundCol(vec2 uv) {
+          //_textureSize;
+          float r = _textureSize.y/_textureSize.x;
+
+          vec2 aa = vec2(1.0, r);
+
+          vec2 mult = uv * aa * 20.0;
+          int a = int(mult.x) % 2;
+          int b = int(mult.y) % 2;
+          bool darker = ((a+b) % 2) == 0;
+
+          if(darker)
+            return vec4(vec3(4.0/8.0), 1.0);
+          else
+            return vec4(vec3(7.0/8.0), 1.0);
+        }
             
         void main() {
             initRandom();
-            fragColor = process(v_texCoord);
+            //fragColor = process(v_texCoord);
+            vec4 col = process(v_texCoord);
+            vec4 colBG = backgroundCol(v_texCoord);
+            
+            //fragColor = mix(colBG, col, col.a);
+            //fragColor.a = col.a;
+
+            // // alpha
+            fragColor = col;
         }
 
         `;

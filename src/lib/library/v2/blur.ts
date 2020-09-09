@@ -41,6 +41,27 @@ export class BlurV2 extends DesignerNode {
             return col / accum;
         }
 
+        vec4 blur4(sampler2D sp, vec2 uv, vec2 scale) {
+            vec4 col = vec4(0.0);
+            float accum = 0.0;
+            float weight;
+            vec2 offset;
+
+            float sigma = float(prop_samples) * 0.25;
+            
+            for (int x = -prop_samples / 2; x < prop_samples / 2; ++x) {
+                for (int y = -prop_samples / 2; y < prop_samples / 2; ++y) {
+                    offset = vec2(x, y);
+                    vec4 texel = texture(sp, uv + scale * offset);
+                    weight = gaussian(offset, sigma);
+                    col += vec4(texel.rgb * texel.a, texel.a) * weight;
+                    accum += weight;
+                }
+            }
+            
+            return col / accum;
+        }
+
         vec4 process(vec2 uv)
         {
             if (!image_connected)
@@ -48,8 +69,10 @@ export class BlurV2 extends DesignerNode {
 
             vec4 color = vec4(0.0);
             vec2 ps = vec2(1.0, 1.0) / _textureSize;
-            color.rgb = blur(image, uv, ps * prop_intensity);
-            color.a = 1.0;
+            // color.rgb = blur(image, uv, ps * prop_intensity);
+            // color.a = 1.0;
+
+            color = blur4(image, uv, ps * prop_intensity);
 
             return color;
         }

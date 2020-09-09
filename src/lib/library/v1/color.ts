@@ -12,7 +12,8 @@ export class ColorizeNode extends DesignerNode {
     let source = `
         vec4 process(vec2 uv)
         {
-            return texture(image,uv) * prop_color;
+          vec4 texel = texture(image,uv);
+          return vec4(texel.rgb * prop_color.rgb, texel.a);
         }
         `;
 

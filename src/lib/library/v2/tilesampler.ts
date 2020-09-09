@@ -71,7 +71,7 @@ export class TileSampler extends DesignerNode {
             float rowSpacing = 1.0 / float(prop_rows);
             float colSpacing = 1.0 / float(prop_columns);
 
-            vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+            vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
             for(int r = 0; r<prop_rows; r++)
                 for(int c = 0; c<prop_columns; c++)
                 {

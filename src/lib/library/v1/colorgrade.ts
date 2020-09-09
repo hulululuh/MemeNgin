@@ -85,7 +85,7 @@ export class ColorGradeNode extends DesignerNode {
       console.log(lut);
 
       // create fbo texture
-      this.createTexture();
+      //this.createTexture();
 
       let gl = this.gl;
 
@@ -167,6 +167,7 @@ export class ColorGradeNode extends DesignerNode {
               col = vec4(texture(baseTexture, vec3(uv, (uv.x + uv.y)/2.0)).rgb, 1.0);
             }
           }
+
           return col;
         }
         `;
