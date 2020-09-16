@@ -1,3 +1,9 @@
 module.exports = {
-  presets: ["@vue/app"]
+  presets: ["@vue/app"],
+  env: {
+    development: {
+      sourceMaps: true,
+      retainLines: true,
+    },
+  },
 };
