@@ -78,7 +78,7 @@ export class Designer {
     this.rttRenderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       context: this.gl,
-      alpha: true
+      alpha: true,
     });
     this.rttRenderer.setSize(this.width, this.height);
 
@@ -458,7 +458,7 @@ export class Designer {
 
   createImageFromTexture(gl, texture, width, height) {
     // Create a framebuffer backed by the texture
-    var framebuffer = gl.createFramebuffer();
+    let framebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     gl.framebufferTexture2D(
       gl.FRAMEBUFFER,
@@ -469,23 +469,23 @@ export class Designer {
     );
 
     // Read the contents of the framebuffer
-    var data = new Uint8Array(width * height * 4);
+    let data = new Uint8Array(width * height * 4);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
     gl.deleteFramebuffer(framebuffer);
 
     // Create a 2D canvas to store the result
-    var canvas = document.createElement("canvas");
+    let canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    var context = canvas.getContext("2d");
+    let context = canvas.getContext("2d");
 
     // Copy the pixels to a 2D canvas
-    var imageData = context.createImageData(width, height);
+    let imageData = context.createImageData(width, height);
     imageData.data.set(data);
     context.putImageData(imageData, 0, 0);
 
-    var img = new Image();
+    let img = new Image();
     img.src = canvas.toDataURL();
     return img;
   }
