@@ -54,7 +54,8 @@ export class BlurV2 extends DesignerNode {
                     offset = vec2(x, y);
                     vec4 texel = texture(sp, uv + scale * offset);
                     weight = gaussian(offset, sigma);
-                    col += vec4(texel.rgb * texel.a, texel.a) * weight;
+                    //col += vec4(texel.rgb * texel.a, texel.a) * weight;
+                    col += texel * weight;
                     accum += weight;
                 }
             }

@@ -98,11 +98,11 @@ export class NodeGraphicsItem extends GraphicsItem {
       ctx.stroke();
     }
 
-    // background
-    ctx.beginPath();
-    ctx.fillStyle = "rgb(255, 50, 50)";
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.fill();
+    // // background
+    // ctx.beginPath();
+    // ctx.fillStyle = "rgb(0, 0, 0)";
+    // ctx.rect(this.x, this.y, this.width, this.height);
+    // ctx.fill();
 
     // thumbnail if any
     if (this.thumbnail) {

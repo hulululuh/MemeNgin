@@ -79,7 +79,8 @@ export class BlendNode extends DesignerNode {
                 if (colA.a <= prop_alphaThreshold)
                     col = colB;
                 else
-                    col = vec4(mix(colB.rgb * colB.a, colA.rgb * colA.a, colA.a)/ final_alpha, final_alpha);
+                    col = vec4(mix(colB, colA, colA.a).rgb, final_alpha);
+                    //col = vec4(mix(colB.rgb * colB.a, colA.rgb * colA.a, colA.a)/ final_alpha, final_alpha);
                 
                 return col;
             }
