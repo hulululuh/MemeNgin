@@ -2,16 +2,32 @@ import { DesignerNode, NodeType } from "../../designer/designernode";
 import { Color } from "@/lib/designer/color";
 import { SphereBufferGeometry } from "@/lib/geometry/sphere";
 import { Property, FileProperty } from "@/lib/designer/properties";
-import { PythonShell } from "python-shell";
 import { Path } from "three";
 import { resolve } from "path";
 //import * as NativeImage from "@electron/nativeImage";
+import { Tensor, InferenceSession } from "onnxjs";
+import path from "path"
 
 const NativeImage = require("electron").nativeImage;
 
 //const call = "python eval.py --trained_model=weights/yolact_plus_base_54_800000.pth --score_threshold=0.5 --top_k=15 --image=my_image.png:output_image.png";
 
+
+async function Load (
+  modelPath: string
+) {
+  try {
+    await DetectNode.session.loadModel(modelPath);
+    console.log("model " + modelPath + " loaded");
+  } catch (err) {
+    DetectNode.session = undefined;
+    console.log(err);
+    //console.log("failed to load detect model");
+  }
+}
+
 export class DetectNode extends DesignerNode {
+  static session:InferenceSession;
   protected img: Electron.NativeImage;
 
   // constructor
@@ -19,38 +35,33 @@ export class DetectNode extends DesignerNode {
     const app = require("electron").remote.app;
     const appPath = app.getAppPath();
 
-    const path = require("path");
-    const resolve = require("path").resolve;
-    const yolactRoot = resolve(
-      path.normalize(appPath + "/../external_modules/yolact/")
-    );
+    const onnxPath = path.normalize(appPath + "/../src/assets/onnx/")
+    //const modelName = "fcos_imprv_R_50_FPN_1x.onnx";
+    //const modelName = "converted.onnx";
+    const modelName = "converted.onnx";
 
-    const pyPath = PythonShell.getPythonPath();
-
-    const detectronPath = "C:Repo/detectron2-windows/tests/";
-
-    const options = {
-      scriptPath: yolactRoot,
-      //pythonPath: pyPath,
-      //args: ["--trained_model=weights/yolact_plus_base_54_800000.pth", "--score_threshold=0.5", "--top_k=15", "--image=my_image.png:output_image.png"],
-      args: [
-        "--trained_model=weights/yolact_plus_base_54_800000.pth",
-        "--score_threshold=0.15",
-        "--top_k=15",
-        "--image=my_image.png:output_image.png",
-      ],
-    };
-
-    PythonShell.run(
-      "test_windows_install.py",
-      { scriptPath: detectronPath },
-      function(err) {
-        if (err) {
-          throw err;
-        }
-        console.log("finished");
+    if (!DetectNode.session) {
+      try {
+        DetectNode.session = new InferenceSession();
+      } catch(err) {
+        console.log(err);
       }
-    );
+    }
+
+    // use the following in an async method
+    //const modelPath = onnxPath + modelName;
+    const modelPath = "./add.onnx"
+    Load(modelPath).then(()=> {
+      console.debug(DetectNode.session);
+    });
+
+    //const path = require("path");
+    //const resolve = require("path").resolve;
+    // const yolactRoot = resolve(
+    //   path.normalize(appPath + "/../external_modules/yolact/")
+    // );
+
+
 
     super();
     this.nodeType = NodeType.Texture;
@@ -139,6 +150,10 @@ export class DetectNode extends DesignerNode {
         this.requestUpdate();
       }
     }
+
+    // if (prop) {
+      
+    // }
   }
 
   public init() {
