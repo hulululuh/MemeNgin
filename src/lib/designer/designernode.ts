@@ -146,6 +146,7 @@ export class DesignerNode implements IPropertyHolder {
   // callbacks
   onthumbnailgenerated: (DesignerNode, HTMLImageElement) => void;
   onnodepropertychanged?: (prop: Property) => void;
+  ondisconnected?: (node: DesignerNode, name: string) => void;
 
   // an update is requested when:
   // a property is changed
@@ -513,7 +514,9 @@ export class DesignerNode implements IPropertyHolder {
     type: number,
     pixels: ArrayBufferView,
     nodetype: NodeType,
-    gl: WebGL2RenderingContext
+    gl: WebGL2RenderingContext,
+    souldConvertChannel: boolean = false,
+    shouldFlip: boolean = false,
   ): WebGLTexture {
     let tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -530,9 +533,13 @@ export class DesignerNode implements IPropertyHolder {
       new Uint8Array([255, 0, 255, 255])
     ); // red
 
-    if (nodetype === NodeType.Texture) {
+    if (shouldFlip) {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    } else {
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+    }
 
+    if (souldConvertChannel) {
       // TODO: this should be fixed by using proper glAPI for texture format
       for (let i = 0; i < width * height; i++) {
         let pixelIdx = i * 4;

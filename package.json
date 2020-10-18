@@ -24,6 +24,8 @@
     "glsl-lut": "^1.1.1",
     "jquery": "^3.5.0",
     "load-bmfont": "^1.4.1",
+    "ndarray": "^1.0.19",
+    "ndarray-ops": "^1.2.2",
     "onnxjs": "^0.1.8",
     "parse-cube-lut": "^1.0.1",
     "three": "^0.118.3",

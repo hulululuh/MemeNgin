@@ -1,80 +1,41 @@
-import { DesignerNode, NodeType } from "../../designer/designernode";
-import { Color } from "@/lib/designer/color";
-import { SphereBufferGeometry } from "@/lib/geometry/sphere";
+import { DesignerNode, NodeInput, NodeType } from "../../designer/designernode";
 import { Property, FileProperty } from "@/lib/designer/properties";
-import { Path } from "three";
-import { resolve } from "path";
-//import * as NativeImage from "@electron/nativeImage";
 import { Tensor, InferenceSession } from "onnxjs";
-import path from "path"
+import { Editor } from "@/lib/editor";
+
+import ndarray from "ndarray";
+import ops from "ndarray-ops";
+
+import * as runModelUtils from "@/lib/utils/runModel";
+import * as yoloTransforms from "@/lib/utils/utils-yolo/yoloPostprocess";
+import * as yolo from "@/lib/utils/yolo";
 
 const NativeImage = require("electron").nativeImage;
 
-//const call = "python eval.py --trained_model=weights/yolact_plus_base_54_800000.pth --score_threshold=0.5 --top_k=15 --image=my_image.png:output_image.png";
+const targetW = 416;
+const targetH = 416;
 
-
-async function Load (
-  modelPath: string
-) {
-  try {
-    await DetectNode.session.loadModel(modelPath);
-    console.log("model " + modelPath + " loaded");
-  } catch (err) {
-    DetectNode.session = undefined;
-    console.log(err);
-    //console.log("failed to load detect model");
-  }
+export class YoloBox {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+  classProb: number;
+  className: string;
 }
 
 export class DetectNode extends DesignerNode {
-  static session:InferenceSession;
   protected img: Electron.NativeImage;
+  protected output: Tensor.DataType;
+  protected inferenceTime: number;
+  protected sessionRunning: boolean;
+  protected boxes: YoloBox[];
+  static verticesBuffer: WebGLBuffer;
+  static vertices: number[];
 
-  // constructor
   constructor() {
-    const app = require("electron").remote.app;
-    const appPath = app.getAppPath();
-
-    const onnxPath = path.normalize(appPath + "/../src/assets/onnx/")
-    //const modelName = "fcos_imprv_R_50_FPN_1x.onnx";
-    //const modelName = "converted.onnx";
-    const modelName = "converted.onnx";
-
-    if (!DetectNode.session) {
-      try {
-        DetectNode.session = new InferenceSession();
-      } catch(err) {
-        console.log(err);
-      }
-    }
-
-    // use the following in an async method
-    //const modelPath = onnxPath + modelName;
-    const modelPath = "./add.onnx"
-    Load(modelPath).then(()=> {
-      console.debug(DetectNode.session);
-    });
-
-    //const path = require("path");
-    //const resolve = require("path").resolve;
-    // const yolactRoot = resolve(
-    //   path.normalize(appPath + "/../external_modules/yolact/")
-    // );
-
-
-
     super();
     this.nodeType = NodeType.Texture;
-
-    // PythonShell.run("eval.py", options, function(err) {
-    //   if (err) throw err;
-    //   console.log("finished");
-    // });
-
-    // let detect = new PythonShell("eval.py", options);
-    // detect.on("message", function(message) {
-    //   let a = 0;
-    // });
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "file") {
@@ -89,18 +50,145 @@ export class DetectNode extends DesignerNode {
           }
         }
       }
-      // else if (propName === "size") {
-      //   //this.createTexture();
-      // }
     };
+
+    this.ondisconnected = (node: DesignerNode, name: string) => {
+      if (name === "image") {
+        const gl = this.gl;
+        this.isTextureReady = false;
+        gl.uniform1i(
+          gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
+          0
+        );
+
+        let graphicsItem = Editor.getInstance().graph.nodes.filter(
+          (x) => x.id == this.id
+        )[0];
+        graphicsItem.helperViz = [];
+      }
+    };
+  }
+
+  preprocess(data: Uint8ClampedArray, width: number, height: number): Tensor {
+    // data processing
+    const dataTensor = ndarray(new Float32Array(data), [width, height, 4]);
+    const dataProcessedTensor = ndarray(new Float32Array(width * height * 3), [
+      1,
+      3,
+      width,
+      height,
+    ]);
+
+    ops.assign(
+      dataProcessedTensor.pick(0, 0, null, null),
+      dataTensor.pick(null, null, 0)
+    );
+    ops.assign(
+      dataProcessedTensor.pick(0, 1, null, null),
+      dataTensor.pick(null, null, 1)
+    );
+    ops.assign(
+      dataProcessedTensor.pick(0, 2, null, null),
+      dataTensor.pick(null, null, 2)
+    );
+
+    const tensor = new Tensor(new Float32Array(3 * width * height), "float32", [
+      1,
+      3,
+      width,
+      height,
+    ]);
+    (tensor.data as Float32Array).set(dataProcessedTensor.data);
+    return tensor;
+  }
+
+  async postprocess(tensor: Tensor, inferenceTime: number) {
+    try {
+      const originalOutput = new Tensor(
+        tensor.data as Float32Array,
+        "float32",
+        [1, 125, 13, 13]
+      );
+      const outputTensor = yoloTransforms.transpose(originalOutput, [
+        0,
+        2,
+        3,
+        1,
+      ]);
+
+      // postprocessing
+      let boxes = await yolo.postprocess(outputTensor, 20);
+      let graphicsItem = Editor.getInstance().graph.nodes.filter(
+        (x) => x.id == this.id
+      )[0];
+      //graphicsItem.helperViz = [];
+
+      let helpers: YoloBox[] = [];
+
+      boxes.forEach((box) => {
+        const ratioW = this.width / targetW;
+        const ratioH = this.height / targetH;
+
+        const l = ratioW * box.left;
+        const r = ratioW * box.right;
+        const b = ratioH * box.bottom;
+        const t = ratioH * box.top;
+
+        const boxTransformed = {
+          top: t,
+          left: l,
+          bottom: b,
+          right: r,
+          classProb: box.classProb,
+          className: box.className,
+        };
+        helpers.push(boxTransformed);
+      });
+
+      graphicsItem.helperViz = helpers;
+    } catch (e) {
+      alert("Model is not valid!");
+    }
   }
 
   public createTexture() {
     let gl = this.gl;
 
+    if (!DetectNode.verticesBuffer) {
+      // init buffer for rect
+      DetectNode.verticesBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, DetectNode.verticesBuffer);
+
+      DetectNode.vertices = [
+        1.0,
+        1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0,
+        0.0,
+        -1.0,
+        -1.0,
+        0.0,
+      ];
+
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array(DetectNode.vertices),
+        gl.STATIC_DRAW
+      );
+    }
+
     if (this.tex) {
       gl.deleteTexture(this.tex);
       this.tex = null;
+    }
+
+    if (this.baseTex) {
+      gl.deleteTexture(this.baseTex);
+      this.baseTex = null;
     }
 
     const level = 0;
@@ -111,12 +199,77 @@ export class DetectNode extends DesignerNode {
     const nodetype = this.nodeType;
     let data = null;
 
-    if (!this.img && this.texPath) {
-      this.img = NativeImage.createFromPath(this.texPath);
+    this.clearTexture();
+    const editor = Editor.getInstance();
+    const designer = editor.designer;
+
+    if (!designer) {
+      console.log("could not find designer");
+      return;
     }
 
-    if (this.img) {
-      const image = this.img;
+    // 1. Find if there are input node
+    let leftNode = designer.findLeftNode(this.id, "image");
+    if (!leftNode) {
+      // abort - no connected input yet
+      return;
+    }
+
+    // tinyyolov2-7.onnx - [0, 3, 416, 416]
+    const texW = leftNode.getWidth();
+    const texH = leftNode.getHeight();
+
+    let readPixelBuffer = new Uint8Array(texW * texH * 4);
+    let readPixelCompleted = false;
+    let fb = gl.createFramebuffer();
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_2D,
+      leftNode.tex,
+      0
+    );
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) {
+      gl.readPixels(
+        0,
+        0,
+        texW,
+        texH,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        readPixelBuffer
+      );
+      readPixelCompleted = true;
+    }
+
+    if (!readPixelCompleted) {
+      return;
+    }
+
+    let img = NativeImage.createFromBuffer(
+      Buffer.from(readPixelBuffer.buffer),
+      { width: texW, height: texH }
+    );
+
+    // convert and resize input image
+    let imgResized = img.resize({ width: targetW, height: targetH });
+    let resizedBuffer = Uint8ClampedArray.from(imgResized.getBitmap());
+
+    // 2. convert input image to tensor, setup ML session
+    let tensor = this.preprocess(resizedBuffer, targetW, targetH);
+
+    // 3. run ML session
+    let tensorOutput = null;
+    tensorOutput = this.runSession(tensor);
+
+    // 4. retrieve and visualize results
+
+    // create texture for debug
+    if (img) {
+      this.img = img;
+      const image = img;
       const imgSize = image.getSize();
       if (image.isEmpty() === false) {
         this.width = imgSize.width;
@@ -147,13 +300,55 @@ export class DetectNode extends DesignerNode {
           this.gl
         );
         this.isTextureReady = true;
+        this.resize(imgSize.width, imgSize.height);
         this.requestUpdate();
       }
     }
+  }
 
-    // if (prop) {
-      
-    // }
+  clearTexture() {
+    const gl = this.gl;
+
+    if (!gl) {
+      return;
+    }
+
+    const imgSize: number[] = [this.width, this.height];
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const border = 0;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    const nodetype = this.nodeType;
+    let data = null;
+
+    this.tex = DesignerNode.updateTexture(
+      level,
+      internalFormat,
+      imgSize[0],
+      imgSize[1],
+      border,
+      format,
+      type,
+      data,
+      NodeType.Procedural,
+      this.gl
+    );
+
+    this.isTextureReady = false;
+  }
+
+  async runSession(preprocessedData: Tensor): Promise<Tensor> {
+    let tensorOutput = null;
+    let session = Editor.getInstance().mlModel.session;
+    [tensorOutput, this.inferenceTime] = await runModelUtils.runModel(
+      session!,
+      preprocessedData
+    );
+    this.output = tensorOutput.data;
+    this.postprocess(tensorOutput, 0);
+    this.sessionRunning = false;
+    return tensorOutput;
   }
 
   public init() {

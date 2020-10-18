@@ -10,15 +10,11 @@ let parseCubeLUT = require("parse-cube-lut");
 import * as fs from "fs";
 import { Property, FileProperty } from "@/lib/designer/properties";
 import { getTotalHeight } from "custom-electron-titlebar/lib/common/dom";
-const NativeImage = require("electron").nativeImage;
 
 export class ColorGradeNode extends DesignerNode {
-  //protected img: Electron.NativeImage;
-
   constructor() {
     super();
     this.nodeType = NodeType.Texture;
-    //this.nodeType = NodeType.Procedural;
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "file") {

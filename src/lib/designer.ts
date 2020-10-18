@@ -350,7 +350,12 @@ export class Designer {
         con.rightNode == rightNode &&
         con.rightNodeInput == rightIndex
       ) {
+        
         // right node needs to be updated
+        if (rightNode.ondisconnected) {
+          rightNode.ondisconnected(leftNode, rightIndex);
+        }
+        
         this.requestUpdate(rightNode);
 
         // found our connection, remove
@@ -903,5 +908,26 @@ export class Designer {
     }
 
     return d;
+  }
+
+  public findLeftNode(rightNodeId:string, rightNodeInput:string) : DesignerNode {
+    let conns = this.conns.filter(conn => conn.rightNode.id === rightNodeId && conn.rightNodeInput === rightNodeInput);
+    
+    let leftNode;
+
+    if (conns.length > 0)
+      leftNode = conns[0].leftNode;
+    return leftNode;
+  }
+
+  public findRightNodes(leftNodeId:string, leftNodeOutput:string) : DesignerNode[] {
+    let conn = this.conns.filter(conn => conn.leftNode.id === leftNodeId && conn.leftNodeOutput === leftNodeOutput);
+    let rightNodes;
+
+    for (let con of conn) {
+      rightNodes.add(con.rightNode);
+    }
+    
+    return rightNodes;
   }
 }

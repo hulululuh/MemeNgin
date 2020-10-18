@@ -81,7 +81,9 @@ export class TextureNode extends DesignerNode {
           type,
           Uint8Array.from(image.getBitmap()),
           NodeType.Texture,
-          this.gl
+          this.gl,
+          true,
+          true,
         );
         this.isTextureReady = true;
         this.requestUpdate();
