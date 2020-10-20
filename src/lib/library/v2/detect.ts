@@ -354,12 +354,12 @@ export class DetectNode extends DesignerNode {
   public init() {
     this.title = "Detect";
     this.addInput("image");
-    let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);
+    //let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);
 
     // this happens when we drop image file into canvas
-    if (this.texPath !== "") {
-      fileProp.setValue(this.texPath);
-    }
+    // if (this.texPath !== "") {
+    //   fileProp.setValue(this.texPath);
+    // }
 
     let source = `
         vec4 process(vec2 uv)
