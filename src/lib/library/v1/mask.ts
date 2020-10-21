@@ -3,6 +3,7 @@ import { DesignerNode } from "../../designer/designernode";
 export class MaskNode extends DesignerNode {
   public init() {
     this.title = "Mask";
+    this.parentIndex = "textureB";
 
     this.addInput("textureA");
     this.addInput("textureB");
@@ -16,7 +17,8 @@ export class MaskNode extends DesignerNode {
 
         vec4 process(vec2 uv)
         {
-            vec4 a =  texture(textureA, uv);
+            vec2 foreground_uv = clamp(uv * (textureB_size / textureA_size), 0.0, 1.0);
+            vec4 a =  texture(textureA, foreground_uv);
             vec4 b =  texture(textureB, uv);
             vec4 m =  texture(mask, uv);
             float t = lum(m);

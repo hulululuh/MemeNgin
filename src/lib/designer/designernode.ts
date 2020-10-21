@@ -84,6 +84,9 @@ export class DesignerNode implements IPropertyHolder {
   public width: number;
   public height: number;
 
+  // this indicates which node should we use, when it needs to be resized
+  public parentIndex: string;
+
   //program:WebGLShader;
   source: string; // shader code
   shaderProgram: WebGLProgram;
@@ -103,6 +106,23 @@ export class DesignerNode implements IPropertyHolder {
     this.isResult = false;
     this.width = 1024;
     this.height = 1024;
+    this.parentIndex = "image";
+  }
+
+  public isParentIndex(name: string): boolean {
+    // if the node has one input then it is a prime index
+    if (this.inputs.length < 2) {
+      return true;
+    } else {
+      return name === this.parentIndex;
+    }
+  }
+
+  public getParentNode(): any {
+    return Editor.getInstance().designer.findLeftNode(
+      this.id,
+      this.parentIndex
+    );
   }
 
   public getWidth(): number {
@@ -224,6 +244,9 @@ export class DesignerNode implements IPropertyHolder {
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
       const tex = input.node.tex ? input.node.tex : Designer.dummyTex;
+      const texW = input.node.tex ? input.node.getWidth() : 100;
+      const texH = input.node.tex ? input.node.getHeight() : 100;
+
       gl.activeTexture(gl.TEXTURE0 + texIndex);
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.uniform1i(
@@ -234,6 +257,12 @@ export class DesignerNode implements IPropertyHolder {
         gl.getUniformLocation(this.shaderProgram, input.name + "_connected"),
         1
       );
+      gl.uniform2f(
+        gl.getUniformLocation(this.shaderProgram, input.name + "_size"),
+        texW,
+        texH
+      );
+      input.name;
       console.log("bound texture " + texIndex);
       texIndex++;
     }
@@ -516,7 +545,7 @@ export class DesignerNode implements IPropertyHolder {
     nodetype: NodeType,
     gl: WebGL2RenderingContext,
     souldConvertChannel: boolean = false,
-    shouldFlip: boolean = false,
+    shouldFlip: boolean = false
   ): WebGLTexture {
     let tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -832,6 +861,7 @@ export class DesignerNode implements IPropertyHolder {
     for (let input of this.inputs) {
       code += "uniform sampler2D " + input + ";\n";
       code += "uniform bool " + input + "_connected;\n";
+      code += "uniform vec2 " + input + "_size;\n";
     }
 
     if (this.hasBaseTexture()) {

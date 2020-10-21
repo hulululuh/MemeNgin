@@ -3,6 +3,7 @@ import { DesignerNode, NodeInput } from "../../designer/designernode";
 export class BlendNode extends DesignerNode {
   public init() {
     this.title = "Blend";
+    this.parentIndex = "colorB";
 
     this.addInput("colorA"); // foreground
     this.addInput("colorB"); // background
@@ -42,7 +43,9 @@ export class BlendNode extends DesignerNode {
             if (opacity_connected)
                 finalOpacity *= texture(opacity, uv).r;
 
-            vec4 colA = texture(colorA,uv);
+            //
+            vec2 foreground_uv = clamp(uv * (colorB_size / colorA_size), 0.0, 1.0);
+            vec4 colA = texture(colorA, foreground_uv);
             vec4 colB = texture(colorB,uv);
             vec4 col = vec4(1.0);
 

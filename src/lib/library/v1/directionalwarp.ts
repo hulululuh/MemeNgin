@@ -4,7 +4,7 @@ export class DirectionalWarpNode extends DesignerNode {
   public init() {
     this.title = "Directional Warp";
 
-    this.addInput("inputImage");
+    this.addInput("image");
     this.addInput("height");
 
     this.addFloatProperty("intensity", "Intensity", 0.1, -0.5, 0.5, 0.01);
@@ -21,7 +21,7 @@ export class DirectionalWarpNode extends DesignerNode {
             // center point
             float dist = abs(texture(height, uv).r) - 0.5;
             
-            vec4 color = texture(inputImage, uv + dir * prop_intensity * dist);
+            vec4 color = texture(image, uv + dir * prop_intensity * dist);
 
             return color;
         }

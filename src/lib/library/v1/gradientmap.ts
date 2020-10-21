@@ -6,7 +6,7 @@ export class GradientMapNode extends DesignerNode {
   public init() {
     this.title = "GradientMap";
 
-    this.addInput("inputImage");
+    this.addInput("image");
 
     this.addGradientProperty("gradient", "Gradient", Gradient.default());
 
@@ -19,7 +19,7 @@ export class GradientMapNode extends DesignerNode {
         vec4 process(vec2 uv)
         {
             // grayscale input color
-            float t = grayscale(texture(inputImage, uv).rgb);
+            float t = grayscale(texture(image, uv).rgb);
             vec3 col = sampleGradient(prop_gradient, t);
             
             return vec4(col, 1.0);

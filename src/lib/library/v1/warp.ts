@@ -3,6 +3,7 @@ import { DesignerNode } from "../../designer/designernode";
 export class WarpNode extends DesignerNode {
   public init() {
     this.title = "Warp";
+    this.parentIndex = "inputImage";
 
     this.addInput("inputImage");
     this.addInput("height");
