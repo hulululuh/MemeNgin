@@ -5,6 +5,7 @@ import { SolidCellNode } from "./v1/solidcell";
 import { LineCellNode } from "./v1/linecell";
 import { PolygonNode, CircleNode } from "./v1/shapes";
 import { BlendNode } from "./v1/blend";
+import { OverlayNode } from "./v1/overlay";
 import { InvertNode } from "./v1/invert";
 import { WarpNode } from "./v1/warp";
 import { ColorNode, ColorizeNode } from "./v1/color";
@@ -49,6 +50,7 @@ export function createLibrary() {
   lib.addNode("circle", "Circle", CircleNode);
   lib.addNode("polygon", "Polygon", PolygonNode);
   lib.addNode("blend", "Blend", BlendNode);
+  lib.addNode("overlay", "Overlay", OverlayNode);
   lib.addNode("invert", "Invert", InvertNode);
   lib.addNode("warp", "Warp", WarpNode);
   lib.addNode("color", "Color", ColorNode);
