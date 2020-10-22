@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class AdvanceSplatterV2 extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Advance Splatter";
 
     this.addInput("image");

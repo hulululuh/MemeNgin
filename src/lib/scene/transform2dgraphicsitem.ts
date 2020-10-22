@@ -50,7 +50,7 @@ export class Transform2DGraphicsItem extends GraphicsItem {
     this.tooSmallSize = 5;
   }
 
-  public isPointInside(px: number, py: number): boolean {
+  isPointInside(px: number, py: number): boolean {
     //todo: loop through child items rect to see if a hit is made
     for (let item of this.items) {
       if (
@@ -205,7 +205,7 @@ export class Transform2DGraphicsItem extends GraphicsItem {
   // after the first phase, items will not be empty
   // if there is a mouse event and items is not empty
   // then its in drag mode
-  public mouseDown(evt: MouseDownEvent) {
+  mouseDown(evt: MouseDownEvent) {
     this.hit = true;
     this.dragged = false;
 
@@ -218,7 +218,7 @@ export class Transform2DGraphicsItem extends GraphicsItem {
     }
   }
 
-  public mouseMove(evt: MouseMoveEvent) {
+  mouseMove(evt: MouseMoveEvent) {
     if (this.items.length > 0) {
       for (let item of this.draggableItems) {
         item.move(evt.deltaX, evt.deltaY);
@@ -231,7 +231,7 @@ export class Transform2DGraphicsItem extends GraphicsItem {
     }
   }
 
-  public mouseUp(evt: MouseUpEvent) {
+  mouseUp(evt: MouseUpEvent) {
     this.hit = false;
     if (this.items.length == 0 && !this.isTooSmall()) {
       this.items = this.getHitItems();

@@ -27,16 +27,16 @@ export class ColorGradeNode extends DesignerNode {
     };
   }
 
-  public getBaseTextureType(): number {
+  getBaseTextureType(): number {
     return this.gl.TEXTURE_3D;
   }
 
-  public getTexturePrecision(): TexPrecision {
+  getTexturePrecision(): TexPrecision {
     return TexPrecision.lowp;
   }
 
   // call createLut instead
-  public createTexture() {
+  createTexture() {
     let gl = this.gl;
 
     if (this.tex) {
@@ -65,7 +65,7 @@ export class ColorGradeNode extends DesignerNode {
     );
   }
 
-  public createLut() {
+  createLut() {
     if (this.texPath) {
       const buf = fs.readFileSync(this.texPath);
       const lut = parseCubeLUT(buf);
@@ -134,7 +134,7 @@ export class ColorGradeNode extends DesignerNode {
     }
   }
 
-  public init() {
+  init() {
     this.title = "Color Grade";
     let fileProp = this.addFileProperty("file", "path", "", ["cube"]);
 

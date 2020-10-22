@@ -3,8 +3,8 @@ import { GraphicsItem } from "./graphicsitem";
 
 export class ConnectionGraphicsItem extends GraphicsItem {
   id!: string;
-  public socketA!: SocketGraphicsItem;
-  public socketB!: SocketGraphicsItem;
+  socketA!: SocketGraphicsItem;
+  socketB!: SocketGraphicsItem;
 
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
     ctx.beginPath();

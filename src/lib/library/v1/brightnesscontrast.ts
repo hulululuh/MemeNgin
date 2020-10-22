@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // https://github.com/evanw/glfx.js/blob/master/src/filters/adjust/brightnesscontrast.js
 export class BrightnessContrastNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Brightness Contrast";
 
     this.addInput("image");

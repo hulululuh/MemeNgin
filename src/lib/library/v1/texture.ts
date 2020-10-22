@@ -32,7 +32,7 @@ export class TextureNode extends DesignerNode {
     };
   }
 
-  public createTexture() {
+  createTexture() {
     let gl = this.gl;
 
     if (this.tex) {
@@ -83,7 +83,7 @@ export class TextureNode extends DesignerNode {
           NodeType.Texture,
           this.gl,
           true,
-          true,
+          true
         );
         this.isTextureReady = true;
         this.requestUpdate();
@@ -91,7 +91,7 @@ export class TextureNode extends DesignerNode {
     }
   }
 
-  public init() {
+  init() {
     this.title = "Image Texture";
     let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);
 

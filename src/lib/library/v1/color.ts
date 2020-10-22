@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 import { Color } from "@/lib/designer/color";
 
 export class ColorizeNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Colorize";
 
     this.addInput("image");
@@ -22,7 +22,7 @@ export class ColorizeNode extends DesignerNode {
 }
 
 export class ColorNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Color";
 
     this.addColorProperty("color", "Color", new Color());

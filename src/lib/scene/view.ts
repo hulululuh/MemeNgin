@@ -50,8 +50,8 @@ export class Vector2 {
 }
 
 export class BoundingBox {
-  public min: Vector2;
-  public max: Vector2;
+  min: Vector2;
+  max: Vector2;
 
   constructor(min: Vector2, max: Vector2) {
     this.min = min;
@@ -98,14 +98,14 @@ export class BoundingBox {
 }
 
 export class Rect {
-  public x: number = 0;
-  public y: number = 0;
-  public width: number;
-  public height: number;
+  x: number = 0;
+  y: number = 0;
+  width: number;
+  height: number;
 
   color: string;
 
-  public constructor() {
+  constructor() {
     //this.scene = scene;
     //scene.addItem(this);
     this.width = 1;
@@ -113,12 +113,12 @@ export class Rect {
     this.color = "rgb(255, 50, 50)";
   }
 
-  public setSize(w: number, h: number) {
+  setSize(w: number, h: number) {
     this.width = w;
     this.height = h;
   }
 
-  public isPointInside(px: number, py: number): boolean {
+  isPointInside(px: number, py: number): boolean {
     if (
       px >= this.x &&
       px <= this.x + this.width &&
@@ -129,45 +129,45 @@ export class Rect {
     return false;
   }
 
-  public setCenter(x: number, y: number) {
+  setCenter(x: number, y: number) {
     this.x = x - this.width / 2;
     this.y = y - this.height / 2;
   }
 
-  public centerX(): number {
+  centerX(): number {
     return this.x + this.width / 2;
   }
 
-  public centerY(): number {
+  centerY(): number {
     return this.y + this.height / 2;
   }
 
-  public move(dx: number, dy: number) {
+  move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
   }
 
-  public get left() {
+  get left() {
     return this.x;
   }
 
-  public get top() {
+  get top() {
     return this.y;
   }
 
-  public get right() {
+  get right() {
     return this.x + this.width;
   }
 
-  public get bottom() {
+  get bottom() {
     return this.y + this.height;
   }
 
-  public get center() {
+  get center() {
     return new Vector2(this.centerX(), this.centerY());
   }
 
-  public intersects(other: Rect) {
+  intersects(other: Rect) {
     if (this.left > other.right) return false;
     if (this.right < other.left) return false;
     if (this.bottom < other.top) return false;
@@ -176,7 +176,7 @@ export class Rect {
     return true;
   }
 
-  public expand(uniformSize: number) {
+  expand(uniformSize: number) {
     let halfSize = uniformSize * 0.5;
 
     // assume it's a rect with a positive area
@@ -186,7 +186,7 @@ export class Rect {
     this.height += halfSize * 2;
   }
 
-  public expandByRect(rect: Rect) {
+  expandByRect(rect: Rect) {
     // assume it's a rect with a positive area
     this.x = Math.min(this.x, rect.x);
     this.y = Math.min(this.y, rect.y);

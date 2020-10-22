@@ -73,7 +73,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
   showTitleProp: BoolProperty;
   descrProp: StringProperty;
 
-  public constructor(view: SceneView) {
+  constructor(view: SceneView) {
     super();
     this.title = "Frame";
     this.description = "";
@@ -147,7 +147,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     return col;
   }
 
-  public setPos(x: number, y: number) {
+  setPos(x: number, y: number) {
     // find diff
     let diff = new Vector2(x - this.x, y - this.y);
     super.setPos(x, y);
@@ -158,7 +158,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     // }
   }
 
-  public setFrameRect(rect: Rect) {
+  setFrameRect(rect: Rect) {
     this.x = rect.x;
     this.y = rect.y;
     this.width = rect.width;
@@ -245,7 +245,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     // }
   }
 
-  public isPointInside(px: number, py: number): boolean {
+  isPointInside(px: number, py: number): boolean {
     let regions = this.getFrameRegions();
     for (let region of regions) {
       if (region.rect.isPointInside(px, py)) {
@@ -265,7 +265,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
   }
 
   // MOUSE EVENTS
-  public mouseDown(evt: MouseDownEvent) {
+  mouseDown(evt: MouseDownEvent) {
     this.hit = true;
     this.dragged = false;
 
@@ -309,7 +309,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     }
   }
 
-  public mouseOver(evt: MouseOverEvent) {
+  mouseOver(evt: MouseOverEvent) {
     let px = evt.globalX;
     let py = evt.globalY;
 
@@ -353,7 +353,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     return nodes;
   }
 
-  public mouseMove(evt: MouseMoveEvent) {
+  mouseMove(evt: MouseMoveEvent) {
     if (this.hit) {
       // movement
       if (this.dragMode == DragMode.HandleTop) {
@@ -395,7 +395,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     }
   }
 
-  public mouseUp(evt: MouseUpEvent) {
+  mouseUp(evt: MouseUpEvent) {
     // add undo/redo action
     if (this.dragged) {
       if (this.dragMode == DragMode.HandleTop) {

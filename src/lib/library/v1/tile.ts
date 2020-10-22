@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class TileNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Tile";
 
     this.addInput("image");

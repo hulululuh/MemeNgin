@@ -19,7 +19,7 @@ export class NodeGraphicsItemRenderState {
 export class NodeGraphicsItem extends GraphicsItem {
   id!: string;
   sockets: SocketGraphicsItem[] = Array();
-  public title: string;
+  title: string;
   thumbnail!: HTMLImageElement;
   imageCanvas: ImageCanvas;
   relScale: number;
@@ -48,7 +48,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   // resize graphics node by given image size
-  public setVirtualSize(width: number, height: number) {
+  setVirtualSize(width: number, height: number) {
     let wScaled = 100;
     let hScaled = 100;
 
@@ -68,25 +68,25 @@ export class NodeGraphicsItem extends GraphicsItem {
     }
   }
 
-  public setScene(scene: NodeScene) {
+  setScene(scene: NodeScene) {
     this.scene = scene;
 
     for (let sock of this.sockets) sock.setScene(scene);
   }
 
-  public setTextureChannel(name: string) {
+  setTextureChannel(name: string) {
     this.textureChannel = name;
   }
 
-  public clearTextureChannel() {
+  clearTextureChannel() {
     this.textureChannel = null;
   }
 
-  public setThumbnail(thumbnail: HTMLImageElement) {
+  setThumbnail(thumbnail: HTMLImageElement) {
     this.thumbnail = thumbnail;
   }
 
-  public move(dx: number, dy: number) {
+  move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
     for (let sock of this.sockets) {
@@ -197,17 +197,17 @@ export class NodeGraphicsItem extends GraphicsItem {
     }
   }
 
-  public setPos(x: number, y: number) {
+  setPos(x: number, y: number) {
     super.setPos(x, y);
     this.sortSockets();
   }
 
-  public setCenter(x: number, y: number) {
+  setCenter(x: number, y: number) {
     super.setCenter(x, y);
     this.sortSockets();
   }
 
-  public sortSockets() {
+  sortSockets() {
     // top and bottom padding for sockets
     let pad = 10;
 
@@ -289,7 +289,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   // adds socket to node
-  public addSocket(name: string, id: string, type: SocketType) {
+  addSocket(name: string, id: string, type: SocketType) {
     let sock = new SocketGraphicsItem();
     sock.id = id;
     sock.title = name;
@@ -301,19 +301,19 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   // MOUSE EVENTS
-  public mouseDown(evt: MouseDownEvent) {
+  mouseDown(evt: MouseDownEvent) {
     this.hit = true;
     this.dragStartPos = new Vector2(this.x, this.y);
   }
 
-  public mouseMove(evt: MouseMoveEvent) {
+  mouseMove(evt: MouseMoveEvent) {
     if (this.hit) {
       // movement
       this.move(evt.deltaX, evt.deltaY);
     }
   }
 
-  public mouseUp(evt: MouseUpEvent) {
+  mouseUp(evt: MouseUpEvent) {
     this.hit = false;
 
     // add undo/redo

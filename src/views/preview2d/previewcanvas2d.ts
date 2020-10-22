@@ -21,29 +21,29 @@ export enum DrawMode {
 }
 
 class Rect {
-  protected visible: boolean = true;
-
-  protected x: number = 0;
-  protected y: number = 0;
-  protected width: number;
-  protected height: number;
+  private visible: boolean;
+  private x: number;
+  private y: number;
+  private width: number;
+  private height: number;
 
   color: string;
 
-  public constructor() {
-    //this.scene = scene;
-    //scene.addItem(this);
+  constructor() {
+    this.visible = true;
+    this.x = 0;
+    this.y = 0;
     this.width = 1;
     this.height = 1;
     this.color = "rgb(255, 50, 50)";
   }
 
-  public setSize(w: number, h: number) {
+  setSize(w: number, h: number) {
     this.width = w;
     this.height = h;
   }
 
-  public isPointInside(px: number, py: number): boolean {
+  isPointInside(px: number, py: number): boolean {
     if (
       px >= this.x &&
       px <= this.x + this.width &&
@@ -54,20 +54,20 @@ class Rect {
     return false;
   }
 
-  public setCenter(x: number, y: number) {
+  setCenter(x: number, y: number) {
     this.x = x - this.width / 2;
     this.y = y - this.height / 2;
   }
 
-  public centerX(): number {
+  centerX(): number {
     return this.x + this.width / 2;
   }
 
-  public centerY(): number {
+  centerY(): number {
     return this.y + this.height / 2;
   }
 
-  public move(dx: number, dy: number) {
+  move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
   }
@@ -107,7 +107,7 @@ export class DragZoom {
   rect: Rect;
   image: HTMLCanvasElement;
 
-  public drawMode: DrawMode;
+  drawMode: DrawMode;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;

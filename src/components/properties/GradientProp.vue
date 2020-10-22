@@ -107,12 +107,12 @@ export class Point {
 }
 
 export class Box {
-  public x: number = 0;
-  public y: number = 0;
-  public width: number = 1;
-  public height: number = 1;
+  x: number = 0;
+  y: number = 0;
+  width: number = 1;
+  height: number = 1;
 
-  public isPointInside(px: number, py: number): boolean {
+  isPointInside(px: number, py: number): boolean {
     if (
       px >= this.x &&
       px <= this.x + this.width &&
@@ -123,28 +123,28 @@ export class Box {
     return false;
   }
 
-  public setCenter(x: number, y: number) {
+  setCenter(x: number, y: number) {
     this.x = x - this.width / 2;
     this.y = y - this.height / 2;
   }
 
-  public setCenterX(x: number) {
+  setCenterX(x: number) {
     this.x = x - this.width / 2;
   }
 
-  public setCenterY(y: number) {
+  setCenterY(y: number) {
     this.y = y - this.height / 2;
   }
 
-  public centerX(): number {
+  centerX(): number {
     return this.x + this.width / 2;
   }
 
-  public centerY(): number {
+  centerY(): number {
     return this.y + this.height / 2;
   }
 
-  public move(dx: number, dy: number) {
+  move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
   }
@@ -394,7 +394,7 @@ export class GradientWidget {
     return handle;
   }
 
-  public el() {
+  el() {
     return this.canvas;
   }
 

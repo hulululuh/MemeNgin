@@ -1,7 +1,7 @@
 import { DesignerNode, NodeInput } from "../../designer/designernode";
 
 export class OverlayNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Overlay";
     this.parentIndex = "colorB";
 

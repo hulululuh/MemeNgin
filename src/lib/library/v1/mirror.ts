@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class MirrorNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Mirror";
 
     this.addInput("image");

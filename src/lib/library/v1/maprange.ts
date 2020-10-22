@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class MapRangeNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Map Range";
 
     this.addInput("color");

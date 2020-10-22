@@ -151,7 +151,7 @@ export class DetectNode extends DesignerNode {
     }
   }
 
-  public createTexture() {
+  createTexture() {
     let gl = this.gl;
 
     if (!DetectNode.verticesBuffer) {
@@ -200,8 +200,7 @@ export class DetectNode extends DesignerNode {
     let data = null;
 
     this.clearTexture();
-    const editor = Editor.getInstance();
-    const designer = editor.designer;
+    const designer = Editor.getDesigner();
 
     if (!designer) {
       console.log("could not find designer");
@@ -351,7 +350,7 @@ export class DetectNode extends DesignerNode {
     return tensorOutput;
   }
 
-  public init() {
+  init() {
     this.title = "Detect";
     this.addInput("image");
     //let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);

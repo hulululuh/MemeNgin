@@ -12,8 +12,8 @@ export enum DesignerVariableType {
 }
 
 export class DesignerNodePropertyMap {
-  public node: DesignerNode;
-  public propertyName: string;
+  node: DesignerNode;
+  propertyName: string;
 }
 
 export class DesignerVariable {

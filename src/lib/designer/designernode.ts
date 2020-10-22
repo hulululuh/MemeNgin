@@ -54,8 +54,8 @@ const PrecisionName = new Map<TexPrecision, string>([
 ]);
 
 export class NodeInput {
-  public node: DesignerNode;
-  public name: string;
+  node: DesignerNode;
+  name: string;
 }
 
 export enum NodeType {
@@ -66,26 +66,26 @@ export enum NodeType {
 }
 
 export class DesignerNode implements IPropertyHolder {
-  public id: string = Guid.newGuid();
-  public title: string;
-  public typeName: string; // added when node is created from library
-  public texPath: string;
-  public nodeType: NodeType;
+  id: string = Guid.newGuid();
+  title: string;
+  typeName: string; // added when node is created from library
+  texPath: string;
+  nodeType: NodeType;
 
-  public gl: WebGL2RenderingContext;
-  public designer: Designer;
-  public tex: WebGLTexture;
-  public baseTex: WebGLTexture;
-  public isTextureReady: boolean;
+  gl: WebGL2RenderingContext;
+  designer: Designer;
+  tex: WebGLTexture;
+  baseTex: WebGLTexture;
+  isTextureReady: boolean;
 
-  public isInput: boolean;
-  public isResult: boolean;
+  isInput: boolean;
+  isResult: boolean;
 
-  public width: number;
-  public height: number;
+  width: number;
+  height: number;
 
   // this indicates which node should we use, when it needs to be resized
-  public parentIndex: string;
+  parentIndex: string;
 
   //program:WebGLShader;
   source: string; // shader code
@@ -109,7 +109,7 @@ export class DesignerNode implements IPropertyHolder {
     this.parentIndex = "image";
   }
 
-  public isParentIndex(name: string): boolean {
+  isParentIndex(name: string): boolean {
     // if the node has one input then it is a prime index
     if (this.inputs.length < 2) {
       return true;
@@ -118,14 +118,11 @@ export class DesignerNode implements IPropertyHolder {
     }
   }
 
-  public getParentNode(): any {
-    return Editor.getInstance().designer.findLeftNode(
-      this.id,
-      this.parentIndex
-    );
+  getParentNode(): any {
+    return Editor.getDesigner().findLeftNode(this.id, this.parentIndex);
   }
 
-  public getWidth(): number {
+  getWidth(): number {
     if (this.width) {
       return this.width;
     } else {
@@ -133,7 +130,7 @@ export class DesignerNode implements IPropertyHolder {
     }
   }
 
-  public getHeight(): number {
+  getHeight(): number {
     if (this.height) {
       return this.height;
     } else {
@@ -141,21 +138,21 @@ export class DesignerNode implements IPropertyHolder {
     }
   }
 
-  public getBaseTextureType(): number {
+  getBaseTextureType(): number {
     return this.gl.TEXTURE_2D;
   }
 
-  public getTexturePrecision(): TexPrecision {
+  getTexturePrecision(): TexPrecision {
     return TexPrecision.highp;
   }
 
-  public hasBaseTexture(): boolean {
+  hasBaseTexture(): boolean {
     return (
       this.nodeType === NodeType.Text || this.nodeType === NodeType.Texture
     );
   }
 
-  public readyToUpdate() {
+  readyToUpdate() {
     if (this.hasBaseTexture()) {
       return this.isTextureReady;
     } else {
@@ -174,15 +171,15 @@ export class DesignerNode implements IPropertyHolder {
   // a connection is removed
   //
   // all output connected nodes are invalidated as well
-  public requestUpdate() {
+  requestUpdate() {
     this.designer.requestUpdate(this);
   }
 
-  public requestUpdateThumbnail() {
+  requestUpdateThumbnail() {
     this.designer.requestUpdateThumbnail(this);
   }
 
-  public resize(width: number, height: number) {
+  resize(width: number, height: number) {
     const sizeChanged = this.width !== width || this.height !== height;
 
     if (sizeChanged) {
@@ -213,7 +210,7 @@ export class DesignerNode implements IPropertyHolder {
     //this.requestUpdate();
   }
 
-  public render(inputs: NodeInput[], optional?: Function) {
+  render(inputs: NodeInput[], optional?: Function) {
     let gl = this.gl;
 
     // bind texture to fbo
@@ -399,7 +396,7 @@ export class DesignerNode implements IPropertyHolder {
     // render
   }
 
-  public getInputs(): string[] {
+  getInputs(): string[] {
     return this.inputs;
   }
 
@@ -407,7 +404,7 @@ export class DesignerNode implements IPropertyHolder {
     this.inputs.push(name);
   }
 
-  public setProperty(name: string, value: any) {
+  setProperty(name: string, value: any) {
     let prop = this.properties.find((x) => {
       return x.name == name;
     });
@@ -428,7 +425,7 @@ export class DesignerNode implements IPropertyHolder {
     // }
   }
 
-  public _init() {
+  _init() {
     //this.inputs = new Array();
     //this.properties = new Array();
     this.createTexture();
@@ -449,11 +446,11 @@ export class DesignerNode implements IPropertyHolder {
         */
   }
 
-  public setAsInput() {
+  setAsInput() {
     this.isInput = true;
   }
 
-  public setAsResult() {
+  setAsResult() {
     this.isResult = true;
   }
 
@@ -533,7 +530,7 @@ export class DesignerNode implements IPropertyHolder {
     this.shaderProgram = buildShaderProgram(this.gl, vertSource, fragSource);
   }
 
-  protected static updateTexture<T>(
+  static updateTexture<T>(
     level: number,
     internalFormat: number,
     width: number,
@@ -611,7 +608,7 @@ export class DesignerNode implements IPropertyHolder {
     return tex;
   }
 
-  public static getNearestPOT(num: number): number {
+  static getNearestPOT(num: number): number {
     const pow = Math.floor(Math.log2(num));
     return Math.pow(2, pow);
   }
@@ -619,7 +616,7 @@ export class DesignerNode implements IPropertyHolder {
   // creates opengl texture for this node
   // gets the height from the scene
   // if the texture is already created, delete it and recreate it
-  public createTexture() {
+  createTexture() {
     let gl = this.gl;
 
     if (this.tex) {

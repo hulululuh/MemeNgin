@@ -1,7 +1,7 @@
 import { DesignerNode, NodeInput } from "../../designer/designernode";
 
 export class BlendNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Blend";
     this.parentIndex = "colorB";
 

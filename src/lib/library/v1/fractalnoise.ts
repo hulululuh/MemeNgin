@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // https://thebookofshaders.com/11/
 export class FractalNoiseNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Fractal Noise";
 
     this.addIntProperty("scale", "Scale", 1, 1, 10, 1);

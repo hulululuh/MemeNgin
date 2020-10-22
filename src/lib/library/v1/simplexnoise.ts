@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // https://thebookofshaders.com/11/
 export class SimplexNoiseNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Simplex Noise";
 
     this.addFloatProperty("scale", "Scale", 100, 1, 1000, 0.01);

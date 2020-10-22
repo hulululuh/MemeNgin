@@ -23,15 +23,15 @@ export enum SocketType {
 }
 
 export class SocketGraphicsItem extends GraphicsItem {
-  public id!: string;
-  public title!: string;
-  public node!: NodeGraphicsItem;
-  public socketType!: SocketType;
+  id!: string;
+  title!: string;
+  node!: NodeGraphicsItem;
+  socketType!: SocketType;
   radius: number = 8;
 
   // only in sockets store the connection
   // since outsockets can have multiple connections
-  //public con:ConnectionGraphicsItem;
+  //con:ConnectionGraphicsItem;
   conns: ConnectionGraphicsItem[] = new Array();
 
   hit: boolean;
@@ -162,7 +162,7 @@ export class SocketGraphicsItem extends GraphicsItem {
   }
 
   // MOUSE EVENTS
-  public mouseDown(evt: MouseDownEvent) {
+  mouseDown(evt: MouseDownEvent) {
     this.hit = true;
     this.hitSocket = null;
     this.mouseDragX = evt.globalX;
@@ -178,7 +178,7 @@ export class SocketGraphicsItem extends GraphicsItem {
     } else this.hitSocket = this;
   }
 
-  public mouseMove(evt: MouseMoveEvent) {
+  mouseMove(evt: MouseMoveEvent) {
     if (this.hit) {
       // movement
       //this.move(evt.deltaX, evt.deltaY);
@@ -187,7 +187,7 @@ export class SocketGraphicsItem extends GraphicsItem {
     }
   }
 
-  public mouseUp(evt: MouseUpEvent) {
+  mouseUp(evt: MouseUpEvent) {
     console.log("mouse up!!");
     let mouseX = evt.globalX;
     let mouseY = evt.globalY;

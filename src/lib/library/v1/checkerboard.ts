@@ -3,7 +3,7 @@ import { Color } from "@/lib/designer/color";
 
 // https://stackoverflow.com/questions/4694608/glsl-checkerboard-pattern
 export class CheckerBoardNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "CheckerBoard";
 
     this.addFloatProperty("rows", "Rows", 2, 1, 20, 1);

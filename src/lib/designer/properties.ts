@@ -14,18 +14,18 @@ export enum PropertyType {
 }
 
 export class Property {
-  public name: string;
-  public displayName: string;
-  public type: string;
+  name: string;
+  displayName: string;
+  type: string;
 
   // to be overriden
-  public getValue(): any {
+  getValue(): any {
     return null;
   }
 
-  public setValue(val: any) {}
+  setValue(val: any) {}
 
-  public clone(): Property {
+  clone(): Property {
     return null;
   }
 }
@@ -41,7 +41,7 @@ export class FloatProperty extends Property {
   minValue: number = 0;
   maxValue: number = 1;
   step: number = 1;
-  public constructor(
+  constructor(
     name: string,
     displayName: string,
     value: number,
@@ -55,16 +55,16 @@ export class FloatProperty extends Property {
     this.type = PropertyType.Float;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.value;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     // todo: validate
     this.value = val;
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new FloatProperty(
       this.name,
       this.displayName,
@@ -77,7 +77,7 @@ export class FloatProperty extends Property {
     return prop;
   }
 
-  public copyValuesFrom(prop: FloatProperty) {
+  copyValuesFrom(prop: FloatProperty) {
     this.minValue = prop.minValue;
     this.maxValue = prop.maxValue;
     this.value = prop.value;
@@ -90,7 +90,7 @@ export class IntProperty extends Property {
   minValue: number = 0;
   maxValue: number = 100;
   step: number = 1;
-  public constructor(
+  constructor(
     name: string,
     displayName: string,
     value: number,
@@ -104,16 +104,16 @@ export class IntProperty extends Property {
     this.type = PropertyType.Int;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.value;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     // todo: validate
     this.value = val;
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new IntProperty(
       this.name,
       this.displayName,
@@ -126,7 +126,7 @@ export class IntProperty extends Property {
     return prop;
   }
 
-  public copyValuesFrom(prop: IntProperty) {
+  copyValuesFrom(prop: IntProperty) {
     this.minValue = prop.minValue;
     this.maxValue = prop.maxValue;
     this.value = prop.value;
@@ -136,7 +136,7 @@ export class IntProperty extends Property {
 
 export class BoolProperty extends Property {
   value: boolean;
-  public constructor(name: string, displayName: string, value: boolean) {
+  constructor(name: string, displayName: string, value: boolean) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -144,22 +144,22 @@ export class BoolProperty extends Property {
     this.type = PropertyType.Bool;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.value;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     // todo: validate
     this.value = val;
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new BoolProperty(this.name, this.displayName, this.value);
 
     return prop;
   }
 
-  public copyValuesFrom(prop: BoolProperty) {
+  copyValuesFrom(prop: BoolProperty) {
     this.value = prop.value;
   }
 }
@@ -167,7 +167,7 @@ export class BoolProperty extends Property {
 export class EnumProperty extends Property {
   values: string[];
   index: number = 0;
-  public constructor(name: string, displayName: string, values: string[]) {
+  constructor(name: string, displayName: string, values: string[]) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -175,20 +175,20 @@ export class EnumProperty extends Property {
     this.type = PropertyType.Enum;
   }
 
-  public getValues(): string[] {
+  getValues(): string[] {
     return this.values;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.index;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     // todo: validate
     this.index = val;
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new EnumProperty(
       this.name,
       this.displayName,
@@ -199,7 +199,7 @@ export class EnumProperty extends Property {
     return prop;
   }
 
-  public copyValuesFrom(prop: EnumProperty) {
+  copyValuesFrom(prop: EnumProperty) {
     this.values = prop.values;
     this.index = prop.index;
   }
@@ -207,7 +207,7 @@ export class EnumProperty extends Property {
 
 export class ColorProperty extends Property {
   value: Color;
-  public constructor(name: string, displayName: string, value: Color) {
+  constructor(name: string, displayName: string, value: Color) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -215,11 +215,11 @@ export class ColorProperty extends Property {
     this.type = PropertyType.Color;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.value;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     // todo: validate
     console.log("got color: " + val);
     if (val instanceof Color) this.value = val;
@@ -236,13 +236,13 @@ export class ColorProperty extends Property {
     }
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new ColorProperty(this.name, this.displayName, this.value);
 
     return prop;
   }
 
-  public copyValuesFrom(prop: ColorProperty) {
+  copyValuesFrom(prop: ColorProperty) {
     this.setValue(prop.value);
   }
 }
@@ -250,7 +250,7 @@ export class ColorProperty extends Property {
 export class StringProperty extends Property {
   value: string;
   isMultiline: boolean;
-  public constructor(
+  constructor(
     name: string,
     displayName: string,
     value: string = "",
@@ -264,22 +264,22 @@ export class StringProperty extends Property {
     this.isMultiline = isMultiline;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.value;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     // todo: validate
     this.value = val;
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new StringProperty(this.name, this.displayName, this.value);
 
     return prop;
   }
 
-  public copyValuesFrom(prop: StringProperty) {
+  copyValuesFrom(prop: StringProperty) {
     this.value = prop.value;
   }
 }
@@ -287,7 +287,7 @@ export class StringProperty extends Property {
 export class FileProperty extends Property {
   value: string;
   extensions: string[];
-  public constructor(
+  constructor(
     name: string,
     displayName: string,
     value: string = "",
@@ -301,29 +301,29 @@ export class FileProperty extends Property {
     this.type = PropertyType.File;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.value;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     // todo: validate
     this.value = val;
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new FileProperty(this.name, this.displayName, this.value);
 
     return prop;
   }
 
-  public copyValuesFrom(prop: FileProperty) {
+  copyValuesFrom(prop: FileProperty) {
     this.value = prop.value;
   }
 }
 
 export class GradientProperty extends Property {
   value: Gradient;
-  public constructor(name: string, displayName: string, value: Gradient) {
+  constructor(name: string, displayName: string, value: Gradient) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -331,16 +331,16 @@ export class GradientProperty extends Property {
     this.type = PropertyType.Gradient;
   }
 
-  public getValue(): any {
+  getValue(): any {
     return this.value;
   }
 
-  public setValue(val: any) {
+  setValue(val: any) {
     console.log("setting gradient value");
     this.value = Gradient.parse(val);
   }
 
-  public clone(): Property {
+  clone(): Property {
     let prop = new GradientProperty(
       this.name,
       this.displayName,
@@ -350,7 +350,7 @@ export class GradientProperty extends Property {
     return prop;
   }
 
-  public copyValuesFrom(prop: GradientProperty) {
+  copyValuesFrom(prop: GradientProperty) {
     console.log("copy value from gradient");
     this.setValue(prop.value.clone());
   }

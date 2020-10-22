@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class TileSampler extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Tile Sampler";
 
     this.addInput("image");

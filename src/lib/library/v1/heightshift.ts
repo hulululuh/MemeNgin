@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class HeightShiftNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Height Shift";
 
     this.addInput("image");

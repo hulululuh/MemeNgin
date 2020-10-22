@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class WaveNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Wave";
 
     this.addIntProperty("xfrequency", "X Frequency", 1, 0, 20, 0.01);

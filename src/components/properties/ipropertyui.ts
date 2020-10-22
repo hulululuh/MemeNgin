@@ -3,7 +3,7 @@ export interface IProperyUi {
 }
 
 export class PropertyChangeComplete {
-  public propName: string;
-  public oldValue: any;
-  public newValue: any;
+  propName: string;
+  oldValue: any;
+  newValue: any;
 }

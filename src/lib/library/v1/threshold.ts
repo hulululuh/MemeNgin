@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class ThresholdNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Threshold";
 
     this.addInput("image");

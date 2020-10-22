@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class TestGradientNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Gradient Node";
     console.log("goodbye from inside gradient node");
 
@@ -17,7 +17,7 @@ export class TestGradientNode extends DesignerNode {
 }
 
 export class TestInvertNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Invert";
 
     this.addInput("color");
@@ -36,7 +36,7 @@ export class TestInvertNode extends DesignerNode {
 }
 
 export class TestMultiplyNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Multiply";
 
     this.addInput("colorA");
@@ -56,7 +56,7 @@ export class TestMultiplyNode extends DesignerNode {
 }
 
 export class TestShapeNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Shape";
     //this.exportName = "result";
 
@@ -91,7 +91,7 @@ export class TestShapeNode extends DesignerNode {
 }
 
 export class TestWorleyNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Worley";
     //this.exportName = "result";
 
@@ -174,7 +174,7 @@ export class TestWorleyNode extends DesignerNode {
 
 // http://www.smart-page.net/smartnormal/js/SmartNormalMapFilter.js
 export class TestNormalNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Normal Map";
     //this.exportName = "result";
     this.addInput("height");
@@ -220,7 +220,7 @@ export class TestNormalNode extends DesignerNode {
 }
 
 export class TestWarpNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Warp";
 
     this.addInput("inputImage");
@@ -270,7 +270,7 @@ export class TestWarpNode extends DesignerNode {
 
 // https://thebookofshaders.com/11/
 export class TestSimplexNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Simplex Noise";
 
     this.addFloatProperty("scale", "Scale", 100, 1, 1000, 0.01);
@@ -339,7 +339,7 @@ export class TestSimplexNode extends DesignerNode {
 }
 
 export class TestBrickNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Brick";
 
     this.addIntProperty("widthX", "Width X", 3, 0, 10, 1);

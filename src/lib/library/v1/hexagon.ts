@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class HexagonNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Hexagon";
 
     this.addFloatProperty("scaleX", "X Scale", 2, 1, 32, 1);

@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class Perlin3DNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Perlin 3D";
 
     let source = `

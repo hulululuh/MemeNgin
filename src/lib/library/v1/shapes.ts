@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // https://thebookofshaders.com/07/
 export class PolygonNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Polygon";
 
     this.addFloatProperty("radius", "Radius", 0.7, 0, 3, 0.01);
@@ -43,7 +43,7 @@ export class PolygonNode extends DesignerNode {
 }
 
 export class CircleNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Circle";
 
     this.addFloatProperty("radius", "Radius", 0.5, 0, 1, 0.01);

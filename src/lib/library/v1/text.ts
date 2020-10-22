@@ -169,7 +169,7 @@ export class TextNode extends DesignerNode {
     };
   }
 
-  public createTexture() {
+  createTexture() {
     let gl = this.gl;
 
     if (this.tex) {
@@ -226,7 +226,7 @@ export class TextNode extends DesignerNode {
     }
   }
 
-  public init() {
+  init() {
     // defer node initialization until texture is ready
 
     this.title = "Text";

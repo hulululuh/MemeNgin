@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class InvertNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Invert";
 
     this.addInput("color");

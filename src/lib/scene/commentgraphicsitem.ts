@@ -164,14 +164,14 @@ export class CommentGraphicsItem extends GraphicsItem
   }
 
   // MOUSE EVENTS
-  public mouseDown(evt: MouseDownEvent) {
+  mouseDown(evt: MouseDownEvent) {
     this.hit = true;
     this.dragged = false;
     this.dragStartPos = new Vector2(this.x, this.y);
     //console.log(this.text);
   }
 
-  public mouseMove(evt: MouseMoveEvent) {
+  mouseMove(evt: MouseMoveEvent) {
     if (this.hit) {
       // movement
       this.move(evt.deltaX, evt.deltaY);
@@ -179,7 +179,7 @@ export class CommentGraphicsItem extends GraphicsItem
     }
   }
 
-  public mouseUp(evt: MouseUpEvent) {
+  mouseUp(evt: MouseUpEvent) {
     this.hit = false;
 
     // add undo/redo

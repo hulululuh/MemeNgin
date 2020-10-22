@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 import { Color } from "@/lib/designer/color";
 
 export class OutputNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Output";
 
     this.addInput("image");

@@ -44,17 +44,17 @@ function rgbToHex(r, g, b) {
 
 // stores the IDs for the display nodes
 export class DisplayNodes {
-  public albedoNode: string;
-  public normalNode: string;
-  public roughnessNode: string;
-  public heightNode: string;
-  public metallicNode: string;
+  albedoNode: string;
+  normalNode: string;
+  roughnessNode: string;
+  heightNode: string;
+  metallicNode: string;
   /*
-    public albedoCanvas : ImageCanvas = new ImageCanvas();
-    public normalCanvas : ImageCanvas = new ImageCanvas();
-    public roughnessCanvas : ImageCanvas = new ImageCanvas();
-    public heightCanvas : ImageCanvas = new ImageCanvas();
-    public metallicCanvas : ImageCanvas = new ImageCanvas();
+    albedoCanvas : ImageCanvas = new ImageCanvas();
+    normalCanvas : ImageCanvas = new ImageCanvas();
+    roughnessCanvas : ImageCanvas = new ImageCanvas();
+    heightCanvas : ImageCanvas = new ImageCanvas();
+    metallicCanvas : ImageCanvas = new ImageCanvas();
 
     resize(width:number, height:number)
     {
@@ -137,6 +137,11 @@ export class Editor {
       Editor.instance = new Editor();
     }
     return Editor.instance;
+  }
+
+  static getDesigner() {
+    const editor = this.getInstance();
+    return editor.designer;
   }
 
   getMLModel() {

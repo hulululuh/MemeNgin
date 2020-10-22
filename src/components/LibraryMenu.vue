@@ -48,7 +48,7 @@ declare let __static: any;
 
 @Component
 export default class LibraryMenu extends Vue {
-  @Prop() private library!: DesignerLibrary;
+  @Prop() library!: DesignerLibrary;
 
   @Prop()
   editor!: Editor;

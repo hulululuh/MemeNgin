@@ -17,7 +17,7 @@ import { UndoStack } from "./undostack";
 import { Rect, Vector2 } from "./scene/view";
 
 export class ItemClipboard {
-  public static copyItems(
+  static copyItems(
     designer: Designer,
     library: DesignerLibrary,
     scene: NodeScene,
@@ -110,7 +110,7 @@ export class ItemClipboard {
     clipboard.setData("json/nodes", json);
   }
 
-  public static pasteItems(
+  static pasteItems(
     designer: Designer,
     library: DesignerLibrary,
     scene: NodeScene,

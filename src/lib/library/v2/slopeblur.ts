@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // multiple pass warp
 export class SlopeBlur extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Slope Blur";
 
     this.addInput("image");

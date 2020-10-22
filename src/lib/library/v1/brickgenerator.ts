@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class BrickGeneratorNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Brick Generator";
 
     this.addFloatProperty("offset", "Offset", 0.5, 0, 1, 0.1);

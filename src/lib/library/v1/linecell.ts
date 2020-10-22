@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // https://thebookofshaders.com/edit.php#12/tissue.frag
 export class LineCellNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Lined Cell";
 
     this.addIntProperty("scale", "Scale", 5, 0, 256);

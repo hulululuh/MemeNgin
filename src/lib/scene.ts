@@ -34,7 +34,7 @@ enum DragMode {
 class Selection {
   nodes: NodeGraphicsItem[];
 
-  public clear() {
+  clear() {
     this.nodes = [];
   }
 }

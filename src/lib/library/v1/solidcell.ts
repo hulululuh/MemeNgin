@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class SolidCellNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Solid Cell";
 
     this.addIntProperty("scale", "Scale", 5, 0, 256);

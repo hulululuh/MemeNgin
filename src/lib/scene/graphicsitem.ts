@@ -18,19 +18,19 @@ export class MouseEvent {
 
   // default is accepted
   private accepted: boolean = true;
-  public accept() {
+  accept() {
     this.accepted = true;
   }
 
-  public reject() {
+  reject() {
     this.accepted = false;
   }
 
-  public get isAccepted() {
+  get isAccepted() {
     return this.accepted;
   }
 
-  public get isRejected() {
+  get isRejected() {
     return !this.accepted;
   }
 }
@@ -54,7 +54,7 @@ export class GraphicsItem {
   protected width: number;
   protected height: number;
 
-  public constructor() {
+  constructor() {
     //this.scene = scene;
     //scene.addItem(this);
     this.width = 1;
@@ -62,25 +62,25 @@ export class GraphicsItem {
   }
 
   // sets top-left
-  public setPos(x: number, y: number) {
+  setPos(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
 
-  public getPos() {
+  getPos() {
     return new Vector2(this.x, this.y);
   }
 
-  public setSize(w: number, h: number) {
+  setSize(w: number, h: number) {
     this.width = w;
     this.height = h;
   }
 
-  public setScene(scene: NodeScene) {
+  setScene(scene: NodeScene) {
     this.scene = scene;
   }
 
-  public isPointInside(px: number, py: number): boolean {
+  isPointInside(px: number, py: number): boolean {
     if (
       px >= this.x &&
       px <= this.x + this.width &&
@@ -91,31 +91,31 @@ export class GraphicsItem {
     return false;
   }
 
-  public get left() {
+  get left() {
     return this.x;
   }
 
-  public set left(value) {
+  set left(value) {
     this.x = value;
   }
 
-  public get top() {
+  get top() {
     return this.y;
   }
 
-  public set top(value) {
+  set top(value) {
     this.y = value;
   }
 
-  public get right() {
+  get right() {
     return this.x + this.width;
   }
 
-  public get bottom() {
+  get bottom() {
     return this.y + this.height;
   }
 
-  public intersectsRect(other: Rect) {
+  intersectsRect(other: Rect) {
     if (this.left > other.right) return false;
     if (this.right < other.left) return false;
     if (this.bottom < other.top) return false;
@@ -124,7 +124,7 @@ export class GraphicsItem {
     return true;
   }
 
-  public intersects(other: GraphicsItem) {
+  intersects(other: GraphicsItem) {
     if (this.left > other.right) return false;
     if (this.right < other.left) return false;
     if (this.bottom < other.top) return false;
@@ -133,7 +133,7 @@ export class GraphicsItem {
     return true;
   }
 
-  public getRect(): Rect {
+  getRect(): Rect {
     let rect = new Rect();
     rect.x = this.x;
     rect.y = this.y;
@@ -143,28 +143,28 @@ export class GraphicsItem {
     return rect;
   }
 
-  public setCenter(x: number, y: number) {
+  setCenter(x: number, y: number) {
     this.x = x - this.width / 2;
     this.y = y - this.height / 2;
   }
 
-  public centerX(): number {
+  centerX(): number {
     return this.x + this.width / 2;
   }
 
-  public centerY(): number {
+  centerY(): number {
     return this.y + this.height / 2;
   }
 
-  public getWidth(): number {
+  getWidth(): number {
     return this.width;
   }
 
-  public getHeight(): number {
+  getHeight(): number {
     return this.height;
   }
 
-  public move(dx: number, dy: number) {
+  move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
   }
@@ -185,15 +185,15 @@ export class GraphicsItem {
   }
 
   // to be overriden
-  public draw(ctx: CanvasRenderingContext2D, renderData: any = null) {}
+  draw(ctx: CanvasRenderingContext2D, renderData: any = null) {}
 
   // MOUSE EVENTS
 
   // STANDARD MOUSE EVENTS
-  public mouseDown(evt: MouseDownEvent) {}
-  public mouseMove(evt: MouseMoveEvent) {}
-  public mouseUp(evt: MouseUpEvent) {}
+  mouseDown(evt: MouseDownEvent) {}
+  mouseMove(evt: MouseMoveEvent) {}
+  mouseUp(evt: MouseUpEvent) {}
 
   // called every frame the mouse is over this object
-  public mouseOver(evt: MouseOverEvent) {}
+  mouseOver(evt: MouseOverEvent) {}
 }

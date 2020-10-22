@@ -80,7 +80,7 @@ export class Gradient {
     return grad;
   }
 
-  public static parse(obj: any) {
+  static parse(obj: any) {
     let gradient = new Gradient();
     for (let p of obj.points) {
       let t = p.t;
@@ -93,7 +93,7 @@ export class Gradient {
     return gradient;
   }
 
-  public static default() {
+  static default() {
     let gradient = new Gradient();
     gradient.addPoint(0, new Color(0, 0, 0, 1.0));
     gradient.addPoint(1, new Color(1, 1, 1, 1.0));

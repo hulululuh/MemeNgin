@@ -22,7 +22,7 @@ import {
 import { Editor } from "./editor";
 
 export class Designer {
-  public static dummyTex: WebGLTexture;
+  static dummyTex: WebGLTexture;
 
   canvas: HTMLCanvasElement;
   gl: WebGL2RenderingContext;
@@ -32,8 +32,8 @@ export class Designer {
   rttCamera: THREE.OrthographicCamera;
   rttScene: THREE.Scene;
 
-  public texCoordBuffer: WebGLBuffer;
-  public posBuffer: WebGLBuffer;
+  texCoordBuffer: WebGLBuffer;
+  posBuffer: WebGLBuffer;
   vertexShaderSource: string;
   fbo: WebGLFramebuffer;
   thumbnailProgram: WebGLProgram;
@@ -61,7 +61,7 @@ export class Designer {
   // by rendering the node's texture with renderNodeTextureToCanvas(node, imageCanvas)
   onnodetextureupdated: (DesignerNode) => void;
 
-  public constructor() {
+  constructor() {
     this.width = 1024;
     this.height = 1024;
     this.randomSeed = 32;
@@ -102,7 +102,7 @@ export class Designer {
     this.init();
   }
 
-  public setTextureSize(width: number, height: number) {
+  setTextureSize(width: number, height: number) {
     //todo: is resizing the canvas even necessary?
     this.width = width;
     this.height = height;
@@ -115,17 +115,17 @@ export class Designer {
     // }
   }
 
-  public randomizeSeed() {
+  randomizeSeed() {
     this.setRandomSeed(Math.floor(Math.random() * 256));
   }
 
-  public setRandomSeed(newSeed: number) {
+  setRandomSeed(newSeed: number) {
     this.randomSeed = newSeed;
     // invalidate all nodes
     this.invalidateAllNodes();
   }
 
-  public getRandomSeed(): number {
+  getRandomSeed(): number {
     return this.randomSeed;
   }
 
@@ -210,7 +210,7 @@ export class Designer {
     }
   }
 
-  public invalidateAllNodes() {
+  invalidateAllNodes() {
     for (let node of this.nodes) {
       this.requestUpdate(node);
     }
@@ -663,7 +663,7 @@ export class Designer {
     return inputs;
   }
 
-  public addVariable(
+  addVariable(
     name: string,
     displayName: string,
     varType: DesignerVariableType
@@ -697,7 +697,7 @@ export class Designer {
   }
 
   // todo: keep reference inside node's property
-  public mapNodePropertyToVariable(
+  mapNodePropertyToVariable(
     varName: string,
     node: DesignerNode,
     nodePropName: string
@@ -714,7 +714,7 @@ export class Designer {
 
   //todo: remove property map
 
-  public setVariable(name: string, value: any) {
+  setVariable(name: string, value: any) {
     let variable = this.findVariable(name);
     if (variable) {
       //todo: throw exception for invalid types being set
@@ -730,23 +730,23 @@ export class Designer {
     }
   }
 
-  public findVariable(name: string) {
+  findVariable(name: string) {
     for (let variable of this.variables)
       if (variable.property.name == name) return variable;
     return null;
   }
 
-  public hasVariable(name: string): boolean {
+  hasVariable(name: string): boolean {
     for (let variable of this.variables)
       if (variable.property.name == name) return true;
     return false;
   }
 
-  public variableCount(): number {
+  variableCount(): number {
     return this.variables.length;
   }
 
-  public save(): any {
+  save(): any {
     let nodes = new Array();
     for (let node of this.nodes) {
       let n = {};
@@ -915,10 +915,7 @@ export class Designer {
     return d;
   }
 
-  public findLeftNode(
-    rightNodeId: string,
-    rightNodeInput: string
-  ): DesignerNode {
+  findLeftNode(rightNodeId: string, rightNodeInput: string): DesignerNode {
     let conns = this.conns.filter(
       (conn) =>
         conn.rightNode.id === rightNodeId &&
@@ -931,10 +928,7 @@ export class Designer {
     return leftNode;
   }
 
-  public findRightNodes(
-    leftNodeId: string,
-    leftNodeOutput: string
-  ): DesignerNode[] {
+  findRightNodes(leftNodeId: string, leftNodeOutput: string): DesignerNode[] {
     let conn = this.conns.filter(
       (conn) =>
         conn.leftNode.id === leftNodeId &&

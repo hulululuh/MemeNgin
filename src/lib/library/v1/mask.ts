@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class MaskNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Mask";
     this.parentIndex = "textureB";
 

@@ -4,7 +4,7 @@ import { DesignerNode } from "../../designer/designernode";
 // https://www.shadertoy.com/view/4tSyzy
 // https://stackoverflow.com/questions/2157920/why-define-pi-4atan1-d0
 export class BlurV2 extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Blur";
 
     this.addInput("image");

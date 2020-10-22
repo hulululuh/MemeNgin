@@ -43,7 +43,7 @@ export default class ColorPropertyView extends Vue {
   @Prop()
   propHolder: IPropertyHolder;
 
-  public ColorPropertyView() {}
+  ColorPropertyView() {}
 
   mounted() {
     this.oldValue = this.prop.value.toHex();

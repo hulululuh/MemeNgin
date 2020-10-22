@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 import { Color } from "@/lib/designer/color";
 
 export class GradientNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Gradient";
 
     let white = new Color();
@@ -100,7 +100,7 @@ export class GradientNode extends DesignerNode {
 }
 
 export class TriGradientNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "TriGradient";
 
     let white = new Color();

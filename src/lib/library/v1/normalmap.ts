@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // http://www.smart-page.net/smartnormal/js/SmartNormalMapFilter.js
 export class NormalMapNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Normal Map";
     //this.exportName = "result";
     this.addInput("height");
@@ -52,7 +52,7 @@ export class NormalMapNode extends DesignerNode {
 }
 
 export class BetterWarpNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Better Warp Node";
     //this.exportName = "result";
     this.addInput("image");

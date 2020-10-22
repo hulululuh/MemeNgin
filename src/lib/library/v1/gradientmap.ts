@@ -3,7 +3,7 @@ import { Color } from "@/lib/designer/color";
 import { Gradient } from "@/lib/designer/gradient";
 
 export class GradientMapNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "GradientMap";
 
     this.addInput("image");

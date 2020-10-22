@@ -2,7 +2,7 @@ import { DesignerNode } from "../../designer/designernode";
 
 // https://thebookofshaders.com/12/
 export class CellNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Cell";
 
     this.addIntProperty("scale", "Scale", 5, 0, 256);

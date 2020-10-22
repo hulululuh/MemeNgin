@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class SplatNodeV2 extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Splat";
 
     this.addInput("image");

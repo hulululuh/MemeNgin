@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class Transform2DNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Transform2D";
 
     this.addInput("image");

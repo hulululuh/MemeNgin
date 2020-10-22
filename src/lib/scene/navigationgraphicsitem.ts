@@ -11,8 +11,8 @@ import { UndoStack } from "../undostack";
 
 export class NavigationGraphicsItem extends GraphicsItem {
   id!: string;
-  public socketA!: SocketGraphicsItem;
-  public socketB!: SocketGraphicsItem;
+  socketA!: SocketGraphicsItem;
+  socketB!: SocketGraphicsItem;
 
   label: string;
   hit: boolean;
@@ -47,13 +47,13 @@ export class NavigationGraphicsItem extends GraphicsItem {
   }
 
   // MOUSE EVENTS
-  public mouseDown(evt: MouseDownEvent) {
+  mouseDown(evt: MouseDownEvent) {
     this.hit = true;
     this.dragged = false;
     this.dragStartPos = new Vector2(this.x, this.y);
   }
 
-  public mouseMove(evt: MouseMoveEvent) {
+  mouseMove(evt: MouseMoveEvent) {
     if (this.hit) {
       // movement
       this.move(evt.deltaX, evt.deltaY);
@@ -61,7 +61,7 @@ export class NavigationGraphicsItem extends GraphicsItem {
     }
   }
 
-  public mouseUp(evt: MouseUpEvent) {
+  mouseUp(evt: MouseUpEvent) {
     this.hit = false;
 
     // add undo/redo

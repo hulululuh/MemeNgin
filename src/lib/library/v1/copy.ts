@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class CopyNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Copy";
 
     this.addInput("image");

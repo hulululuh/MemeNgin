@@ -1,7 +1,7 @@
 import { DesignerNode } from "../../designer/designernode";
 
 export class DirectionalWarpNode extends DesignerNode {
-  public init() {
+  init() {
     this.title = "Directional Warp";
 
     this.addInput("image");
