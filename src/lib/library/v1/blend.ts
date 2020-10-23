@@ -43,9 +43,11 @@ export class BlendNode extends DesignerNode {
             if (opacity_connected)
                 finalOpacity *= texture(opacity, uv).r;
 
-            //
-            vec2 foreground_uv = clamp(uv * (colorB_size / colorA_size), 0.0, 1.0);
-            vec4 colA = texture(colorA, foreground_uv);
+            // foreground uv
+            vec2 fuv = uv * (colorB_size / colorA_size);
+            vec4 colA = vec4(0.0);
+            if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
+              colA = texture(colorA, fuv);
             vec4 colB = texture(colorB,uv);
             vec4 col = vec4(1.0);
 

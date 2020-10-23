@@ -15,11 +15,13 @@ import {
 } from "./scene/graphicsitem";
 import { SceneView, Vector2, Rect, BoundingBox } from "./scene/view";
 import { FrameGraphicsItem } from "./scene/framegraphicsitem";
+import { Transform2dWidget } from "./scene/Transform2dWidget";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
 import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
 import { SelectionGraphicsItem } from "./scene/selectiongraphicsitem";
 import { Color } from "./designer/color";
 import { ItemClipboard } from "./clipboard";
+import { Transform2DGraphicsItem } from "./scene/transform2dgraphicsitem";
 
 enum DragMode {
   None,
@@ -58,6 +60,10 @@ export class NodeScene {
   contextExtra: any;
   hasFocus: boolean;
 
+  // singleton widgets
+  widget2d: Transform2dWidget;
+
+  // elements that consisting a scene
   frames: FrameGraphicsItem[];
   comments: CommentGraphicsItem[];
   navigations: NavigationGraphicsItem[];
@@ -83,6 +89,7 @@ export class NodeScene {
   oncommentselected?: (item: CommentGraphicsItem) => void;
   onframeselected?: (item: FrameGraphicsItem) => void;
   onnavigationselected?: (item: NavigationGraphicsItem) => void;
+  onwidget2dselected?: (item: Transform2dWidget) => void;
 
   onnodedeleted?: (item: NodeGraphicsItem) => void;
 
@@ -131,6 +138,13 @@ export class NodeScene {
     this.view = new SceneView(canvas);
     this.hasFocus = false;
     this.contextExtra = this.context;
+
+    // widget
+    this.widget2d = new Transform2dWidget(this.view);
+    //this.widget2d.setCenter(200, 200);
+    this.widget2d.setPos(200, 200);
+    this.widget2d.setSize(100, 100);
+
     this.frames = new Array();
     this.comments = new Array();
     this.nodes = new Array();
@@ -624,6 +638,9 @@ export class NodeScene {
     for (let nav of this.navigations) nav.draw(this.context);
 
     if (this.selection) this.selection.draw(this.context);
+
+    // 2d widget
+    if (this.widget2d) this.widget2d.draw(this.context);
   }
 
   // TODO: setup color palette
@@ -721,6 +738,15 @@ export class NodeScene {
             if (this.onframeselected) {
               if (hit) this.onframeselected(hit);
               else this.onframeselected(hit);
+            }
+          }
+
+          if (hitItem instanceof Transform2dWidget) {
+            let hit = <Transform2dWidget>hitItem;
+
+            if (this.onwidget2dselected) {
+              if (hit) this.onwidget2dselected(hit);
+              else this.onwidget2dselected(hit);
             }
           }
 
@@ -990,6 +1016,11 @@ export class NodeScene {
   }
 
   _getHitItem(x: number, y: number): GraphicsItem {
+    // 0) widget
+    if (this.widget2d) {
+      if (this.widget2d.isPointInside(x, y)) return this.widget2d;
+    }
+
     // 1) navigation pins
     for (let index = this.navigations.length - 1; index >= 0; index--) {
       let nav = this.navigations[index];

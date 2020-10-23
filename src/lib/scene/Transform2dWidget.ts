@@ -18,6 +18,7 @@ import {
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 import { ResizeFrameAction } from "../actions/resizeframeaction";
+import { mat3, mat4, vec3 } from "gl-matrix";
 
 enum XResizeDir {
   None,
@@ -46,12 +47,10 @@ export class FrameRegion {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
-  title: string;
-  description: string;
-  showTitle: boolean;
+export class Transform2dWidget extends GraphicsItem {
   view: SceneView;
   color: Color;
+  strokeColor: Color;
   hit: boolean;
   dragged: boolean;
   dragStartPos: Vector2;
@@ -67,19 +66,16 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
   // the radius of the resize handle
   resizeHandleSize: number;
 
-  nodes: NodeGraphicsItem[];
+  //
+  minSize: number;
 
-  titleProp: StringProperty;
-  showTitleProp: BoolProperty;
-  descrProp: StringProperty;
+  nodes: NodeGraphicsItem[];
 
   constructor(view: SceneView) {
     super();
-    this.title = "Frame";
-    this.description = "";
-    this.showTitle = true;
     this.view = view;
     this.color = new Color(0.1, 0, 0.2);
+    this.strokeColor = new Color(1.0, 1.0, 1.0);
     this.hit = false;
     this.dragged = true;
 
@@ -88,48 +84,17 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     this.dragMode = DragMode.None;
 
     this.handleSize = 30;
-    this.resizeHandleSize = 20;
+    this.resizeHandleSize = 10;
+    this.minSize = 2;
 
     this.setSize(500, 300);
 
     this.nodes = [];
-
-    this.titleProp = new StringProperty("title", "Title", "Frame");
-    this.showTitleProp = new BoolProperty("showtitle", "Show Title", true);
-    this.descrProp = new StringProperty("description", "Description", "", true);
-    this.properties.push(this.titleProp);
-    this.properties.push(this.showTitleProp);
-    this.properties.push(this.descrProp);
-  }
-  properties: Property[] = new Array();
-  setProperty(name: string, value: any) {
-    if (name == "title") {
-      this.setTitle(value);
-    } else if (name == "showtitle") {
-      this.setShowTitle(value);
-    } else if (name == "description") {
-      this.setDescription(value);
-    }
   }
 
   setSize(w: number, h: number) {
     this.width = w;
     this.height = h;
-  }
-
-  setTitle(text: string) {
-    this.title = text;
-    this.titleProp.setValue(text);
-  }
-
-  setShowTitle(shouldShow: boolean) {
-    this.showTitle = shouldShow;
-    this.showTitleProp.setValue(shouldShow);
-  }
-
-  setDescription(text: string) {
-    this.description = text;
-    this.descrProp.setValue(text);
   }
 
   private buildColor(color: Color, alpha: number) {
@@ -166,70 +131,39 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
   }
 
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
-    // outer frame
-    ctx.beginPath();
-    ctx.lineWidth = 1;
-    //ctx.strokeStyle = "rgb(100, 0, 0)";
-    ctx.strokeStyle = this.buildColor(this.color, 1);
-    this.roundRect(ctx, this.x, this.y, this.width, this.height, 1);
-    ctx.stroke();
+    // // outer frame
+    // ctx.beginPath();
+    // ctx.lineWidth = 1;
+    // //ctx.strokeStyle = "rgb(100, 0, 0)";
+    // ctx.strokeStyle = this.buildColor(this.color, 1);
+    // this.roundRect(ctx, this.x, this.y, this.width, this.height, 1);
+    // ctx.stroke();
 
-    // handle
+    // // handle
     let handleSize = this.handleSize;
-    ctx.beginPath();
-    ctx.lineWidth = 1;
-    //ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-    ctx.fillStyle = this.buildColor(this.color, 0.5);
-    this.roundRect(ctx, this.x, this.y, this.width, handleSize, 1);
-    ctx.fill();
+    // ctx.beginPath();
+    // ctx.lineWidth = 1;
+    // //ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+    // ctx.fillStyle = this.buildColor(this.color, 0.5);
+    // this.roundRect(ctx, this.x, this.y, this.width, handleSize, 1);
+    // ctx.fill();
 
-    ctx.beginPath();
-    ctx.lineWidth = 1;
-    //ctx.strokeStyle = "rgb(100, 0, 0, 0.8)";
-    ctx.strokeStyle = this.buildColor(this.color, 0.8);
-    this.roundRect(ctx, this.x, this.y, this.width, handleSize, 1);
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.lineWidth = 1;
+    // //ctx.strokeStyle = "rgb(100, 0, 0, 0.8)";
+    // ctx.strokeStyle = this.buildColor(this.color, 0.8);
+    // this.roundRect(ctx, this.x, this.y, this.width, handleSize, 1);
+    // ctx.stroke();
 
     // body
     ctx.beginPath();
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.0;
     //ctx.fillStyle = "rgba(100, 0, 0, 0.2)";
     ctx.fillStyle = this.buildColor(this.color, 0.2);
-    this.roundRect(
-      ctx,
-      this.x,
-      this.y + handleSize,
-      this.width,
-      this.height - handleSize,
-      1
-    );
-    ctx.fill();
-
-    // title
-    if (this.showTitle == true) {
-      ctx.beginPath();
-
-      let fontSize = 18; // * this.view.zoomFactor;
-
-      ctx.save();
-      //ctx.scale(1.0 / this.view.zoomFactor, 1.0 / this.view.zoomFactor);
-      ctx.setTransform(1, 0, 0, 1, this.view.offset.x, this.view.offset.y);
-
-      //ctx.font = fontSize + "px 'Open Sans'";
-      ctx.font = "30px 'Open Sans'";
-      ctx.fillStyle = "rgb(240, 240, 240)";
-      //let size = ctx.measureText(this.textureChannel.toUpperCase());
-      let textX = this.x;
-      let textY = this.y;
-      //ctx.fillText("Hello World", textX, textY - 5);
-      ctx.fillText(
-        this.title,
-        textX * this.view.zoomFactor,
-        (textY - 5) * this.view.zoomFactor
-      );
-
-      ctx.restore();
-    }
+    ctx.strokeStyle = this.buildColor(this.strokeColor, 1.0);
+    ctx.rect(this.x, this.y, this.width, this.height);
+    //this.roundRect(ctx, this.x, this.y, this.width, this.height, 1);
+    ctx.stroke();
 
     // // debug draw frames
     // if (false) {
@@ -258,7 +192,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
       px >= this.x &&
       px <= this.x + this.width &&
       py >= this.y &&
-      py <= this.y + this.handleSize
+      py <= this.y + this.height
     )
       return true;
     return false;
@@ -292,7 +226,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
         px >= this.x &&
         px <= this.x + this.width &&
         py >= this.y &&
-        py <= this.y + this.handleSize
+        py <= this.y + this.height
       ) {
         this.dragMode = DragMode.HandleTop;
         this.xResize = XResizeDir.None;
@@ -301,7 +235,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
         this.dragStartPos = new Vector2(this.x, this.y);
 
         // capture nodes if alt key isnt pressed
-        if (!evt.altKey) this.nodes = this.getHoveredNodes();
+        //if (!evt.altKey) this.nodes = this.getHoveredNodes();
 
         // set cursor
         this.view.canvas.style.cursor = "grabbing";
@@ -328,30 +262,30 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
         px >= this.x &&
         px <= this.x + this.width &&
         py >= this.y &&
-        py <= this.y + this.handleSize
+        py <= this.y + this.height
       ) {
         this.view.canvas.style.cursor = "grab";
       }
     }
   }
 
-  // return all scene's nodes in this frame
-  getHoveredNodes(): NodeGraphicsItem[] {
-    let nodes: NodeGraphicsItem[] = [];
-    for (let node of this.scene.nodes) {
-      // node must be entirely inside frame
-      if (
-        node.left >= this.left &&
-        node.right <= this.right &&
-        node.top >= this.top &&
-        node.bottom <= this.bottom
-      ) {
-        nodes.push(node);
-      }
-    }
+  // // return all scene's nodes in this frame
+  // getHoveredNodes(): NodeGraphicsItem[] {
+  //   let nodes: NodeGraphicsItem[] = [];
+  //   for (let node of this.scene.nodes) {
+  //     // node must be entirely inside frame
+  //     if (
+  //       node.left >= this.left &&
+  //       node.right <= this.right &&
+  //       node.top >= this.top &&
+  //       node.bottom <= this.bottom
+  //     ) {
+  //       nodes.push(node);
+  //     }
+  //   }
 
-    return nodes;
-  }
+  //   return nodes;
+  // }
 
   mouseMove(evt: MouseMoveEvent) {
     if (this.hit) {
@@ -365,11 +299,11 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
         }
       }
 
-      const minSize = this.resizeHandleSize * 2;
+      const minSize = this.minSize;
       //todo: clamp size
       if (this.dragMode == DragMode.Resize) {
         if (this.xResize == XResizeDir.Left) {
-          const minSize = this.resizeHandleSize * 2;
+          //const minSize = this.resizeHandleSize * 2;
           const dtClamped =
             this.width - evt.deltaX > minSize
               ? evt.deltaX
@@ -382,7 +316,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
           this.width += evt.deltaX;
         }
         if (this.yResize == YResizeDir.Top) {
-          const minSize = this.resizeHandleSize + this.handleSize;
+          //const minSize = this.resizeHandleSize + this.handleSize;
           const dtClamped =
             this.height - evt.deltaY > minSize
               ? evt.deltaY
@@ -396,12 +330,9 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
         }
 
         // clamp
-        this.height = Math.max(
-          this.height,
-          this.handleSize + this.resizeHandleSize
-        );
+        this.height = Math.max(this.height, this.minSize);
 
-        this.width = Math.max(this.width, this.resizeHandleSize * 2);
+        this.width = Math.max(this.width, this.minSize);
       }
 
       this.dragged = true;
@@ -438,12 +369,12 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
         let action = new MoveItemsAction(items, oldPosList, newPosList);
         UndoStack.current.push(action);
       } else if (this.dragMode == DragMode.Resize) {
-        let action = new ResizeFrameAction(
-          this,
-          this.dragStartRect.clone(),
-          this.getRect().clone()
-        );
-        UndoStack.current.push(action);
+        // let action = new ResizeFrameAction(
+        //   this,
+        //   this.dragStartRect.clone(),
+        //   this.getRect().clone()
+        // );
+        // UndoStack.current.push(action);
       }
     }
 

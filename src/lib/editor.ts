@@ -19,6 +19,7 @@ import { createLibrary as createV2Library } from "@/lib/library/libraryv2";
 import { Color } from "./designer/color";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
 import { FrameGraphicsItem } from "./scene/framegraphicsitem";
+import { Transform2dWidget } from "./scene/Transform2dWidget";
 import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
 import { ItemClipboard } from "./clipboard";
 import { UndoStack } from "./undostack";
@@ -106,6 +107,7 @@ export class Editor {
   onnodeselected?: (item: DesignerNode) => void;
   oncommentselected?: (item: CommentGraphicsItem) => void;
   onframeselected?: (item: FrameGraphicsItem) => void;
+  onwidget2dselected?: (item: Transform2dWidget) => void;
   onnavigationselected?: (item: NavigationGraphicsItem) => void;
   onpreviewnode?: (item: DesignerNode, image: HTMLCanvasElement) => void;
   onlibrarymenu?: () => void;
@@ -564,6 +566,10 @@ export class Editor {
 
     this.graph.onframeselected = function(item: FrameGraphicsItem) {
       if (self.onframeselected) self.onframeselected(item);
+    };
+
+    this.graph.onwidget2dselected = function(item: Transform2dWidget) {
+      if (self.onwidget2dselected) self.onwidget2dselected(item);
     };
 
     this.graph.onnavigationselected = function(item: NavigationGraphicsItem) {

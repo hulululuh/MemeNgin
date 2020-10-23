@@ -1,18 +1,10 @@
+import { Vector2 } from "@/lib/scene/view";
+
 const IMAGE_RENDER_SIZE = 1000;
 
 function _getMousePos(canvas, evt) {
   let rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left, evt.clientY - rect.top);
-}
-
-class Vector2 {
-  x: number;
-  y: number;
-
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
 }
 
 export enum DrawMode {
