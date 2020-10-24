@@ -13,7 +13,7 @@ import {
   MouseUpEvent,
   MouseOverEvent,
 } from "./scene/graphicsitem";
-import { SceneView, Vector2, Rect, BoundingBox } from "./scene/view";
+import { SceneView, Rect, BoundingBox } from "./scene/view";
 import { FrameGraphicsItem } from "./scene/framegraphicsitem";
 import { Transform2dWidget } from "./scene/Transform2dWidget";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
@@ -22,6 +22,7 @@ import { SelectionGraphicsItem } from "./scene/selectiongraphicsitem";
 import { Color } from "./designer/color";
 import { ItemClipboard } from "./clipboard";
 import { Transform2DGraphicsItem } from "./scene/transform2dgraphicsitem";
+import { Vector2 } from "@math.gl/core";
 
 enum DragMode {
   None,
@@ -1065,7 +1066,7 @@ export class NodeScene {
   // UTILITY
 
   // returns the scene pos from the mouse event
-  getScenePos(evt: MouseEvent) {
+  getScenePos(evt: MouseEvent): Vector2 {
     let canvasPos = _getMousePos(this.canvas, evt);
     return this.view.canvasToSceneXY(canvasPos.x, canvasPos.y);
   }

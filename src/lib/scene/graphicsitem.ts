@@ -1,5 +1,6 @@
 import { NodeScene } from "../scene";
-import { Rect, Vector2 } from "./view";
+import { Rect } from "./view";
+import { Vector2 } from "@math.gl/core";
 
 export class MouseEvent {
   // scene space

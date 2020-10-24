@@ -6,7 +6,8 @@ import {
   MouseUpEvent,
   MouseOverEvent,
 } from "./graphicsitem";
-import { SceneView, Vector2, Rect } from "./view";
+import { SceneView, Rect } from "./view";
+import { Vector2 } from "@math.gl/core";
 import { Color } from "../designer/color";
 import { NodeGraphicsItem } from "./nodegraphicsitem";
 import {
@@ -429,7 +430,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
           // new pos is the current pos
           let itemNewPos = new Vector2(node.left, node.top);
           // old pos is current pos plus reverse diff
-          let itemOldPos = Vector2.add(itemNewPos, diff);
+          let itemOldPos = itemNewPos.clone().add(diff);
 
           newPosList.push(itemNewPos);
           oldPosList.push(itemOldPos);

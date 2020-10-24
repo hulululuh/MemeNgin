@@ -1,6 +1,6 @@
 import { Action } from "../undostack";
 import { GraphicsItem } from "../scene/graphicsitem";
-import { Vector2 } from "../scene/view";
+import { Vector2 } from "@math.gl/core";
 
 export class MoveItemsAction extends Action {
   items: GraphicsItem[];

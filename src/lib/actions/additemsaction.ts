@@ -1,6 +1,6 @@
 import { Action } from "../undostack";
 import { GraphicsItem } from "../scene/graphicsitem";
-import { Vector2 } from "../scene/view";
+import { Vector2 } from "@math.gl/core";
 import { ConnectionGraphicsItem } from "../scene/connectiongraphicsitem";
 import { NodeScene } from "../scene";
 import { FrameGraphicsItem } from "../scene/framegraphicsitem";

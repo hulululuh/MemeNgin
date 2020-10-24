@@ -5,7 +5,7 @@ import {
   MouseMoveEvent,
   MouseUpEvent,
 } from "./graphicsitem";
-import { Vector2 } from "./view";
+import { Vector2 } from "@math.gl/core";
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 

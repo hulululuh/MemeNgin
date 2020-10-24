@@ -6,7 +6,8 @@ import {
   MouseUpEvent,
   MouseOverEvent,
 } from "./graphicsitem";
-import { SceneView, Vector2, Rect } from "./view";
+import { SceneView, Rect } from "./view";
+import { Vector2 } from "@math.gl/core";
 import { Color } from "../designer/color";
 import { NodeGraphicsItem } from "./nodegraphicsitem";
 import {
@@ -18,7 +19,6 @@ import {
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 import { ResizeFrameAction } from "../actions/resizeframeaction";
-import { mat3, mat4, vec3 } from "gl-matrix";
 
 enum XResizeDir {
   None,
@@ -345,13 +345,13 @@ export class Transform2dWidget extends GraphicsItem {
       if (this.dragMode == DragMode.HandleTop) {
         let newPos = new Vector2(this.x, this.y);
         let items: GraphicsItem[] = [this];
-        let oldPosList: Vector2[] = [this.dragStartPos.clone()];
+        let oldPosList: Vector2[] = [this.dragStartPos];
         let newPosList: Vector2[] = [newPos];
 
         // reverse diff: new pos to old pos
         let diff = new Vector2(
-          this.dragStartPos.x - newPos.x,
-          this.dragStartPos.y - newPos.y
+          this.dragStartPos[0] - newPos[0],
+          this.dragStartPos[1] - newPos[1]
         );
 
         // add all captured nodes
@@ -360,7 +360,7 @@ export class Transform2dWidget extends GraphicsItem {
           // new pos is the current pos
           let itemNewPos = new Vector2(node.left, node.top);
           // old pos is current pos plus reverse diff
-          let itemOldPos = Vector2.add(itemNewPos, diff);
+          let itemOldPos = itemNewPos.clone().add(diff);
 
           newPosList.push(itemNewPos);
           oldPosList.push(itemOldPos);

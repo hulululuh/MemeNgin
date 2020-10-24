@@ -1,4 +1,5 @@
-import { Vector2 } from "@/lib/scene/view";
+//import { Vector2 } from "@/lib/scene/view";
+import { Vector2 } from "@math.gl/core";
 
 const IMAGE_RENDER_SIZE = 1000;
 
@@ -88,7 +89,6 @@ export class DragZoom {
   mousePos: Vector2;
   prevMousePos: Vector2;
   mouseDownPos: Vector2; // pos of last mouse down
-  mouseDragDiff: Vector2; // mouse drag diff
 
   zoomFactor: number;
   offset: Vector2;
@@ -133,9 +133,11 @@ export class DragZoom {
 
     // this.zoomFactor = 1;
     this.zoomFactor = 0.4;
-    this.offset = new Vector2(0, 0);
+    //this.offset = new Vector2(0, 0);
 
     this.mousePos = new Vector2(0, 0);
+    this.prevMousePos = new Vector2(0, 0);
+    this.mouseDownPos = new Vector2(0, 0);
 
     this.rect = new Rect();
     this.rect.setSize(50, 50);
@@ -163,8 +165,8 @@ export class DragZoom {
       0,
       0,
       this.zoomFactor,
-      this.offset.x,
-      this.offset.y
+      this.offset[0],
+      this.offset[1]
     );
   }
 
@@ -207,8 +209,9 @@ export class DragZoom {
       // const diff = new Vector2(this.prevMousePos.x - this.mousePos.x, this.prevMousePos.y - this.mousePos.y);
 
       const factor = this.zoomFactor;
-      this.offset.x -= diff.x * factor;
-      this.offset.y -= diff.y * factor;
+      this.offset.sub(diff.clone().multiplyByScalar(factor));
+      // this.offset.x -= diff.x * factor;
+      // this.offset.y -= diff.y * factor;
     }
 
     // let lastX = this.mouseX;
@@ -240,8 +243,14 @@ export class DragZoom {
     // find offset from previous zoom then move offset by that value
 
     this.zoomFactor *= delta;
-    this.offset.x = pos.x - (pos.x - this.offset.x) * delta; // * (factor);
-    this.offset.y = pos.y - (pos.y - this.offset.y) * delta; // * (factor);
+    this.offset = pos.clone().sub(
+      pos
+        .clone()
+        .sub(this.offset)
+        .multiplyByScalar(delta)
+    );
+    // this.offset.x = pos.x - (pos.x - this.offset.x) * delta; // * (factor);
+    // this.offset.y = pos.y - (pos.y - this.offset.y) * delta; // * (factor);
 
     //this.zoom(pos.x, pos.y, delta);
 
@@ -266,7 +275,6 @@ export class DragZoom {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = "rgb(50,50,50)";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
     ctx.setTransform(
       this.zoomFactor,
       0,
@@ -277,7 +285,8 @@ export class DragZoom {
     );
 
     // highlight rect if mouse over
-    const scenePos = this.canvasToScene(this.mousePos);
+    let scenePos = this.canvasToScene(this.mousePos);
+
     //console.log(scenePos);
     if (this.rect.isPointInside(scenePos.x, scenePos.y)) {
       this.rect.color = "rgb(0, 255, 255)";
@@ -319,9 +328,8 @@ export class DragZoom {
 
   // converts from canvas(screen) coords to the scene(world) coords
   canvasToScene(pos: Vector2): Vector2 {
-    return new Vector2(
-      (pos.x - this.offset.x) * (1.0 / this.zoomFactor),
-      (pos.y - this.offset.y) * (1.0 / this.zoomFactor)
-    );
+    return new Vector2(pos[0], pos[1])
+      .sub(this.offset)
+      .multiplyByScalar(1 / this.zoomFactor);
   }
 }

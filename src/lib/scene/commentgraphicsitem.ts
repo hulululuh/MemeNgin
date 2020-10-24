@@ -5,7 +5,8 @@ import {
   MouseMoveEvent,
   MouseUpEvent,
 } from "./graphicsitem";
-import { SceneView, Vector2 } from "./view";
+import { SceneView } from "./view";
+import { Vector2 } from "@math.gl/core";
 import { Color } from "../designer/color";
 import {
   IPropertyHolder,

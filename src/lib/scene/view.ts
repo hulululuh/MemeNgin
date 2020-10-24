@@ -10,6 +10,9 @@
 
 import TWEEN from "@tweenjs/tween.js";
 
+import { configure, Vector2 } from "@math.gl/core";
+configure({ debug: true });
+
 // Setup the animation loop.
 function animate(time) {
   requestAnimationFrame(animate);
@@ -18,44 +21,44 @@ function animate(time) {
 requestAnimationFrame(animate);
 
 // get local mouse position
-function _getMousePos(canvas, evt) {
+function _getMousePos(canvas, evt): Vector2 {
   let rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left, evt.clientY - rect.top);
 }
 
-export class Vector2 {
-  x: number;
-  y: number;
+// export class Vector2 {
+//   x: number;
+//   y: number;
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
+//   constructor(x: number, y: number) {
+//     this.x = x;
+//     this.y = y;
+//   }
 
-  clone(): Vector2 {
-    return new Vector2(this.x, this.y);
-  }
+//   clone(): Vector2 {
+//     return new Vector2(this.x, this.y);
+//   }
 
-  static add(a: Vector2, b: Vector2): Vector2 {
-    return new Vector2(a.x + b.x, a.y + b.y);
-  }
+//   static add(a: Vector2, b: Vector2): Vector2 {
+//     return new Vector2(a.x + b.x, a.y + b.y);
+//   }
 
-  static subtract(a: Vector2, b: Vector2): Vector2 {
-    return new Vector2(a.x - b.x, a.y - b.y);
-  }
+//   static subtract(a: Vector2, b: Vector2): Vector2 {
+//     return new Vector2(a.x - b.x, a.y - b.y);
+//   }
 
-  static mult(a: Vector2, b: number): Vector2 {
-    return new Vector2(a.x * b, a.y * b);
-  }
-}
+//   static mult(a: Vector2, b: number): Vector2 {
+//     return new Vector2(a.x * b, a.y * b);
+//   }
+// }
 
 export class BoundingBox {
   min: Vector2;
   max: Vector2;
 
   constructor(min: Vector2, max: Vector2) {
-    this.min = min;
-    this.max = max;
+    this.min = min.clone();
+    this.max = max.clone();
   }
 
   clone(): BoundingBox {
@@ -263,6 +266,8 @@ export class SceneView {
 
     this.mousePos = new Vector2(0, 0);
     this.globalMousePos = new Vector2(0, 0);
+    this.prevMousePos = new Vector2(0, 0);
+    this.mouseDownPos = new Vector2(0, 0);
   }
 
   reset() {
@@ -310,12 +315,13 @@ export class SceneView {
     if (this.panning) {
       const prev = this.canvasToScene(this.prevMousePos);
       const cur = this.canvasToScene(this.mousePos);
-      const diff = new Vector2(prev.x - cur.x, prev.y - cur.y);
+      const diff = prev.clone().sub(cur);
       this.mouseDragDiff = diff;
 
       const factor = this.zoomFactor;
-      this.offset.x -= diff.x * factor;
-      this.offset.y -= diff.y * factor;
+      this.offset = new Vector2(this.offset[0], this.offset[1])
+        .clone()
+        .sub(diff.clone().multiplyByScalar(factor));
     }
   }
 
@@ -334,8 +340,15 @@ export class SceneView {
     // find offset from previous zoom then move offset by that value
 
     this.zoomFactor *= delta;
-    this.offset.x = pos.x - (pos.x - this.offset.x) * delta; // * (factor);
-    this.offset.y = pos.y - (pos.y - this.offset.y) * delta; // * (factor);
+
+    this.offset = pos.clone().sub(
+      pos
+        .clone()
+        .sub(this.offset)
+        .multiplyByScalar(delta)
+    );
+    // this.offset.x = pos.x - (pos.x - this.offset.x) * delta; // * (factor);
+    // this.offset.y = pos.y - (pos.y - this.offset.y) * delta; // * (factor);
 
     //this.zoom(pos.x, pos.y, delta);
 
@@ -361,22 +374,25 @@ export class SceneView {
     const zoomFactor = Math.min(zoomX, zoomY);
     const center = this.sceneToCanvas(box.center(), zoomFactor);
 
-    this.changeView(
-      Vector2.subtract(
-        new Vector2(this.canvas.width / 2, this.canvas.height / 2),
-        center
-      ),
-      zoomFactor
+    let targetOffset = new Vector2(
+      this.canvas.width / 2,
+      this.canvas.height / 2
     );
+    targetOffset.sub(center);
+    this.changeView(targetOffset, zoomFactor);
   }
 
   changeView(targetOffset: Vector2, targetZoomFactor: number) {
     const doAnimate = true;
     if (!doAnimate) {
-      this.offset = targetOffset;
+      this.offset = targetOffset.clone();
       this.zoomFactor = targetZoomFactor;
     } else {
-      const start = { x: this.offset.x, y: this.offset.y, z: this.zoomFactor };
+      const start = {
+        x: this.offset[0],
+        y: this.offset[1],
+        z: this.zoomFactor,
+      };
       const end = { x: targetOffset.x, y: targetOffset.y, z: targetZoomFactor };
 
       const tween = new TWEEN.Tween(start)
@@ -405,8 +421,8 @@ export class SceneView {
       0,
       0,
       this.zoomFactor,
-      this.offset.x,
-      this.offset.y
+      this.offset[0],
+      this.offset[1]
     );
   }
 
@@ -449,21 +465,19 @@ export class SceneView {
   }
 
   sceneToCanvas(pos: Vector2, zoomFactor: number): Vector2 {
-    return Vector2.mult(pos, zoomFactor);
+    return pos.clone().multiplyByScalar(zoomFactor);
   }
 
   canvasToScene(pos: Vector2): Vector2 {
-    return new Vector2(
-      (pos.x - this.offset.x) * (1.0 / this.zoomFactor),
-      (pos.y - this.offset.y) * (1.0 / this.zoomFactor)
-    );
+    return new Vector2(pos[0], pos[1])
+      .sub(this.offset)
+      .multiplyByScalar(1 / this.zoomFactor);
   }
 
   canvasToSceneXY(x: number, y: number): Vector2 {
-    return new Vector2(
-      (x - this.offset.x) * (1.0 / this.zoomFactor),
-      (y - this.offset.y) * (1.0 / this.zoomFactor)
-    );
+    return new Vector2(x, y)
+      .sub(this.offset)
+      .multiplyByScalar(1 / this.zoomFactor);
   }
 
   globalToCanvasXY(x: number, y: number): Vector2 {
@@ -478,16 +492,14 @@ export class SceneView {
   getMouseDeltaCanvasSpace(): Vector2 {
     const prev = this.prevMousePos;
     const cur = this.mousePos;
-    const diff = new Vector2(cur.x - prev.x, cur.y - prev.y);
 
-    return diff;
+    return cur.clone().sub(prev);
   }
 
   getMouseDeltaSceneSpace(): Vector2 {
     const prev = this.canvasToScene(this.prevMousePos);
     const cur = this.canvasToScene(this.mousePos);
-    const diff = new Vector2(cur.x - prev.x, cur.y - prev.y);
 
-    return diff;
+    return cur.clone().sub(prev);
   }
 }

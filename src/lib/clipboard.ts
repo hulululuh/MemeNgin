@@ -14,7 +14,7 @@ import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { Guid } from "./utils";
 import { AddItemsAction } from "./actions/additemsaction";
 import { UndoStack } from "./undostack";
-import { Rect, Vector2 } from "./scene/view";
+import { Rect } from "./scene/view";
 
 export class ItemClipboard {
   static copyItems(
@@ -258,8 +258,11 @@ export class ItemClipboard {
         // find diff, then offset each object by that diff
         //let diff = Vector2.subtract(center, rect.center);
         for (let item of focusItems) {
-          let offsetFromRect = Vector2.subtract(item.getPos(), rect.center);
-          let newPos = Vector2.add(center, offsetFromRect);
+          let offsetFromRect = item
+            .getPos()
+            .clone()
+            .subtract(rect.center);
+          let newPos = center.clone().add(offsetFromRect);
           item.setPos(newPos.x, newPos.y);
           //item.move(diff.x, diff.y);
         }

@@ -458,8 +458,8 @@ export class Editor {
 
     this.canvas.ondrop = function(ev: DragEvent) {
       const zoomFactor = self.graph.view.zoomFactor;
-      const x = (ev.offsetX - self.graph.view.offset.x) / zoomFactor;
-      const y = (ev.offsetY - self.graph.view.offset.y) / zoomFactor;
+      const x = (ev.offsetX - self.graph.view.offset[0]) / zoomFactor;
+      const y = (ev.offsetY - self.graph.view.offset[1]) / zoomFactor;
 
       let isValidImagePath = (filePath: string) => {
         let isValid = filePath.length > 0;

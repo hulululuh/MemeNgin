@@ -7,7 +7,7 @@ import {
   MouseUpEvent,
 } from "./graphicsitem";
 import { NodeScene } from "../scene";
-import { Vector2 } from "./view";
+import { Vector2 } from "@math.gl/core";
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 
@@ -320,11 +320,7 @@ export class NodeGraphicsItem extends GraphicsItem {
     let newPos = new Vector2(this.x, this.y);
 
     if (newPos.x != this.dragStartPos.x || newPos.y != this.dragStartPos.y) {
-      let action = new MoveItemsAction(
-        [this],
-        [this.dragStartPos.clone()],
-        [newPos]
-      );
+      let action = new MoveItemsAction([this], [this.dragStartPos], [newPos]);
 
       UndoStack.current.push(action);
     }
