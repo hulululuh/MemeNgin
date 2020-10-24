@@ -215,13 +215,17 @@ export class NodeScene {
     self._keyDown = function(evt: KeyboardEvent) {
       if (self.hasFocus) {
         // Delete selected nodes
-        if (evt.key == "Delete" && self.selectedItems.length !== 0) {
+        if (
+          evt.key == "Delete" &&
+          self.view.isMouseOverCanvas() &&
+          self.selectedItems.length !== 0
+        ) {
           //self.deleteNode(self.selectedNode);
           self.deleteItems(self.selectedItems);
         }
 
         // Zoom selected
-        if (evt.key.toLowerCase() === "f") {
+        if (evt.key.toLowerCase() === "f" && self.view.isMouseOverCanvas()) {
           if (self.selectedItems.length !== 0) {
             self.zoomSelected(self.selectedItems);
           } else {
@@ -242,6 +246,7 @@ export class NodeScene {
         self.view.isMouseOverCanvas()
       ) {
         if (self.onlibrarymenu != null && self.hitItem == null) {
+          self.hasFocus = false;
           self.onlibrarymenu();
         }
       }

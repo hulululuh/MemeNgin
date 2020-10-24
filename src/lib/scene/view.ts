@@ -282,12 +282,13 @@ export class SceneView {
   }
 
   isMouseOverCanvas() {
+    //let rect = this.canvas.getBoundingClientRect();
     let rect = this.canvas.getBoundingClientRect();
     //console.log(rect);
-    if (this.globalMousePos.x < rect.left) return false;
-    if (this.globalMousePos.y < rect.top) return false;
-    if (this.globalMousePos.x > rect.right) return false;
-    if (this.globalMousePos.y > rect.bottom) return false;
+    if (this.globalMousePos[0] < rect.left) return false;
+    if (this.globalMousePos[1] < rect.top) return false;
+    if (this.globalMousePos[0] > rect.right) return false;
+    if (this.globalMousePos[1] > rect.bottom) return false;
 
     return true;
   }
@@ -315,13 +316,12 @@ export class SceneView {
     if (this.panning) {
       const prev = this.canvasToScene(this.prevMousePos);
       const cur = this.canvasToScene(this.mousePos);
-      const diff = prev.clone().sub(cur);
+      const diff = new Vector2(prev.x, prev.y).sub(cur);
       this.mouseDragDiff = diff;
 
       const factor = this.zoomFactor;
-      this.offset = new Vector2(this.offset[0], this.offset[1])
-        .clone()
-        .sub(diff.clone().multiplyByScalar(factor));
+      const s = new Vector2(diff.x, diff.y).multiplyByScalar(factor);
+      this.offset = new Vector2(this.offset[0], this.offset[1]).sub(s);
     }
   }
 
