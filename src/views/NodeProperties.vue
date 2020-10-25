@@ -39,6 +39,8 @@ import {
 import { UndoStack } from "@/lib/undostack";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
 
+/* eslint-disable */
+
 class PropHolder {
   prop: Property;
   componentName: string;
