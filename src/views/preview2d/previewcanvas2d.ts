@@ -8,6 +8,7 @@ function _getMousePos(canvas, evt) {
   return new Vector2(evt.clientX - rect.left, evt.clientY - rect.top);
 }
 
+/* eslint-disable */
 export enum DrawMode {
   Single,
   Nine,
@@ -209,27 +210,10 @@ export class DragZoom {
       // const diff = new Vector2(this.prevMousePos.x - this.mousePos.x, this.prevMousePos.y - this.mousePos.y);
 
       const factor = this.zoomFactor;
-      this.offset.sub(diff.clone().multiplyByScalar(factor));
-      // this.offset.x -= diff.x * factor;
-      // this.offset.y -= diff.y * factor;
+      this.offset = new Vector2(this.offset[0], this.offset[1]).sub(
+        diff.clone().multiplyByScalar(factor)
+      );
     }
-
-    // let lastX = this.mouseX;
-    // let lastY = this.mouseY;
-    // let pos = this.getScenePos(evt);
-    // this.mouseX = pos.x;
-    // this.mouseY = pos.y;
-
-    // if (this.panning) {
-    //     // convert to scene space first
-    //     //let lastPt = this.contextExtra.transformedPoint(lastX, lastY);
-    //     //let pt = this.contextExtra.transformedPoint(this.mouseX, this.mouseY);
-    //     //this.context.translate(pt.x - lastPt.x, pt.y - lastPt.y);
-    //     //console.log(pt.x - this.panStart.x, pt.y - this.panStart.y);
-    //     console.log(this.mouseX - this.panStart.x, this.mouseY - this.panStart.y);
-    //     this.context.translate(this.mouseX - this.panStart.x, this.mouseY - this.panStart.y);
-    //     //this.panStart = pos;
-    // }
   }
 
   onMouseScroll(evt: WheelEvent) {

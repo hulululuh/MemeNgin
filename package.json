@@ -13,7 +13,6 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "main": "background.js",
-  "resolutions": { "eslint-loader": "2.1.2" },
   "dependencies": {
     "@tweenjs/tween.js": "^18.6.0",
     "adm-zip": "^0.4.16",
@@ -22,6 +21,7 @@
     "custom-electron-titlebar": "^3.1.0",
     "dedent-js": "^1.0.1",
     "element-resize-detector": "^1.1.15",
+    "eslint-webpack-plugin": "^2.1.0",
     "glsl-lut": "^1.1.1",
     "jquery": "^3.5.0",
     "load-bmfont": "^1.4.1",
@@ -32,7 +32,6 @@
     "parse-cube-lut": "^1.0.1",
     "three": "^0.118.3",
     "three-bmfont-text": "^3.0.1",
-    "three-orbitcontrols-ts": "git+https://git@github.com/nicolaspanel/three-orbitcontrols-ts.git",
     "typeface-open-sans": "^0.0.75",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",

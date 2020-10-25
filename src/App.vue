@@ -232,11 +232,9 @@ import EditorView from "@/views/Editor.vue";
 import LibraryView from "@/views/Library.vue";
 import LibraryMenu from "@/components/LibraryMenu.vue";
 import { Editor } from "@/lib/editor";
-import { View3D } from "@/lib/view3d";
 import { createLibrary as createV1Library } from "@/lib/library/libraryv1";
 import NodePropertiesView from "./views/NodeProperties.vue";
 import Preview2D from "./views/Preview2D.vue";
-import Preview3D from "./views/Preview3D.vue";
 import { DesignerLibrary } from "./lib/designer/library";
 import { DesignerNode } from "./lib/designer/designernode";
 import { Designer } from "./lib/designer";
@@ -266,13 +264,11 @@ declare let __static: any;
     NodePropertiesView,
     LibraryMenu,
     preview2d: Preview2D,
-    preview3d: Preview3D,
   },
 })
 export default class App extends Vue {
   editor!: Editor;
   library!: DesignerLibrary;
-  view3d!: View3D;
 
   selectedNode: DesignerNode = null;
   propHolder: IPropertyHolder = null;
@@ -571,17 +567,17 @@ export default class App extends Vue {
       });
     }
 
-    // 3d view
-    if (item.config.title == "3D View") {
-      let container = item.container;
-      item.container.on("resize", () => {
-        // const canvas = <HTMLCanvasElement>document.getElementById("_3dview");
-        // canvas.width = container.width;
-        // canvas.height = container.height;
-        //if (this.view3d) this.view3d.resize(container.width, container.height);
-        (this.$refs.preview3d as any).resize(container.width, container.height);
-      });
-    }
+    // // 3d view
+    // if (item.config.title == "3D View") {
+    //   let container = item.container;
+    //   item.container.on("resize", () => {
+    //     // const canvas = <HTMLCanvasElement>document.getElementById("_3dview");
+    //     // canvas.width = container.width;
+    //     // canvas.height = container.height;
+    //     //if (this.view3d) this.view3d.resize(container.width, container.height);
+    //     (this.$refs.preview3d as any).resize(container.width, container.height);
+    //   });
+    // }
   }
 
   resizeCanvas() {
