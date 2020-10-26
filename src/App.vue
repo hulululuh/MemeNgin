@@ -386,7 +386,7 @@ export default class App extends Vue {
       let itemJson = evt.dataTransfer.getData("text/plain");
       let item = JSON.parse(itemJson);
       let rect = canv.getBoundingClientRect();
-      let pos = this.editor.graph.view.canvasToSceneXY(
+      let pos = this.editor.nodeScene.view.canvasToSceneXY(
         evt.clientX - rect.left,
         evt.clientY - rect.top
       );
@@ -406,7 +406,7 @@ export default class App extends Vue {
         n.setCenter(pos.x, pos.y);
 
         action = new AddItemsAction(
-          this.editor.graph,
+          this.editor.nodeScene,
           this.editor.designer,
           [],
           [],
@@ -420,7 +420,7 @@ export default class App extends Vue {
         d.setCenter(pos.x, pos.y);
 
         action = new AddItemsAction(
-          this.editor.graph,
+          this.editor.nodeScene,
           this.editor.designer,
           [],
           [d],
@@ -434,7 +434,7 @@ export default class App extends Vue {
         d.setCenter(pos.x, pos.y);
 
         action = new AddItemsAction(
-          this.editor.graph,
+          this.editor.nodeScene,
           this.editor.designer,
           [d],
           [],
@@ -448,7 +448,7 @@ export default class App extends Vue {
         d.setCenter(pos.x, pos.y);
 
         action = new AddItemsAction(
-          this.editor.graph,
+          this.editor.nodeScene,
           this.editor.designer,
           [],
           [],

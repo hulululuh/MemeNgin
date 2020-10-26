@@ -203,7 +203,7 @@ export class Designer {
 
   requestUpdateThumbnail(dNode: DesignerNode) {
     const editor = Editor.getInstance();
-    const node = editor.graph.nodes.find((i) => i.id === dNode.id);
+    const node = editor.nodeScene.nodes.find((i) => i.id === dNode.id);
 
     if (dNode && node) {
       editor.createThumnail(dNode, node);

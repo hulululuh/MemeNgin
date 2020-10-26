@@ -87,7 +87,7 @@ export class Editor {
   canvas: HTMLCanvasElement;
 
   library: DesignerLibrary;
-  graph: NodeScene;
+  nodeScene: NodeScene;
   designer: Designer;
   selectedDesignerNode: DesignerNode;
 
@@ -96,7 +96,7 @@ export class Editor {
   preview2D: HTMLCanvasElement;
   preview2DCtx: CanvasRenderingContext2D;
 
-  scene3D: any; // todo: set a type
+  //scene3D: any; // todo: set a type
 
   mlModel: MLModel;
 
@@ -166,7 +166,7 @@ export class Editor {
     ) {
       // remove label from node view
       let oldNode = this.textureChannels[channelName] as DesignerNode;
-      let nodeView = this.graph.getNodeById(oldNode.id);
+      let nodeView = this.nodeScene.getNodeById(oldNode.id);
       nodeView.clearTextureChannel();
       //this.textureChannels[channelName] = null;
       delete this.textureChannels[channelName];
@@ -176,7 +176,7 @@ export class Editor {
       }
     }
 
-    let nodeView = this.graph.getNodeById(nodeId);
+    let nodeView = this.nodeScene.getNodeById(nodeId);
     nodeView.setTextureChannel(channelName);
 
     let newNode = this.designer.getNodeById(nodeId);
@@ -195,7 +195,7 @@ export class Editor {
 
       if (node.id == nodeId) {
         let oldNode = this.textureChannels[channelName] as DesignerNode;
-        let nodeView = this.graph.getNodeById(oldNode.id);
+        let nodeView = this.nodeScene.getNodeById(oldNode.id);
 
         // if this function is called when a node is deleted
         // nodeView will be null
@@ -239,7 +239,7 @@ export class Editor {
     if (this.hasTextureChannel(channelName)) {
       //console.log(this.textureChannels[channelName]);
       let dnodeId = this.textureChannels[channelName].id;
-      let nodeView = this.graph.getNodeById(dnodeId);
+      let nodeView = this.nodeScene.getNodeById(dnodeId);
       //console.log(nodeView)
       //console.log(this.graph)
       return nodeView.imageCanvas;
@@ -307,13 +307,13 @@ export class Editor {
     nodeView.setCenter(centerX + 150, centerY);
     console.log(nodeView);
     this.assignNodeToTextureChannel(nodeView.id, "albedo");
-    this.graph.view.reset();
+    this.nodeScene.view.reset();
 
     // connection
-    this.graph.createConnection(inputNode.id, node.id, 0);
+    this.nodeScene.createConnection(inputNode.id, node.id, 0);
 
     const dnode = this.designer.getNodeById(node.id);
-    const graphNode = this.graph.getNodeById(dnode.id);
+    const graphNode = this.nodeScene.getNodeById(dnode.id);
     // todo: move to double click
     if (this.onpreviewnode) {
       this.onpreviewnode(dnode, graphNode.imageCanvas.canvas);
@@ -347,16 +347,16 @@ export class Editor {
     this.canvas.height = height;
   }
 
-  set3DScene(scene3D: any) {
-    this.scene3D = scene3D;
-  }
+  // set3DScene(scene3D: any) {
+  //   this.scene3D = scene3D;
+  // }
 
   setDesigner(designer: Designer) {
     this.designer = designer;
     let self = this;
 
     designer.onnodetextureupdated = function(dnode) {
-      let graphNode = self.graph.getNodeById(dnode.id);
+      let graphNode = self.nodeScene.getNodeById(dnode.id);
       if (!graphNode) return; // node could have been deleted
 
       // something worng with fbo setup around here.
@@ -382,7 +382,7 @@ export class Editor {
       //     });
       // }
 
-      self.updateDisplayNode(graphNode);
+      //self.updateDisplayNode(graphNode);
     };
 
     /*
@@ -413,15 +413,15 @@ export class Editor {
 
   setScene(scene: NodeScene) {
     // cleanup previous graph
-    if (this.graph) this.graph.dispose();
+    if (this.nodeScene) this.nodeScene.dispose();
 
     this.undoStack = new UndoStack();
     UndoStack.current = this.undoStack;
 
-    this.graph = scene;
+    this.nodeScene = scene;
 
     let self = this;
-    this.graph.onconnectioncreated = function(con: ConnectionGraphicsItem) {
+    this.nodeScene.onconnectioncreated = function(con: ConnectionGraphicsItem) {
       // get node from graph
       let leftNode = con.socketA.node;
       let rightNode = con.socketB.node;
@@ -439,7 +439,9 @@ export class Editor {
       //rightNode.setThumbnail(thumb);
     };
 
-    this.graph.onconnectiondestroyed = function(con: ConnectionGraphicsItem) {
+    this.nodeScene.onconnectiondestroyed = function(
+      con: ConnectionGraphicsItem
+    ) {
       // get node from graph
       let leftNode = con.socketA.node;
       let rightNode = con.socketB.node;
@@ -457,9 +459,9 @@ export class Editor {
     };
 
     this.canvas.ondrop = function(ev: DragEvent) {
-      const zoomFactor = self.graph.view.zoomFactor;
-      const x = (ev.offsetX - self.graph.view.offset[0]) / zoomFactor;
-      const y = (ev.offsetY - self.graph.view.offset[1]) / zoomFactor;
+      const zoomFactor = self.nodeScene.view.zoomFactor;
+      const x = (ev.offsetX - self.nodeScene.view.offset[0]) / zoomFactor;
+      const y = (ev.offsetY - self.nodeScene.view.offset[1]) / zoomFactor;
 
       let isValidImagePath = (filePath: string) => {
         let isValid = filePath.length > 0;
@@ -512,7 +514,7 @@ export class Editor {
 
       if (nodes.length === viewNodes.length && nodes.length > 0) {
         let action = new AddItemsAction(
-          self.graph,
+          self.nodeScene,
           self.designer,
           [],
           [],
@@ -529,7 +531,7 @@ export class Editor {
       }
     };
 
-    this.graph.onnodeselected = function(node: NodeGraphicsItem) {
+    this.nodeScene.onnodeselected = function(node: NodeGraphicsItem) {
       if (node != null) {
         let dnode = self.designer.getNodeById(node.id);
         self.selectedDesignerNode = dnode;
@@ -550,33 +552,35 @@ export class Editor {
         //   self.onpreviewnode(dnode, node.imageCanvas.canvas);
         // }
 
-        //console.log(this.scene3D);
-        if (self.scene3D) {
-          //console.log("setting height texture");
-          //self.scene3D.setHeightTexture(node.thumbnail);
-          self.updateDisplayNode(node);
-        }
+        // //console.log(this.scene3D);
+        // if (self.scene3D) {
+        //   //console.log("setting height texture");
+        //   //self.scene3D.setHeightTexture(node.thumbnail);
+        //   self.updateDisplayNode(node);
+        // }
         if (self.onnodeselected) self.onnodeselected(dnode);
       }
     };
 
-    this.graph.oncommentselected = function(item: CommentGraphicsItem) {
+    this.nodeScene.oncommentselected = function(item: CommentGraphicsItem) {
       if (self.oncommentselected) self.oncommentselected(item);
     };
 
-    this.graph.onframeselected = function(item: FrameGraphicsItem) {
+    this.nodeScene.onframeselected = function(item: FrameGraphicsItem) {
       if (self.onframeselected) self.onframeselected(item);
     };
 
-    this.graph.onwidget2dselected = function(item: Transform2dWidget) {
+    this.nodeScene.onwidget2dselected = function(item: Transform2dWidget) {
       if (self.onwidget2dselected) self.onwidget2dselected(item);
     };
 
-    this.graph.onnavigationselected = function(item: NavigationGraphicsItem) {
+    this.nodeScene.onnavigationselected = function(
+      item: NavigationGraphicsItem
+    ) {
       if (self.onnavigationselected) self.onnavigationselected(item);
     };
 
-    this.graph.onnodedeleted = function(node: NodeGraphicsItem) {
+    this.nodeScene.onnodedeleted = function(node: NodeGraphicsItem) {
       // remove node from channels
       //console.log(self);
       self.clearTextureChannel(node.id);
@@ -588,7 +592,7 @@ export class Editor {
       // }
     };
 
-    this.graph.onitemsdeleting = function(
+    this.nodeScene.onitemsdeleting = function(
       frames: FrameGraphicsItem[],
       comments: CommentGraphicsItem[],
       navs: NavigationGraphicsItem[],
@@ -607,7 +611,7 @@ export class Editor {
 
       let action = new RemoveItemsAction(
         self,
-        self.graph,
+        self.nodeScene,
         self.designer,
         frames,
         comments,
@@ -619,7 +623,7 @@ export class Editor {
       UndoStack.current.push(action);
     };
 
-    this.graph.onitemsdeleted = function(
+    this.nodeScene.onitemsdeleted = function(
       frames: FrameGraphicsItem[],
       comments: CommentGraphicsItem[],
       navs: NavigationGraphicsItem[],
@@ -630,22 +634,25 @@ export class Editor {
       //   self.onpreviewnode(null, null);
       // }
       // clear selected items
-      self.graph.selectedItems.splice(0, self.graph.selectedItems.length);
+      self.nodeScene.selectedItems.splice(
+        0,
+        self.nodeScene.selectedItems.length
+      );
     };
 
-    this.graph.oncopy = function(evt: ClipboardEvent) {
+    this.nodeScene.oncopy = function(evt: ClipboardEvent) {
       self.executeCopy(evt);
     };
 
-    this.graph.oncut = function(evt: ClipboardEvent) {
+    this.nodeScene.oncut = function(evt: ClipboardEvent) {
       self.executeCut(evt);
     };
 
-    this.graph.onpaste = function(evt: ClipboardEvent) {
+    this.nodeScene.onpaste = function(evt: ClipboardEvent) {
       self.executePaste(evt);
     };
 
-    this.graph.onlibrarymenu = function() {
+    this.nodeScene.onlibrarymenu = function() {
       console.log(self.onlibrarymenu);
       if (self.onlibrarymenu != null) {
         self.onlibrarymenu();
@@ -682,7 +689,7 @@ export class Editor {
     ItemClipboard.copyItems(
       this.designer,
       this.library,
-      this.graph,
+      this.nodeScene,
       evt.clipboardData
     );
   }
@@ -691,7 +698,7 @@ export class Editor {
     ItemClipboard.copyItems(
       this.designer,
       this.library,
-      this.graph,
+      this.nodeScene,
       evt.clipboardData
     );
   }
@@ -700,7 +707,7 @@ export class Editor {
     ItemClipboard.pasteItems(
       this.designer,
       this.library,
-      this.graph,
+      this.nodeScene,
       evt.clipboardData
     );
   }
@@ -729,10 +736,10 @@ export class Editor {
       node.addSocket(input, input, SocketType.In);
     }
     node.addSocket("output", "output", SocketType.Out);
-    this.graph.addNode(node);
+    this.nodeScene.addNode(node);
     node.id = dNode.id;
 
-    let pos = this.graph.view.canvasToSceneXY(screenX, screenY);
+    let pos = this.nodeScene.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);
 
     // if (dNode.readyToUpdate()) {
@@ -743,78 +750,78 @@ export class Editor {
   }
 
   createComment(): CommentGraphicsItem {
-    let comment = new CommentGraphicsItem(this.graph.view);
-    let pos = this.graph.view.sceneCenter;
+    let comment = new CommentGraphicsItem(this.nodeScene.view);
+    let pos = this.nodeScene.view.sceneCenter;
     comment.setCenter(pos.x, pos.y);
 
-    this.graph.addComment(comment);
+    this.nodeScene.addComment(comment);
 
     return comment;
   }
 
   createFrame(): FrameGraphicsItem {
-    let frame = new FrameGraphicsItem(this.graph.view);
-    let pos = this.graph.view.sceneCenter;
+    let frame = new FrameGraphicsItem(this.nodeScene.view);
+    let pos = this.nodeScene.view.sceneCenter;
     frame.setCenter(pos.x, pos.y);
 
-    this.graph.addFrame(frame);
+    this.nodeScene.addFrame(frame);
 
     return frame;
   }
 
   createNavigation(): NavigationGraphicsItem {
     let nav = new NavigationGraphicsItem();
-    let pos = this.graph.view.sceneCenter;
+    let pos = this.nodeScene.view.sceneCenter;
     nav.setCenter(pos.x, pos.y);
 
-    this.graph.addNavigation(nav);
+    this.nodeScene.addNavigation(nav);
 
     return nav;
   }
 
   // DISPLAY NODE FUNCTIONS
 
-  // updates appropriate image if set
-  updateDisplayNode(node: NodeGraphicsItem) {
-    if (!this.scene3D) return;
+  // // updates appropriate image if set
+  // updateDisplayNode(node: NodeGraphicsItem) {
+  //   if (!this.scene3D) return;
 
-    //console.log(node.id);
-    //console.log(this.displayNodes.normalNode);
+  //   //console.log(node.id);
+  //   //console.log(this.displayNodes.normalNode);
 
-    // TODO: create custom CanvasImage that resizes with
-    // the texture size. NodeGraphicsItem's CanvasImage is fixed
-    // to 1024x1024. Another option is to give each DesignerNode a
-    // CanvasImage that updates when its texture updates then pass
-    // it to NodeGraphicsitem. That way it gets used one place and
-    // gets updated everywhere else all at once.
-    if (node.id == this.displayNodes.albedoNode) {
-      //this.scene3D.setAlbedoTexture(node.thumbnail);
-      this.scene3D.setAlbedoCanvasTexture(node.imageCanvas.canvas);
-    }
+  //   // TODO: create custom CanvasImage that resizes with
+  //   // the texture size. NodeGraphicsItem's CanvasImage is fixed
+  //   // to 1024x1024. Another option is to give each DesignerNode a
+  //   // CanvasImage that updates when its texture updates then pass
+  //   // it to NodeGraphicsitem. That way it gets used one place and
+  //   // gets updated everywhere else all at once.
+  //   if (node.id == this.displayNodes.albedoNode) {
+  //     //this.scene3D.setAlbedoTexture(node.thumbnail);
+  //     this.scene3D.setAlbedoCanvasTexture(node.imageCanvas.canvas);
+  //   }
 
-    if (node.id == this.displayNodes.metallicNode) {
-      //this.scene3D.setMetallicTexture(node.thumbnail);
-      this.scene3D.setMetallicCanvasTexture(node.imageCanvas.canvas);
-    }
+  //   if (node.id == this.displayNodes.metallicNode) {
+  //     //this.scene3D.setMetallicTexture(node.thumbnail);
+  //     this.scene3D.setMetallicCanvasTexture(node.imageCanvas.canvas);
+  //   }
 
-    if (node.id == this.displayNodes.normalNode) {
-      //this.scene3D.setNormalTexture(node.thumbnail);
-      this.scene3D.setNormalCanvasTexture(node.imageCanvas.canvas);
-    }
+  //   if (node.id == this.displayNodes.normalNode) {
+  //     //this.scene3D.setNormalTexture(node.thumbnail);
+  //     this.scene3D.setNormalCanvasTexture(node.imageCanvas.canvas);
+  //   }
 
-    if (node.id == this.displayNodes.roughnessNode) {
-      //this.scene3D.setRoughnessTexture(node.thumbnail);
-      this.scene3D.setRoughnessCanvasTexture(node.imageCanvas.canvas);
-    }
+  //   if (node.id == this.displayNodes.roughnessNode) {
+  //     //this.scene3D.setRoughnessTexture(node.thumbnail);
+  //     this.scene3D.setRoughnessCanvasTexture(node.imageCanvas.canvas);
+  //   }
 
-    if (node.id == this.displayNodes.heightNode) {
-      //this.scene3D.setHeightTexture(node.thumbnail);
-      this.scene3D.setHeightCanvasTexture(node.imageCanvas.canvas);
-    }
-  }
+  //   if (node.id == this.displayNodes.heightNode) {
+  //     //this.scene3D.setHeightTexture(node.thumbnail);
+  //     this.scene3D.setHeightCanvasTexture(node.imageCanvas.canvas);
+  //   }
+  // }
 
   setDisplayChannelNode(channel: DisplayChannel, nodeId: string) {
-    let node = this.graph.getNodeById(nodeId);
+    let node = this.nodeScene.getNodeById(nodeId);
     if (channel == DisplayChannel.Albedo) {
       this.displayNodes.albedoNode = nodeId;
     }
@@ -831,7 +838,7 @@ export class Editor {
       this.displayNodes.heightNode = nodeId;
     }
 
-    this.updateDisplayNode(node);
+    //this.updateDisplayNode(node);
   }
 
   exposeVariable(node: DesignerNode, prop: Property, varDisplayName: string) {
@@ -880,7 +887,7 @@ export class Editor {
   }
 
   draw() {
-    if (this.graph) this.graph.draw();
+    if (this.nodeScene) this.nodeScene.draw();
   }
 
   load(data: any) {
@@ -926,7 +933,7 @@ export class Editor {
       for (let channelName in e.textureChannels) {
         if (!e.textureChannels.hasOwnProperty(channelName)) continue;
         console.log(e);
-        let node = this.graph.getNodeById(e.textureChannels[channelName]);
+        let node = this.nodeScene.getNodeById(e.textureChannels[channelName]);
         if (node) this.assignNodeToTextureChannel(node.id, channelName);
       }
 
@@ -937,7 +944,7 @@ export class Editor {
 
   save(): any {
     let data = this.designer.save();
-    data["scene"] = this.graph.save();
+    data["scene"] = this.nodeScene.save();
 
     let textureChannels = {};
     for (let channelName in this.textureChannels) {

@@ -61,7 +61,7 @@ export class DetectNode extends DesignerNode {
           0
         );
 
-        let graphicsItem = Editor.getInstance().graph.nodes.filter(
+        let graphicsItem = Editor.getInstance().nodeScene.nodes.filter(
           (x) => x.id == this.id
         )[0];
         graphicsItem.helperViz = [];
@@ -118,7 +118,7 @@ export class DetectNode extends DesignerNode {
 
       // postprocessing
       let boxes = await yolo.postprocess(outputTensor, 20);
-      let graphicsItem = Editor.getInstance().graph.nodes.filter(
+      let graphicsItem = Editor.getInstance().nodeScene.nodes.filter(
         (x) => x.id == this.id
       )[0];
       //graphicsItem.helperViz = [];

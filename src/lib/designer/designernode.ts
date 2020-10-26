@@ -199,7 +199,7 @@ export class DesignerNode implements IPropertyHolder {
       }
 
       // find a corresponding NodeGraphicsItem
-      const gNodes = Editor.getInstance().graph.nodes.find(
+      const gNodes = Editor.getInstance().nodeScene.nodes.find(
         (x) => x.id === this.id
       );
       if (gNodes) {

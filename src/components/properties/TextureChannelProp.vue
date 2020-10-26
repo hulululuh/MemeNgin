@@ -62,7 +62,7 @@ export default class TextureChannelPropertyView extends Vue {
     let node2 = null;
     let channel2 = index == 0 ? null : channelName;
 
-    let nodeView = this.editor.graph.getNodeById(this.node.id);
+    let nodeView = this.editor.nodeScene.getNodeById(this.node.id);
     let channel1 = nodeView.textureChannel;
     if (this.editor.textureChannels.hasOwnProperty(channelName))
       node2 = this.editor.textureChannels[channelName].id;

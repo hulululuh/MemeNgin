@@ -213,12 +213,12 @@ export default class LibraryMenu extends Vue {
     let action: AddItemsAction = null;
 
     // bring mouse pos to local space first
-    let canvasPos = this.editor.graph.view.globalToCanvasXY(
+    let canvasPos = this.editor.nodeScene.view.globalToCanvasXY(
       this.mouseX,
       this.mouseY
     );
 
-    let scenePos = this.editor.graph.view.canvasToSceneXY(
+    let scenePos = this.editor.nodeScene.view.canvasToSceneXY(
       canvasPos.x,
       canvasPos.y
     );
@@ -231,7 +231,7 @@ export default class LibraryMenu extends Vue {
       n.setCenter(scenePos.x, scenePos.y);
 
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [],
         [],
@@ -246,7 +246,7 @@ export default class LibraryMenu extends Vue {
       item.setCenter(scenePos.x, scenePos.y);
 
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [],
         [item],
@@ -261,7 +261,7 @@ export default class LibraryMenu extends Vue {
       item.setCenter(scenePos.x, scenePos.y);
 
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [item],
         [],
@@ -276,7 +276,7 @@ export default class LibraryMenu extends Vue {
       item.setCenter(scenePos.x, scenePos.y);
 
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [],
         [],

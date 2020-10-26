@@ -127,7 +127,7 @@ export default class LibraryView extends Vue {
       n.setCenter(200, 200);
 
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [],
         [],
@@ -141,7 +141,7 @@ export default class LibraryView extends Vue {
       let item = this.editor.createComment();
       //item.setCenter(200, 200);
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [],
         [item],
@@ -155,7 +155,7 @@ export default class LibraryView extends Vue {
       let item = this.editor.createFrame();
       //item.setCenter(200, 200);
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [item],
         [],
@@ -169,7 +169,7 @@ export default class LibraryView extends Vue {
       let item = this.editor.createNavigation();
       //item.setCenter(200, 200);
       action = new AddItemsAction(
-        this.editor.graph,
+        this.editor.nodeScene,
         this.editor.designer,
         [],
         [],
