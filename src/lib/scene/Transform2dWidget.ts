@@ -7,7 +7,7 @@ import {
   MouseOverEvent,
 } from "./graphicsitem";
 import { SceneView, Rect } from "./view";
-import { Vector2 } from "@math.gl/core";
+import { Vector2, Matrix3 } from "@math.gl/core";
 import { Color } from "../designer/color";
 import { NodeGraphicsItem } from "./nodegraphicsitem";
 import {
@@ -19,6 +19,14 @@ import {
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 import { ResizeFrameAction } from "../actions/resizeframeaction";
+import { Line, MathUtils, Vector } from "three";
+import { runAtThisOrScheduleAtNextAnimationFrame } from "custom-electron-titlebar/lib/common/dom";
+import { centerCrop } from "../utils/math";
+
+// collision margin in pixels
+const colMarginLine = 10;
+const colMarginCircle = 5;
+const radius = 5;
 
 enum XResizeDir {
   None,
@@ -34,8 +42,9 @@ enum YResizeDir {
 
 enum DragMode {
   None,
-  HandleTop,
+  Move,
   Resize,
+  Rotate,
 }
 
 export class FrameRegion {
@@ -46,6 +55,106 @@ export class FrameRegion {
   cursor: string = null;
 }
 
+enum ColliderType {
+  None,
+  Line,
+  Circle,
+  Rect,
+}
+
+export interface iCollider {
+  type: ColliderType;
+
+  // resulting value - cursor
+  label: string;
+
+  isIntersectWith(pt: Vector2): boolean;
+  getCenter(): Vector2;
+  setPts(pts: Array<Vector2>);
+}
+
+export class CircleCollider implements iCollider {
+  type: ColliderType;
+  label: string;
+  protected _idx: number;
+  protected _pts: Array<Vector2>;
+
+  constructor(label: string, idx: number, pts?: Array<Vector2>) {
+    this.type = ColliderType.Circle;
+    this.label = label;
+    this._idx = idx;
+    this._pts = pts;
+  }
+
+  isIntersectWith(pt: Vector2): boolean {
+    if (!this._pts) {
+      console.warn("intersection test without data");
+      return;
+    }
+    const distance = pt.distanceTo(this._pts[this._idx]);
+    return distance < colMarginCircle + radius;
+  }
+
+  getCenter(): Vector2 {
+    return this._pts[this._idx];
+  }
+
+  setPts(pts: Array<Vector2>) {
+    this._pts = pts;
+  }
+}
+
+export class LineCollider implements iCollider {
+  type: ColliderType;
+  label: string;
+  protected _idxA: number;
+  protected _idxB: number;
+  protected _pts: Array<Vector2>;
+
+  constructor(label: string, idxA: number, idxB: number, pts?: Array<Vector2>) {
+    this.type = ColliderType.Line;
+    this.label = label;
+    this._idxA = idxA;
+    this._idxB = idxB;
+    this._pts = pts;
+  }
+
+  isIntersectWith(pt: Vector2): boolean {
+    if (!this._pts) {
+      console.warn("intersection test without data");
+      return;
+    }
+
+    const pt1 = this._pts[this._idxA];
+    const pt2 = this._pts[this._idxB];
+
+    if (!pt1 || !pt2) {
+      return false;
+    }
+
+    const dir = new Vector2(pt2).sub(pt1);
+    const dir2 = new Vector2(pt).sub(pt1);
+
+    const t = dir2.dot(new Vector2(dir).normalize());
+    const closestPt = new Vector2(pt1).add(
+      new Vector2(dir).normalize().multiplyByScalar(t)
+    );
+
+    const distance = pt.distanceTo(closestPt);
+    return distance < colMarginLine;
+  }
+
+  getCenter(): Vector2 {
+    const pt1 = this._pts[this._idxA];
+    const pt2 = this._pts[this._idxB];
+    return new Vector2(pt1).add(pt2).divideScalar(2);
+  }
+
+  setPts(pts: Array<Vector2>) {
+    this._pts = pts;
+  }
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 export class Transform2dWidget extends GraphicsItem {
   view: SceneView;
@@ -54,11 +163,19 @@ export class Transform2dWidget extends GraphicsItem {
   hit: boolean;
   dragged: boolean;
   dragStartPos: Vector2;
+  dragStartCenter: Vector2;
   dragStartRect: Rect;
 
   xResize: XResizeDir;
   yResize: YResizeDir;
   dragMode: DragMode;
+
+  protected colliders: Array<iCollider>;
+  protected points: Array<Vector2>;
+  protected posRotHandle: Vector2;
+
+  distDragStart: number;
+  sizeOnDragStart: Vector2;
 
   // display properties
   handleSize: number;
@@ -83,6 +200,24 @@ export class Transform2dWidget extends GraphicsItem {
     this.yResize = YResizeDir.None;
     this.dragMode = DragMode.None;
 
+    this.colliders = new Array<iCollider>();
+    this.colliders.push(new CircleCollider("corner0", 0));
+    this.colliders.push(new CircleCollider("corner1", 1));
+    this.colliders.push(new CircleCollider("corner2", 2));
+    this.colliders.push(new CircleCollider("corner3", 3));
+    this.colliders.push(new CircleCollider("rotHandle", 4));
+    this.colliders.push(new LineCollider("edge0", 0, 1));
+    this.colliders.push(new LineCollider("edge1", 1, 2));
+    this.colliders.push(new LineCollider("edge2", 2, 3));
+    this.colliders.push(new LineCollider("edge3", 3, 0));
+
+    this.points = new Array<Vector2>(4);
+    this.points[0] = new Vector2(-0.5, -0.5);
+    this.points[1] = new Vector2(0.5, -0.5);
+    this.points[2] = new Vector2(0.5, 0.5);
+    this.points[3] = new Vector2(-0.5, 0.5);
+    this.posRotHandle = new Vector2(0, -0.75);
+
     this.handleSize = 30;
     this.resizeHandleSize = 10;
     this.minSize = 2;
@@ -90,11 +225,8 @@ export class Transform2dWidget extends GraphicsItem {
     this.setSize(500, 300);
 
     this.nodes = [];
-  }
 
-  setSize(w: number, h: number) {
-    this.width = w;
-    this.height = h;
+    this.rotation = 45 * MathUtils.DEG2RAD;
   }
 
   private buildColor(color: Color, alpha: number) {
@@ -112,23 +244,12 @@ export class Transform2dWidget extends GraphicsItem {
     return col;
   }
 
-  setPos(x: number, y: number) {
-    // find diff
-    let diff = new Vector2(x - this.x, y - this.y);
-    super.setPos(x, y);
-
-    // do a move
-    // for (let node of this.nodes) {
-    // 	node.move(diff.x, diff.y);
-    // }
-  }
-
-  setFrameRect(rect: Rect) {
-    this.x = rect.x;
-    this.y = rect.y;
-    this.width = rect.width;
-    this.height = rect.height;
-  }
+  // setFrameRect(rect: Rect) {
+  //   this.x = rect.x;
+  //   this.y = rect.y;
+  //   this.width = rect.width;
+  //   this.height = rect.height;
+  // }
 
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
     // // outer frame
@@ -165,6 +286,44 @@ export class Transform2dWidget extends GraphicsItem {
     //this.roundRect(ctx, this.x, this.y, this.width, this.height, 1);
     ctx.stroke();
 
+    const xf = this.transform;
+    let ptsXf = new Array<Vector2>(this.points.length);
+    for (let i = 0; i < this.points.length; i++) {
+      const pt = xf.transform(this.points[i]);
+      ptsXf[i] = new Vector2().fromArray(pt);
+    }
+
+    const ptRotHandleSrc = new Vector2(ptsXf[0]).add(ptsXf[1]).divideScalar(2);
+    //const ptRotHandleSrc = new Vector2(ptsXf[0].add(ptsXf[1]).divideScalar(2));
+    const ptRotHandleXf = new Vector2(xf.transform(this.posRotHandle));
+
+    // rectangle
+    ctx.beginPath();
+    const ptBegin = xf.transform(this.points[0]);
+    ctx.moveTo(ptBegin[0], ptBegin[1]);
+    for (let i = 0; i < this.points.length; i++) {
+      let next = (i + 1) % this.points.length;
+      //const ptNext = xf.transform(this.points[next]);
+      const ptNext = ptsXf[next];
+      ctx.lineTo(ptNext[0], ptNext[1]);
+    }
+
+    ctx.moveTo(ptRotHandleSrc[0], ptRotHandleSrc[1]);
+    ctx.lineTo(ptRotHandleXf[0], ptRotHandleXf[1]);
+    ctx.stroke();
+
+    // scaleHandles
+    for (const pt of ptsXf) {
+      ctx.beginPath();
+      ctx.ellipse(pt[0], pt[1], radius, radius, 0, 0, 360);
+      ctx.stroke();
+    }
+
+    // rotationHandle
+    ctx.beginPath();
+    ctx.ellipse(ptRotHandleXf[0], ptRotHandleXf[1], radius, radius, 0, 0, 360);
+    ctx.stroke();
+
     // // debug draw frames
     // if (false) {
     //   let regions = this.getFrameRegions();
@@ -183,6 +342,22 @@ export class Transform2dWidget extends GraphicsItem {
     let regions = this.getFrameRegions();
     for (let region of regions) {
       if (region.rect.isPointInside(px, py)) {
+        return true;
+      }
+    }
+
+    const xf = this.transform;
+    let ptsXf = new Array<Vector2>();
+    for (let i = 0; i < this.points.length; i++) {
+      ptsXf[i] = new Vector2(xf.transform(this.points[i]));
+    }
+
+    const ptXfRotHandle = new Vector2(xf.transform(this.posRotHandle));
+    ptsXf.push(ptXfRotHandle);
+
+    for (let collider of this.colliders) {
+      collider.setPts(ptsXf);
+      if (collider.isIntersectWith(new Vector2(px, py))) {
         return true;
       }
     }
@@ -216,11 +391,18 @@ export class Transform2dWidget extends GraphicsItem {
 
         this.dragStartRect = this.getRect();
         hitRegion = region;
+
+        this.dragStartCenter = new Vector2(this.centerX(), this.centerY());
+        this.distDragStart = new Vector2(px, py)
+          .sub(this.dragStartCenter)
+          .magnitude();
+        this.sizeOnDragStart = new Vector2(this.width, this.height);
+        //sizeOnDragStart: Vector2;
         break;
       }
     }
 
-    // topbar
+    // drag to move around
     if (hitRegion == null) {
       if (
         px >= this.x &&
@@ -228,7 +410,7 @@ export class Transform2dWidget extends GraphicsItem {
         py >= this.y &&
         py <= this.y + this.height
       ) {
-        this.dragMode = DragMode.HandleTop;
+        this.dragMode = DragMode.Move;
         this.xResize = XResizeDir.None;
         this.yResize = YResizeDir.None;
 
@@ -256,7 +438,7 @@ export class Transform2dWidget extends GraphicsItem {
       }
     }
 
-    // topbar
+    // drag to move around
     if (hitRegion == null) {
       if (
         px >= this.x &&
@@ -290,7 +472,7 @@ export class Transform2dWidget extends GraphicsItem {
   mouseMove(evt: MouseMoveEvent) {
     if (this.hit) {
       // movement
-      if (this.dragMode == DragMode.HandleTop) {
+      if (this.dragMode == DragMode.Move) {
         this.move(evt.deltaX, evt.deltaY);
 
         // move nodes
@@ -302,47 +484,76 @@ export class Transform2dWidget extends GraphicsItem {
       const minSize = this.minSize;
       //todo: clamp size
       if (this.dragMode == DragMode.Resize) {
-        if (this.xResize == XResizeDir.Left) {
-          //const minSize = this.resizeHandleSize * 2;
-          const dtClamped =
-            this.width - evt.deltaX > minSize
-              ? evt.deltaX
-              : this.width - minSize;
+        let px = evt.globalX;
+        let py = evt.globalY;
 
-          this.left += dtClamped;
-          this.width -= dtClamped;
-        }
-        if (this.xResize == XResizeDir.Right) {
-          this.width += evt.deltaX;
-        }
-        if (this.yResize == YResizeDir.Top) {
-          //const minSize = this.resizeHandleSize + this.handleSize;
-          const dtClamped =
-            this.height - evt.deltaY > minSize
-              ? evt.deltaY
-              : this.height - minSize;
+        const distNow = new Vector2(px, py)
+          .sub(this.dragStartCenter)
+          .magnitude();
 
-          this.top += dtClamped;
-          this.height -= dtClamped;
-        }
-        if (this.yResize == YResizeDir.Bottom) {
-          this.height += evt.deltaY;
-        }
+        const relScale = distNow / this.distDragStart;
+        const w = this.sizeOnDragStart[0] * relScale;
+        const h = this.sizeOnDragStart[1] * relScale;
 
-        // clamp
-        this.height = Math.max(this.height, this.minSize);
+        this.setSize(w, h);
 
-        this.width = Math.max(this.width, this.minSize);
+        // new Vector2(px, py).sub(
+        //   new Vector2(this.x, this.y)
+        // ).length;
+
+        // if (this.xResize == XResizeDir.Left) {
+        //   //const minSize = this.resizeHandleSize * 2;
+        //   const dtClamped =
+        //     this.width - evt.deltaX > minSize
+        //       ? evt.deltaX
+        //       : this.width - minSize;
+
+        //   this.left += dtClamped;
+        //   this.width -= dtClamped;
+        // }
+        // if (this.xResize == XResizeDir.Right) {
+        //   this.width += evt.deltaX;
+        // }
+        // if (this.yResize == YResizeDir.Top) {
+        //   //const minSize = this.resizeHandleSize + this.handleSize;
+        //   const dtClamped =
+        //     this.height - evt.deltaY > minSize
+        //       ? evt.deltaY
+        //       : this.height - minSize;
+
+        //   this.top += dtClamped;
+        //   this.height -= dtClamped;
+        // }
+        // if (this.yResize == YResizeDir.Bottom) {
+        //   this.height += evt.deltaY;
+        // }
+
+        // // clamp
+        // const h = Math.max(this.height, this.minSize);
+        // const w = Math.max(this.width, this.minSize);
+        // this.setSize(w, h);
+
+        // this.width = w;
+        // this.height = h;
+        // this.scale = new Vector2(this.width, this.height);
       }
 
       this.dragged = true;
     }
   }
 
+  get transform(): Matrix3 {
+    const xf = new Matrix3()
+      .translate([this.position[0], this.position[1]])
+      .scale([this.scale[0], this.scale[1]])
+      .rotate(this.rotation);
+    return xf;
+  }
+
   mouseUp(evt: MouseUpEvent) {
     // add undo/redo action
     if (this.dragged) {
-      if (this.dragMode == DragMode.HandleTop) {
+      if (this.dragMode == DragMode.Move) {
         let newPos = new Vector2(this.x, this.y);
         let items: GraphicsItem[] = [this];
         let oldPosList: Vector2[] = [this.dragStartPos];

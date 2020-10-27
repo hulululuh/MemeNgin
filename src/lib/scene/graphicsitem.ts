@@ -55,17 +55,28 @@ export class GraphicsItem {
   protected width: number;
   protected height: number;
 
+  // transform
+  protected scale: Vector2;
+  protected position: Vector2;
+  protected rotation: number;
+
   constructor() {
     //this.scene = scene;
     //scene.addItem(this);
     this.width = 1;
     this.height = 1;
+
+    this.scale = new Vector2(1, 1);
+    this.position = new Vector2(0, 0);
+    this.rotation = 0;
   }
 
   // sets top-left
   setPos(x: number, y: number) {
     this.x = x;
     this.y = y;
+
+    this.position = new Vector2(this.centerX(), this.centerY());
   }
 
   getPos() {
@@ -75,6 +86,9 @@ export class GraphicsItem {
   setSize(w: number, h: number) {
     this.width = w;
     this.height = h;
+
+    this.scale = new Vector2(w, h);
+    //this.scale.set(this.width, this.height);
   }
 
   setScene(scene: NodeScene) {
@@ -147,6 +161,14 @@ export class GraphicsItem {
   setCenter(x: number, y: number) {
     this.x = x - this.width / 2;
     this.y = y - this.height / 2;
+    //this.position.set(this.x, this.y);
+
+    this.position = new Vector2(this.centerX(), this.centerY());
+
+    // this.position = new Vector2(
+    //   this.x + this.width / 2,
+    //   this.y + this.height / 2
+    // );
   }
 
   centerX(): number {
@@ -168,6 +190,13 @@ export class GraphicsItem {
   move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
+
+    //this.position = new Vector2(this.centerX(), this.centerY());
+
+    // this.position = new Vector2(
+    //   this.x + this.width / 2,
+    //   this.y + this.height / 2
+    // );
   }
 
   // UTILITIES

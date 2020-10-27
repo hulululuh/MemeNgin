@@ -143,7 +143,7 @@ export class NodeScene {
     // widget
     this.widget2d = new Transform2dWidget(this.view);
     //this.widget2d.setCenter(200, 200);
-    this.widget2d.setPos(200, 200);
+    //this.widget2d.setPos(200, 200);
     this.widget2d.setSize(100, 100);
 
     this.frames = new Array();
