@@ -654,6 +654,7 @@ export class NodeScene {
   // https://www.rapidtables.com/convert/color/hex-to-rgb.html
   drawSelectedItems(items: GraphicsItem[], ctx: CanvasRenderingContext2D) {
     for (let item of items) {
+      if (!item.drawSelHighlight) continue;
       ctx.beginPath();
       //this.roundRect(ctx, this.x, this.y, width, height, 1);
       // ctx.rect(item.left, item.top, item.getWidth(), item.getHeight());

@@ -49,6 +49,7 @@ export class HoverEvent extends MouseEvent {}
 export class GraphicsItem {
   scene!: NodeScene;
   protected visible: boolean = true;
+  protected _drawSelHighlight: boolean = true;
 
   protected x: number = 0;
   protected y: number = 0;
@@ -69,6 +70,10 @@ export class GraphicsItem {
     this.scale = new Vector2(1, 1);
     this.position = new Vector2(0, 0);
     this.rotation = 0;
+  }
+
+  get drawSelHighlight(): boolean {
+    return this._drawSelHighlight;
   }
 
   // sets top-left
