@@ -12,8 +12,10 @@ import {
   MouseDownEvent,
   MouseUpEvent,
   MouseOverEvent,
+  WidgetEvent,
 } from "./scene/graphicsitem";
-import { SceneView, Rect, BoundingBox } from "./scene/view";
+
+import { SceneView } from "./scene/view";
 import { FrameGraphicsItem } from "./scene/framegraphicsitem";
 import { Transform2dWidget } from "./scene/Transform2dWidget";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
@@ -23,6 +25,8 @@ import { Color } from "./designer/color";
 import { ItemClipboard } from "./clipboard";
 import { Transform2DGraphicsItem } from "./scene/transform2dgraphicsitem";
 import { Vector2 } from "@math.gl/core";
+import { BoundingBox } from "@/lib/math/boundingbox";
+import { Rect } from "@/lib/math/rect";
 
 enum DragMode {
   None,
@@ -131,6 +135,7 @@ export class NodeScene {
   _copyEvent: (evt: ClipboardEvent) => void;
   _cutEvent: (evt: ClipboardEvent) => void;
   _pasteEvent: (evt: ClipboardEvent) => void;
+  _widgetUpdate: (evt: WidgetEvent) => void;
   copyElement: HTMLInputElement;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -142,8 +147,6 @@ export class NodeScene {
 
     // widget
     this.widget2d = new Transform2dWidget(this.view);
-    //this.widget2d.setCenter(200, 200);
-    //this.widget2d.setPos(200, 200);
     this.widget2d.setSize(100, 100);
 
     this.frames = new Array();
@@ -177,7 +180,8 @@ export class NodeScene {
 
     // bind event listeners
     let self = this;
-    this._mouseMove = function(evt: MouseEvent) {
+
+    self._mouseMove = function(evt: MouseEvent) {
       self.onMouseMove(evt);
     };
     canvas.addEventListener("mousemove", this._mouseMove);
@@ -299,6 +303,11 @@ export class NodeScene {
     };
     document.addEventListener("paste", this._pasteEvent);
 
+    self._widgetUpdate = function(evt: WidgetEvent) {
+      self.widget2d.onWidgetUpdated(evt);
+    };
+    document.addEventListener("widgetUpdate", this._widgetUpdate);
+
     this.copyElement = document.createElement("input");
     self.copyElement.value = " ";
     //self.copyElement.style.display = "none";
@@ -321,6 +330,7 @@ export class NodeScene {
     this.canvas.removeEventListener("contextmenu", this._contextMenu);
     document.removeEventListener("copy", this._copyEvent);
     document.removeEventListener("paste", this._pasteEvent);
+    document.removeEventListener("widgetUpdate", this._widgetUpdate);
     // this.copyElement.removeEventListener("copy", this._copyEvent);
     // this.copyElement.removeEventListener("paste", this._copyEvent);
   }

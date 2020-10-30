@@ -1,31 +1,21 @@
-import { SocketGraphicsItem } from "./socketgraphicsitem";
 import {
   GraphicsItem,
   MouseDownEvent,
   MouseMoveEvent,
   MouseUpEvent,
   MouseOverEvent,
+  WidgetEvent,
 } from "./graphicsitem";
-import { SceneView, Rect } from "./view";
+import { SceneView } from "./view";
+import { Rect } from "@/lib/math/rect";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { Color } from "../designer/color";
-import { NodeGraphicsItem } from "./nodegraphicsitem";
 import {
-  IPropertyHolder,
-  Property,
-  StringProperty,
-  BoolProperty,
-} from "../designer/properties";
-import { MoveItemsAction } from "../actions/moveItemsaction";
-import { UndoStack } from "../undostack";
-import { ResizeFrameAction } from "../actions/resizeframeaction";
-import { Line, MathUtils, Vector } from "three";
-import { runAtThisOrScheduleAtNextAnimationFrame } from "custom-electron-titlebar/lib/common/dom";
-import { centerCrop } from "../utils/math";
+  iCollider,
+  CircleCollider,
+  LineCollider,
+} from "@/lib/math/collision2d";
 
-// collision margin in pixels
-const colMarginLine = 10;
-const colMarginCircle = 5;
 const radius = 5;
 
 enum ScaleMode {
@@ -40,106 +30,6 @@ enum DragMode {
   Move,
   Scale,
   Rotate,
-}
-
-enum ColliderType {
-  None,
-  Line,
-  Circle,
-  Rect,
-}
-
-export interface iCollider {
-  type: ColliderType;
-
-  // resulting value - cursor
-  label: string;
-
-  isIntersectWith(pt: Vector2): boolean;
-  getCenter(): Vector2;
-  setPts(pts: Array<Vector2>);
-}
-
-export class CircleCollider implements iCollider {
-  type: ColliderType;
-  label: string;
-  protected _idx: number;
-  protected _pts: Array<Vector2>;
-
-  constructor(label: string, idx: number, pts?: Array<Vector2>) {
-    this.type = ColliderType.Circle;
-    this.label = label;
-    this._idx = idx;
-    this._pts = pts;
-  }
-
-  isIntersectWith(pt: Vector2): boolean {
-    if (!this._pts) {
-      console.warn("intersection test without data");
-      return;
-    }
-    const distance = pt.distanceTo(this._pts[this._idx]);
-    return distance < colMarginCircle + radius;
-  }
-
-  getCenter(): Vector2 {
-    return this._pts[this._idx];
-  }
-
-  setPts(pts: Array<Vector2>) {
-    this._pts = pts;
-  }
-}
-
-export class LineCollider implements iCollider {
-  type: ColliderType;
-  label: string;
-  protected _idxA: number;
-  protected _idxB: number;
-  protected _pts: Array<Vector2>;
-
-  constructor(label: string, idxA: number, idxB: number, pts?: Array<Vector2>) {
-    this.type = ColliderType.Line;
-    this.label = label;
-    this._idxA = idxA;
-    this._idxB = idxB;
-    this._pts = pts;
-  }
-
-  isIntersectWith(pt: Vector2): boolean {
-    if (!this._pts) {
-      console.warn("intersection test without data");
-      return;
-    }
-
-    const pt1 = this._pts[this._idxA];
-    const pt2 = this._pts[this._idxB];
-
-    if (!pt1 || !pt2) {
-      return false;
-    }
-
-    const dir = new Vector2(pt2).sub(pt1);
-    const dir2 = new Vector2(pt).sub(pt1);
-
-    const t = dir2.dot(new Vector2(dir).normalize());
-    const closestPt = new Vector2(pt1).add(
-      new Vector2(dir).normalize().multiplyByScalar(t)
-    );
-
-    const distance = pt.distanceTo(closestPt);
-    return distance < colMarginLine && t > 0 && t < dir.len();
-  }
-
-  getCenter(): Vector2 {
-    const pt1 = this._pts[this._idxA];
-    const pt2 = this._pts[this._idxB];
-    return new Vector2(pt1).add(pt2).divideScalar(2);
-  }
-
-  setPts(pts: Array<Vector2>) {
-    this._pts = pts;
-  }
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
@@ -189,11 +79,11 @@ export class Transform2dWidget extends GraphicsItem {
     this.dragMode = DragMode.None;
 
     this.colliders = new Array<iCollider>();
-    this.colliders.push(new CircleCollider("cornerTL", 0));
-    this.colliders.push(new CircleCollider("cornerTR", 1));
-    this.colliders.push(new CircleCollider("cornerBR", 2));
-    this.colliders.push(new CircleCollider("cornerBL", 3));
-    this.colliders.push(new CircleCollider("rotHandle", 4));
+    this.colliders.push(new CircleCollider("cornerTL", 0, radius));
+    this.colliders.push(new CircleCollider("cornerTR", 1, radius));
+    this.colliders.push(new CircleCollider("cornerBR", 2, radius));
+    this.colliders.push(new CircleCollider("cornerBL", 3, radius));
+    this.colliders.push(new CircleCollider("rotHandle", 4, radius));
     this.colliders.push(new LineCollider("edgeT", 0, 1));
     this.colliders.push(new LineCollider("edgeR", 1, 2));
     this.colliders.push(new LineCollider("edgeB", 2, 3));
@@ -223,8 +113,7 @@ export class Transform2dWidget extends GraphicsItem {
 
     this.setSize(500, 300);
 
-    this.rotation = 0;
-    //this.rotation = 22.5 * MathUtils.DEG2RAD;
+    this.transform2d.setRotation(0);
   }
 
   private buildColor(color: Color, alpha: number) {
@@ -302,9 +191,7 @@ export class Transform2dWidget extends GraphicsItem {
     this.hit = true;
     this.dragged = false;
 
-    let px = evt.globalX;
-    let py = evt.globalY;
-    const ptCursor = new Vector2(px, py);
+    const ptCursor = new Vector2(evt.globalX, evt.globalY);
 
     let collided;
     const ptsXf = this.ptsTransformed;
@@ -312,12 +199,12 @@ export class Transform2dWidget extends GraphicsItem {
       collider.setPts(ptsXf);
       if (collider.isIntersectWith(ptCursor)) {
         collided = collider;
-        this.dragStartPos = new Vector2(this.position);
-        this.distDragStart = new Vector2(px, py)
+        this.dragStartPos = new Vector2(this.transform2d.position);
+        this.distDragStart = new Vector2(ptCursor)
           .sub(this.dragStartPos)
           .magnitude();
-        this.sizeOnDragStart = new Vector2(this.width, this.height);
-        this.dragStartRotation = this.rotation;
+        this.sizeOnDragStart = new Vector2(this.transform2d.scale);
+        this.dragStartRotation = this.transform2d.rotation;
         this.dragMode =
           collider.label === "rotHandle" ? DragMode.Rotate : DragMode.Scale;
 
@@ -340,7 +227,7 @@ export class Transform2dWidget extends GraphicsItem {
       if (this.isPointInsideRect(ptCursor)) {
         this.dragMode = DragMode.Move;
 
-        this.dragStartPos = new Vector2(this.position);
+        this.dragStartPos = new Vector2(this.transform2d.position);
         this.dragStartCursor = new Vector2(ptCursor);
 
         // set cursor
@@ -350,13 +237,10 @@ export class Transform2dWidget extends GraphicsItem {
   }
 
   mouseOver(evt: MouseOverEvent) {
-    let px = evt.globalX;
-    let py = evt.globalY;
-
-    const ptCursor = new Vector2(px, py);
+    const ptCursor = new Vector2(evt.globalX, evt.globalY);
 
     for (let collider of this.colliders) {
-      const pt = new Vector2(ptCursor).sub(this.position);
+      const pt = new Vector2(ptCursor).sub(this.transform2d.position);
       if (collider.isIntersectWith(ptCursor)) {
         if (collider.label === "rotHandle") {
           this.view.canvas.style.cursor = "grab";
@@ -380,12 +264,17 @@ export class Transform2dWidget extends GraphicsItem {
       // movement
       if (this.dragMode == DragMode.Move) {
         const offsetPos = new Vector2(ptCursor).sub(this.dragStartCursor);
-        this.position = new Vector2(this.dragStartPos).add(offsetPos);
-        this.x = this.position[0];
-        this.y = this.position[1];
+        this.transform2d.position = new Vector2(this.dragStartPos).add(
+          offsetPos
+        );
+        this.x = this.transform2d.position[0];
+        this.y = this.transform2d.position[1];
       } else if (this.dragMode === DragMode.Rotate) {
-        const rotNow = new Vector2(ptCursor).sub(this.position).normalize();
-        this.rotation = Math.atan2(rotNow[1], rotNow[0]) + Math.PI / 2;
+        const rotNow = new Vector2(ptCursor)
+          .sub(this.transform2d.position)
+          .normalize();
+        this.transform2d.rotation =
+          Math.atan2(rotNow[1], rotNow[0]) + Math.PI / 2;
       } else if (this.dragMode == DragMode.Scale) {
         const distNow = new Vector2(ptCursor)
           .sub(this.dragStartPos)
@@ -407,14 +296,28 @@ export class Transform2dWidget extends GraphicsItem {
       }
 
       this.dragged = true;
+
+      // send a event to apply result to target
+      if (document) {
+        const event = new WidgetEvent("widgetDragged", {
+          detail: {
+            transform2d: this.transform2d.clone(),
+            // position: new Vector2(this.transform2d.position),
+            // scale: new Vector2(this.transform2d.scale),
+            // rotation: this.transform2d.rotation,
+          },
+        });
+
+        document.dispatchEvent(event);
+      }
     }
   }
 
   get transform(): Matrix3 {
     const xf = new Matrix3()
-      .translate([this.position[0], this.position[1]])
-      .rotate(this.rotation)
-      .scale([this.scale[0], this.scale[1]]);
+      .translate([this.transform2d.position[0], this.transform2d.position[1]])
+      .rotate(this.transform2d.rotation)
+      .scale([this.transform2d.scale[0], this.transform2d.scale[1]]);
     return xf;
   }
 
@@ -514,5 +417,22 @@ export class Transform2dWidget extends GraphicsItem {
 
     let idx = ((Math.atan2(dir.y, dir.x) + Math.PI) * 8) / (Math.PI * 2);
     return this.scaleCursorIdx[idx.toFixed()];
+  }
+
+  // event handlers
+  onWidgetUpdated(evt: WidgetEvent) {
+    this.active = true;
+    this.visible = true;
+
+    this.transform2d = evt.detail.transform2d.clone();
+
+    // this.transform2d.setPosition(evt.detail.position);
+    // this.transform2d.setScale(evt.detail.scale);
+    // this.transform2d.setRotation(evt.detail.rotation);
+
+    this.x = this.transform2d.position[0];
+    this.y = this.transform2d.position[1];
+    this.width = this.transform2d.scale[0];
+    this.height = this.transform2d.scale[1];
   }
 }

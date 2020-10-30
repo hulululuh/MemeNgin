@@ -6,7 +6,8 @@ import {
   MouseUpEvent,
   MouseOverEvent,
 } from "./graphicsitem";
-import { SceneView, Rect } from "./view";
+import { SceneView } from "./view";
+import { Rect } from "@/lib/math/rect";
 import { Vector2 } from "@math.gl/core";
 import { Color } from "../designer/color";
 import { NodeGraphicsItem } from "./nodegraphicsitem";

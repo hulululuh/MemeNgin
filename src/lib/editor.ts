@@ -146,6 +146,11 @@ export class Editor {
     return editor.designer;
   }
 
+  static getScene() {
+    const editor = this.getInstance();
+    return editor.nodeScene;
+  }
+
   getMLModel() {
     return this.mlModel;
   }

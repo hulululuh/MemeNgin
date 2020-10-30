@@ -1,5 +1,5 @@
 import { Action } from "../undostack";
-import { Rect } from "../scene/view";
+import { Rect } from "@/lib/math/rect";
 import { FrameGraphicsItem } from "../scene/framegraphicsitem";
 
 export class ResizeFrameAction extends Action {

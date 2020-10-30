@@ -330,12 +330,7 @@ export class Designer {
 
     this.conns.push(con);
 
-    if (rightNode.isParentIndex(rightIndex)) {
-      // fit the size to parent node - try resize
-      rightNode.resize(leftNode.width, leftNode.height);
-    }
-    rightNode.createTexture();
-    rightNode.requestUpdate();
+    rightNode.connected(leftNode, rightIndex);
 
     return con;
   }

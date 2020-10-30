@@ -1,6 +1,6 @@
 import { Action } from "../undostack";
 import { GraphicsItem } from "../scene/graphicsitem";
-import { Rect } from "../scene/view";
+import { Rect } from "@/lib/math/rect";
 import { FrameGraphicsItem } from "../scene/framegraphicsitem";
 import { Editor } from "../editor";
 import { IPropertyHolder } from "../designer/properties";

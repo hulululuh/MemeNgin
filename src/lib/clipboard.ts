@@ -14,7 +14,7 @@ import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { Guid } from "./utils";
 import { AddItemsAction } from "./actions/additemsaction";
 import { UndoStack } from "./undostack";
-import { Rect } from "./scene/view";
+import { Rect } from "@/lib/math/rect";
 
 export class ItemClipboard {
   static copyItems(

@@ -1,6 +1,8 @@
 import { NodeScene } from "../scene";
-import { Rect } from "./view";
+import { Rect } from "@/lib/math/rect";
+import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2 } from "@math.gl/core";
+import { runAtThisOrScheduleAtNextAnimationFrame } from "custom-electron-titlebar/lib/common/dom";
 
 export class MouseEvent {
   // scene space
@@ -19,6 +21,7 @@ export class MouseEvent {
 
   // default is accepted
   private accepted: boolean = true;
+
   accept() {
     this.accepted = true;
   }
@@ -46,9 +49,17 @@ export class MouseOverEvent extends MouseEvent {}
 
 export class HoverEvent extends MouseEvent {}
 
+export class WidgetEvent extends CustomEvent<any> {
+  transform2d: Transform2D;
+  // position: Vector2;
+  // scale: Vector2;
+  // rotation: number;
+}
+
 export class GraphicsItem {
   scene!: NodeScene;
   protected visible: boolean = true;
+  protected active: boolean = true;
   protected _drawSelHighlight: boolean = true;
 
   protected x: number = 0;
@@ -57,9 +68,10 @@ export class GraphicsItem {
   protected height: number;
 
   // transform
-  protected scale: Vector2;
-  protected position: Vector2;
-  protected rotation: number;
+  protected transform2d: Transform2D;
+  // protected scale: Vector2;
+  // protected position: Vector2;
+  // protected rotation: number;
 
   constructor() {
     //this.scene = scene;
@@ -67,9 +79,10 @@ export class GraphicsItem {
     this.width = 1;
     this.height = 1;
 
-    this.scale = new Vector2(1, 1);
-    this.position = new Vector2(0, 0);
-    this.rotation = 0;
+    this.transform2d = new Transform2D(new Vector2(0, 0), new Vector2(1, 1), 0);
+    // this.scale = new Vector2(1, 1);
+    // this.position = new Vector2(0, 0);
+    // this.rotation = 0;
   }
 
   get drawSelHighlight(): boolean {
@@ -81,7 +94,9 @@ export class GraphicsItem {
     this.x = x;
     this.y = y;
 
-    this.position = new Vector2(this.centerX(), this.centerY());
+    this.transform2d.setPosition(new Vector2(this.centerX(), this.centerY()));
+
+    //this.position = new Vector2(this.centerX(), this.centerY());
   }
 
   getPos() {
@@ -92,7 +107,9 @@ export class GraphicsItem {
     this.width = w;
     this.height = h;
 
-    this.scale = new Vector2(w, h);
+    this.transform2d.setScale(new Vector2(w, h));
+
+    //this.scale = new Vector2(w, h);
     //this.scale.set(this.width, this.height);
   }
 
@@ -168,7 +185,8 @@ export class GraphicsItem {
     this.y = y - this.height / 2;
     //this.position.set(this.x, this.y);
 
-    this.position = new Vector2(this.centerX(), this.centerY());
+    //this.position = new Vector2(this.centerX(), this.centerY());
+    this.transform2d.setPosition(new Vector2(this.centerX(), this.centerY()));
 
     // this.position = new Vector2(
     //   this.x + this.width / 2,

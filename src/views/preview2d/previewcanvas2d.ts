@@ -131,10 +131,7 @@ export class DragZoom {
     });
 
     this.drawMode = DrawMode.Single;
-
-    // this.zoomFactor = 1;
     this.zoomFactor = 0.4;
-    //this.offset = new Vector2(0, 0);
 
     this.mousePos = new Vector2(0, 0);
     this.prevMousePos = new Vector2(0, 0);

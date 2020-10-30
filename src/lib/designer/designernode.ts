@@ -16,6 +16,7 @@ import { buildShaderProgram } from "./gl";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
 import { Editor } from "../editor";
+import { Vector2 } from "@math.gl/core";
 
 const NativeImage = require("electron").nativeImage;
 
@@ -98,6 +99,8 @@ export class DesignerNode implements IPropertyHolder {
   // tells scene to update the texture next frame
   needsUpdate: boolean = true;
 
+  isEditing: boolean = false;
+
   // constructor
   constructor() {
     this.nodeType = NodeType.Procedural;
@@ -120,6 +123,21 @@ export class DesignerNode implements IPropertyHolder {
 
   getParentNode(): any {
     return Editor.getDesigner().findLeftNode(this.id, this.parentIndex);
+  }
+
+  getCenter(): Vector2 {
+    const scene = Editor.getScene();
+    const result = scene.nodes.filter((item) => item.id === this.id)[0];
+
+    if (result) {
+      const pos = result.getPos();
+      return new Vector2(
+        pos.x + result.getWidth() / 2,
+        pos.y + result.getHeight() / 2
+      );
+    } else {
+      return new Vector2(0, 0);
+    }
   }
 
   getWidth(): number {
@@ -643,6 +661,15 @@ export class DesignerNode implements IPropertyHolder {
       nodetype,
       this.gl
     );
+  }
+
+  connected(leftNode: DesignerNode, rightIndex: string) {
+    if (this.isParentIndex(rightIndex)) {
+      // fit the size to parent node - try resize
+      this.resize(leftNode.width, leftNode.height);
+    }
+    this.createTexture();
+    this.requestUpdate();
   }
 
   createRandomLibOld(): string {
