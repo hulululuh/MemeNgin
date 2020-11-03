@@ -5,6 +5,7 @@ import {
   MouseDownEvent,
   MouseMoveEvent,
   MouseUpEvent,
+  WidgetEvent,
 } from "./graphicsitem";
 import { NodeScene } from "../scene";
 import { Vector2 } from "@math.gl/core";
@@ -310,6 +311,16 @@ export class NodeGraphicsItem extends GraphicsItem {
     if (this.hit) {
       // movement
       this.move(evt.deltaX, evt.deltaY);
+
+      if (document) {
+        const event = new WidgetEvent("widgetUpdate", {
+          detail: {
+            enable: false,
+          },
+        });
+
+        document.dispatchEvent(event);
+      }
     }
   }
 

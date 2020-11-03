@@ -542,6 +542,10 @@ export class Editor {
         self.selectedDesignerNode = dnode;
         //console.log(dnode);
 
+        if (dnode.onItemSelected) {
+          dnode.onItemSelected();
+        }
+
         if (self.preview2DCtx) {
           self.preview2DCtx.drawImage(
             node.imageCanvas.canvas,

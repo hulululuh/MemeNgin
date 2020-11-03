@@ -21,6 +21,8 @@ import {
 } from "./designer/designervariable";
 import { Editor } from "./editor";
 
+const HALF = 0.5;
+
 export class Designer {
   static dummyTex: WebGLTexture;
 
@@ -271,23 +273,23 @@ export class Designer {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([
-        -1.0,
-        -1.0,
+        -HALF,
+        -HALF,
         0.0,
-        1.0,
-        -1.0,
+        HALF,
+        -HALF,
         0.0,
-        -1.0,
-        1.0,
+        -HALF,
+        HALF,
         0.0,
-        -1.0,
-        1.0,
+        -HALF,
+        HALF,
         0.0,
-        1.0,
-        -1.0,
+        HALF,
+        -HALF,
         0.0,
-        1.0,
-        1.0,
+        HALF,
+        HALF,
         0.0,
       ]),
       gl.STATIC_DRAW
@@ -597,6 +599,8 @@ export class Designer {
         varying vec2 v_texCoord;
             
         void main() {
+          //gl_Position = vec4(a_pos, 1.0);
+          //v_texCoord = a_texCoord;
           gl_Position = vec4(a_pos * 2.0, 1.0);
           v_texCoord = (gl_Position.xy + 1.0) / 2.0;
         }`,

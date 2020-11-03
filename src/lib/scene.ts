@@ -27,6 +27,7 @@ import { Transform2DGraphicsItem } from "./scene/transform2dgraphicsitem";
 import { Vector2 } from "@math.gl/core";
 import { BoundingBox } from "@/lib/math/boundingbox";
 import { Rect } from "@/lib/math/rect";
+import { Editor } from "./editor";
 
 enum DragMode {
   None,
@@ -82,7 +83,6 @@ export class NodeScene {
   //selectedNode: NodeGraphicsItem;
   hitSocket?: SocketGraphicsItem;
   hitConnection?: ConnectionGraphicsItem;
-  //selectedItem: GraphicsItem;
   selectedItems: GraphicsItem[];
   hitItem: GraphicsItem;
 
@@ -136,6 +136,7 @@ export class NodeScene {
   _cutEvent: (evt: ClipboardEvent) => void;
   _pasteEvent: (evt: ClipboardEvent) => void;
   _widgetUpdate: (evt: WidgetEvent) => void;
+  _widgetDragged: (evt: WidgetEvent) => void;
   copyElement: HTMLInputElement;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -308,6 +309,17 @@ export class NodeScene {
     };
     document.addEventListener("widgetUpdate", this._widgetUpdate);
 
+    self._widgetDragged = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedDesignerNode;
+
+      // TODO: Complete this condition
+      if (node && node.onWidgetDragged) {
+        node.onWidgetDragged(evt);
+      }
+      //self.selectedItems[0]?.onWidgetDragged(evt);
+    };
+    document.addEventListener("widgetDragged", this._widgetDragged);
+
     this.copyElement = document.createElement("input");
     self.copyElement.value = " ";
     //self.copyElement.style.display = "none";
@@ -331,6 +343,7 @@ export class NodeScene {
     document.removeEventListener("copy", this._copyEvent);
     document.removeEventListener("paste", this._pasteEvent);
     document.removeEventListener("widgetUpdate", this._widgetUpdate);
+    document.removeEventListener("WidgetDragged", this._widgetDragged);
     // this.copyElement.removeEventListener("copy", this._copyEvent);
     // this.copyElement.removeEventListener("paste", this._copyEvent);
   }
@@ -401,6 +414,15 @@ export class NodeScene {
       ) {
         this.removeConnection(con);
       }
+    }
+
+    if (item.enabled) {
+      const event = new WidgetEvent("widgetUpdate", {
+        detail: {
+          enable: false,
+        },
+      });
+      document.dispatchEvent(event);
     }
 
     // remove node from list
@@ -1035,7 +1057,8 @@ export class NodeScene {
   _getHitItem(x: number, y: number): GraphicsItem {
     // 0) widget
     if (this.widget2d) {
-      if (this.widget2d.isPointInside(x, y)) return this.widget2d;
+      if (this.widget2d.isPointInside(x, y) && this.widget2d.enabled)
+        return this.widget2d;
     }
 
     // 1) navigation pins

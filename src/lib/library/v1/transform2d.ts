@@ -72,8 +72,10 @@ export class Transform2DNode extends DesignerNode {
 
             mat3 trans = transMat(vec2(0.5, 0.5)) *
                 transMat(vec2(prop_translateX, prop_translateY)) *
+                scaleMat(vec2(0.5, 1.0)) * 
                 rotMat(prop_rot) *
-                scaleMat(vec2(prop_scaleX, prop_scaleY)) *
+                scaleMat(vec2(2.0, 1.0)) * 
+                //scaleMat(vec2(prop_scaleX, prop_scaleY)) *
                 transMat(vec2(-0.5, -0.5));
 
             vec3 res = inverse(trans) * vec3(uv, 1.0);

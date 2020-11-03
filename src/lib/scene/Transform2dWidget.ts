@@ -15,6 +15,8 @@ import {
   CircleCollider,
   LineCollider,
 } from "@/lib/math/collision2d";
+import { Transform2D } from "@/lib/math/transform2d";
+import { runAtThisOrScheduleAtNextAnimationFrame } from "custom-electron-titlebar/lib/common/dom";
 
 const radius = 5;
 
@@ -40,7 +42,9 @@ export class Transform2dWidget extends GraphicsItem {
   hit: boolean;
 
   // dragging
+  relScale: Vector2;
   dragged: boolean;
+  dragStartRelScale: Vector2;
   dragStartCursor: Vector2;
   dragStartPos: Vector2;
   dragStartRect: Rect;
@@ -73,8 +77,9 @@ export class Transform2dWidget extends GraphicsItem {
     this.color = new Color(0.1, 0, 0.2);
     this.strokeColor = new Color(1.0, 1.0, 1.0);
     this.hit = false;
-    this.dragged = true;
 
+    this.relScale = new Vector2(1, 1);
+    this.dragged = true;
     this.scaleMode = ScaleMode.None;
     this.dragMode = DragMode.None;
 
@@ -132,6 +137,10 @@ export class Transform2dWidget extends GraphicsItem {
   }
 
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
+    if (!this.visible) {
+      return;
+    }
+
     // body - rectangle
     const xf = this.transform;
     let ptsXf = this.ptsTransformed;
@@ -188,6 +197,10 @@ export class Transform2dWidget extends GraphicsItem {
 
   // MOUSE EVENTS
   mouseDown(evt: MouseDownEvent) {
+    if (!this.enable) {
+      return;
+    }
+
     this.hit = true;
     this.dragged = false;
 
@@ -204,6 +217,7 @@ export class Transform2dWidget extends GraphicsItem {
           .sub(this.dragStartPos)
           .magnitude();
         this.sizeOnDragStart = new Vector2(this.transform2d.scale);
+        this.dragStartRelScale = new Vector2(this.relScale);
         this.dragStartRotation = this.transform2d.rotation;
         this.dragMode =
           collider.label === "rotHandle" ? DragMode.Rotate : DragMode.Scale;
@@ -237,6 +251,9 @@ export class Transform2dWidget extends GraphicsItem {
   }
 
   mouseOver(evt: MouseOverEvent) {
+    if (!this.enable) {
+      return;
+    }
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
 
     for (let collider of this.colliders) {
@@ -258,6 +275,9 @@ export class Transform2dWidget extends GraphicsItem {
   }
 
   mouseMove(evt: MouseMoveEvent) {
+    if (!this.enable) {
+      return;
+    }
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
 
     if (this.hit) {
@@ -281,44 +301,57 @@ export class Transform2dWidget extends GraphicsItem {
           .magnitude();
         const relScale = distNow / this.distDragStart;
 
-        let w = this.sizeOnDragStart[0] * relScale;
-        let h = this.sizeOnDragStart[1] * relScale;
+        let w = this.sizeOnDragStart[0]; // * relScale;
+        let h = this.sizeOnDragStart[1]; // * relScale;
 
         if (this.scaleMode === ScaleMode.XDir) {
           // do not change y scale
-          h = this.sizeOnDragStart[1];
+          // h = this.sizeOnDragStart[1];
+          w *= relScale;
+          this.relScale[0] = this.dragStartRelScale[0] * relScale;
         } else if (this.scaleMode === ScaleMode.YDir) {
           // do not change x scale
-          w = this.sizeOnDragStart[0];
+          // w = this.sizeOnDragStart[0];
+          h *= relScale;
+          this.relScale[1] = this.dragStartRelScale[1] * relScale;
+          //this.dragStartScale[1] *= relScale;
+        } else {
+          // Both
+          w *= relScale;
+          h *= relScale;
+          this.relScale[0] = this.dragStartRelScale[0] * relScale;
+          this.relScale[1] = this.dragStartRelScale[1] * relScale;
+          // this.dragStartScale[0] *= relScale;
+          // this.dragStartScale[1] *= relScale;
         }
 
         this.setSize(w, h);
       }
 
-      this.dragged = true;
-
       // send a event to apply result to target
       if (document) {
         const event = new WidgetEvent("widgetDragged", {
           detail: {
-            transform2d: this.transform2d.clone(),
-            // position: new Vector2(this.transform2d.position),
-            // scale: new Vector2(this.transform2d.scale),
-            // rotation: this.transform2d.rotation,
+            transform2d: new Transform2D(
+              this.transform2d.position,
+              this.relScale,
+              this.transform2d.rotation
+            ),
+
+            dragStartRelScale: this.dragStartRelScale,
+            relScale: this.relScale,
           },
         });
 
         document.dispatchEvent(event);
       }
+
+      this.dragged = true;
     }
   }
 
   get transform(): Matrix3 {
-    const xf = new Matrix3()
-      .translate([this.transform2d.position[0], this.transform2d.position[1]])
-      .rotate(this.transform2d.rotation)
-      .scale([this.transform2d.scale[0], this.transform2d.scale[1]]);
-    return xf;
+    return this.transform2d.toMatrix();
   }
 
   get ptsTransformed(): Array<Vector2> {
@@ -375,6 +408,9 @@ export class Transform2dWidget extends GraphicsItem {
   }
 
   mouseUp(evt: MouseUpEvent) {
+    if (!this.enable) {
+      return;
+    }
     // // add undo/redo action
     // if (this.dragged) {
     //   if (this.dragMode == DragMode.Move) {
@@ -421,9 +457,16 @@ export class Transform2dWidget extends GraphicsItem {
 
   // event handlers
   onWidgetUpdated(evt: WidgetEvent) {
-    this.active = true;
-    this.visible = true;
+    // this.dragStartRelScale = new Vector2(1, 1);
+    // this.relScale = new Vector2(1, 1);
 
+    this.enable = evt.detail.enable;
+    this.visible = evt.detail.enable;
+
+    if (!this.enable) return;
+
+    this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
+    this.relScale = new Vector2(evt.detail.relScale);
     this.transform2d = evt.detail.transform2d.clone();
 
     // this.transform2d.setPosition(evt.detail.position);

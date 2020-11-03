@@ -1,14 +1,73 @@
+import { DesignerNode, NodeInput } from "../../designer/designernode";
 import { Editor } from "@/lib/editor";
-import { WidgetEvent } from "@/lib/scene/graphicsitem";
-import { DesignerNode } from "../../designer/designernode";
-import { Vector2 } from "@math.gl/core";
+import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
+import { Vector2, Matrix3 } from "@math.gl/core";
 
 export class OverlayNode extends DesignerNode {
+  srcTransform: Transform2D;
+  inputASize: Vector2;
+  inputBSize: Vector2;
+  relPos: Vector2;
+  baseScale: Vector2;
+  item: GraphicsItem;
+  dragStartRelScale: Vector2;
+  relScale: Vector2;
+
   init() {
     this.title = "Overlay";
     this.parentIndex = "colorB";
     this.isEditing = true;
+    this.inputASize = new Vector2(100, 100);
+    this.inputBSize = new Vector2(100, 100);
+
+    this.baseScale = new Vector2(1, 1);
+    this.dragStartRelScale = new Vector2(1, 1);
+    this.relScale = new Vector2(1, 1);
+
+    this.srcTransform = new Transform2D(
+      new Vector2(0, 0),
+      new Vector2(1, 1),
+      0
+    );
+
+    this.onWidgetDragged = (evt: WidgetEvent) => {
+      if (!this.item) {
+        this.item = Editor.getScene().getNodeById(this.id);
+      }
+
+      this.relPos = new Vector2(evt.detail.transform2d.position)
+        .sub(new Vector2(this.item.centerX(), this.item.centerY()))
+        .divide(new Vector2(this.item.getWidth(), this.item.getHeight() * -1));
+
+      //this.srcTransform = evt.detail.transform2d.clone();
+      this.srcTransform = new Transform2D(
+        this.relPos,
+        evt.detail.transform2d.scale,
+        evt.detail.transform2d.rotation
+      );
+
+      this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
+      this.relScale = new Vector2(evt.detail.relScale);
+
+      this.createTexture();
+      this.requestUpdate();
+    };
+
+    this.onItemSelected = () => {
+      if (document) {
+        const event = new WidgetEvent("widgetUpdate", {
+          detail: {
+            transform2d: this.widgetTransform,
+            dragStartRelScale: this.dragStartRelScale,
+            relScale: this.relScale,
+            enable: true,
+          },
+        });
+
+        document.dispatchEvent(event);
+      }
+    };
 
     this.addInput("colorA"); // foreground
     this.addInput("colorB"); // background
@@ -25,19 +84,19 @@ export class OverlayNode extends DesignerNode {
     );
 
     let source = `
-
-        float screen(float fg, float bg) {
-            float res = (1.0 - fg) * (1.0 - bg);
-            return 1.0 - res;
-        }
+        uniform mat3 srcTransform;
+        
         vec4 process(vec2 uv)
         {
             float finalOpacity = prop_opacity;
             if (opacity_connected)
                 finalOpacity *= texture(opacity, uv).r;
 
+            vec2 p = vec2(256.0, 256.0);
+            vec2 s = vec2(2.0, 1.0);
+
             // foreground uv
-            vec2 fuv = (uv - vec2(0.5)) * (colorB_size / colorA_size) + vec2(0.5);
+            vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
             vec4 colA = vec4(0.0);
             if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
               colA = texture(colorA, fuv);
@@ -52,7 +111,6 @@ export class OverlayNode extends DesignerNode {
                 col = colB;
             else
                 col = vec4(mix(colB, colA, colA.a).rgb, final_alpha);
-                //col = vec4(mix(colB.rgb * colB.a, colA.rgb * colA.a, colA.a)/ final_alpha, final_alpha);
             
             return col;
         }
@@ -61,17 +119,48 @@ export class OverlayNode extends DesignerNode {
     this.buildShader(source);
   }
 
-  // render(inputs: NodeInput[]) {
-  //   const designer = Editor.getDesigner();
-  //   designer.findLeftNode(this.id, "colorA");
+  render(inputs: NodeInput[]) {
+    const designer = Editor.getDesigner();
+    designer.findLeftNode(this.id, "colorA");
 
-  //   const option = () => {
-  //     if (this.isEditing) {
-  //     }
-  //   };
+    const option = () => {
+      if (this.isEditing) {
+        const gl = this.gl;
+        if (this.srcTransform) {
+          const prop = this.inputASize[0] / this.inputASize[1];
+          const transMat = new Matrix3()
+            .translate(new Vector2(this.relPos))
+            .multiplyRight(new Matrix3().translate(new Vector2(0.5, 0.5)))
+            .multiplyRight(
+              new Matrix3().scale(
+                new Vector2(this.inputASize).divide(this.inputBSize)
+              )
+            )
+            .multiplyRight(new Matrix3().scale(new Vector2(1 / prop, 1)))
+            .multiplyRight(
+              new Matrix3().rotate(this.srcTransform.rotation).transpose()
+            )
+            .multiplyRight(
+              new Matrix3()
+                .scale(new Vector2(prop, 1))
+                .multiplyRight(
+                  new Matrix3().scale(new Vector2(this.srcTransform.scale))
+                )
+            )
+            .multiplyRight(new Matrix3().translate(new Vector2(-0.5, -0.5)));
+          transMat.invert();
 
-  //   super.render(inputs, option);
-  // }
+          gl.uniformMatrix3fv(
+            gl.getUniformLocation(this.shaderProgram, "srcTransform"),
+            false,
+            transMat.toFloat32Array()
+          );
+        }
+      }
+    };
+
+    super.render(inputs, option);
+  }
 
   connected(leftNode: DesignerNode, rightIndex: string) {
     super.connected(leftNode, rightIndex);
@@ -90,25 +179,45 @@ export class OverlayNode extends DesignerNode {
     const w = this.getWidth();
     const h = this.getHeight();
 
+    this.inputASize = new Vector2(lw, lh);
+    this.inputBSize = new Vector2(w, h);
+
     //this.relScale
     const scale = Math.min(w, h);
     const scaleFactor = 100 / scale;
 
+    this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
+    this.dragStartRelScale = new Vector2(1, 1);
+    this.relScale = new Vector2(1, 1);
+
     if (document) {
+      // select this in order to activate transform2d widget
+      Editor.getInstance().selectedDesignerNode = this;
+
       const event = new WidgetEvent("widgetUpdate", {
         detail: {
-          transform2d: new Transform2D(
-            this.getCenter(),
-            new Vector2(lw * scaleFactor, lh * scaleFactor),
-            0
-          ),
-          // position: new Vector2(this.getCenter()),
-          // scale: new Vector2(lw * scaleFactor, lh * scaleFactor),
-          // rotation: 0,
+          transform2d: this.widgetTransform,
+          dragStartRelScale: this.dragStartRelScale,
+          relScale: this.relScale,
+          enable: true,
         },
       });
 
       document.dispatchEvent(event);
     }
+  }
+
+  get widgetTransform(): Transform2D {
+    if (!this.item) {
+      this.item = Editor.getScene().getNodeById(this.id);
+    }
+    const offsetPos = new Vector2(this.srcTransform.position).multiply(
+      new Vector2(this.item.getWidth(), this.item.getHeight() * -1)
+    );
+    return new Transform2D(
+      new Vector2(this.getCenter()).add(offsetPos),
+      new Vector2(this.baseScale).multiply(this.srcTransform.scale),
+      this.srcTransform.rotation
+    );
   }
 }

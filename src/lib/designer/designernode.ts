@@ -16,7 +16,8 @@ import { buildShaderProgram } from "./gl";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
 import { Editor } from "../editor";
-import { Vector2 } from "@math.gl/core";
+import { Vector2, Matrix4 } from "@math.gl/core";
+import { WidgetEvent } from "@/lib/scene/graphicsitem";
 
 const NativeImage = require("electron").nativeImage;
 
@@ -100,6 +101,17 @@ export class DesignerNode implements IPropertyHolder {
   needsUpdate: boolean = true;
 
   isEditing: boolean = false;
+
+  onWidgetDragged?: (evt: WidgetEvent) => void;
+  onItemSelected(): void {
+    const event = new WidgetEvent("widgetUpdate", {
+      detail: {
+        enable: false,
+      },
+    });
+
+    document.dispatchEvent(event);
+  }
 
   // constructor
   constructor() {
@@ -277,6 +289,7 @@ export class DesignerNode implements IPropertyHolder {
         texW,
         texH
       );
+
       input.name;
       console.log("bound texture " + texIndex);
       texIndex++;
@@ -298,9 +311,34 @@ export class DesignerNode implements IPropertyHolder {
         gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
         1
       );
+
       console.log("bound texture " + texIndex);
       texIndex++;
     }
+
+    const texW = this.getWidth();
+    const texH = this.getHeight();
+
+    const modelMat = new Matrix4().scale([texW, texH, 1.0]);
+    const viewMat = new Matrix4().lookAt([0, 0, 1], [0, 0, 0], [0, 1, 0]);
+    const projMat = new Matrix4().ortho({
+      left: -texW / 2,
+      right: texW / 2,
+      bottom: -texH / 2,
+      top: texH / 2,
+      near: -100,
+      far: 100,
+    });
+
+    const mvpMat = new Matrix4(modelMat)
+      .multiplyRight(viewMat)
+      .multiplyRight(projMat);
+
+    gl.uniformMatrix4fv(
+      gl.getUniformLocation(this.shaderProgram, "baseTexMVP"),
+      false,
+      mvpMat.toFloat32Array()
+    );
 
     // pass seed
     gl.uniform1f(
@@ -395,21 +433,21 @@ export class DesignerNode implements IPropertyHolder {
 
     // bind mesh
     let posLoc = gl.getAttribLocation(this.shaderProgram, "a_pos");
-    //let texCoordLoc = gl.getAttribLocation(this.shaderProgram, "a_texCoord");
+    let texCoordLoc = gl.getAttribLocation(this.shaderProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.designer.posBuffer);
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.designer.texCoordBuffer);
-    // gl.enableVertexAttribArray(texCoordLoc);
-    // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.designer.texCoordBuffer);
+    gl.enableVertexAttribArray(texCoordLoc);
+    gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
     gl.disableVertexAttribArray(posLoc);
-    //gl.disableVertexAttribArray(texCoordLoc);
+    gl.disableVertexAttribArray(texCoordLoc);
 
     // render
   }
@@ -476,19 +514,20 @@ export class DesignerNode implements IPropertyHolder {
   buildShader(source: string) {
     let vertSource: string = `#version 300 es
         precision highp float;
+        uniform mat4 baseTexMVP;
 
         in vec3 a_pos;
-        //in vec2 a_texCoord;
+        in vec2 a_texCoord;
             
         // the texCoords passed in from the vertex shader.
         out vec2 v_texCoord;
             
         void main() {
-            // gl_Position = vec4(a_pos, 1.0);
-            // v_texCoord = a_texCoord;
+            gl_Position = vec4(a_pos, 1.0) * baseTexMVP;
+            v_texCoord = a_texCoord;
             
-            gl_Position = vec4(a_pos * 2.0, 1.0);
-            v_texCoord = (gl_Position.xy + 1.0) / 2.0;
+            //gl_Position = vec4(a_pos * 2.0, 1.0);
+            //v_texCoord = (gl_Position.xy + 1.0) / 2.0;
         }`;
 
     let fragSource: string = `#version 300 es
@@ -524,6 +563,7 @@ export class DesignerNode implements IPropertyHolder {
         void main() {
             initRandom();
             //fragColor = process(v_texCoord);
+
             vec4 col = process(v_texCoord);
             vec4 colBG = backgroundCol(v_texCoord);
             
@@ -898,6 +938,9 @@ export class DesignerNode implements IPropertyHolder {
       }
       code += "uniform bool baseTexture_ready;\n";
     }
+
+    // TODO: relocate it later
+    //code += "uniform mat4 baseTexMVP;\n";
 
     return code;
   }
