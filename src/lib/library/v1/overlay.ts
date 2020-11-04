@@ -55,18 +55,7 @@ export class OverlayNode extends DesignerNode {
     };
 
     this.onItemSelected = () => {
-      if (document) {
-        const event = new WidgetEvent("widgetUpdate", {
-          detail: {
-            transform2d: this.widgetTransform,
-            dragStartRelScale: this.dragStartRelScale,
-            relScale: this.relScale,
-            enable: true,
-          },
-        });
-
-        document.dispatchEvent(event);
-      }
+      this.requestUpdateWidget();
     };
 
     this.addInput("colorA"); // foreground
@@ -190,7 +179,11 @@ export class OverlayNode extends DesignerNode {
     this.dragStartRelScale = new Vector2(1, 1);
     this.relScale = new Vector2(1, 1);
 
-    if (document) {
+    this.requestUpdateWidget();
+  }
+
+  requestUpdateWidget(): void {
+    if (document && this.isWidgetAvailable) {
       // select this in order to activate transform2d widget
       Editor.getInstance().selectedDesignerNode = this;
 
@@ -205,6 +198,16 @@ export class OverlayNode extends DesignerNode {
 
       document.dispatchEvent(event);
     }
+  }
+
+  get isWidgetAvailable(): boolean {
+    const colA = Editor.getDesigner().findLeftNode(this.id, "colorA");
+    const colB = Editor.getDesigner().findLeftNode(this.id, "colorB");
+
+    if (colA && colB) {
+      return true;
+    }
+    return false;
   }
 
   get widgetTransform(): Transform2D {

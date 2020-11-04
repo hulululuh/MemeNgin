@@ -135,12 +135,12 @@ export class SceneView {
     if (this.panning) {
       const prev = this.canvasToScene(this.prevMousePos);
       const cur = this.canvasToScene(this.mousePos);
-      const diff = new Vector2(prev.x, prev.y).sub(cur);
+      const diff = new Vector2(prev).sub(cur);
       this.mouseDragDiff = diff;
 
       const factor = this.zoomFactor;
-      const s = new Vector2(diff.x, diff.y).multiplyByScalar(factor);
-      this.offset = new Vector2(this.offset[0], this.offset[1]).sub(s);
+      const s = new Vector2(diff).multiplyByScalar(factor);
+      this.offset = new Vector2(this.offset).sub(s);
     }
   }
 
@@ -212,7 +212,11 @@ export class SceneView {
         y: this.offset[1],
         z: this.zoomFactor,
       };
-      const end = { x: targetOffset.x, y: targetOffset.y, z: targetZoomFactor };
+      const end = {
+        x: targetOffset[0],
+        y: targetOffset[1],
+        z: targetZoomFactor,
+      };
 
       const tween = new TWEEN.Tween(start)
         .to(end, 100)

@@ -261,8 +261,8 @@ export class DragZoom {
       0,
       0,
       this.zoomFactor,
-      this.offset.x,
-      this.offset.y
+      this.offset[0],
+      this.offset[1]
     );
 
     // highlight rect if mouse over
