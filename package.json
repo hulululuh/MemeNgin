@@ -31,6 +31,7 @@
     "ndarray-ops": "^1.2.2",
     "onnxjs": "^0.1.8",
     "parse-cube-lut": "^1.0.1",
+    "sass": "^1.29.0",
     "sass-loader": "^10.0.5",
     "scss": "^0.2.4",
     "three": "^0.118.3",
