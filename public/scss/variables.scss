@@ -1,0 +1,31 @@
+$colorBackground: #1e1e1e;
+$colorMenubar: #252526;
+$colorTitle: #3c3c3c;
+$colorItem: #2d2d2d;
+$colorSelected: #1e1e1e;
+$colorBorder: #444444;
+$colorIcon: #858585;
+$colorText: #ffffff;
+$colorAccent: #66fcf1;
+$colorGridBackground: #4a5050;
+$colorGridPrimary: #464c4c;
+$colorGridSecondary: #4e5454;
+
+$prefix: "--";
+// Merges a variable name with $prefix
+@function custom-property-name($name) {
+  @return $prefix + $name;
+}
+
+// Defines a custom property
+@mixin define-custom-property($name, $value) {
+  #{custom-property-name($name)}: $value;
+}
+
+body {
+  // Append SASS variables which are desired to be accesible:
+  @include define-custom-property("colorTitle", $colorTitle);
+  @include define-custom-property("colorGridBackground", $colorGridBackground);
+  @include define-custom-property("colorGridPrimary", $colorGridPrimary);
+  @include define-custom-property("colorGridSecondary", $colorGridSecondary);
+}

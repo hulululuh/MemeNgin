@@ -29,6 +29,12 @@ import { BoundingBox } from "@/lib/math/boundingbox";
 import { Rect } from "@/lib/math/rect";
 import { Editor } from "./editor";
 
+import {
+  colorGridBackground,
+  colorGridPrimary,
+  colorGridSecondary,
+} from "../main";
+
 enum DragMode {
   None,
   Selection,
@@ -621,10 +627,10 @@ export class NodeScene {
 
     // todo: draw grid
 
-    this.view.clear(this.context, "#4A5050");
+    this.view.clear(this.context, colorGridBackground);
     this.view.setViewMatrix(this.context);
-    this.view.drawGrid(this.context, 33.33333, "#4E5454", 1);
-    this.view.drawGrid(this.context, 100, "#464C4C", 3);
+    this.view.drawGrid(this.context, 33.33333, colorGridSecondary, 1);
+    this.view.drawGrid(this.context, 100, colorGridPrimary, 3);
   }
 
   draw() {

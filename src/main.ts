@@ -2,7 +2,8 @@ import Vue from "vue";
 import vgl from "vue-golden-layout";
 //import vgl from "vue-golden-layout/src";
 import "golden-layout/src/css/goldenlayout-dark-theme.css";
-import "../public/css/scrollbar.css";
+//import "golden-layout/src/css/goldenlayout-light-theme.css";
+import "../public/scss/scrollbar.scss";
 import "./utils/inspectelement";
 import "boxicons/css/boxicons.css";
 require("typeface-open-sans");
@@ -20,8 +21,16 @@ Vue.config.productionTip = false;
 Vue.use(vgl);
 
 import { Titlebar, Color } from "custom-electron-titlebar";
+import "../public/scss/scrollbar.scss";
+import { readProperty } from "./utils/scsshelper";
+
+const colorTitle = readProperty("colorTitle");
+export const colorGridBackground = readProperty("colorGridBackground");
+export const colorGridPrimary = readProperty("colorGridPrimary");
+export const colorGridSecondary = readProperty("colorGridSecondary");
+
 let titleBar = new Titlebar({
-  backgroundColor: Color.fromHex("#333333"),
+  backgroundColor: Color.fromHex(colorTitle),
   icon: "./favicon.svg",
   shadow: true,
 });

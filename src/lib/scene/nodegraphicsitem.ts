@@ -172,14 +172,24 @@ export class NodeGraphicsItem extends GraphicsItem {
       ctx.fillText(this.title, textX, textY);
     }
 
+    ctx.globalAlpha = 0.5;
     ctx.beginPath();
     ctx.lineWidth = 4;
     // if (renderState.selected) ctx.strokeStyle = "rgb(255, 255, 255)";
     // else ctx.strokeStyle = "rgb(0, 0, 0)";
     ctx.strokeStyle = "rgb(0, 0, 0)";
     //ctx.rect(this.x, this.y, this.width, this.height);
-    this.roundRect(ctx, this.x, this.y, this.width, this.height, 2);
+    const offset = ctx.lineWidth / 2 - 0.0001;
+    this.roundRect(
+      ctx,
+      this.x - offset,
+      this.y - offset,
+      this.width + offset * 2,
+      this.height + offset * 2,
+      offset
+    );
     ctx.stroke();
+    ctx.globalAlpha = 1;
 
     for (let sock of this.sockets) {
       sock.draw(ctx, renderState);

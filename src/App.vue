@@ -14,12 +14,22 @@
     <golden-layout
       class="container"
       @itemCreated="itemCreated"
-      :headerHeight="30"
+      :headerHeight="32"
       :showPopoutIcon="false"
       :showMaximiseIcon="false"
       ref="GL"
     >
       <gl-row>
+        <gl-col width="8">
+          <gl-component title="Library" :closable="false">
+            <library-view
+              :editor="this.editor"
+              :library="this.library"
+              v-if="this.library != null"
+            />
+          </gl-component>
+        </gl-col>
+
         <gl-col width="55" ref="canvas">
           <gl-component title="Editor" class="test-component" :closable="false">
             <library-menu
@@ -28,11 +38,7 @@
               v-if="this.library != null"
               ref="libraryMenu"
             />
-            <div class="editor-menu" style="height:2em;">
-              <!-- <a class="btn" href="#" @click="setShape('sphere')">S</a>
-      <a class="btn" href="#" @click="setShape('cube')">C</a>
-      <a class="btn" href="#" @click="setShape('plane')">P</a>
-              <a class="btn" href="#" @click="setShape('cylinder')">C</a>-->
+            <!-- <div class="editor-menu" style="height:2em;">
               <select class="enum" :value="resolution" @change="setResolution">
                 <option value="32">Resolution: 32x32</option>
                 <option value="64">Resolution: 64x64</option>
@@ -49,10 +55,8 @@
                 :value="randomSeed"
                 @change="setRandomSeed"
               />
-            </div>
+            </div> -->
             <canvas
-              width="400"
-              height="400"
               id="editor"
               ondragover="event.preventDefault()"
             />
@@ -62,18 +66,7 @@
           </gl-component>-->
         </gl-col>
 
-        <gl-col width="25">
-          <gl-component
-            title="2D View"
-            class="test-component"
-            :closable="false"
-          >
-            <!-- <canvas width="100" height="100" id="_2dview" /> -->
-            <preview2d ref="preview2d" />
-          </gl-component>
-        </gl-col>
-
-        <gl-col width="20">
+        <gl-col width="15">
           <!-- 
           <gl-component title="3D View" class="test-component" :closable="false">
             <canvas width="100" height="100" id="_3dview" /> 
@@ -87,12 +80,14 @@
               :node="this.propHolder"
             />
           </gl-component>
-          <gl-component title="Library" :closable="false">
-            <library-view
-              :editor="this.editor"
-              :library="this.library"
-              v-if="this.library != null"
-            />
+          
+          <gl-component
+            title="2D View"
+            class="test-component"
+            :closable="false"
+          >
+            <!-- <canvas width="100" height="100" id="_2dview" /> -->
+            <preview2d ref="preview2d" />
           </gl-component>
           <!-- <gl-component title="Texture Properties" class="test-component" :closable="false"></gl-component> -->
         </gl-col>
@@ -101,128 +96,12 @@
   </div>
 </template>
 
-<style>
-body {
-  overflow: hidden; /* The 'light' theme let a scroll-bar on the right of the main container */
-  padding: 0;
-  margin: 0;
-}
-
-.lm_tab {
-  font-family: "Open Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
-  background: #333 !important;
-  /* border-radius: 2px 2px 0 0; */
-  height: 24px !important;
-  box-sizing: border-box;
-  line-height: 24px;
-  font-weight: bold;
-  -webkit-user-select: none;
-  -webkit-user-drag: none;
-  -webkit-app-region: no-drag;
-}
-
-.no-select {
-  -webkit-user-select: none;
-  -webkit-user-drag: none;
-  -webkit-app-region: no-drag;
-}
+<style lang="scss">
+@import "../public/scss/main.scss";
 </style>
-<style scoped>
-.topbar {
-  background: #333;
-  border-bottom: 2px black solid;
-  flex-grow: 0;
-  /* flex-basis: 100px; */
-  padding: 0.5em 0;
-  overflow: hidden;
-  padding-left: 0.5em;
-}
 
-.button {
-  border-radius: 2px;
-  background: #666;
-  padding: 0.5em 1em;
-  text-decoration: none;
-  color: white;
-  display: flex;
-  vertical-align: middle;
-  float: left;
-  margin-right: 0.5em;
-}
-
-.button:hover {
-  background: #999;
-}
-
-.button:active {
-  background: #555;
-}
-
-.right {
-  float: right;
-}
-
-.hscreen {
-  /* width: 100vw; */
-  /* height: calc(100vh - 2em); */
-  /* height: 100%; */
-  padding: 0;
-  margin: 0;
-  /* flex-grow: 1; */
-}
-
-.container {
-  display: block;
-  width: 100vw;
-  height: calc(100vh - 30px - 38px - (2 * 0.5em) - 2px);
-  /* flex-direction: column; */
-}
-
-.glComponent {
-  background: #333;
-}
-.test-component {
-  overflow: hidden;
-  background: #333;
-}
-
-.editor-menu .enum {
-  margin-top: 0.1em;
-  border: solid white 1px;
-  border-radius: 2px;
-  color: white;
-  background: #222;
-  padding: 4px;
-  margin-right: 5px;
-}
-
-.editor-menu span {
-  color: white;
-}
-
-.editor-menu input[type="number"] {
-  /* //color: white; */
-  margin: 5px;
-  border: solid white 1px;
-  border-radius: 2px;
-  line-height: 1.5em;
-  width: 3em;
-  padding: 0 5px;
-}
-
-.enum {
-  outline: 0;
-  box-shadow: none;
-  border: 0 !important;
-
-  margin-top: 0.4em;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  background: #222;
-  padding: 0.5em;
-  font-family: "Open Sans";
-}
+<style scoped lang="scss">
+@import "../public/scss/app.scss";
 </style>
 
 <script lang="ts">
@@ -251,6 +130,8 @@ import path from "path";
 import { IPropertyHolder } from "./lib/designer/properties";
 import { AddItemsAction } from "./lib/actions/additemsaction";
 import { UndoStack } from "./lib/undostack";
+import { ApplicationSettings } from "./settings";
+
 const electron = require("electron");
 const remote = electron.remote;
 const { dialog, app, BrowserWindow, Menu } = remote;
@@ -267,6 +148,7 @@ declare let __static: any;
   },
 })
 export default class App extends Vue {
+  settings!: ApplicationSettings;
   editor!: Editor;
   library!: DesignerLibrary;
 
@@ -290,6 +172,7 @@ export default class App extends Vue {
   constructor() {
     super();
 
+    this.settings = new ApplicationSettings();
     this.editor = new Editor();
     this.library = null;
 
@@ -551,7 +434,8 @@ export default class App extends Vue {
       item.container.on("resize", function() {
         const canvas = <HTMLCanvasElement>document.getElementById("editor");
         canvas.width = container.width;
-        canvas.height = container.height - 32;
+        canvas.height = container.height;
+        //canvas.height = container.height - 32;
       });
     }
 

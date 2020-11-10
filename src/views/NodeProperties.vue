@@ -127,7 +127,7 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
 </script>
 
 <style scoped>
-.properties {
+/* .properties {
   background: #333;
-}
+} */
 </style>

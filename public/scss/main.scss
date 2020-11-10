@@ -1,0 +1,52 @@
+@import "variables";
+
+body {
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+.titlebar {
+  background: $colorTitle;
+}
+
+.lm_root {
+  background: $colorItem;
+}
+
+.lm_splitter {
+  background: $colorBorder;
+}
+
+.lm_header {
+  background: $colorMenubar;
+}
+
+.lm_tab {
+  font-family: "Open Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
+  background: $colorItem !important;
+  box-shadow: none;
+  border: none !important;
+  height: 24px !important;
+  line-height: 24px;
+  font-weight: bold;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+}
+
+.lm_active {
+  box-shadow: none;
+  border: none !important;
+  background: $colorSelected !important;
+}
+
+.lm-content {
+  border: $colorBorder;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+}
