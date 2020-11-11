@@ -4,15 +4,13 @@
   background: $colorMenubar;
   border-bottom: 2px $colorBorder solid;
   flex-grow: 0;
-  /* flex-basis: 100px; */
   padding: 0.5em 0;
   overflow: hidden;
   padding-left: 0.5em;
 }
 
 .button {
-  /* border-radius: 2px; */
-  background: #45a29e;
+  background: $colorAccentDarker;
   padding: 0.5em 1em;
   text-decoration: none;
   color: $colorText;
@@ -23,8 +21,7 @@
 }
 
 .button:hover {
-  background: $colorSelected;
-  /* #0b0c10, #1f2833, #c5c6c7, #66fcf1, #45a29e */
+  background: $colorAccent;
 }
 
 .button:active {
