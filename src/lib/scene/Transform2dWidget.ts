@@ -16,7 +16,6 @@ import {
   LineCollider,
 } from "@/lib/math/collision2d";
 import { Transform2D } from "@/lib/math/transform2d";
-import { runAtThisOrScheduleAtNextAnimationFrame } from "custom-electron-titlebar/lib/common/dom";
 
 const radius = 5;
 
