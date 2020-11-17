@@ -1,4 +1,4 @@
-import { NodeScene } from "../scene";
+import { NodeScene } from "@/lib/scene";
 import { Rect } from "@/lib/math/rect";
 import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2 } from "@math.gl/core";

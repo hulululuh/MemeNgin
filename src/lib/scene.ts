@@ -349,7 +349,7 @@ export class NodeScene {
     document.removeEventListener("copy", this._copyEvent);
     document.removeEventListener("paste", this._pasteEvent);
     document.removeEventListener("widgetUpdate", this._widgetUpdate);
-    document.removeEventListener("WidgetDragged", this._widgetDragged);
+    document.removeEventListener("widgetDragged", this._widgetDragged);
     // this.copyElement.removeEventListener("copy", this._copyEvent);
     // this.copyElement.removeEventListener("paste", this._copyEvent);
   }
@@ -1129,6 +1129,8 @@ export class NodeScene {
       n["id"] = node.id;
       n["x"] = node.centerX();
       n["y"] = node.centerY();
+      n["w"] = node.getWidth();
+      n["h"] = node.getHeight();
 
       nodes[node.id] = n;
     }
@@ -1198,10 +1200,12 @@ export class NodeScene {
       s.addNode(node);
       node.id = dNode.id;
 
+      const nodeData = data["nodes"][node.id];
       // get position
-      let x = data["nodes"][node.id].x;
-      let y = data["nodes"][node.id].y;
-      node.setCenter(x, y);
+      // let x = data["nodes"][node.id].x;
+      // let y = data["nodes"][node.id].y;
+      node.setCenter(nodeData.x, nodeData.y);
+      node.setVirtualSize(nodeData.w, nodeData.h);
     }
 
     // add connection one by one

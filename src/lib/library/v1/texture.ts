@@ -1,8 +1,5 @@
-import { DesignerNode, NodeType } from "../../designer/designernode";
-import { Color } from "@/lib/designer/color";
-import { SphereBufferGeometry } from "@/lib/geometry/sphere";
+import { DesignerNode, NodeType } from "@/lib/designer/designernode";
 import { Property, FileProperty } from "@/lib/designer/properties";
-//import * as NativeImage from "@electron/nativeImage";
 const NativeImage = require("electron").nativeImage;
 
 export class TextureNode extends DesignerNode {
@@ -26,9 +23,6 @@ export class TextureNode extends DesignerNode {
           }
         }
       }
-      // else if (propName === "size") {
-      //   //this.createTexture();
-      // }
     };
   }
 

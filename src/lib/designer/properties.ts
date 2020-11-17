@@ -1,6 +1,7 @@
 import { Transform2D } from "../math/transform2d";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
+import { Vector2 } from "math.gl";
 
 // for use in code after build
 export enum PropertyType {
@@ -379,7 +380,9 @@ export class Transform2DProperty extends Property {
   }
 
   setValue(val: any) {
-    this.value = val.clone();
+    this.value.position = new Vector2(val.position);
+    this.value.scale = new Vector2(val.scale);
+    this.value.rotation = val.rotation;
   }
 
   clone(): Property {
