@@ -347,15 +347,6 @@ export class Editor {
     this.setScene(new NodeScene(canvas));
   }
 
-  resizeScene(width: number, height: number) {
-    this.canvas.width = width;
-    this.canvas.height = height;
-  }
-
-  // set3DScene(scene3D: any) {
-  //   this.scene3D = scene3D;
-  // }
-
   setDesigner(designer: Designer) {
     this.designer = designer;
     let self = this;

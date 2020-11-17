@@ -172,7 +172,6 @@ export default class App extends Vue {
   constructor() {
     super();
 
-    this.settings = new ApplicationSettings();
     this.editor = new Editor();
     this.library = null;
 
@@ -435,7 +434,6 @@ export default class App extends Vue {
         const canvas = <HTMLCanvasElement>document.getElementById("editor");
         canvas.width = container.width;
         canvas.height = container.height;
-        //canvas.height = container.height - 32;
       });
     }
 

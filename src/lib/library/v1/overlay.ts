@@ -2,10 +2,12 @@ import { DesignerNode, NodeInput } from "../../designer/designernode";
 import { Editor } from "@/lib/editor";
 import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
+import { Property } from "@/lib/designer/properties";
 import { Vector2, Matrix3 } from "@math.gl/core";
+import { MathUtils } from "three";
 
 export class OverlayNode extends DesignerNode {
-  srcTransform: Transform2D;
+  //srcTransform: Transform2D;
   inputASize: Vector2;
   inputBSize: Vector2;
   relPos: Vector2;
@@ -13,6 +15,16 @@ export class OverlayNode extends DesignerNode {
   item: GraphicsItem;
   dragStartRelScale: Vector2;
   relScale: Vector2;
+
+  constructor() {
+    super();
+
+    this.onnodepropertychanged = (prop: Property) => {
+      if (prop.name === "transform2d") {
+        this.requestUpdateWidget();
+      }
+    };
+  }
 
   init() {
     this.title = "Overlay";
@@ -25,11 +37,11 @@ export class OverlayNode extends DesignerNode {
     this.dragStartRelScale = new Vector2(1, 1);
     this.relScale = new Vector2(1, 1);
 
-    this.srcTransform = new Transform2D(
-      new Vector2(0, 0),
-      new Vector2(1, 1),
-      0
-    );
+    // this.srcTransform = new Transform2D(
+    //   new Vector2(0, 0),
+    //   new Vector2(1, 1),
+    //   0
+    // );
 
     this.onWidgetDragged = (evt: WidgetEvent) => {
       if (!this.item) {
@@ -41,11 +53,13 @@ export class OverlayNode extends DesignerNode {
         .divide(new Vector2(this.item.getWidth(), this.item.getHeight() * -1));
 
       //this.srcTransform = evt.detail.transform2d.clone();
-      this.srcTransform = new Transform2D(
+      const xf = new Transform2D(
         this.relPos,
         evt.detail.transform2d.scale,
-        evt.detail.transform2d.rotation
+        evt.detail.transform2d.rotation * MathUtils.RAD2DEG
       );
+
+      this.properties.filter((p) => p.name === "transform2d")[0].setValue(xf);
 
       this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
       this.relScale = new Vector2(evt.detail.relScale);
@@ -62,6 +76,12 @@ export class OverlayNode extends DesignerNode {
     this.addInput("colorB"); // background
     this.addInput("opacity");
 
+    this.addTransform2DProperty(
+      "transform2d",
+      "Transform",
+      Transform2D.IDENTITY
+    );
+
     this.addFloatProperty("opacity", "Opacity", 1.0, 0.0, 1.0, 0.01);
     this.addFloatProperty(
       "alphaThreshold",
@@ -74,6 +94,7 @@ export class OverlayNode extends DesignerNode {
 
     let source = `
         uniform mat3 srcTransform;
+        //uniform mat3 prop_transform2d;
         
         vec4 process(vec2 uv)
         {
@@ -115,36 +136,11 @@ export class OverlayNode extends DesignerNode {
     const option = () => {
       if (this.isEditing) {
         const gl = this.gl;
-        if (this.srcTransform) {
-          const prop = this.inputASize[0] / this.inputASize[1];
-          const transMat = new Matrix3()
-            .translate(new Vector2(this.relPos))
-            .multiplyRight(new Matrix3().translate(new Vector2(0.5, 0.5)))
-            .multiplyRight(
-              new Matrix3().scale(
-                new Vector2(this.inputASize).divide(this.inputBSize)
-              )
-            )
-            .multiplyRight(new Matrix3().scale(new Vector2(1 / prop, 1)))
-            .multiplyRight(
-              new Matrix3().rotate(this.srcTransform.rotation).transpose()
-            )
-            .multiplyRight(
-              new Matrix3()
-                .scale(new Vector2(prop, 1))
-                .multiplyRight(
-                  new Matrix3().scale(new Vector2(this.srcTransform.scale))
-                )
-            )
-            .multiplyRight(new Matrix3().translate(new Vector2(-0.5, -0.5)));
-          transMat.invert();
-
-          gl.uniformMatrix3fv(
-            gl.getUniformLocation(this.shaderProgram, "srcTransform"),
-            false,
-            transMat.toFloat32Array()
-          );
-        }
+        gl.uniformMatrix3fv(
+          gl.getUniformLocation(this.shaderProgram, "srcTransform"),
+          false,
+          this.overlayTransformGL.toFloat32Array()
+        );
       }
     };
 
@@ -191,7 +187,7 @@ export class OverlayNode extends DesignerNode {
         detail: {
           transform2d: this.widgetTransform,
           dragStartRelScale: this.dragStartRelScale,
-          relScale: this.relScale,
+          relScale: this.transform.scale,
           enable: true,
         },
       });
@@ -211,16 +207,61 @@ export class OverlayNode extends DesignerNode {
   }
 
   get widgetTransform(): Transform2D {
+    const xf = this.transform;
     if (!this.item) {
       this.item = Editor.getScene().getNodeById(this.id);
     }
-    const offsetPos = new Vector2(this.srcTransform.position).multiply(
+    const offsetPos = new Vector2(xf.position).multiply(
       new Vector2(this.item.getWidth(), this.item.getHeight() * -1)
     );
     return new Transform2D(
       new Vector2(this.getCenter()).add(offsetPos),
-      new Vector2(this.baseScale).multiply(this.srcTransform.scale),
-      this.srcTransform.rotation
+      new Vector2(this.baseScale).multiply(xf.scale),
+      xf.rotation * MathUtils.DEG2RAD
     );
+  }
+
+  get transform(): Transform2D {
+    return this.properties
+      .filter((p) => p.name === "transform2d")[0]
+      .getValue();
+  }
+
+  get overlayTransformGL(): Matrix3 {
+    if (!this.item) {
+      this.item = Editor.getScene().getNodeById(this.id);
+    }
+
+    const xf = this.properties
+      .filter((p) => p.name === "transform2d")[0]
+      .getValue();
+
+    this.relPos = new Vector2(xf.position);
+    // .sub(new Vector2(this.item.centerX(), this.item.centerY()))
+    //.divide(new Vector2(this.item.getWidth(), this.item.getHeight() * -1));
+
+    const scale = new Vector2(xf.scale);
+    const rotation = xf.rotation * MathUtils.DEG2RAD;
+
+    const prop = this.inputASize[0] / this.inputASize[1];
+    const transMat = new Matrix3()
+      .translate(new Vector2(this.relPos))
+      .multiplyRight(new Matrix3().translate(new Vector2(0.5, 0.5)))
+      .multiplyRight(
+        new Matrix3().scale(
+          new Vector2(this.inputASize).divide(this.inputBSize)
+        )
+      )
+      .multiplyRight(new Matrix3().scale(new Vector2(1 / prop, 1)))
+      .multiplyRight(new Matrix3().rotate(rotation).transpose())
+      .multiplyRight(
+        new Matrix3()
+          .scale(new Vector2(prop, 1))
+          .multiplyRight(new Matrix3().scale(new Vector2(scale)))
+      )
+      .multiplyRight(new Matrix3().translate(new Vector2(-0.5, -0.5)));
+    transMat.invert();
+
+    return transMat;
   }
 }

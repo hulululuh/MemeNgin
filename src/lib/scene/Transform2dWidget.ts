@@ -8,6 +8,7 @@ import {
 } from "./graphicsitem";
 import { SceneView } from "./view";
 import { Rect } from "@/lib/math/rect";
+import { ApplicationSettings } from "@/settings";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { Color } from "../designer/color";
 import {
@@ -17,7 +18,7 @@ import {
 } from "@/lib/math/collision2d";
 import { Transform2D } from "@/lib/math/transform2d";
 
-const radius = 5;
+const settings = ApplicationSettings.getInstance();
 
 enum ScaleMode {
   None,
@@ -83,11 +84,21 @@ export class Transform2dWidget extends GraphicsItem {
     this.dragMode = DragMode.None;
 
     this.colliders = new Array<iCollider>();
-    this.colliders.push(new CircleCollider("cornerTL", 0, radius));
-    this.colliders.push(new CircleCollider("cornerTR", 1, radius));
-    this.colliders.push(new CircleCollider("cornerBR", 2, radius));
-    this.colliders.push(new CircleCollider("cornerBL", 3, radius));
-    this.colliders.push(new CircleCollider("rotHandle", 4, radius));
+    this.colliders.push(
+      new CircleCollider("cornerTL", 0, settings.widgetRadius)
+    );
+    this.colliders.push(
+      new CircleCollider("cornerTR", 1, settings.widgetRadius)
+    );
+    this.colliders.push(
+      new CircleCollider("cornerBR", 2, settings.widgetRadius)
+    );
+    this.colliders.push(
+      new CircleCollider("cornerBL", 3, settings.widgetRadius)
+    );
+    this.colliders.push(
+      new CircleCollider("rotHandle", 4, settings.widgetRadius)
+    );
     this.colliders.push(new LineCollider("edgeT", 0, 1));
     this.colliders.push(new LineCollider("edgeR", 1, 2));
     this.colliders.push(new LineCollider("edgeB", 2, 3));
@@ -144,7 +155,7 @@ export class Transform2dWidget extends GraphicsItem {
     const xf = this.transform;
     let ptsXf = this.ptsTransformed;
 
-    ctx.lineWidth = 1;
+    ctx.lineWidth = settings.lineWidthThick / this.view.zoomFactor;
     ctx.strokeStyle = "white";
 
     ctx.beginPath();
@@ -168,13 +179,29 @@ export class Transform2dWidget extends GraphicsItem {
     // scaleHandles
     for (const pt of ptsXf) {
       ctx.beginPath();
-      ctx.ellipse(pt[0], pt[1], radius, radius, 0, 0, 360);
+      ctx.ellipse(
+        pt[0],
+        pt[1],
+        settings.widgetRadius / this.view.zoomFactor,
+        settings.widgetRadius / this.view.zoomFactor,
+        0,
+        0,
+        360
+      );
       ctx.stroke();
     }
 
     // rotationHandle
     ctx.beginPath();
-    ctx.ellipse(ptRotHandleXf[0], ptRotHandleXf[1], radius, radius, 0, 0, 360);
+    ctx.ellipse(
+      ptRotHandleXf[0],
+      ptRotHandleXf[1],
+      settings.widgetRadius / this.view.zoomFactor,
+      settings.widgetRadius / this.view.zoomFactor,
+      0,
+      0,
+      360
+    );
     ctx.stroke();
   }
 
@@ -183,7 +210,7 @@ export class Transform2dWidget extends GraphicsItem {
     let ptsXf = this.ptsTransformed;
     for (let collider of this.colliders) {
       collider.setPts(ptsXf);
-      if (collider.isIntersectWith(new Vector2(px, py))) {
+      if (collider.isIntersectWith(new Vector2(px, py), this.view.zoomFactor)) {
         return true;
       }
     }
@@ -209,7 +236,7 @@ export class Transform2dWidget extends GraphicsItem {
     const ptsXf = this.ptsTransformed;
     for (let collider of this.colliders) {
       collider.setPts(ptsXf);
-      if (collider.isIntersectWith(ptCursor)) {
+      if (collider.isIntersectWith(ptCursor, this.view.zoomFactor)) {
         collided = collider;
         this.dragStartPos = new Vector2(this.transform2d.position);
         this.distDragStart = new Vector2(ptCursor)
@@ -257,7 +284,7 @@ export class Transform2dWidget extends GraphicsItem {
 
     for (let collider of this.colliders) {
       const pt = new Vector2(ptCursor).sub(this.transform2d.position);
-      if (collider.isIntersectWith(ptCursor)) {
+      if (collider.isIntersectWith(ptCursor, this.view.zoomFactor)) {
         if (collider.label === "rotHandle") {
           this.view.canvas.style.cursor = "grab";
         } else {

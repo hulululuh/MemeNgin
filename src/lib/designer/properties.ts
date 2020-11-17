@@ -1,3 +1,4 @@
+import { Transform2D } from "../math/transform2d";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
 
@@ -11,6 +12,7 @@ export enum PropertyType {
   String = "string",
   Gradient = "gradient",
   File = "file",
+  Transform2D = "transform2d",
 }
 
 export class Property {
@@ -352,6 +354,46 @@ export class GradientProperty extends Property {
 
   copyValuesFrom(prop: GradientProperty) {
     console.log("copy value from gradient");
+    this.setValue(prop.value.clone());
+  }
+}
+
+export class Transform2DProperty extends Property {
+  value: Transform2D;
+  positionX: number;
+  positionY: number;
+  scaleX: number;
+  scaleY: number;
+  rotation: number;
+
+  constructor(name: string, displayName: string, value: Transform2D) {
+    super();
+    this.name = name;
+    this.displayName = displayName;
+    this.value = value;
+    this.type = PropertyType.Transform2D;
+  }
+
+  getValue(): any {
+    return this.value;
+  }
+
+  setValue(val: any) {
+    this.value = val.clone();
+  }
+
+  clone(): Property {
+    let prop = new Transform2DProperty(
+      this.name,
+      this.displayName,
+      this.value.clone()
+    );
+
+    return prop;
+  }
+
+  copyValuesFrom(prop: Transform2DProperty) {
+    console.log("copy value from transform2d");
     this.setValue(prop.value.clone());
   }
 }

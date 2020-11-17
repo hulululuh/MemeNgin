@@ -28,16 +28,18 @@ import TextureChannelPropertyView from "@/components/properties/TextureChannelPr
 import Accordion from "@/components/Accordion.vue";
 import { Editor } from "@/lib/editor";
 import { DesignerNode } from "@/lib/designer/designernode";
-import { Property, IPropertyHolder } from "@/lib/designer/properties";
+import { Property, IPropertyHolder, Transform2DProperty } from "@/lib/designer/properties";
 import GradientPropertyView from "@/components/properties/GradientProp.vue";
 import StringPropertyView from "@/components/properties/StringProp.vue";
 import FilePropertyView from "@/components/properties/FileProp.vue";
+import Transform2DPropertyView from "@/components/properties/Transform2DProp.vue";
 import {
   IProperyUi,
   PropertyChangeComplete,
 } from "../components/properties/ipropertyui";
 import { UndoStack } from "@/lib/undostack";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
+import { Transform2D } from '@/lib/math/transform2d';
 
 /* eslint-disable */
 
@@ -56,6 +58,7 @@ class PropHolder {
     gradient: GradientPropertyView,
     string: StringPropertyView,
     file: FilePropertyView,
+    transform2d: Transform2DPropertyView,
 
     textureChannel: TextureChannelPropertyView,
     Accordion,

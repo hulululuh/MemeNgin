@@ -11,6 +11,7 @@ import {
   FileProperty,
   GradientProperty,
   IPropertyHolder,
+  Transform2DProperty,
 } from "./properties";
 import { buildShaderProgram } from "./gl";
 import { Color } from "./color";
@@ -18,6 +19,7 @@ import { Gradient } from "./gradient";
 import { Editor } from "../editor";
 import { Vector2, Matrix4 } from "@math.gl/core";
 import { WidgetEvent } from "@/lib/scene/graphicsitem";
+import { Transform2D } from "../math/transform2d";
 
 const NativeImage = require("electron").nativeImage;
 
@@ -428,6 +430,18 @@ export class DesignerNode implements IPropertyHolder {
             point.t
           );
         }
+      }
+
+      if (prop instanceof Transform2DProperty) {
+        let mat2d = (prop as Transform2DProperty).value
+          .toMatrix()
+          .toFloat32Array();
+
+        gl.uniformMatrix3fv(
+          gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
+          false,
+          mat2d
+        );
       }
     }
 
@@ -977,6 +991,9 @@ export class DesignerNode implements IPropertyHolder {
 
         code += "uniform Gradient prop_" + prop.name + ";\n";
       }
+      if (prop instanceof Transform2DProperty) {
+        code += "uniform mat3 prop_" + prop.name + ";\n";
+      }
     }
 
     code += "\n";
@@ -1081,6 +1098,17 @@ export class DesignerNode implements IPropertyHolder {
     defaultVal: Gradient
   ): GradientProperty {
     let prop = new GradientProperty(id, displayName, defaultVal);
+
+    this.properties.push(prop);
+    return prop;
+  }
+
+  addTransform2DProperty(
+    id: string,
+    displayName: string,
+    defaultVal: Transform2D
+  ): Transform2DProperty {
+    let prop = new Transform2DProperty(id, displayName, defaultVal);
 
     this.properties.push(prop);
     return prop;

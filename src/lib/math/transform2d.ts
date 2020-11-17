@@ -4,6 +4,19 @@ export class Transform2D {
   position: Vector2;
   scale: Vector2;
   rotation: number;
+  static _identity: Transform2D;
+
+  static get IDENTITY() {
+    if (!Transform2D._identity) {
+      Transform2D._identity = new Transform2D(
+        new Vector2(0, 0),
+        new Vector2(1, 1),
+        0
+      );
+    }
+
+    return Transform2D._identity;
+  }
 
   constructor(p: Vector2, s: Vector2, r: number) {
     this.position = new Vector2(p);

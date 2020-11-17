@@ -1,4 +1,4 @@
-import settings from "electron-settings";
+//import settings from "electron-settings";
 
 export class ApplicationSettings {
   colorPrimary: string = "#21252b";
@@ -11,4 +11,16 @@ export class ApplicationSettings {
 
   lineWidthNormal: number = 2;
   lineWidthThick: number = 3;
+
+  widgetRadius: number = 7;
+  colThicknessLine: number = 10;
+  colThicknessCircle: number = 3;
+
+  static _instance: ApplicationSettings;
+  static getInstance(): ApplicationSettings {
+    if (!ApplicationSettings._instance) {
+      ApplicationSettings._instance = new ApplicationSettings();
+    }
+    return ApplicationSettings._instance;
+  }
 }

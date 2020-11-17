@@ -1,8 +1,8 @@
+import { ApplicationSettings } from "@/settings";
 import { Vector2 } from "@math.gl/core";
 
 // collision margin in pixels
-const colMarginLine = 10;
-const colMarginCircle = 5;
+const settings = ApplicationSettings.getInstance();
 
 enum ColliderType {
   None,
@@ -17,7 +17,7 @@ export interface iCollider {
   // resulting value - cursor
   label: string;
 
-  isIntersectWith(pt: Vector2): boolean;
+  isIntersectWith(pt: Vector2, zoomFactor: number): boolean;
   getCenter(): Vector2;
   setPts(pts: Array<Vector2>);
 }
@@ -42,13 +42,13 @@ export class CircleCollider implements iCollider {
     this._radius = radius;
   }
 
-  isIntersectWith(pt: Vector2): boolean {
+  isIntersectWith(pt: Vector2, zoomFactor: number = 1): boolean {
     if (!this._pts) {
       console.warn("intersection test without data");
       return;
     }
     const distance = pt.distanceTo(this._pts[this._idx]);
-    return distance < colMarginCircle + this._radius;
+    return distance < (settings.colThicknessCircle + this._radius) / zoomFactor;
   }
 
   getCenter(): Vector2 {
@@ -75,7 +75,7 @@ export class LineCollider implements iCollider {
     this._pts = pts;
   }
 
-  isIntersectWith(pt: Vector2): boolean {
+  isIntersectWith(pt: Vector2, zoomFactor: number = 1): boolean {
     if (!this._pts) {
       console.warn("intersection test without data");
       return;
@@ -97,7 +97,11 @@ export class LineCollider implements iCollider {
     );
 
     const distance = pt.distanceTo(closestPt);
-    return distance < colMarginLine && t > 0 && t < dir.len();
+    return (
+      distance < settings.colThicknessLine / zoomFactor &&
+      t > 0 &&
+      t < dir.len()
+    );
   }
 
   getCenter(): Vector2 {
