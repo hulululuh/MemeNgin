@@ -1108,7 +1108,7 @@ export class DesignerNode implements IPropertyHolder {
     displayName: string,
     defaultVal: Transform2D
   ): Transform2DProperty {
-    let prop = new Transform2DProperty(id, displayName, defaultVal);
+    let prop = new Transform2DProperty(id, displayName, defaultVal.clone());
 
     this.properties.push(prop);
     return prop;

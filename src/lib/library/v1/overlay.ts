@@ -7,7 +7,6 @@ import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
 
 export class OverlayNode extends DesignerNode {
-  //srcTransform: Transform2D;
   inputASize: Vector2;
   inputBSize: Vector2;
   relPos: Vector2;
@@ -37,12 +36,6 @@ export class OverlayNode extends DesignerNode {
     this.dragStartRelScale = new Vector2(1, 1);
     this.relScale = new Vector2(1, 1);
 
-    // this.srcTransform = new Transform2D(
-    //   new Vector2(0, 0),
-    //   new Vector2(1, 1),
-    //   0
-    // );
-
     this.onWidgetDragged = (evt: WidgetEvent) => {
       if (!this.item) {
         this.item = Editor.getScene().getNodeById(this.id);
@@ -52,7 +45,6 @@ export class OverlayNode extends DesignerNode {
         .sub(new Vector2(this.item.centerX(), this.item.centerY()))
         .divide(new Vector2(this.item.getWidth(), this.item.getHeight() * -1));
 
-      //this.srcTransform = evt.detail.transform2d.clone();
       const xf = new Transform2D(
         this.relPos,
         evt.detail.transform2d.scale,
@@ -69,6 +61,9 @@ export class OverlayNode extends DesignerNode {
     };
 
     this.onItemSelected = () => {
+      this.properties
+        .filter((p) => p.name === "transform2d")[0]
+        .setValue(this.transform);
       this.requestUpdateWidget();
     };
 
