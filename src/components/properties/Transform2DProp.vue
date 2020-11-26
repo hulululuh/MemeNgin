@@ -16,6 +16,7 @@
               type="number"
               :value="parseFloat(prop.value.position[0]).toFixed(3)"
               :step="0.001"
+              @input="updateValuePX"
               @keydown="updateValuePX"
               class="number"
               @focus="focus"
@@ -30,6 +31,7 @@
               type="number"
               :value="parseFloat(prop.value.position[1]).toFixed(3)"
               :step="0.001"
+              @input="updateValuePY"
               @keydown="updateValuePY"
               class="number"
               @focus="focus"
@@ -47,6 +49,7 @@
               type="number"
               :value="parseFloat(prop.value.scale[0]).toFixed(3)"
               :step="0.001"
+              @input="updateValueSX"
               @keydown="updateValueSX"
               class="number"
               @focus="focus"
@@ -61,6 +64,7 @@
               type="number"
               :value="parseFloat(prop.value.scale[1]).toFixed(3)"
               :step="0.001"
+              @input="updateValueSY"
               @keydown="updateValueSY"
               class="number"
               @focus="focus"
@@ -78,6 +82,7 @@
               type="number"
               :value="parseFloat(prop.value.rotation).toFixed(1)"
               :step="0.1"
+              @input="updateValueR"
               @keydown="updateValueR"
               class="number"
               @focus="focus"
@@ -141,7 +146,7 @@ export default class Transform2DPropertyView extends Vue {
   @Prop()
   propHolder: IPropertyHolder;
 
-  oldValue: number;
+  oldValue: Transform2D;
 
   @Emit()
   propertyChanged() {
@@ -157,66 +162,93 @@ export default class Transform2DPropertyView extends Vue {
   updateValue(value: number, comp: Transform2DComponent) {
     const xf = getUpdatedTransform(this.prop.value, value, comp);
     this.propHolder.setProperty(this.prop.name, xf);
+    
     this.propertyChanged();
+    //this.onValueChanged();
   }
 
   updateValuePX(evt) {
-    if (evt.key !== "Enter") return;
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.PositionX);
+    const comp = Transform2DComponent.PositionX;
+    if (evt.key === "Enter") {
+      const val = parseFloat(evt.target.value);
+      if (isNaN(val)) return;
+      this.updateValue(val, comp);
+    } else if(evt.inputType === "historyUndo") {
+      const val = parseFloat(evt.detail);
+      this.updateValue(val, comp);
+    }
   }
 
   updateValuePY(evt) {
-    if (evt.key !== "Enter") return;
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.PositionY);
+    const comp = Transform2DComponent.PositionY;
+    if (evt.key === "Enter") {
+      const val = parseFloat(evt.target.value);
+      if (isNaN(val)) return;
+      this.updateValue(val, comp);
+    } else if(evt.inputType === "historyUndo") {
+      const val = parseFloat(evt.detail);
+      this.updateValue(val, comp);
+    }
   }
 
   updateValueSX(evt) {
-    if (evt.key !== "Enter") return;
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.ScaleX);
+    const comp = Transform2DComponent.ScaleX;
+    if (evt.key === "Enter") {
+      const val = parseFloat(evt.target.value);
+      if (isNaN(val)) return;
+      this.updateValue(val, comp);
+    } else if(evt.inputType === "historyUndo") {
+      const val = parseFloat(evt.detail);
+      this.updateValue(val, comp);
+    }
   }
 
   updateValueSY(evt) {
-    if (evt.key !== "Enter") return;
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.ScaleY);
+    const comp = Transform2DComponent.ScaleY;
+    if (evt.key === "Enter") {
+      const val = parseFloat(evt.target.value);
+      if (isNaN(val)) return;
+      this.updateValue(val, comp);
+    } else if(evt.inputType === "historyUndo") {
+      const val = parseFloat(evt.detail);
+      this.updateValue(val, comp);
+    }
   }
 
   updateValueR(evt) {
-    if (evt.key !== "Enter") return;
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.Rotation);
+    const comp = Transform2DComponent.Rotation;
+    if (evt.key === "Enter") {
+      const val = parseFloat(evt.target.value);
+      if (isNaN(val)) return;
+      this.updateValue(val, comp);
+    } else if(evt.inputType === "historyUndo") {
+      const val = parseFloat(evt.detail);
+      this.updateValue(val, comp);
+    }
   }
 
-  focus() {
-    //console.log("focus");
-    this.oldValue = this.prop.value;
-  }
-
-  positionX() {
-    return Transform2DComponent.PositionX;
+  focus(evt) {
+    this.oldValue = this.prop.value.clone();
   }
 
   blurPX(evt) {
     this.updateValue(parseFloat(evt.target.value), Transform2DComponent.PositionX);
-    this.onValueChanged();
   }
 
   blurPY(evt) {
     this.updateValue(parseFloat(evt.target.value), Transform2DComponent.PositionY);
-    this.onValueChanged();
   }
 
   blurSX(evt) {
     this.updateValue(parseFloat(evt.target.value), Transform2DComponent.ScaleX);
-    this.onValueChanged();
   }
 
   blurSY(evt) {
     this.updateValue(parseFloat(evt.target.value), Transform2DComponent.ScaleY);
-    this.onValueChanged();
   }
 
   blurR(evt) {
     this.updateValue(parseFloat(evt.target.value), Transform2DComponent.Rotation);
-    this.onValueChanged();
   }
 
   onValueChanged() {
@@ -224,7 +256,7 @@ export default class Transform2DPropertyView extends Vue {
       null,
       this.prop.name,
       this.propHolder,
-      this.oldValue,
+      this.oldValue.clone(),
       this.prop.value
     );
     UndoStack.current.push(action);

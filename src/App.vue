@@ -105,7 +105,6 @@
 </style>
 
 <script lang="ts">
-// https://www.sitepoint.com/class-based-vue-js-typescript/
 import { Component, Prop, Vue, Watch, Model } from "vue-property-decorator";
 import EditorView from "@/views/Editor.vue";
 import LibraryView from "@/views/Library.vue";
@@ -124,7 +123,6 @@ import { unityExport } from "@/lib/export/unityexporter.js";
 import { unityZipExport } from "@/lib/export/unityzipexporter.js";
 import { zipExport } from "@/lib/export/zipexporter.js";
 import { shell } from "electron";
-//import libv1 from "./lib/library/libraryv1";
 import fs from "fs";
 import path from "path";
 import { IPropertyHolder } from "./lib/designer/properties";

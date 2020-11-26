@@ -15,7 +15,7 @@ export class Transform2D {
       );
     }
 
-    return Transform2D._identity;
+    return Transform2D._identity.clone();
   }
 
   constructor(p: Vector2, s: Vector2, r: number) {

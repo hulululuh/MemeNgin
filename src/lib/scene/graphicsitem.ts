@@ -45,7 +45,6 @@ export class MouseMoveEvent extends MouseEvent {
 }
 export class MouseUpEvent extends MouseEvent {}
 export class MouseOverEvent extends MouseEvent {}
-
 export class HoverEvent extends MouseEvent {}
 
 export class WidgetEvent extends CustomEvent<any> {

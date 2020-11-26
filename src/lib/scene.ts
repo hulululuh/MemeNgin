@@ -34,6 +34,7 @@ import {
   colorGridPrimary,
   colorGridSecondary,
 } from "../main";
+import { app } from "electron";
 
 enum DragMode {
   None,

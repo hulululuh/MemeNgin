@@ -71,18 +71,10 @@ export default class FloatPropertyView extends Vue {
   }
 
   focus() {
-    //console.log("focus");
     this.oldValue = this.prop.value;
   }
 
   blur() {
-    //console.log("blur");
-    // let evt = {
-    // 	propName: this.prop.name,
-    // 	oldValue: this.oldValue,
-    // 	newValue: this.prop.value,
-    // };
-    // this.propertyChangeCompleted(evt);
     let action = new PropertyChangeAction(
       null,
       this.prop.name,

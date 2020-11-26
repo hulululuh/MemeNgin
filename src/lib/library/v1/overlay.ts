@@ -5,15 +5,15 @@ import { Transform2D } from "@/lib/math/transform2d";
 import { Property } from "@/lib/designer/properties";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
+import { ITransformable } from "@/lib/designer/Transformable";
 
-export class OverlayNode extends DesignerNode {
+export class OverlayNode extends DesignerNode implements ITransformable {
   inputASize: Vector2;
   inputBSize: Vector2;
   relPos: Vector2;
   baseScale: Vector2;
-  item: GraphicsItem;
   dragStartRelScale: Vector2;
-  relScale: Vector2;
+  item: GraphicsItem;
 
   constructor() {
     super();
@@ -34,7 +34,6 @@ export class OverlayNode extends DesignerNode {
 
     this.baseScale = new Vector2(1, 1);
     this.dragStartRelScale = new Vector2(1, 1);
-    this.relScale = new Vector2(1, 1);
 
     this.onWidgetDragged = (evt: WidgetEvent) => {
       if (!this.item) {
@@ -54,7 +53,6 @@ export class OverlayNode extends DesignerNode {
       this.properties.filter((p) => p.name === "transform2d")[0].setValue(xf);
 
       this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
-      this.relScale = new Vector2(evt.detail.relScale);
 
       this.createTexture();
       this.requestUpdate();
@@ -63,7 +61,7 @@ export class OverlayNode extends DesignerNode {
     this.onItemSelected = () => {
       this.properties
         .filter((p) => p.name === "transform2d")[0]
-        .setValue(this.transform);
+        .setValue(this.getTransform());
       this.requestUpdateWidget();
     };
 
@@ -134,7 +132,7 @@ export class OverlayNode extends DesignerNode {
         gl.uniformMatrix3fv(
           gl.getUniformLocation(this.shaderProgram, "srcTransform"),
           false,
-          this.overlayTransformGL.toFloat32Array()
+          this.getTransformGL().toFloat32Array()
         );
       }
     };
@@ -162,27 +160,25 @@ export class OverlayNode extends DesignerNode {
     this.inputASize = new Vector2(lw, lh);
     this.inputBSize = new Vector2(w, h);
 
-    //this.relScale
     const scale = Math.min(w, h);
     const scaleFactor = 100 / scale;
 
     this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
     this.dragStartRelScale = new Vector2(1, 1);
-    this.relScale = new Vector2(1, 1);
 
     this.requestUpdateWidget();
   }
 
   requestUpdateWidget(): void {
-    if (document && this.isWidgetAvailable) {
+    if (document && this.isWidgetAvailable()) {
       // select this in order to activate transform2d widget
       Editor.getInstance().selectedDesignerNode = this;
 
       const event = new WidgetEvent("widgetUpdate", {
         detail: {
-          transform2d: this.widgetTransform,
+          transform2d: this.getTransformWidget(),
           dragStartRelScale: this.dragStartRelScale,
-          relScale: this.transform.scale,
+          relScale: this.getTransform().scale,
           enable: true,
         },
       });
@@ -191,7 +187,7 @@ export class OverlayNode extends DesignerNode {
     }
   }
 
-  get isWidgetAvailable(): boolean {
+  isWidgetAvailable(): boolean {
     const colA = Editor.getDesigner().findLeftNode(this.id, "colorA");
     const colB = Editor.getDesigner().findLeftNode(this.id, "colorB");
 
@@ -201,8 +197,8 @@ export class OverlayNode extends DesignerNode {
     return false;
   }
 
-  get widgetTransform(): Transform2D {
-    const xf = this.transform;
+  getTransformWidget(): Transform2D {
+    const xf = this.getTransform();
     if (!this.item) {
       this.item = Editor.getScene().getNodeById(this.id);
     }
@@ -216,13 +212,13 @@ export class OverlayNode extends DesignerNode {
     );
   }
 
-  get transform(): Transform2D {
+  getTransform(): Transform2D {
     return this.properties
       .filter((p) => p.name === "transform2d")[0]
       .getValue();
   }
 
-  get overlayTransformGL(): Matrix3 {
+  getTransformGL(): Matrix3 {
     if (!this.item) {
       this.item = Editor.getScene().getNodeById(this.id);
     }
@@ -232,8 +228,6 @@ export class OverlayNode extends DesignerNode {
       .getValue();
 
     this.relPos = new Vector2(xf.position);
-    // .sub(new Vector2(this.item.centerX(), this.item.centerY()))
-    //.divide(new Vector2(this.item.getWidth(), this.item.getHeight() * -1));
 
     const scale = new Vector2(xf.scale);
     const rotation = xf.rotation * MathUtils.DEG2RAD;

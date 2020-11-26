@@ -483,9 +483,6 @@ export class Transform2dWidget extends GraphicsItem {
 
   // event handlers
   onWidgetUpdated(evt: WidgetEvent) {
-    // this.dragStartRelScale = new Vector2(1, 1);
-    // this.relScale = new Vector2(1, 1);
-
     this.enable = evt.detail.enable;
     this.visible = evt.detail.enable;
 
@@ -494,10 +491,6 @@ export class Transform2dWidget extends GraphicsItem {
     this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
     this.relScale = new Vector2(evt.detail.relScale);
     this.transform2d = evt.detail.transform2d.clone();
-
-    // this.transform2d.setPosition(evt.detail.position);
-    // this.transform2d.setScale(evt.detail.scale);
-    // this.transform2d.setRotation(evt.detail.rotation);
 
     this.x = this.transform2d.position[0];
     this.y = this.transform2d.position[1];

@@ -3,7 +3,7 @@
 // https://electronjs.org/docs/api/menu
 // https://alan.fyi/renderer-menu-functions-in-electron-vue/
 
-const { app, Menu, BrowserWindow } = require("electron");
+const { app, Menu, BrowserWindow, globalShortcut } = require("electron");
 
 export enum MenuCommands {
   FileNew = "file_new",
@@ -32,6 +32,8 @@ export enum MenuCommands {
   HelpSubmitBug = "help_submitbug",
 }
 
+// TODO : accelerator must be fixed
+// https://stackoverflow.com/questions/40776653/electron-menu-accelerator-not-working
 export function setupMenu() {
   const template = [
     {
