@@ -1,4 +1,8 @@
-import { DesignerNode, NodeType } from "@/lib/designer/designernode";
+import {
+  DesignerNode,
+  NodeCategory,
+  NodeType,
+} from "@/lib/designer/designernode";
 import { Property, FileProperty } from "@/lib/designer/properties";
 const NativeImage = require("electron").nativeImage;
 
@@ -9,6 +13,7 @@ export class TextureNode extends DesignerNode {
   constructor() {
     super();
     this.nodeType = NodeType.Texture;
+    this.nodeCategory = NodeCategory.Create;
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "file") {

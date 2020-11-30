@@ -33,51 +33,98 @@ import { TextureNode } from "./v1/texture";
 import { DesignerLibrary } from "../designer/library";
 import { OutputNode } from "./v1/output";
 import { GradientMapNode } from "./v1/gradientmap";
+import { NodeCategory } from "../designer/designernode";
 
 export function createLibrary() {
   let lib = new DesignerLibrary();
   lib.versionName = "v1";
-  lib.addNode("brickgenerator", "Brick Generator", BrickGeneratorNode);
-  lib.addNode("normalmap", "Normal Map", NormalMapNode);
-  lib.addNode("cell", "Cell", CellNode);
-  lib.addNode("solidcell", "Solid Cell", SolidCellNode);
-  lib.addNode("linecell", "Line Cell", LineCellNode);
-  lib.addNode("circle", "Circle", CircleNode);
-  lib.addNode("polygon", "Polygon", PolygonNode);
-  lib.addNode("blend", "Blend", BlendNode);
-  lib.addNode("overlay", "Overlay", OverlayNode);
-  lib.addNode("invert", "Invert", InvertNode);
-  lib.addNode("warp", "Warp", WarpNode);
-  lib.addNode("color", "Color", ColorNode);
-  lib.addNode("colorize", "Colorize", ColorizeNode);
-  lib.addNode("text", "Text", TextNode);
-  lib.addNode("simplexnoise", "Simplex Noise", SimplexNoiseNode);
-  lib.addNode("mask", "Mask", MaskNode);
-  lib.addNode("transform2d", "Transform2D", Transform2DNode);
-  lib.addNode("maprange", "Map Range", MapRangeNode);
-  lib.addNode("splat", "Splat", SplatNode);
-  lib.addNode("perlin3d", "Perlin 3D", Perlin3DNode);
-  lib.addNode("hexagon", "Hexagon", HexagonNode);
-  lib.addNode("fractalnoise", "Fractal Noise", FractalNoiseNode);
-  lib.addNode("tile", "Tile", TileNode);
-  lib.addNode("threshold", "Threshold", ThresholdNode);
-  lib.addNode("heightshift", "Height Shift", HeightShiftNode);
-  lib.addNode("checkerboard", "CheckerBoard", CheckerBoardNode);
-  lib.addNode("directionalwarp", "Directional Warp", DirectionalWarpNode);
-  lib.addNode("mirror", "Mirror", MirrorNode);
+  lib.addNode(
+    "brickgenerator",
+    "Brick Generator",
+    BrickGeneratorNode,
+    NodeCategory.Create
+  );
+  lib.addNode("normalmap", "Normal Map", NormalMapNode, NodeCategory.Create);
+  lib.addNode("cell", "Cell", CellNode, NodeCategory.Create);
+  lib.addNode("solidcell", "Solid Cell", SolidCellNode, NodeCategory.Create);
+  lib.addNode("linecell", "Line Cell", LineCellNode, NodeCategory.Create);
+  lib.addNode("circle", "Circle", CircleNode, NodeCategory.Create);
+  lib.addNode("polygon", "Polygon", PolygonNode, NodeCategory.Create);
+  lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
+  lib.addNode("overlay", "Overlay", OverlayNode, NodeCategory.Composite);
+  lib.addNode("invert", "Invert", InvertNode, NodeCategory.Color);
+  lib.addNode("warp", "Warp", WarpNode, NodeCategory.Shape);
+  lib.addNode("color", "Color", ColorNode, NodeCategory.Color);
+  lib.addNode("colorize", "Colorize", ColorizeNode, NodeCategory.Color);
+  lib.addNode("text", "Text", TextNode, NodeCategory.Create);
+  lib.addNode(
+    "simplexnoise",
+    "Simplex Noise",
+    SimplexNoiseNode,
+    NodeCategory.Create
+  );
+  lib.addNode("mask", "Mask", MaskNode, NodeCategory.Composite);
+  lib.addNode(
+    "transform2d",
+    "Transform2D",
+    Transform2DNode,
+    NodeCategory.Shape
+  );
+  lib.addNode("maprange", "Map Range", MapRangeNode, NodeCategory.Color);
+  lib.addNode("splat", "Splat", SplatNode, NodeCategory.Composite);
+  lib.addNode("perlin3d", "Perlin 3D", Perlin3DNode, NodeCategory.Create);
+  lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Create);
+  lib.addNode(
+    "fractalnoise",
+    "Fractal Noise",
+    FractalNoiseNode,
+    NodeCategory.Create
+  );
+  lib.addNode("tile", "Tile", TileNode, NodeCategory.Shape);
+  lib.addNode("threshold", "Threshold", ThresholdNode, NodeCategory.Color);
+  lib.addNode(
+    "heightshift",
+    "Height Shift",
+    HeightShiftNode,
+    NodeCategory.Color
+  );
+  lib.addNode(
+    "checkerboard",
+    "CheckerBoard",
+    CheckerBoardNode,
+    NodeCategory.Create
+  );
+  lib.addNode(
+    "directionalwarp",
+    "Directional Warp",
+    DirectionalWarpNode,
+    NodeCategory.Shape
+  );
+  lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
   lib.addNode(
     "brightnesscontrast",
     "Brightness Contrast",
-    BrightnessContrastNode
+    BrightnessContrastNode,
+    NodeCategory.Color
   );
-  lib.addNode("colorgrade", "Color Grade", ColorGradeNode);
-  lib.addNode("wave", "Wave", WaveNode);
-  lib.addNode("copy", "Copy", CopyNode);
-  lib.addNode("gradient", "Gradient", GradientNode);
-  lib.addNode("texture", "Texture", TextureNode);
-  lib.addNode("trigradient", "TriGradient", TriGradientNode);
-  lib.addNode("output", "Output", OutputNode);
-  lib.addNode("gradientmap", "Gradient Map", GradientMapNode);
+  lib.addNode("colorgrade", "Color Grade", ColorGradeNode, NodeCategory.Color);
+  lib.addNode("wave", "Wave", WaveNode, NodeCategory.Create);
+  lib.addNode("copy", "Copy", CopyNode, NodeCategory.Think);
+  lib.addNode("gradient", "Gradient", GradientNode, NodeCategory.Create);
+  lib.addNode("texture", "Texture", TextureNode, NodeCategory.Create);
+  lib.addNode(
+    "trigradient",
+    "TriGradient",
+    TriGradientNode,
+    NodeCategory.Create
+  );
+  lib.addNode("output", "Output", OutputNode, NodeCategory.Think);
+  lib.addNode(
+    "gradientmap",
+    "Gradient Map",
+    GradientMapNode,
+    NodeCategory.Create
+  );
   // lib.addNode("betterwarp", "Better Warp", BetterWarpNode);
 
   return lib;

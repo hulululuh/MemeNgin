@@ -3,6 +3,7 @@ import {
   NodeType,
   NodeInput,
   TexPrecision,
+  NodeCategory,
 } from "../../designer/designernode";
 //import { parseCubeLUT } from "parse-cube-lut";
 //import { fs } from "fs";
@@ -15,6 +16,7 @@ export class ColorGradeNode extends DesignerNode {
   constructor() {
     super();
     this.nodeType = NodeType.Texture;
+    this.nodeCategory = NodeCategory.Color;
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "file") {

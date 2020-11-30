@@ -37,7 +37,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { DesignerLibrary } from "@/lib/designer/library";
-import { LibraryItem, LibraryItemType } from "@/views/Library.vue";
+import { LibraryItem, LibraryItemType, LibraryItemCategory } from "@/views/Library.vue";
 import { Editor } from "@/lib/editor";
 import fs from "fs";
 import path from "path";
@@ -67,15 +67,15 @@ export default class LibraryMenu extends Vue {
 
   get items() {
     let items = Object.values(this.library.nodes).map((n) => {
-      let item = new LibraryItem(LibraryItemType.Node);
+      let item = new LibraryItem(LibraryItemType.Node, <LibraryItemCategory>(n.NodeCategory));
       item.name = n.name;
       item.displayName = n.displayName;
 
       return item;
     });
 
-    items.push(new LibraryItem(LibraryItemType.Comment, "comment", "Comment"));
-    items.push(new LibraryItem(LibraryItemType.Frame, "frame", "Frame"));
+    items.push(new LibraryItem(LibraryItemType.Comment, LibraryItemCategory.Undefined, "comment", "Comment"));
+    items.push(new LibraryItem(LibraryItemType.Frame, LibraryItemCategory.Undefined, "frame", "Frame"));
     // items.push(
     // 	new LibraryItem(
     // 		LibraryItemType.Navigation,

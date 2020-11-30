@@ -1,8 +1,9 @@
-import { DesignerNode } from "./designernode";
+import { DesignerNode, NodeCategory } from "./designernode";
 
 export class DesignerNodeFactory {
   name: string;
   displayName: string;
+  category: NodeCategory;
   create: () => DesignerNode;
 }
 
@@ -15,11 +16,13 @@ export class DesignerLibrary {
   addNode<T extends DesignerNode>(
     name: string,
     displayName: string,
-    type: { new (): T }
+    type: { new (): T },
+    category: NodeCategory = NodeCategory.Undefined
   ) {
     let factory = new DesignerNodeFactory();
     factory.name = name;
     factory.displayName = displayName;
+    factory.category = category;
     factory.create = (): DesignerNode => {
       return new type();
     };

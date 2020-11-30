@@ -69,12 +69,32 @@ export enum NodeType {
   Logic,
 }
 
+// export type NodeCategory = string;
+// export const NodeCategory = {
+//   Undefined: "undefined",
+//   Shape: "shape",
+//   Color: "color",
+//   Composite: "composite",
+//   Create: "create",
+//   Think: "think",
+// };
+
+export enum NodeCategory {
+  Undefined = "undefined",
+  Shape = "shape",
+  Color = "color",
+  Composite = "composite",
+  Create = "create",
+  Think = "think",
+}
+
 export class DesignerNode implements IPropertyHolder {
   id: string = Guid.newGuid();
   title: string;
   typeName: string; // added when node is created from library
   texPath: string;
   nodeType: NodeType;
+  nodeCategory: NodeCategory;
 
   gl: WebGL2RenderingContext;
   designer: Designer;
@@ -118,6 +138,7 @@ export class DesignerNode implements IPropertyHolder {
   // constructor
   constructor() {
     this.nodeType = NodeType.Procedural;
+    this.nodeCategory = NodeCategory.Undefined;
     this.isTextureReady = false;
     this.isInput = false;
     this.isResult = false;
