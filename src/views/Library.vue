@@ -33,7 +33,7 @@
             />
             <div v-else class="thumbnail" />
 
-            <div class="node-name">{{ item.displayName }}</div>
+            <!-- <div class="node-name">{{ item.displayName }}</div> -->
           </span>
         </div>
       </accordion>
@@ -55,7 +55,7 @@
             />
             <div v-else class="thumbnail" />
 
-            <div class="node-name">{{ item.displayName }}</div>
+            <!-- <div class="node-name">{{ item.displayName }}</div> -->
           </span>
         </div>
       </accordion>
@@ -77,7 +77,7 @@
             />
             <div v-else class="thumbnail" />
 
-            <div class="node-name">{{ item.displayName }}</div>
+            <!-- <div class="node-name">{{ item.displayName }}</div> -->
           </span>
         </div>
       </accordion>
@@ -99,7 +99,7 @@
             />
             <div v-else class="thumbnail" />
 
-            <div class="node-name">{{ item.displayName }}</div>
+            <!-- <div class="node-name">{{ item.displayName }}</div> -->
           </span>
         </div>
       </accordion>
@@ -121,13 +121,17 @@
             />
             <div v-else class="thumbnail" />
 
-            <div class="node-name">{{ item.displayName }}</div>
+            <!-- <div class="node-name">{{ item.displayName }}</div> -->
           </span>
         </div>
       </accordion>
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+@import "../../public/scss/library.scss";
+</style>
 
 <script lang="ts">
 import { Component, Prop, Model, Vue } from "vue-property-decorator";
@@ -346,88 +350,3 @@ export default class LibraryView extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.libcard {
-  width: 3rem;
-  display: block;
-  float: left;
-  padding: 5px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.libcard:hover {
-  background: rgb(0, 0, 0, 0.3);
-}
-
-.thumbnail {
-  display: block;
-  width: 3rem;
-  height: 3rem;
-  background: #ccc;
-  border-radius: 4px;
-
-  margin-left: -4px;
-  border: solid rgba(0, 0, 0, 0.7) 4px;
-}
-
-.node-name {
-  height: 3rem;
-  line-height: 2rem;
-  padding: 0;
-  margin: 0;
-
-  color: white;
-  text-decoration: none;
-}
-
-.node-list {
-  overflow-y: scroll;
-  flex: 1 1 auto;
-}
-
-.search-container {
-  flex-grow: 1;
-}
-
-.search-container input {
-  /* width: calc(100% - 2em); */
-  width: calc(100% - 0.5em) !important;
-  padding: 0.5em;
-  height: 1.5em;
-  flex: 0 1 auto;
-  padding: 4px;
-  margin: 0;
-  border-radius: 3px;
-  /* border: solid #999 1px; */
-  border: 0;
-  color: white;
-  background: #999;
-  outline: none;
-}
-
-.size-container {
-  flex-grow: 0;
-  width: 100px;
-}
-
-.size-container select {
-  width: 100%;
-  height: 100%;
-  border: solid white 1px;
-  border-radius: 2px;
-  color: white;
-  background: #222;
-  padding: 4px;
-}
-
-.library-container {
-  overflow: hidden;
-  height: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-flow: column;
-}
-
-</style>

@@ -20,7 +20,7 @@
       ref="GL"
     >
       <gl-row>
-        <gl-col width="8">
+        <gl-col width="8.4">
           <gl-component title="Library" :closable="false">
             <library-view
               :editor="this.editor"

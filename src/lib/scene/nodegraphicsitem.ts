@@ -175,10 +175,8 @@ export class NodeGraphicsItem extends GraphicsItem {
     ctx.globalAlpha = 0.5;
     ctx.beginPath();
     ctx.lineWidth = 4;
-    // if (renderState.selected) ctx.strokeStyle = "rgb(255, 255, 255)";
-    // else ctx.strokeStyle = "rgb(0, 0, 0)";
     ctx.strokeStyle = "rgb(0, 0, 0)";
-    //ctx.rect(this.x, this.y, this.width, this.height);
+
     const offset = ctx.lineWidth / 2 - 0.0001;
     this.roundRect(
       ctx,
