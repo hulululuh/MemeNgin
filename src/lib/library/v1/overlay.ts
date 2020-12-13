@@ -5,7 +5,7 @@ import { Transform2D } from "@/lib/math/transform2d";
 import { Property } from "@/lib/designer/properties";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
-import { ITransformable } from "@/lib/designer/Transformable";
+import { ITransformable } from "@/lib/designer/transformable";
 
 export class OverlayNode extends DesignerNode implements ITransformable {
   inputASize: Vector2;

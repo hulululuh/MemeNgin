@@ -57,6 +57,7 @@ export default class FloatPropertyView extends Vue {
 
   @Emit()
   propertyChanged() {
+    this.$emit("propertyChanged", this.prop);
     return this.prop.name;
   }
 

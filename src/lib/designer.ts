@@ -71,7 +71,9 @@ export class Designer {
     this.canvas = <HTMLCanvasElement>document.createElement("canvas");
     this.canvas.width = this.width;
     this.canvas.height = this.height;
-    this.gl = this.canvas.getContext("webgl2");
+    this.gl = this.canvas.getContext("webgl2", {
+      premultipliedAlpha: false,
+    });
 
     const gl = this.gl;
     gl.blendEquation(gl.FUNC_ADD);
@@ -478,7 +480,6 @@ export class Designer {
     // Read the contents of the framebuffer
     let data = new Uint8Array(width * height * 4);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
-
     gl.deleteFramebuffer(framebuffer);
 
     // Create a 2D canvas to store the result

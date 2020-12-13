@@ -10,7 +10,6 @@ import { Geometry } from "three";
 import { BufferGeometry } from "three";
 import { Float32BufferAttribute } from "three";
 import { Vector3 } from "three";
-import { Vector2 } from "three";
 
 class CylinderGeometry extends Geometry {
   parameters = {};

@@ -155,6 +155,7 @@ export class NodeGraphicsItem extends GraphicsItem {
       });
     }
 
+    ctx.globalAlpha = 0.65;
     // title
     if (!renderState.hovered) {
       ctx.beginPath();

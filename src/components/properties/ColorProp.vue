@@ -51,13 +51,14 @@ export default class ColorPropertyView extends Vue {
 
   @Emit()
   propertyChanged() {
+    this.$emit("propertyChanged", this.prop);
     return this.prop.name;
   }
 
   onInput(value) {
     //console.log(value);
     this.propHolder.setProperty(this.prop.name, value);
-    //this.propertyChanged();
+    this.propertyChanged();
   }
 
   onValue(value) {
@@ -78,8 +79,7 @@ export default class ColorPropertyView extends Vue {
     // );
 
     this.oldValue = this.prop.value.toHex();
-
-    this.propertyChanged();
+    //this.propertyChanged();
   }
 
   // onInput(evt) {
