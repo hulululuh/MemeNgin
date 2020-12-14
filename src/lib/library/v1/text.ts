@@ -8,6 +8,9 @@ import { TextGeometry } from "@/lib/geometry/textGeometry";
 
 const placeholderText = "Lorem ipsum Dolor sit amet.";
 const placeholderSize = 72;
+const placeholderLetterSpacing = 0;
+const placeholderLineHeight = 1.175;
+
 export class TextNode extends DesignerNode {
   textGeom: TextGeometry;
   textFbo: WebGLFramebuffer;
@@ -34,7 +37,9 @@ export class TextNode extends DesignerNode {
       placeholderSize,
       false,
       false,
-      1
+      1,
+      placeholderLetterSpacing,
+      placeholderLineHeight
     );
 
     const updateGeom = () => {
@@ -50,12 +55,18 @@ export class TextNode extends DesignerNode {
       if (prop.name === "text") {
         this.textGeom.updateText(prop.getValue());
         updateGeom();
-      } else if (prop.name === "color") {
-        this.color = prop.getValue();
-        this.drawFont();
       } else if (prop.name === "size") {
         this.textGeom.updateSize(prop.getValue());
         updateGeom();
+      } else if (prop.name === "letterSpacing") {
+        this.textGeom.updateLetterSpacing(prop.getValue());
+        updateGeom();
+      } else if (prop.name === "lineHeight") {
+        this.textGeom.updateLineHeight(prop.getValue());
+        updateGeom();
+      } else if (prop.name === "color") {
+        this.color = prop.getValue();
+        this.drawFont();
       }
     };
   }
@@ -203,6 +214,20 @@ export class TextNode extends DesignerNode {
     // size
     this.addBoolProperty("fitToFrame", "Fit to frame", false);
     this.addIntProperty("size", "Size", placeholderSize, 5, 256, 1);
+
+    // character interval
+    this.addFloatProperty(
+      "letterSpacing",
+      "Letter spacing",
+      0.0,
+      0.0,
+      1.0,
+      0.01
+    );
+
+    // line interval
+    this.addFloatProperty("lineHeight", "Line height", 1.175, 0.5, 3, 0.01);
+
     this.addIntProperty("frameWidth", "Frame Width", 1024, 128, 1024, 128);
 
     let vertSource = `

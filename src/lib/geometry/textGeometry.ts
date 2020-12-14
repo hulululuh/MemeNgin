@@ -113,7 +113,7 @@ export class TextGeometry {
   italic: boolean;
   quality: number;
   letterSpacing: number;
-  lineSpacing: number;
+  lineHeignt: number;
 
   font: any;
   vertices: any;
@@ -132,7 +132,7 @@ export class TextGeometry {
     italic?,
     quality?,
     letterSpacing?,
-    lineSpacing?
+    lineHeignt?
   ) {
     this.text = text;
     this.size = size;
@@ -140,7 +140,7 @@ export class TextGeometry {
     this.italic = italic;
     this.quality = quality;
     this.letterSpacing = letterSpacing;
-    this.lineSpacing = lineSpacing;
+    this.lineHeignt = lineHeignt;
 
     this.needsUpdate = true;
 
@@ -158,6 +158,20 @@ export class TextGeometry {
   updateText(text: string) {
     if (this.text !== text) {
       this.text = text;
+      this.needsUpdate = true;
+    }
+  }
+
+  updateLetterSpacing(amount: number) {
+    if (this.letterSpacing !== amount) {
+      this.letterSpacing = amount;
+      this.needsUpdate = true;
+    }
+  }
+
+  updateLineHeight(amount: number) {
+    if (this.lineHeignt !== amount) {
+      this.lineHeignt = amount;
       this.needsUpdate = true;
     }
   }
@@ -193,7 +207,8 @@ export class TextGeometry {
 
     // Layout some text - notice everything is in em units!
     let result = computeLayout(this.font, this.text, {
-      lineHeight: 1.175 * this.font.unitsPerEm, // '2.5em' in font units
+      lineHeight: this.lineHeignt * this.font.unitsPerEm, // '2.5em' in font units
+      letterSpacing: this.letterSpacing * this.font.unitsPerEm,
       width: theta / scale, // '1024px' in font units
     });
 
