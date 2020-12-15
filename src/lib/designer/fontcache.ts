@@ -4,7 +4,6 @@ import path from "path";
 
 import { remote } from "electron";
 import { Dictionary } from "dictionary-types";
-import { promises } from "fs";
 
 // const fontUrl =
 //   "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf";

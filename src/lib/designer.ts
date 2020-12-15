@@ -29,11 +29,6 @@ export class Designer {
   canvas: HTMLCanvasElement;
   gl: WebGL2RenderingContext;
 
-  // scene for render to texture
-  rttRenderer: THREE.WebGLRenderer;
-  rttCamera: THREE.OrthographicCamera;
-  rttScene: THREE.Scene;
-
   texCoordBuffer: WebGLBuffer;
   posBuffer: WebGLBuffer;
   vertexShaderSource: string;
@@ -78,25 +73,6 @@ export class Designer {
     const gl = this.gl;
     gl.blendEquation(gl.FUNC_ADD);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-    this.rttRenderer = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      context: this.gl,
-      alpha: true,
-    });
-    this.rttRenderer.setSize(this.width, this.height);
-
-    this.rttScene = new THREE.Scene();
-
-    this.rttCamera = new THREE.OrthographicCamera(
-      this.width / -2,
-      this.width / 2,
-      this.height / 2,
-      this.height / -2,
-      -1000,
-      1000
-    );
-    this.rttCamera.position.z = 100;
 
     this.nodes = new Array();
     this.conns = new Array();

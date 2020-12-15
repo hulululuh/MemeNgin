@@ -24,11 +24,9 @@ export class TextNode extends DesignerNode {
     this.color = new Color(1.0, 1.0, 1.0);
 
     const fontPath = path.join(
-      //remote.app.getAppPath() + "/../src/assets/fonts/malgun-gothic/malgun.ttf"
       remote.app.getAppPath() +
         "/../src/assets/fonts/East_Sea_Dokdo/EastSeaDokdo-Regular.ttf"
-      // remote.app.getAppPath() +
-      //   "/../src/assets/fonts/Faster_One/FasterOne-Regular.ttf"
+      //"/../src/assets/fonts/Roboto/Roboto-Regular.ttf"
     );
 
     this.textGeom = new TextGeometry(
@@ -43,6 +41,7 @@ export class TextNode extends DesignerNode {
     );
 
     const updateGeom = () => {
+      this.resize(this.getWidth(), this.getHeight());
       this.createTexture();
       this.createFontGeom();
     };
@@ -80,6 +79,7 @@ export class TextNode extends DesignerNode {
 
     // bind a text framebuffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.textFbo);
+    gl.activeTexture(gl.TEXTURE0);
     gl.framebufferTexture2D(
       gl.FRAMEBUFFER,
       gl.COLOR_ATTACHMENT0,
@@ -93,6 +93,9 @@ export class TextNode extends DesignerNode {
     // skip parent's render routine since render here is quite differnt from original one.
     const width = this.getWidth();
     const height = this.getHeight();
+
+    gl.viewport(0, 0, width, height);
+
     this.designer.setTextureSize(width, height);
 
     const [uScale, uOffset, uColor] = [
@@ -109,7 +112,6 @@ export class TextNode extends DesignerNode {
     gl.clearColor(color.r, color.g, color.b, 0.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    //this.textGeom.indices.length
     const vertBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, this.textGeom.vertices, gl.STATIC_DRAW);
@@ -128,7 +130,7 @@ export class TextNode extends DesignerNode {
     gl.drawElements(
       gl.TRIANGLES,
       this.textGeom.indices.length,
-      gl.UNSIGNED_SHORT,
+      gl.UNSIGNED_INT,
       0
     );
 
@@ -226,7 +228,7 @@ export class TextNode extends DesignerNode {
     );
 
     // line interval
-    this.addFloatProperty("lineHeight", "Line height", 1.175, 0.5, 3, 0.01);
+    this.addFloatProperty("lineHeight", "Line height", 1.175, 0.5, 3, 0.001);
 
     this.addIntProperty("frameWidth", "Frame Width", 1024, 128, 1024, 128);
 
@@ -253,7 +255,7 @@ export class TextNode extends DesignerNode {
 
     let source = `
         vec4 process(vec2 uv)
-        {
+        {         
           vec4 col = vec4(0,1,0,1);
           if (baseTexture_ready) {
             col = texture(baseTexture, uv);

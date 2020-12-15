@@ -2,20 +2,7 @@ import earcut from "earcut";
 import computeLayout from "opentype-layout-improved";
 import { FontCache } from "@/lib/designer/fontcache";
 
-// const fontUrl =
-//   "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf";
-
-// from: https://css-tricks.com/techniques-for-rendering-text-with-webgl/
-// Reads out a .ttf and triangulates the glyphs using OpenType and Earcut.
-// Code made By riv -> https://stackoverflow.com/questions/50554803/triangulate-path-data-from-opentype-js-using-earcut/50581183#50581183
-// Original here -> https://jsbin.com/gecakub/edit?html,js,output
-
-// 1. Reads Bezier curves from `.tff` font file using OpenType.js.
-// 2. Converts Bezier curves into closed shapes and sort them by descending area.
-// 3. Determines the indices for the holes by figuring out which shapes are inside other shapes.
-// 4. Send all points to Earcut with the holes indices as a second parameter.
-// 5. Uses earcut's result as indices for the geometry.
-// 6. Then, render triangles with webGL.
+// font rendering from: https://codepen.io/Anemolo/pen/jOOYmEZ
 
 function distance(p1, p2) {
   const dx = p1.x - p2.x,
@@ -201,6 +188,8 @@ export class TextGeometry {
     }
     this.needsUpdate = false;
 
+    const glyphs = this.font.stringToGlyphs(this.text);
+
     // create path layout
     let scale = (1 / this.font.unitsPerEm) * this.size;
     let theta = 1024;
@@ -249,41 +238,9 @@ export class TextGeometry {
       });
     });
 
-    /*
-    // create path
-    const path = this.font.getPath(this.text, 0, 0, fontSizePx);
-
-    // create a list of closed contours
-    const polys1 = [];
-    path.commands.forEach(({ type, x, y, x1, y1, x2, y2 }) => {
-      switch (type) {
-        case "M":
-          polys1.push(new Polygon());
-          polys1[polys1.length - 1].moveTo({ x, y });
-          break;
-        case "L":
-          polys1[polys1.length - 1].moveTo({ x, y });
-          break;
-        case "C":
-          polys1[polys1.length - 1].cubicTo(
-            { x, y },
-            { x: x1, y: y1 },
-            { x: x2, y: y2 }
-          );
-          break;
-        case "Q":
-          polys1[polys1.length - 1].conicTo({ x, y }, { x: x1, y: y1 });
-          break;
-        case "Z":
-          polys1[polys1.length - 1].close();
-          break;
-      }
-    });
-
-    */
-
     // sort contours by descending area
     polys.sort((a, b) => Math.abs(b.area) - Math.abs(a.area));
+
     // classify contours to find holes and their 'parents'
     const root = [];
     for (let i = 0; i < polys.length; ++i) {
@@ -332,7 +289,7 @@ export class TextGeometry {
     root.forEach(process);
 
     this.vertices = vertices;
-    this.indicesData = new Uint16Array(indices);
+    this.indicesData = new Uint32Array(indices);
     this.indices = indices;
   }
 }

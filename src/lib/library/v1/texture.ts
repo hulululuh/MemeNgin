@@ -33,6 +33,7 @@ export class TextureNode extends DesignerNode {
 
   createTexture() {
     let gl = this.gl;
+    this.isTextureReady = false;
 
     if (this.tex) {
       gl.deleteTexture(this.tex);

@@ -71,8 +71,6 @@ export default {
         self.image = image;
 
         self.dragZoom.setImage(image);
-
-        //this.paint();
       };
     },
     resize(width, height) {
@@ -94,10 +92,6 @@ export default {
 
       let canvas = this.$refs.canvas;
       let ctx = canvas.getContext("2d");
-
-      // ctx.beginPath();
-      // ctx.rect(20, 20, 150, 100);
-      // ctx.stroke();
 
       ctx.drawImage(this.image, 0, 0, canvas.width, canvas.height);
     },
