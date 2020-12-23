@@ -25,6 +25,7 @@ import { DirectionalWarpNode } from "./v1/directionalwarp";
 import { MirrorNode } from "./v1/mirror";
 import { BrightnessContrastNode } from "./v1/brightnesscontrast";
 import { ColorGradeNode } from "./v1/colorgrade";
+import { ColorAdjustNode } from "./v2/coloradjust";
 import { WaveNode } from "./v1/wave";
 import { CopyNode } from "./v1/copy";
 import { TextureNode } from "./v1/texture";
@@ -49,7 +50,6 @@ export function createLibrary() {
     BrickGeneratorNode,
     NodeCategory.Create
   );
-  lib.addNode("normalmap", "Normal Map", NormalMapNode, NodeCategory.Create);
   lib.addNode("cell", "Cell", CellNode, NodeCategory.Create);
   lib.addNode("solidcell", "Solid Cell", SolidCellNode, NodeCategory.Create);
   lib.addNode("linecell", "Line Cell", LineCellNode, NodeCategory.Create);
@@ -58,7 +58,6 @@ export function createLibrary() {
   lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
   lib.addNode("overlay", "Overlay", OverlayNode, NodeCategory.Composite);
   lib.addNode("invert", "Invert", InvertNode, NodeCategory.Color);
-  lib.addNode("warp", "Warp", WarpNode, NodeCategory.Shape);
   lib.addNode("color", "Color", ColorNode, NodeCategory.Color);
   lib.addNode("colorize", "Colorize", ColorizeNode, NodeCategory.Color);
   lib.addNode("text", "Text", TextNode, NodeCategory.Create);
@@ -85,6 +84,7 @@ export function createLibrary() {
     FractalNoiseNode,
     NodeCategory.Create
   );
+  lib.addNode("warp", "Warp", WarpNode, NodeCategory.Shape);
   lib.addNode("tile", "Tile", TileNode, NodeCategory.Shape);
   lib.addNode("threshold", "Threshold", ThresholdNode, NodeCategory.Color);
   lib.addNode(
@@ -100,12 +100,20 @@ export function createLibrary() {
     NodeCategory.Create
   );
   lib.addNode(
+    "gradientmap",
+    "Gradient Map",
+    GradientMapNode,
+    NodeCategory.Color
+  );
+  lib.addNode(
     "directionalwarp",
     "Directional Warp",
     DirectionalWarpNode,
     NodeCategory.Shape
   );
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
+  lib.addNode("tilesampler", "Tile Sampler", TileSampler, NodeCategory.Shape);
+  lib.addNode("normalmap", "Normal Map", NormalMapNode, NodeCategory.Shape);
   lib.addNode(
     "brightnesscontrast",
     "Brightness Contrast",
@@ -113,6 +121,12 @@ export function createLibrary() {
     NodeCategory.Color
   );
   lib.addNode("colorgrade", "Color Grade", ColorGradeNode, NodeCategory.Color);
+  lib.addNode(
+    "coloradjust",
+    "Color Adjust",
+    ColorAdjustNode,
+    NodeCategory.Color
+  );
   lib.addNode("wave", "Wave", WaveNode, NodeCategory.Create);
   lib.addNode("copy", "Copy", CopyNode, NodeCategory.Think);
   lib.addNode("gradient", "Gradient", GradientNode, NodeCategory.Create);
@@ -124,12 +138,6 @@ export function createLibrary() {
     NodeCategory.Create
   );
   lib.addNode("output", "Output", OutputNode, NodeCategory.Think);
-  lib.addNode(
-    "gradientmap",
-    "Gradient Map",
-    GradientMapNode,
-    NodeCategory.Create
-  );
   lib.addNode("blurv2", "Blur", BlurV2, NodeCategory.Shape);
   lib.addNode("slopeblur", "Slope Blur", SlopeBlur, NodeCategory.Shape);
   lib.addNode(
@@ -138,8 +146,6 @@ export function createLibrary() {
     AdvanceSplatterV2,
     NodeCategory.Composite
   );
-  lib.addNode("tilesampler", "Tile Sampler", TileSampler, NodeCategory.Shape);
-  // lib.addNode("betterwarp", "Better Warp", BetterWarpNode);
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Think);
 
   return lib;

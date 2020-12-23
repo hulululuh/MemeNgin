@@ -1,16 +1,13 @@
 import {
   DesignerNode,
   NodeType,
-  NodeInput,
   TexPrecision,
   NodeCategory,
 } from "../../designer/designernode";
-//import { parseCubeLUT } from "parse-cube-lut";
-//import { fs } from "fs";
+
 let parseCubeLUT = require("parse-cube-lut");
 import * as fs from "fs";
 import { Property, FileProperty } from "@/lib/designer/properties";
-import { getTotalHeight } from "custom-electron-titlebar/lib/common/dom";
 
 export class ColorGradeNode extends DesignerNode {
   constructor() {

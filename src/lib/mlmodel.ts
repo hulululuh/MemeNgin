@@ -1,5 +1,5 @@
-import path from "path"
-import { Tensor, InferenceSession } from "onnxjs"
+import path from "path";
+import { Tensor, InferenceSession } from "onnxjs";
 import * as runModelUtils from "@/lib/utils/runModel";
 
 const warmupImgSize = 128;
@@ -9,7 +9,7 @@ const dimension = [0, 3, 416, 416];
 
 function getOnnxPath() {
   const appPath = require("electron").remote.app.getAppPath();
-  const onnxPath = path.normalize(appPath + "/../src/assets/onnx/")
+  const onnxPath = path.normalize(appPath + "/../src/assets/onnx/");
 
   // Loading success
   // 1. segmentation
@@ -38,11 +38,11 @@ function getOnnxPath() {
 
 export class MLModel {
   sessionBackend: string;
-  backendSelectList: Array<{text: string, value: string}>;
+  backendSelectList: Array<{ text: string; value: string }>;
   modelLoading: boolean;
   modelInitializing: boolean;
   modelLoadingError: boolean;
-  sessionRunning: boolean;  
+  sessionRunning: boolean;
   session: InferenceSession | undefined;
   gpuSession: InferenceSession | undefined;
   cpuSession: InferenceSession | undefined;
@@ -50,7 +50,7 @@ export class MLModel {
   inferenceTime: number;
   imageURLInput: string;
   imageURLSelect: null;
-  imageURLSelectList: Array<{text: string, value: string}>;
+  imageURLSelectList: Array<{ text: string; value: string }>;
   imageLoading: boolean;
   imageLoadingError: boolean;
   output: Tensor.DataType;
@@ -59,14 +59,17 @@ export class MLModel {
   warmupImgSize: number;
 
   constructor() {
-    this.sessionBackend = 'webgl';
-    this.backendSelectList = [{text: 'GPU-WebGL', value: 'webgl'}, {text: 'CPU-WebAssembly', value: 'wasm'}];
+    this.sessionBackend = "webgl";
+    this.backendSelectList = [
+      { text: "GPU-WebGL", value: "webgl" },
+      { text: "CPU-WebAssembly", value: "wasm" },
+    ];
     this.modelLoading = true;
     this.modelInitializing = true;
     this.modelLoadingError = false;
     this.sessionRunning = false;
     this.inferenceTime = 0;
-    this.imageURLInput = '';
+    this.imageURLInput = "";
     this.imageURLSelect = null;
     //this.imageURLSelectList = this.imageUrls;
     this.imageLoading = false;
@@ -86,60 +89,61 @@ export class MLModel {
       await this.initSession();
       console.log(modelPath + "Loaded");
     } catch (e) {
-      this.sessionBackend = 'wasm';
+      this.sessionBackend = "wasm";
     }
   }
 
   async initSession() {
     this.sessionRunning = false;
     this.modelLoadingError = false;
-    if (this.sessionBackend === 'webgl') { 
+    if (this.sessionBackend === "webgl") {
       if (this.gpuSession) {
         this.session = this.gpuSession;
         return;
       }
       this.modelLoading = true;
-      this.modelInitializing = true;  
-      this.gpuSession = new InferenceSession({backendHint: this.sessionBackend});
+      this.modelInitializing = true;
+      this.gpuSession = new InferenceSession({
+        backendHint: this.sessionBackend,
+      });
       this.session = this.gpuSession;
     }
-    if (this.sessionBackend === 'wasm') {        
+    if (this.sessionBackend === "wasm") {
       if (this.cpuSession) {
         this.session = this.cpuSession;
         return;
       }
       this.modelLoading = true;
-      this.modelInitializing = true;  
-      this.cpuSession = new InferenceSession({backendHint: this.sessionBackend});
+      this.modelInitializing = true;
+      this.cpuSession = new InferenceSession({
+        backendHint: this.sessionBackend,
+      });
       this.session = this.cpuSession;
-    }    
-    
+    }
+
     try {
       await this.session!.loadModel(this.modelFile);
-    } catch (e){
+    } catch (e) {
       this.modelLoading = false;
       this.modelInitializing = false;
-      if (this.sessionBackend === 'webgl') {
+      if (this.sessionBackend === "webgl") {
         this.gpuSession = undefined;
       } else {
         this.cpuSession = undefined;
       }
-      throw new Error('Error: Backend not supported. ');
+      throw new Error("Error: Backend not supported. ");
     }
     this.modelLoading = false;
-    // warm up session with a sample tensor. Use setTimeout(..., 0) to make it an async execution so 
+    // warm up session with a sample tensor. Use setTimeout(..., 0) to make it an async execution so
     // that UI update can be done.
-    if (this.sessionBackend === 'webgl') {
+    if (this.sessionBackend === "webgl") {
       setTimeout(() => {
         runModelUtils.warmupModel(this.session!, dimensionWarmup);
         this.modelInitializing = false;
-
       }, 0);
     } else {
       await runModelUtils.warmupModel(this.session!, dimensionWarmup);
       this.modelInitializing = false;
     }
-    
   }
-
 }
