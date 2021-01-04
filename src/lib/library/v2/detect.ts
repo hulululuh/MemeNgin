@@ -1,55 +1,37 @@
-import { DesignerNode, NodeInput, NodeType } from "../../designer/designernode";
-import { Property, FileProperty } from "@/lib/designer/properties";
-import { Tensor, InferenceSession } from "onnxjs";
+import { DesignerNode, NodeType } from "../../designer/designernode";
+import { Property } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
-
-import ndarray from "ndarray";
-import ops from "ndarray-ops";
-
-import * as runModelUtils from "@/lib/utils/runModel";
-import * as yoloTransforms from "@/lib/utils/utils-yolo/yoloPostprocess";
-import * as yolo from "@/lib/utils/yolo";
 
 const NativeImage = require("electron").nativeImage;
 
-const targetW = 416;
-const targetH = 416;
-
-export class YoloBox {
-  top: number;
-  left: number;
-  bottom: number;
-  right: number;
-  classProb: number;
-  className: string;
-}
+//import * as tf from "@tensorflow/tfjs-core";
+import * as deeplab from "@tensorflow-models/deeplab";
+//import { getLabels, getColormap } from "@tensorflow-models/deeplab";
+import { DeepLabOutput } from "@tensorflow-models/deeplab/dist/types";
+const loadModel = async () => {
+  const modelName = "pascal"; // set to your preferred model, either `pascal`, `cityscapes` or `ade20k`
+  const quantizationBytes = 4; // either 1, 2 or 4
+  return await deeplab.load({ base: modelName, quantizationBytes });
+};
 
 export class DetectNode extends DesignerNode {
-  protected img: Electron.NativeImage;
-  protected output: Tensor.DataType;
+  protected output: Promise<DeepLabOutput>;
   protected inferenceTime: number;
   protected sessionRunning: boolean;
-  protected boxes: YoloBox[];
+  protected isSegmentationReady: boolean;
   static verticesBuffer: WebGLBuffer;
   static vertices: number[];
+  static model: deeplab.SemanticSegmentation;
 
   constructor() {
     super();
     this.nodeType = NodeType.Texture;
+    this.isSegmentationReady = false;
 
-    this.onnodepropertychanged = (prop: Property) => {
-      if (prop.name === "file") {
-        if (prop) {
-          this.texPath = (prop as FileProperty).value;
-          if (this.texPath) {
-            this.img = NativeImage.createFromPath(this.texPath);
-            const imgSize = this.img.getSize();
-            this.resize(imgSize.width, imgSize.height);
-            this.createTexture();
-            this.requestUpdate();
-          }
-        }
-      }
+    this.onnodepropertychanged = (prop: Property) => {};
+
+    this.onconnected = (node: DesignerNode, name: string) => {
+      this.isSegmentationReady = false;
     };
 
     this.ondisconnected = (node: DesignerNode, name: string) => {
@@ -60,99 +42,18 @@ export class DetectNode extends DesignerNode {
           gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
           0
         );
-
-        let graphicsItem = Editor.getInstance().nodeScene.nodes.filter(
-          (x) => x.id == this.id
-        )[0];
-        graphicsItem.helperViz = [];
       }
     };
   }
 
-  preprocess(data: Uint8ClampedArray, width: number, height: number): Tensor {
-    // data processing
-    const dataTensor = ndarray(new Float32Array(data), [width, height, 4]);
-    const dataProcessedTensor = ndarray(new Float32Array(width * height * 3), [
-      1,
-      3,
-      width,
-      height,
-    ]);
-
-    ops.assign(
-      dataProcessedTensor.pick(0, 0, null, null),
-      dataTensor.pick(null, null, 0)
-    );
-    ops.assign(
-      dataProcessedTensor.pick(0, 1, null, null),
-      dataTensor.pick(null, null, 1)
-    );
-    ops.assign(
-      dataProcessedTensor.pick(0, 2, null, null),
-      dataTensor.pick(null, null, 2)
-    );
-
-    const tensor = new Tensor(new Float32Array(3 * width * height), "float32", [
-      1,
-      3,
-      width,
-      height,
-    ]);
-    (tensor.data as Float32Array).set(dataProcessedTensor.data);
-    return tensor;
-  }
-
-  async postprocess(tensor: Tensor, inferenceTime: number) {
-    try {
-      const originalOutput = new Tensor(
-        tensor.data as Float32Array,
-        "float32",
-        [1, 125, 13, 13]
-      );
-      const outputTensor = yoloTransforms.transpose(originalOutput, [
-        0,
-        2,
-        3,
-        1,
-      ]);
-
-      // postprocessing
-      let boxes = await yolo.postprocess(outputTensor, 20);
-      let graphicsItem = Editor.getInstance().nodeScene.nodes.filter(
-        (x) => x.id == this.id
-      )[0];
-      //graphicsItem.helperViz = [];
-
-      let helpers: YoloBox[] = [];
-
-      boxes.forEach((box) => {
-        const ratioW = this.width / targetW;
-        const ratioH = this.height / targetH;
-
-        const l = ratioW * box.left;
-        const r = ratioW * box.right;
-        const b = ratioH * box.bottom;
-        const t = ratioH * box.top;
-
-        const boxTransformed = {
-          top: t,
-          left: l,
-          bottom: b,
-          right: r,
-          classProb: box.classProb,
-          className: box.className,
-        };
-        helpers.push(boxTransformed);
-      });
-
-      graphicsItem.helperViz = helpers;
-    } catch (e) {
-      alert("Model is not valid!");
-    }
-  }
-
   createTexture() {
+    // if segmentation ready, skip update this node.
+    if (this.isSegmentationReady) {
+      return;
+    }
+
     let gl = this.gl;
+    this.isTextureReady = false;
 
     if (!DetectNode.verticesBuffer) {
       // init buffer for rect
@@ -230,6 +131,7 @@ export class DetectNode extends DesignerNode {
       leftNode.tex,
       0
     );
+
     if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) {
       gl.readPixels(
         0,
@@ -252,57 +154,82 @@ export class DetectNode extends DesignerNode {
       { width: texW, height: texH }
     );
 
-    // convert and resize input image
-    let imgResized = img.resize({ width: targetW, height: targetH });
-    let resizedBuffer = Uint8ClampedArray.from(imgResized.getBitmap());
+    const imageData: ImageData = new ImageData(
+      Uint8ClampedArray.from(img.getBitmap()),
+      texW,
+      texH
+    );
 
-    // 2. convert input image to tensor, setup ML session
-    let tensor = this.preprocess(resizedBuffer, targetW, targetH);
-
-    // 3. run ML session
-    let tensorOutput = null;
-    tensorOutput = this.runSession(tensor);
-
-    // 4. retrieve and visualize results
-
-    // create texture for debug
-    if (img) {
-      this.img = img;
-      const image = img;
-      const imgSize = image.getSize();
-      if (image.isEmpty() === false) {
-        this.width = imgSize.width;
-        this.height = imgSize.height;
-
-        this.tex = DesignerNode.updateTexture(
-          level,
-          internalFormat,
-          imgSize.width,
-          imgSize.height,
-          border,
-          format,
-          type,
-          data,
-          NodeType.Procedural,
-          this.gl
+    // *********** deeplab ***********
+    this.doSegmentation(imageData).then((output) => {
+      if (output.segmentationMap.length > 1) {
+        let resultImg = NativeImage.createFromBuffer(
+          Buffer.from(output.segmentationMap.buffer),
+          { width: output.width, height: output.height }
         );
-        this.baseTex = DesignerNode.updateTexture(
-          level,
-          internalFormat,
-          imgSize.width,
-          imgSize.height,
-          border,
-          format,
-          type,
-          Uint8Array.from(image.getBitmap()),
-          NodeType.Texture,
-          this.gl
-        );
-        this.isTextureReady = true;
-        this.resize(imgSize.width, imgSize.height);
-        this.requestUpdate();
+
+        const w = this.getWidth();
+        const h = this.getHeight();
+
+        let bitmap = resultImg.getBitmap();
+        const n = bitmap.length;
+
+        for (let idx = 0; idx < n / 4; idx++) {
+          const pixelIdx = idx * 4;
+          const iR = pixelIdx + 0;
+          const iG = pixelIdx + 1;
+          const iB = pixelIdx + 2;
+          const iA = pixelIdx + 3;
+
+          // make background pixel transparent
+          if (bitmap[iR] == 0 && bitmap[iG] == 0 && bitmap[iB] == 0) {
+            bitmap[iA] = 0;
+          }
+        }
+
+        resultImg = NativeImage.createFromBuffer(bitmap, {
+          width: output.width,
+          height: output.height,
+        });
+
+        // create texture for debug
+        if (resultImg) {
+          if (!this.isTextureReady) {
+            this.tex = DesignerNode.updateTexture(
+              level,
+              internalFormat,
+              w,
+              h,
+              border,
+              format,
+              type,
+              data,
+              NodeType.Procedural,
+              this.gl
+            );
+            this.baseTex = DesignerNode.updateTexture(
+              level,
+              internalFormat,
+              output.width,
+              output.height,
+              border,
+              format,
+              type,
+              Uint8Array.from(resultImg.getBitmap()),
+              NodeType.Texture,
+              this.gl,
+              false,
+              false
+            );
+
+            this.isTextureReady = true;
+            this.isSegmentationReady = true;
+            this.resize(w, h);
+            this.requestUpdate();
+          }
+        }
       }
-    }
+    });
   }
 
   clearTexture() {
@@ -337,37 +264,23 @@ export class DetectNode extends DesignerNode {
     this.isTextureReady = false;
   }
 
-  async runSession(preprocessedData: Tensor): Promise<Tensor> {
-    let tensorOutput = null;
-    let session = Editor.getInstance().mlModel.session;
-    [tensorOutput, this.inferenceTime] = await runModelUtils.runModel(
-      session!,
-      preprocessedData
-    );
-    this.output = tensorOutput.data;
-    this.postprocess(tensorOutput, 0);
-    this.sessionRunning = false;
-    return tensorOutput;
+  async doSegmentation(imageData: ImageData) {
+    if (!DetectNode.model) {
+      DetectNode.model = await loadModel();
+    }
+    return await DetectNode.model.segment(imageData);
   }
 
   init() {
     this.title = "Detect";
     this.addInput("image");
-    //let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);
-
-    // this happens when we drop image file into canvas
-    // if (this.texPath !== "") {
-    //   fileProp.setValue(this.texPath);
-    // }
 
     let source = `
         vec4 process(vec2 uv)
         {
-          vec4 col = vec4(0,1,0,1);
+          vec4 col = texture(image, uv);
           if (baseTexture_ready) {
-            col = texture(baseTexture, uv);
-          } else {
-            col = vec4(uv.x, uv.y, 0.0, 1.0);
+            col.a = texture(baseTexture, uv).a;
           }
           return col;
         }

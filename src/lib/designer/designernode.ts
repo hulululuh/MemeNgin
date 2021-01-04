@@ -1,5 +1,6 @@
-import { Guid } from "../utils";
-import { Designer } from "../designer";
+import { Guid } from "@/lib/utils";
+import { Designer } from "@/lib/designer";
+import { Editor } from "@/lib/editor";
 import {
   Property,
   FloatProperty,
@@ -12,14 +13,13 @@ import {
   GradientProperty,
   IPropertyHolder,
   Transform2DProperty,
-} from "./properties";
-import { buildShaderProgram } from "./gl";
-import { Color } from "./color";
-import { Gradient } from "./gradient";
-import { Editor } from "../editor";
-import { Vector2, Matrix4 } from "@math.gl/core";
+} from "@/lib/designer/properties";
+import { buildShaderProgram } from "@/lib/designer/gl";
+import { Color } from "@/lib/designer/color";
+import { Gradient } from "@/lib/designer/gradient";
 import { WidgetEvent } from "@/lib/scene/graphicsitem";
-import { Transform2D } from "../math/transform2d";
+import { Transform2D } from "@/lib/math/transform2d";
+import { Vector2, Matrix4 } from "@math.gl/core";
 
 const NativeImage = require("electron").nativeImage;
 
@@ -68,16 +68,6 @@ export enum NodeType {
   Text,
   Logic,
 }
-
-// export type NodeCategory = string;
-// export const NodeCategory = {
-//   Undefined: "undefined",
-//   Shape: "shape",
-//   Color: "color",
-//   Composite: "composite",
-//   Create: "create",
-//   Think: "think",
-// };
 
 export enum NodeCategory {
   Undefined = "undefined",
@@ -216,6 +206,7 @@ export class DesignerNode implements IPropertyHolder {
   // callbacks
   onthumbnailgenerated: (DesignerNode, HTMLImageElement) => void;
   onnodepropertychanged?: (prop: Property) => void;
+  onconnected?: (node: DesignerNode, name: string) => void;
   ondisconnected?: (node: DesignerNode, name: string) => void;
 
   // an update is requested when:
@@ -258,9 +249,7 @@ export class DesignerNode implements IPropertyHolder {
       if (gNodes) {
         gNodes.setVirtualSize(width, height);
       }
-      //this.createTexture();
     }
-    //this.requestUpdate();
   }
 
   render(inputs: NodeInput[], optional?: Function) {
@@ -504,38 +493,14 @@ export class DesignerNode implements IPropertyHolder {
       prop.setValue(value);
       this.requestUpdate();
     }
-
-    // for (let prop of this.properties) {
-    //   console.log("prop iter");
-    //   console.log(prop);
-    //   console.log(prop.name == name);
-    //   if (prop.name == name) {
-    //     prop.setValue(value);
-    //     this.requestUpdate();
-    //   }
-    // }
   }
 
   _init() {
-    //this.inputs = new Array();
-    //this.properties = new Array();
     this.createTexture();
-
     this.init();
   }
 
-  protected init() {
-    /*
-        this.source = `
-        vec4 process(vec2 uv)
-        {
-        return vec4(uv,x, uv.y, 0, 0);
-        }
-        `;
-
-        this.buildShader(this.source);
-        */
-  }
+  protected init() {}
 
   setAsInput() {
     this.isInput = true;
@@ -736,12 +701,19 @@ export class DesignerNode implements IPropertyHolder {
   }
 
   connected(leftNode: DesignerNode, rightIndex: string) {
+    if (this.onconnected) {
+      this.onconnected(leftNode, rightIndex);
+    }
+
     if (this.isParentIndex(rightIndex)) {
       // fit the size to parent node - try resize
       this.resize(leftNode.width, leftNode.height);
     }
     this.createTexture();
+    // update node here, if the createTexture() is sync, otherwise(async) handle it from outside
+    //if (this.isTextureReady) {
     this.requestUpdate();
+    //}
   }
 
   createRandomLibOld(): string {

@@ -25,9 +25,6 @@ export class NodeGraphicsItem extends GraphicsItem {
   imageCanvas: ImageCanvas;
   relScale: number;
 
-  // over-layed visual objects such as rectangle indicating detected objects
-  helperViz: any;
-
   hit: boolean;
 
   // albedo, normal, height, etc...
@@ -42,7 +39,6 @@ export class NodeGraphicsItem extends GraphicsItem {
     this.title = title;
     this.imageCanvas = new ImageCanvas();
     this.hit = false;
-    this.helperViz = null;
 
     // const scale = Math.min(width, height);
     // this.relScale = 100 / scale;
@@ -125,34 +121,6 @@ export class NodeGraphicsItem extends GraphicsItem {
         this.width,
         this.height
       );
-    }
-
-    if (this.helperViz) {
-      this.helperViz.forEach((box) => {
-        ctx.beginPath();
-        ctx.fillStyle = "red";
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 1;
-
-        const w = box.right;
-        const h = box.top;
-
-        ctx.rect(
-          this.x + box.left * this.relScale,
-          this.y + box.top * this.relScale,
-          Math.abs(box.right - box.left) * this.relScale,
-          Math.abs(box.bottom - box.top) * this.relScale
-        );
-        ctx.stroke();
-
-        ctx.beginPath();
-        const text = `${box.className}: ${(box.classProb * 100).toFixed(2)} %`;
-        let size = ctx.measureText(text.toUpperCase());
-        let textX = this.centerX() - size.width / 2;
-        let textY = this.y + this.height + 14;
-        ctx.font = "bold 9px 'Open Sans'";
-        ctx.fillText(text.toUpperCase(), textX, textY);
-      });
     }
 
     ctx.globalAlpha = 0.65;

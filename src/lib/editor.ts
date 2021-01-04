@@ -26,8 +26,6 @@ import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 
-import { MLModel } from "./mlmodel";
-
 function hexToRgb(hex) {
   let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -98,8 +96,6 @@ export class Editor {
 
   //scene3D: any; // todo: set a type
 
-  mlModel: MLModel;
-
   //   propGen: PropertyGenerator;
   //   varGen: VariableGenerator;
   displayNodes: DisplayNodes;
@@ -131,7 +127,6 @@ export class Editor {
     this.displayNodes = new DisplayNodes();
     this.selectedDesignerNode = null;
     this.undoStack = new UndoStack();
-    this.mlModel = new MLModel();
   }
 
   static getInstance() {
@@ -149,10 +144,6 @@ export class Editor {
   static getScene() {
     const editor = this.getInstance();
     return editor.nodeScene;
-  }
-
-  getMLModel() {
-    return this.mlModel;
   }
 
   getImageWidth() {
