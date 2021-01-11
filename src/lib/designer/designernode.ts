@@ -21,8 +21,6 @@ import { WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2, Matrix4 } from "@math.gl/core";
 
-const NativeImage = require("electron").nativeImage;
-
 const POTs: number[] = [
   1,
   2,
@@ -710,10 +708,9 @@ export class DesignerNode implements IPropertyHolder {
       this.resize(leftNode.width, leftNode.height);
     }
     this.createTexture();
+
     // update node here, if the createTexture() is sync, otherwise(async) handle it from outside
-    //if (this.isTextureReady) {
     this.requestUpdate();
-    //}
   }
 
   createRandomLibOld(): string {

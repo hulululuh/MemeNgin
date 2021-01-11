@@ -2,16 +2,28 @@ import { DesignerNode, NodeType } from "../../designer/designernode";
 import { Property } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
 
-const NativeImage = require("electron").nativeImage;
-
-//import * as tf from "@tensorflow/tfjs-core";
+import { DeepLabOutput } from "@tensorflow-models/deeplab/dist/types";
 import * as deeplab from "@tensorflow-models/deeplab";
 //import { getLabels, getColormap } from "@tensorflow-models/deeplab";
-import { DeepLabOutput } from "@tensorflow-models/deeplab/dist/types";
+//import * as tf from "@tensorflow/tfjs-core";
+import path from "path";
+
+const NativeImage = require("electron").nativeImage;
+const appPath = require("electron").remote.app.getAppPath();
+const modelPath = path.normalize(
+  appPath +
+    "/../src/assets/tensorflow/deeplabv3_pascal_trainval/frozen_inference_graph.pb"
+);
+
+const customModel: boolean = false;
 const loadModel = async () => {
-  const modelName = "pascal"; // set to your preferred model, either `pascal`, `cityscapes` or `ade20k`
-  const quantizationBytes = 4; // either 1, 2 or 4
-  return await deeplab.load({ base: modelName, quantizationBytes });
+  if (!customModel) {
+    const modelName = "pascal"; // set to your preferred model, either `pascal`, `cityscapes` or `ade20k`
+    const quantizationBytes = 2; // either 1, 2 or 4
+    return await deeplab.load({ base: modelName, quantizationBytes });
+  } else {
+    return await deeplab.load({ modelUrl: modelPath });
+  }
 };
 
 export class DetectNode extends DesignerNode {
@@ -44,6 +56,12 @@ export class DetectNode extends DesignerNode {
         );
       }
     };
+  }
+
+  static loadModelAsync() {
+    loadModel().then((model) => {
+      DetectNode.model = model;
+    });
   }
 
   createTexture() {

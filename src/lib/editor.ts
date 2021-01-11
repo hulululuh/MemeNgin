@@ -25,6 +25,7 @@ import { ItemClipboard } from "./clipboard";
 import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
+import { DetectNode } from "./library/v2/detect";
 
 function hexToRgb(hex) {
   let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -124,6 +125,7 @@ export class Editor {
 
   constructor() {
     Editor.instance = this;
+    DetectNode.loadModelAsync();
     this.displayNodes = new DisplayNodes();
     this.selectedDesignerNode = null;
     this.undoStack = new UndoStack();
