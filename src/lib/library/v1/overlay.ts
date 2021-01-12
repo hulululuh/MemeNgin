@@ -58,6 +58,13 @@ export class OverlayNode extends DesignerNode implements ITransformable {
       this.requestUpdate();
     };
 
+    this.onPropertyLoadFinished = () => {
+      this.properties
+        .filter((p) => p.name === "transform2d")[0]
+        .setValue(this.getTransform());
+      this.requestUpdateWidget();
+    };
+
     this.onItemSelected = () => {
       this.properties
         .filter((p) => p.name === "transform2d")[0]
@@ -120,6 +127,32 @@ export class OverlayNode extends DesignerNode implements ITransformable {
         `;
 
     this.buildShader(source);
+  }
+
+  resize(width: number, height: number) {
+    super.resize(width, height);
+
+    if (this.isWidgetAvailable()) {
+      // background has changed
+      const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
+      if (!srcNode) return;
+      let lw = srcNode.getWidth();
+      let lh = srcNode.getHeight();
+
+      const w = this.getWidth();
+      const h = this.getHeight();
+
+      this.inputASize = new Vector2(lw, lh);
+      this.inputBSize = new Vector2(w, h);
+
+      const scale = Math.min(w, h);
+      const scaleFactor = 100 / scale;
+
+      this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
+      this.dragStartRelScale = new Vector2(1, 1);
+
+      this.requestUpdateWidget();
+    }
   }
 
   render(inputs: NodeInput[]) {

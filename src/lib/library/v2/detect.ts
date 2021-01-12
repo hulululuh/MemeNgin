@@ -42,8 +42,10 @@ export class DetectNode extends DesignerNode {
 
     this.onnodepropertychanged = (prop: Property) => {};
 
-    this.onconnected = (node: DesignerNode, name: string) => {
+    this.createTextureAsync = async () => {
       this.isSegmentationReady = false;
+      await this.createTexture();
+      return this;
     };
 
     this.ondisconnected = (node: DesignerNode, name: string) => {
@@ -64,7 +66,7 @@ export class DetectNode extends DesignerNode {
     });
   }
 
-  createTexture() {
+  async createTexture() {
     // if segmentation ready, skip update this node.
     if (this.isSegmentationReady) {
       return;
@@ -179,7 +181,7 @@ export class DetectNode extends DesignerNode {
     );
 
     // *********** deeplab ***********
-    this.doSegmentation(imageData).then((output) => {
+    await this.doSegmentation(imageData).then((output) => {
       if (output.segmentationMap.length > 1) {
         let resultImg = NativeImage.createFromBuffer(
           Buffer.from(output.segmentationMap.buffer),
@@ -243,7 +245,7 @@ export class DetectNode extends DesignerNode {
             this.isTextureReady = true;
             this.isSegmentationReady = true;
             this.resize(w, h);
-            this.requestUpdate();
+            //this.requestUpdate();
           }
         }
       }

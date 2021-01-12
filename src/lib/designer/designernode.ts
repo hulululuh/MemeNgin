@@ -112,6 +112,7 @@ export class DesignerNode implements IPropertyHolder {
 
   isEditing: boolean = false;
 
+  onPropertyLoadFinished?: () => void;
   onWidgetDragged?: (evt: WidgetEvent) => void;
   onItemSelected(): void {
     const event = new WidgetEvent("widgetUpdate", {
@@ -201,10 +202,11 @@ export class DesignerNode implements IPropertyHolder {
     }
   }
 
+  createTextureAsync?: () => Promise<DesignerNode>;
+
   // callbacks
   onthumbnailgenerated: (DesignerNode, HTMLImageElement) => void;
   onnodepropertychanged?: (prop: Property) => void;
-  onconnected?: (node: DesignerNode, name: string) => void;
   ondisconnected?: (node: DesignerNode, name: string) => void;
 
   // an update is requested when:
@@ -215,10 +217,6 @@ export class DesignerNode implements IPropertyHolder {
   // all output connected nodes are invalidated as well
   requestUpdate() {
     this.designer.requestUpdate(this);
-  }
-
-  requestUpdateThumbnail() {
-    this.designer.requestUpdateThumbnail(this);
   }
 
   resize(width: number, height: number) {
@@ -482,6 +480,16 @@ export class DesignerNode implements IPropertyHolder {
     this.inputs.push(name);
   }
 
+  getProperty(name: string): any {
+    let prop = this.properties.find((x) => x.name === name);
+    if (prop) {
+      return prop.getValue();
+    } else {
+      console.error("can not find property: " + name);
+      return "";
+    }
+  }
+
   setProperty(name: string, value: any) {
     let prop = this.properties.find((x) => {
       return x.name == name;
@@ -699,18 +707,21 @@ export class DesignerNode implements IPropertyHolder {
   }
 
   connected(leftNode: DesignerNode, rightIndex: string) {
-    if (this.onconnected) {
-      this.onconnected(leftNode, rightIndex);
-    }
-
     if (this.isParentIndex(rightIndex)) {
       // fit the size to parent node - try resize
       this.resize(leftNode.width, leftNode.height);
     }
-    this.createTexture();
 
-    // update node here, if the createTexture() is sync, otherwise(async) handle it from outside
-    this.requestUpdate();
+    if (this.createTextureAsync) {
+      this.createTextureAsync().then((n) => {
+        n.requestUpdate();
+      });
+    } else {
+      this.createTexture();
+
+      // update node here, if the createTexture() is sync, otherwise(async) handle it from outside
+      this.requestUpdate();
+    }
   }
 
   createRandomLibOld(): string {

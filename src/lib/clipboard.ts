@@ -205,8 +205,9 @@ export class ItemClipboard {
       focusItems.push(node);
 
       // generate thumbnail
-      let thumb = designer.generateImageFromNode(dNode);
-      node.setThumbnail(thumb);
+      designer.generateImageFromNode(dNode).then((thumb) => {
+        node.setThumbnail(thumb);
+      });
 
       node.setCenter(n.x, n.y);
 

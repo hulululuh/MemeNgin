@@ -181,12 +181,16 @@ export class Designer {
     }
   }
 
-  requestUpdateThumbnail(dNode: DesignerNode) {
-    const editor = Editor.getInstance();
-    const node = editor.nodeScene.nodes.find((i) => i.id === dNode.id);
-
-    if (dNode && node) {
-      editor.createThumnail(dNode, node);
+  requestUpdateChilds(node: DesignerNode) {
+    // add all right connections
+    for (let con of this.conns) {
+      if (con.leftNode == node) {
+        if (this.updateList.indexOf(con.rightNode) == -1) {
+          // not yet in the list, add to list and add dependent nodes
+          con.rightNode.needsUpdate = true; // just in case...
+          this.updateList.push(con.rightNode);
+        }
+      }
     }
   }
 
@@ -361,7 +365,7 @@ export class Designer {
       this.updateList.splice(this.updateList.indexOf(node), 1);
   }
 
-  generateImage(name: string): HTMLImageElement {
+  generateImage(name: string): Promise<HTMLImageElement> {
     let node: DesignerNode = this.getNodeByName(name);
     return this.generateImageFromNode(node);
   }
@@ -371,10 +375,12 @@ export class Designer {
   // for every node updated in this function, it emits onthumbnailgenerated(node, thumbnail)
   // it returns a thumbnail (an html image)
 
-  generateImageFromNode(node: DesignerNode): HTMLImageElement {
+  async generateImageFromNode(node: DesignerNode): Promise<HTMLImageElement> {
     // Procedural : Render >> Get fbo texture then use it as thumbnail
     // Text : bind text layout as baseTex >> Render >> Get fbo texture then use it as thumbnail
     // Texture : textures already loaded into node.tex (skip the rendering)
+    let thumb;
+
     if (
       node.nodeType === NodeType.Procedural ||
       node.nodeType === NodeType.Text ||
@@ -398,36 +404,47 @@ export class Designer {
 
       if (inputs.length > 0) {
         let parent = node.getParentNode();
-        //node.isPrimeIndex();
 
         if (parent) {
           node.resize(parent.width, parent.height);
         }
-        node.createTexture();
-        node.requestUpdate();
+
+        if (node.createTextureAsync) {
+          await node.createTextureAsync();
+          Editor.getDesigner().requestUpdateChilds(node);
+          thumb = this.prepareThumbnail(node);
+        } else {
+          node.createTexture();
+          node.requestUpdate();
+          thumb = this.prepareThumbnail(node);
+        }
+      } else {
+        thumb = this.prepareThumbnail(node);
       }
-
-      let gl = this.gl;
-
-      // todo: move to node maybe
-      gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.framebufferTexture2D(
-        gl.FRAMEBUFFER,
-        gl.COLOR_ATTACHMENT0,
-        gl.TEXTURE_2D,
-        node.tex,
-        0
-      );
-
-      gl.viewport(0, 0, node.getWidth(), node.getHeight());
-      node.render(inputs);
-
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
-    // else if (node.nodeType === NodeType.Text) {
-    //   return this.createImageFromTexture(this.gl, node.tex, 1024, 1024);
-    // }
+
+    return thumb;
+  }
+
+  prepareThumbnail(node: DesignerNode) {
+    let inputs: NodeInput[] = this.getNodeInputs(node);
+    let gl = this.gl;
+
+    // todo: move to node maybe
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_2D,
+      node.tex,
+      0
+    );
+
+    gl.viewport(0, 0, node.getWidth(), node.getHeight());
+    node.render(inputs);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     if (this.onnodetextureupdated) {
       this.onnodetextureupdated(node);
@@ -805,6 +822,10 @@ export class Designer {
       let properties = node["properties"];
       for (let prop in properties) {
         n.setProperty(prop, properties[prop]);
+      }
+
+      if (n.onPropertyLoadFinished) {
+        n.onPropertyLoadFinished();
       }
     }
 

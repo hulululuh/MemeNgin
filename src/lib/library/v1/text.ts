@@ -68,6 +68,16 @@ export class TextNode extends DesignerNode {
         this.drawFont();
       }
     };
+
+    this.onPropertyLoadFinished = () => {
+      this.textGeom.updateText(this.getProperty("text"));
+      this.textGeom.updateSize(this.getProperty("size"));
+      this.textGeom.updateLetterSpacing(this.getProperty("letterSpacing"));
+      this.textGeom.updateLineHeight(this.getProperty("lineHeight"));
+      this.color = this.getProperty("color");
+      updateGeom();
+      this.drawFont();
+    };
   }
 
   drawFont() {
@@ -229,7 +239,6 @@ export class TextNode extends DesignerNode {
 
     // line interval
     this.addFloatProperty("lineHeight", "Line height", 1.175, 0.5, 3, 0.001);
-
     this.addIntProperty("frameWidth", "Frame Width", 1024, 128, 1024, 128);
 
     let vertSource = `

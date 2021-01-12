@@ -701,12 +701,6 @@ export class Editor {
     );
   }
 
-  createThumnail(dNode: DesignerNode, node: NodeGraphicsItem) {
-    if (!dNode.readyToUpdate()) return;
-    let thumb = this.designer.generateImageFromNode(dNode);
-    node.setThumbnail(thumb);
-  }
-
   // adds node
   // x and y are screen space
   addNode(
@@ -730,10 +724,6 @@ export class Editor {
 
     let pos = this.nodeScene.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);
-
-    // if (dNode.readyToUpdate()) {
-    //   this.createThumnail(dNode, node);
-    // }
 
     return node;
   }
