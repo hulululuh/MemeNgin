@@ -149,7 +149,6 @@ export class OverlayNode extends DesignerNode implements ITransformable {
       const scaleFactor = 100 / scale;
 
       this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
-      this.dragStartRelScale = new Vector2(1, 1);
 
       this.requestUpdateWidget();
     }

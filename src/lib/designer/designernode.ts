@@ -275,7 +275,6 @@ export class DesignerNode implements IPropertyHolder {
 
     texIndex = 0;
     // pass inputs for rendering
-    //for (const input of inputs) {
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
       const tex = input.node.tex ? input.node.tex : Designer.dummyTex;
@@ -298,7 +297,6 @@ export class DesignerNode implements IPropertyHolder {
         texH
       );
 
-      input.name;
       console.log("bound texture " + texIndex);
       texIndex++;
     }
