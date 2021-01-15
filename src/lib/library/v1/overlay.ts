@@ -23,6 +23,27 @@ export class OverlayNode extends DesignerNode implements ITransformable {
         this.requestUpdateWidget();
       }
     };
+
+    this.onResized = (width: number, height: number) => {
+      // background has changed
+      const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
+      if (!srcNode) return;
+      let lw = srcNode.getWidth();
+      let lh = srcNode.getHeight();
+
+      const w = this.getWidth();
+      const h = this.getHeight();
+
+      this.inputASize = new Vector2(lw, lh);
+      this.inputBSize = new Vector2(w, h);
+
+      const scale = Math.min(w, h);
+      const scaleFactor = 100 / scale;
+
+      this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
+
+      this.requestUpdateWidget();
+    };
   }
 
   init() {
@@ -129,31 +150,6 @@ export class OverlayNode extends DesignerNode implements ITransformable {
     this.buildShader(source);
   }
 
-  resize(width: number, height: number) {
-    super.resize(width, height);
-
-    if (this.isWidgetAvailable()) {
-      // background has changed
-      const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
-      if (!srcNode) return;
-      let lw = srcNode.getWidth();
-      let lh = srcNode.getHeight();
-
-      const w = this.getWidth();
-      const h = this.getHeight();
-
-      this.inputASize = new Vector2(lw, lh);
-      this.inputBSize = new Vector2(w, h);
-
-      const scale = Math.min(w, h);
-      const scaleFactor = 100 / scale;
-
-      this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
-
-      this.requestUpdateWidget();
-    }
-  }
-
   render(inputs: NodeInput[]) {
     const designer = Editor.getDesigner();
     designer.findLeftNode(this.id, "colorA");
@@ -175,16 +171,16 @@ export class OverlayNode extends DesignerNode implements ITransformable {
   connected(leftNode: DesignerNode, rightIndex: string) {
     super.connected(leftNode, rightIndex);
 
+    //if (!this.isParentIndex(rightIndex)) return;
+
     let lw = leftNode.getWidth();
     let lh = leftNode.getHeight();
 
     // background has changed
-    if (rightIndex === "colorB") {
-      const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
-      if (!srcNode) return;
-      lw = srcNode.getWidth();
-      lh = srcNode.getHeight();
-    }
+    const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
+    if (!srcNode) return;
+    lw = srcNode.getWidth();
+    lh = srcNode.getHeight();
 
     const w = this.getWidth();
     const h = this.getHeight();
@@ -198,11 +194,15 @@ export class OverlayNode extends DesignerNode implements ITransformable {
     this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
     this.dragStartRelScale = new Vector2(1, 1);
 
-    this.requestUpdateWidget();
+    if (this.isWidgetAvailable()) {
+      Editor.getInstance().selectedDesignerNode = this;
+      this.requestUpdateWidget();
+    }
   }
 
   requestUpdateWidget(): void {
-    if (document && this.isWidgetAvailable()) {
+    if (!document) return;
+    if (this.isWidgetAvailable()) {
       // select this in order to activate transform2d widget
       Editor.getInstance().selectedDesignerNode = this;
 
@@ -212,6 +212,14 @@ export class OverlayNode extends DesignerNode implements ITransformable {
           dragStartRelScale: this.dragStartRelScale,
           relScale: this.getTransform().scale,
           enable: true,
+        },
+      });
+
+      document.dispatchEvent(event);
+    } else {
+      const event = new WidgetEvent("widgetUpdate", {
+        detail: {
+          enable: false,
         },
       });
 

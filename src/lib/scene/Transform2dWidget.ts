@@ -487,6 +487,7 @@ export class Transform2dWidget extends GraphicsItem {
     this.visible = evt.detail.enable;
 
     if (!this.enable) return;
+    if (!evt.detail.transform2d) return;
 
     this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
     this.relScale = new Vector2(evt.detail.relScale);

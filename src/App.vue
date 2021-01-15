@@ -150,7 +150,7 @@ export default class App extends Vue {
   editor!: Editor;
   library!: DesignerLibrary;
 
-  selectedNode: DesignerNode = null;
+  //selectedNode: DesignerNode = null;
   propHolder: IPropertyHolder = null;
 
   //designer!: Designer;

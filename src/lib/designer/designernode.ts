@@ -112,8 +112,10 @@ export class DesignerNode implements IPropertyHolder {
 
   isEditing: boolean = false;
 
+  onResized?: (width: number, height: number) => void;
   onPropertyLoadFinished?: () => void;
   onWidgetDragged?: (evt: WidgetEvent) => void;
+  // default behaviour: turn off transform widget
   onItemSelected(): void {
     const event = new WidgetEvent("widgetUpdate", {
       detail: {
@@ -219,33 +221,38 @@ export class DesignerNode implements IPropertyHolder {
     this.designer.requestUpdate(this);
   }
 
-  resize(width: number, height: number) {
+  resize(width: number, height: number): boolean {
     const sizeChanged = this.width !== width || this.height !== height;
+    if (!sizeChanged) return false;
 
-    if (sizeChanged) {
-      this.width = width;
-      this.height = height;
+    this.width = width;
+    this.height = height;
 
-      // if the result node size has changed, we should resize 2d canvas also
-      if (this.isResult) {
-        let event = new CustomEvent("resizeImage", {
-          detail: {
-            width: this.getWidth(),
-            height: this.getHeight(),
-          },
-        });
-
-        document?.dispatchEvent(event);
-      }
-
-      // find a corresponding NodeGraphicsItem
-      const gNodes = Editor.getInstance().nodeScene.nodes.find(
-        (x) => x.id === this.id
-      );
-      if (gNodes) {
-        gNodes.setVirtualSize(width, height);
-      }
+    if (this.onResized) {
+      this.onResized(width, height);
     }
+
+    // find a corresponding NodeGraphicsItem
+    const gNodes = Editor.getInstance().nodeScene.nodes.find(
+      (x) => x.id === this.id
+    );
+    if (gNodes) {
+      gNodes.setVirtualSize(width, height);
+    }
+
+    // if the result node size has changed, we should resize 2d canvas also
+    if (this.isResult) {
+      let event = new CustomEvent("resizeImage", {
+        detail: {
+          width: this.getWidth(),
+          height: this.getHeight(),
+        },
+      });
+
+      document?.dispatchEvent(event);
+    }
+
+    return true;
   }
 
   render(inputs: NodeInput[], optional?: Function) {
@@ -275,6 +282,7 @@ export class DesignerNode implements IPropertyHolder {
 
     texIndex = 0;
     // pass inputs for rendering
+    //for (const input of inputs) {
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
       const tex = input.node.tex ? input.node.tex : Designer.dummyTex;
@@ -297,6 +305,7 @@ export class DesignerNode implements IPropertyHolder {
         texH
       );
 
+      input.name;
       console.log("bound texture " + texIndex);
       texIndex++;
     }

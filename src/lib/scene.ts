@@ -22,8 +22,6 @@ import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
 import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
 import { SelectionGraphicsItem } from "./scene/selectiongraphicsitem";
 import { Color } from "./designer/color";
-import { ItemClipboard } from "./clipboard";
-import { Transform2DGraphicsItem } from "./scene/transform2dgraphicsitem";
 import { Vector2 } from "@math.gl/core";
 import { BoundingBox } from "@/lib/math/boundingbox";
 import { Rect } from "@/lib/math/rect";
@@ -35,6 +33,7 @@ import {
   colorGridSecondary,
 } from "../main";
 import { app } from "electron";
+import { DesignerNode } from "./designer/designernode";
 
 enum DragMode {
   None,
@@ -890,6 +889,19 @@ export class NodeScene {
         hitItem.mouseUp(mouseEvent);
 
         this.hitItem = null;
+
+        const isClearingSelection = hitItem instanceof SelectionGraphicsItem;
+        if (isClearingSelection) {
+          if (document) {
+            const event = new WidgetEvent("widgetUpdate", {
+              detail: {
+                enable: false,
+              },
+            });
+
+            document.dispatchEvent(event);
+          }
+        }
       }
     }
 
