@@ -893,6 +893,10 @@ export class Editor {
     this.setDesigner(d);
     this.setScene(g);
 
+    // TODO: better way to handle this
+    // scene.onconnectioncreated callback is established from now on, so we need to refresh it
+    g.refresh();
+
     // assign each node to it's texture channel
     // it's expected at this point that the 3d preview should already
     // have the texturechannel callbacks assigned

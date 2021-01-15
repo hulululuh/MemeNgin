@@ -527,6 +527,16 @@ export class NodeScene {
     return null;
   }
 
+  refresh() {
+    // no connections
+    if (this.conns.length < 1) return;
+    if (!this.onconnectioncreated) return;
+
+    this.conns.forEach((con) => {
+      this.onconnectioncreated(con);
+    });
+  }
+
   //todo: integrity check
   addConnection(con: ConnectionGraphicsItem) {
     this.conns.push(con);
