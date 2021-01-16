@@ -1,3 +1,4 @@
+$isValid: 1;
 $colorBackground: #1e1e1e;
 $colorMenubar: #252526;
 $colorTitle: #3c3c3c;
@@ -11,6 +12,13 @@ $colorAccentDarker: #45a29e;
 $colorGridBackground: #4a5050;
 $colorGridPrimary: #464c4c;
 $colorGridSecondary: #4e5454;
+$colorWidget: #ffffff;
+$colorWidgetHighlight: #3282b8;
+$colorWidgetShadow: #1e1e1e4c;
+$colorSelectedItem: #bbe1fa;
+$colorSelectedItemBackground: #3282b84c;
+$widgetThickness: 3.0;
+$widgetShadowThickness: 3.0;
 $nodeIconSize: 2.5rem;
 
 $prefix: "--";
@@ -30,4 +38,11 @@ body {
   @include define-custom-property("colorGridBackground", $colorGridBackground);
   @include define-custom-property("colorGridPrimary", $colorGridPrimary);
   @include define-custom-property("colorGridSecondary", $colorGridSecondary);
+  @include define-custom-property("colorWidget", $colorWidget);
+  @include define-custom-property("colorWidgetHighlight", $colorWidgetHighlight);
+  @include define-custom-property("colorWidgetShadow", $colorWidgetShadow);
+  @include define-custom-property("widgetThickness", $widgetThickness);
+  @include define-custom-property("widgetShadowThickness", $widgetShadowThickness);
+  @include define-custom-property("colorSelectedItem", $colorSelectedItem);
+  @include define-custom-property("colorSelectedItemBackground", $colorSelectedItemBackground);
 }

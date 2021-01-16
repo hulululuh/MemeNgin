@@ -1,4 +1,3 @@
-import { ImageCanvas } from "./designer/imagecanvas";
 import { Designer } from "./designer";
 import {
   NodeGraphicsItem,
@@ -32,9 +31,9 @@ import {
   colorGridPrimary,
   colorGridSecondary,
 } from "../main";
-import { app } from "electron";
-import { DesignerNode } from "./designer/designernode";
 import { OverlayNode } from "./library/v1/overlay";
+import { ApplicationSettings } from "@/settings";
+const settings = ApplicationSettings.getInstance();
 
 enum DragMode {
   None,
@@ -730,7 +729,7 @@ export class NodeScene {
       rect.expand(15);
 
       //ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-      ctx.fillStyle = "rgba(50, 130, 184, 0.3)";
+      ctx.fillStyle = settings.colorSelectedItemBackground;
       ctx.lineWidth = 0;
       ctx.rect(rect.left, rect.top, rect.width, rect.height);
       ctx.fill();

@@ -10,7 +10,6 @@ import { SceneView } from "./view";
 import { Rect } from "@/lib/math/rect";
 import { ApplicationSettings } from "@/settings";
 import { Vector2, Matrix3 } from "@math.gl/core";
-import { Color } from "../designer/color";
 import {
   iCollider,
   CircleCollider,
@@ -34,11 +33,18 @@ enum DragMode {
   Rotate,
 }
 
+enum HighlightMode {
+  None,
+  ScaleX,
+  ScaleY,
+  ScaleCircle,
+  Rotation,
+  Move,
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 export class Transform2dWidget extends GraphicsItem {
   view: SceneView;
-  color: Color;
-  strokeColor: Color;
   hit: boolean;
 
   // dragging
@@ -52,6 +58,7 @@ export class Transform2dWidget extends GraphicsItem {
 
   scaleMode: ScaleMode;
   dragMode: DragMode;
+  highlightMode: HighlightMode;
 
   protected colliders: Array<iCollider>;
   protected points: Array<Vector2>;
@@ -74,14 +81,13 @@ export class Transform2dWidget extends GraphicsItem {
     super();
     this._drawSelHighlight = false;
     this.view = view;
-    this.color = new Color(0.1, 0, 0.2);
-    this.strokeColor = new Color(1.0, 1.0, 1.0);
     this.hit = false;
 
     this.relScale = new Vector2(1, 1);
     this.dragged = true;
     this.scaleMode = ScaleMode.None;
     this.dragMode = DragMode.None;
+    this.highlightMode = HighlightMode.None;
 
     this.colliders = new Array<iCollider>();
     this.colliders.push(
@@ -131,94 +137,192 @@ export class Transform2dWidget extends GraphicsItem {
     this.transform2d.setRotation(0);
   }
 
-  private buildColor(color: Color, alpha: number) {
-    let col =
-      "rgba(" +
-      color.r * 255 +
-      "," +
-      color.g * 255 +
-      "," +
-      color.b * 255 +
-      "," +
-      alpha +
-      ")";
-    //console.log(col);
-    return col;
-  }
-
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
     if (!this.visible) {
       return;
     }
 
-    // body - rectangle
-    const xf = this.transform;
-    let ptsXf = this.ptsTransformed;
+    const drawWidget = function(
+      item: Transform2dWidget,
+      drawHighlight: boolean = false
+    ) {
+      if (drawHighlight && item.highlightMode === HighlightMode.None) return;
 
-    ctx.lineWidth = settings.lineWidthThick / this.view.zoomFactor;
-    ctx.strokeStyle = "white";
+      let drawScaleX = true;
+      let drawScaleY = true;
+      let drawScaleCircle = true;
+      let drawRotation = true;
+      if (drawHighlight) {
+        drawScaleX = item.highlightMode == HighlightMode.ScaleX;
+        drawScaleY = item.highlightMode == HighlightMode.ScaleY;
+        drawScaleCircle = item.highlightMode == HighlightMode.ScaleCircle;
+        drawRotation = item.highlightMode == HighlightMode.Rotation;
+      }
 
-    ctx.beginPath();
-    const ptBegin = ptsXf[0];
-    ctx.moveTo(ptBegin[0], ptBegin[1]);
-    for (let i = 0; i < this.points.length - 1; i++) {
-      let next = (i + 1) % this.points.length;
-      const ptNext = ptsXf[next];
-      ctx.lineTo(ptNext[0], ptNext[1]);
-    }
-    ctx.closePath();
-    ctx.stroke();
+      let ptsXf = item.ptsTransformed;
+      // body
+      if (drawHighlight) {
+        for (let i = 0; i < item.points.length; i++) {
+          const axisX = i % 2 === 1;
+          const shouldDraw =
+            item.highlightMode == HighlightMode.Move ||
+            (axisX && drawScaleX) ||
+            (!axisX && drawScaleY);
 
-    const ptRotHandleSrc = new Vector2(ptsXf[0]).add(ptsXf[1]).divideScalar(2);
-    const ptRotHandleXf = ptsXf[4];
-    ctx.beginPath();
-    ctx.moveTo(ptRotHandleSrc[0], ptRotHandleSrc[1]);
-    ctx.lineTo(ptRotHandleXf[0], ptRotHandleXf[1]);
-    ctx.stroke();
+          if (!shouldDraw) continue;
 
-    // scaleHandles
-    for (const pt of ptsXf) {
-      ctx.beginPath();
-      ctx.ellipse(
-        pt[0],
-        pt[1],
-        settings.widgetRadius / this.view.zoomFactor,
-        settings.widgetRadius / this.view.zoomFactor,
-        0,
-        0,
-        360
-      );
-      ctx.stroke();
-    }
+          ctx.beginPath();
+          const ptBegin = ptsXf[i];
+          ctx.moveTo(ptBegin[0], ptBegin[1]);
+          let next = (i + 1) % item.points.length;
+          const ptNext = ptsXf[next];
+          ctx.lineTo(ptNext[0], ptNext[1]);
+          ctx.stroke();
+        }
+      } else {
+        ctx.beginPath();
+        const ptBegin = ptsXf[0];
+        ctx.moveTo(ptBegin[0], ptBegin[1]);
+        for (let i = 0; i < item.points.length - 1; i++) {
+          let next = (i + 1) % item.points.length;
+          const ptNext = ptsXf[next];
+          ctx.lineTo(ptNext[0], ptNext[1]);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
 
-    // rotationHandle
-    ctx.beginPath();
-    ctx.ellipse(
-      ptRotHandleXf[0],
-      ptRotHandleXf[1],
-      settings.widgetRadius / this.view.zoomFactor,
-      settings.widgetRadius / this.view.zoomFactor,
-      0,
-      0,
-      360
-    );
-    ctx.stroke();
+      // rotation handle
+      if (drawRotation) {
+        // bar
+        const ptRotHandleSrc = new Vector2(ptsXf[0])
+          .add(ptsXf[1])
+          .divideScalar(2);
+        const ptRotHandleXf = ptsXf[4];
+        ctx.beginPath();
+        ctx.moveTo(ptRotHandleSrc[0], ptRotHandleSrc[1]);
+        ctx.lineTo(ptRotHandleXf[0], ptRotHandleXf[1]);
+        ctx.stroke();
+
+        // circle(handle)
+        ctx.beginPath();
+        ctx.ellipse(
+          ptRotHandleXf[0],
+          ptRotHandleXf[1],
+          settings.widgetRadius / item.view.zoomFactor,
+          settings.widgetRadius / item.view.zoomFactor,
+          0,
+          0,
+          360
+        );
+        ctx.stroke();
+      }
+
+      if (drawScaleCircle) {
+        // scaleHandles
+        //for (const pt of ptsXf) {
+        for (let i = 0; i < ptsXf.length - 1; i++) {
+          const pt = ptsXf[i];
+          ctx.beginPath();
+          ctx.ellipse(
+            pt[0],
+            pt[1],
+            settings.widgetRadius / item.view.zoomFactor,
+            settings.widgetRadius / item.view.zoomFactor,
+            0,
+            0,
+            360
+          );
+          ctx.stroke();
+        }
+      }
+    };
+
+    // draw shadow
+    ctx.lineWidth =
+      (settings.widgetThickness + settings.widgetShadowThickness) /
+      this.view.zoomFactor;
+    ctx.strokeStyle = settings.colorWidgetShadow;
+    drawWidget(this);
+
+    // draw body
+    ctx.lineWidth = settings.widgetThickness / this.view.zoomFactor;
+    ctx.strokeStyle = settings.colorWidget;
+    drawWidget(this);
+
+    // draw highlights
+    ctx.lineWidth = settings.widgetThickness / this.view.zoomFactor;
+    ctx.strokeStyle = settings.colorWidgetHighlight;
+    drawWidget(this, true);
   }
 
   isPointInside(px: number, py: number): boolean {
-    const xf = this.transform;
-    let ptsXf = this.ptsTransformed;
-    for (let collider of this.colliders) {
-      collider.setPts(ptsXf);
-      if (collider.isIntersectWith(new Vector2(px, py), this.view.zoomFactor)) {
-        return true;
-      }
-    }
+    let mouseEvent = new MouseOverEvent();
+    mouseEvent.globalX = px;
+    mouseEvent.globalY = py;
+    const hoverResult = this.hover(mouseEvent);
+    const hovered = hoverResult[2] != HighlightMode.None;
+    if (hovered) return true;
+    else this.highlightMode = HighlightMode.None;
+
+    // const xf = this.transform;
+    // let ptsXf = this.ptsTransformed;
+    // for (let collider of this.colliders) {
+    //   collider.setPts(ptsXf);
+    //   if (collider.isIntersectWith(new Vector2(px, py), this.view.zoomFactor)) {
+    //     return true;
+    //   }
+    // }
 
     if (this.isPointInsideRect(new Vector2(px, py))) {
       return true;
     }
     return false;
+  }
+
+  hover(evt: MouseOverEvent): [DragMode, ScaleMode, HighlightMode] {
+    let dragMode: DragMode = DragMode.None;
+    let scaleMode: ScaleMode = ScaleMode.None;
+    let highlightMode: HighlightMode = HighlightMode.None;
+
+    const ptCursor = new Vector2(evt.globalX, evt.globalY);
+    const ptsXf = this.ptsTransformed;
+    let collided;
+    for (let collider of this.colliders) {
+      collider.setPts(ptsXf);
+      if (collider.isIntersectWith(ptCursor, this.view.zoomFactor)) {
+        collided = collider;
+        dragMode =
+          collider.label === "rotHandle" ? DragMode.Rotate : DragMode.Scale;
+
+        if (collider.label === "rotHandle") {
+          highlightMode = HighlightMode.Rotation;
+        }
+
+        if (dragMode === DragMode.Scale) {
+          if (collider.label === "edgeL" || collider.label === "edgeR") {
+            scaleMode = ScaleMode.XDir;
+            highlightMode = HighlightMode.ScaleX;
+          } else if (collider.label === "edgeB" || collider.label === "edgeT") {
+            scaleMode = ScaleMode.YDir;
+            highlightMode = HighlightMode.ScaleY;
+          } else {
+            scaleMode = ScaleMode.Both;
+            highlightMode = HighlightMode.ScaleCircle;
+          }
+        }
+
+        break;
+      }
+    }
+
+    if (!collided) {
+      if (this.isPointInsideRect(ptCursor)) {
+        highlightMode = HighlightMode.Move;
+      }
+    }
+
+    return [dragMode, scaleMode, highlightMode];
   }
 
   // MOUSE EVENTS
@@ -231,7 +335,6 @@ export class Transform2dWidget extends GraphicsItem {
     this.dragged = false;
 
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
-
     let collided;
     const ptsXf = this.ptsTransformed;
     for (let collider of this.colliders) {
@@ -248,13 +351,20 @@ export class Transform2dWidget extends GraphicsItem {
         this.dragMode =
           collider.label === "rotHandle" ? DragMode.Rotate : DragMode.Scale;
 
+        if (collider.label === "rotHandle") {
+          this.highlightMode = HighlightMode.Rotation;
+        }
+
         if (this.dragMode === DragMode.Scale) {
           if (collider.label === "edgeL" || collider.label === "edgeR") {
             this.scaleMode = ScaleMode.XDir;
+            this.highlightMode = HighlightMode.ScaleX;
           } else if (collider.label === "edgeB" || collider.label === "edgeT") {
             this.scaleMode = ScaleMode.YDir;
+            this.highlightMode = HighlightMode.ScaleY;
           } else {
             this.scaleMode = ScaleMode.Both;
+            this.highlightMode = HighlightMode.ScaleCircle;
           }
         }
 
@@ -266,6 +376,7 @@ export class Transform2dWidget extends GraphicsItem {
     if (!collided) {
       if (this.isPointInsideRect(ptCursor)) {
         this.dragMode = DragMode.Move;
+        this.highlightMode = HighlightMode.Move;
 
         this.dragStartPos = new Vector2(this.transform2d.position);
         this.dragStartCursor = new Vector2(ptCursor);
@@ -280,8 +391,14 @@ export class Transform2dWidget extends GraphicsItem {
     if (!this.enable) {
       return;
     }
-    const ptCursor = new Vector2(evt.globalX, evt.globalY);
 
+    if (this.dragMode == DragMode.None) {
+      // hovering - update highlight mode
+      const hoverResult = this.hover(evt);
+      this.highlightMode = hoverResult[2];
+    }
+
+    const ptCursor = new Vector2(evt.globalX, evt.globalY);
     for (let collider of this.colliders) {
       const pt = new Vector2(ptCursor).sub(this.transform2d.position);
       if (collider.isIntersectWith(ptCursor, this.view.zoomFactor)) {
@@ -304,6 +421,7 @@ export class Transform2dWidget extends GraphicsItem {
     if (!this.enable) {
       return;
     }
+
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
 
     if (this.hit) {

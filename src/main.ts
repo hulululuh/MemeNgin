@@ -22,15 +22,23 @@ Vue.use(vgl);
 
 import { Titlebar, Color } from "custom-electron-titlebar";
 import "../public/scss/scrollbar.scss";
-import { readProperty } from "./utils/scsshelper";
+import {
+  readProperty,
+  readPropertyAsColor,
+  readPropertyAsNumber,
+} from "./utils/scsshelper";
 
-const colorTitle = readProperty("colorTitle");
+import { ApplicationSettings } from "@/settings";
+const settings = ApplicationSettings.getInstance();
+settings.load();
+
+const colorTitle = readPropertyAsColor("colorTitle");
 export const colorGridBackground = readProperty("colorGridBackground");
 export const colorGridPrimary = readProperty("colorGridPrimary");
 export const colorGridSecondary = readProperty("colorGridSecondary");
 
 let titleBar = new Titlebar({
-  backgroundColor: Color.fromHex(colorTitle),
+  backgroundColor: colorTitle,
   icon: "./favicon.svg",
   shadow: true,
 });
