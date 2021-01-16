@@ -34,6 +34,7 @@ import {
 } from "../main";
 import { app } from "electron";
 import { DesignerNode } from "./designer/designernode";
+import { OverlayNode } from "./library/v1/overlay";
 
 enum DragMode {
   None,
@@ -532,8 +533,27 @@ export class NodeScene {
     if (this.conns.length < 1) return;
     if (!this.onconnectioncreated) return;
 
-    this.conns.forEach((con) => {
-      this.onconnectioncreated(con);
+    const designer = Editor.getDesigner();
+    if (!designer) return;
+
+    designer.conns.forEach((con) => {
+      const leftNode = con.leftNode;
+      const rightNode = con.rightNode;
+
+      if (rightNode instanceof OverlayNode) {
+        if (rightNode.onResized) {
+          rightNode.onResized(0, 0);
+        }
+      }
+      // if (rightNode.isParentIndex(leftNode.id)) {
+      //   const needToUpdate =
+      //     leftNode.getWidth() != rightNode.getWidth() ||
+      //     leftNode.getHeight() != rightNode.getHeight();
+      //   if (needToUpdate) {
+      //     rightNode.connected(leftNode, rightNode.id);
+      //   }
+      // }
+      //rightNode.connected(leftNode, rightNode.id);
     });
   }
 

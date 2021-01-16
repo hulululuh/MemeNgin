@@ -93,6 +93,34 @@ export class OverlayNode extends DesignerNode implements ITransformable {
       this.requestUpdateWidget();
     };
 
+    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
+      let lw = leftNode.getWidth();
+      let lh = leftNode.getHeight();
+
+      // background has changed
+      const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
+      if (!srcNode) return;
+      lw = srcNode.getWidth();
+      lh = srcNode.getHeight();
+
+      const w = this.getWidth();
+      const h = this.getHeight();
+
+      this.inputASize = new Vector2(lw, lh);
+      this.inputBSize = new Vector2(w, h);
+
+      const scale = Math.min(w, h);
+      const scaleFactor = 100 / scale;
+
+      this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
+      this.dragStartRelScale = new Vector2(1, 1);
+
+      if (this.isWidgetAvailable()) {
+        Editor.getInstance().selectedDesignerNode = this;
+        this.requestUpdateWidget();
+      }
+    };
+
     this.addInput("colorA"); // foreground
     this.addInput("colorB"); // background
     this.addInput("opacity");
@@ -166,38 +194,6 @@ export class OverlayNode extends DesignerNode implements ITransformable {
     };
 
     super.render(inputs, option);
-  }
-
-  connected(leftNode: DesignerNode, rightIndex: string) {
-    super.connected(leftNode, rightIndex);
-
-    //if (!this.isParentIndex(rightIndex)) return;
-
-    let lw = leftNode.getWidth();
-    let lh = leftNode.getHeight();
-
-    // background has changed
-    const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
-    if (!srcNode) return;
-    lw = srcNode.getWidth();
-    lh = srcNode.getHeight();
-
-    const w = this.getWidth();
-    const h = this.getHeight();
-
-    this.inputASize = new Vector2(lw, lh);
-    this.inputBSize = new Vector2(w, h);
-
-    const scale = Math.min(w, h);
-    const scaleFactor = 100 / scale;
-
-    this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
-    this.dragStartRelScale = new Vector2(1, 1);
-
-    if (this.isWidgetAvailable()) {
-      Editor.getInstance().selectedDesignerNode = this;
-      this.requestUpdateWidget();
-    }
   }
 
   requestUpdateWidget(): void {

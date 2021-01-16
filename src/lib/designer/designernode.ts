@@ -112,6 +112,7 @@ export class DesignerNode implements IPropertyHolder {
 
   isEditing: boolean = false;
 
+  onConnected?: (leftNode: DesignerNode, rightIndex: string) => void;
   onResized?: (width: number, height: number) => void;
   onPropertyLoadFinished?: () => void;
   onWidgetDragged?: (evt: WidgetEvent) => void;
@@ -728,6 +729,10 @@ export class DesignerNode implements IPropertyHolder {
 
       // update node here, if the createTexture() is sync, otherwise(async) handle it from outside
       this.requestUpdate();
+    }
+
+    if (this.onConnected) {
+      this.onConnected(leftNode, rightIndex);
     }
   }
 
