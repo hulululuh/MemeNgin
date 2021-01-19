@@ -31,7 +31,6 @@ import {
   colorGridPrimary,
   colorGridSecondary,
 } from "../main";
-import { OverlayNode } from "./library/v1/overlay";
 import { ApplicationSettings } from "@/settings";
 const settings = ApplicationSettings.getInstance();
 
@@ -539,11 +538,10 @@ export class NodeScene {
       const leftNode = con.leftNode;
       const rightNode = con.rightNode;
 
-      if (rightNode instanceof OverlayNode) {
-        if (rightNode.onResized) {
-          rightNode.onResized(0, 0);
-        }
+      if (rightNode.onResized) {
+        rightNode.onResized(0, 0);
       }
+
       // if (rightNode.isParentIndex(leftNode.id)) {
       //   const needToUpdate =
       //     leftNode.getWidth() != rightNode.getWidth() ||

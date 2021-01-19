@@ -6,6 +6,7 @@ import { LineCellNode } from "./v1/linecell";
 import { PolygonNode, CircleNode } from "./v1/shapes";
 import { BlendNode } from "./v1/blend";
 import { OverlayNode } from "./v1/overlay";
+import { PrepareNode } from "./v1/prepare";
 import { InvertNode } from "./v1/invert";
 import { WarpNode } from "./v1/warp";
 import { ColorNode, ColorizeNode } from "./v1/color";
@@ -57,6 +58,7 @@ export function createLibrary() {
   lib.addNode("polygon", "Polygon", PolygonNode, NodeCategory.Create);
   lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
   lib.addNode("overlay", "Overlay", OverlayNode, NodeCategory.Composite);
+  lib.addNode("prepare", "Prepare", PrepareNode, NodeCategory.Shape);
   lib.addNode("invert", "Invert", InvertNode, NodeCategory.Color);
   lib.addNode("color", "Color", ColorNode, NodeCategory.Color);
   lib.addNode("colorize", "Colorize", ColorizeNode, NodeCategory.Color);

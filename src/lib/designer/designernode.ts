@@ -92,6 +92,7 @@ export class DesignerNode implements IPropertyHolder {
 
   isInput: boolean;
   isResult: boolean;
+  inheritParentSize: boolean;
 
   width: number;
   height: number;
@@ -109,7 +110,6 @@ export class DesignerNode implements IPropertyHolder {
 
   // tells scene to update the texture next frame
   needsUpdate: boolean = true;
-
   isEditing: boolean = false;
 
   onConnected?: (leftNode: DesignerNode, rightIndex: string) => void;
@@ -137,6 +137,7 @@ export class DesignerNode implements IPropertyHolder {
     this.width = 1024;
     this.height = 1024;
     this.parentIndex = "image";
+    this.inheritParentSize = true;
   }
 
   isParentIndex(name: string): boolean {
@@ -715,7 +716,7 @@ export class DesignerNode implements IPropertyHolder {
   }
 
   connected(leftNode: DesignerNode, rightIndex: string) {
-    if (this.isParentIndex(rightIndex)) {
+    if (this.isParentIndex(rightIndex) && this.inheritParentSize) {
       // fit the size to parent node - try resize
       this.resize(leftNode.width, leftNode.height);
     }

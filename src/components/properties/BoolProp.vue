@@ -30,6 +30,7 @@ export default class BoolPropertyView extends Vue {
 
   @Emit()
   propertyChanged() {
+    this.$emit("propertyChanged", this.prop);
     return this.prop.name;
   }
 
@@ -53,7 +54,7 @@ export default class BoolPropertyView extends Vue {
 
     //this.value = !this.value;
     this.propHolder.setProperty(this.prop.name, !this.prop.value);
-    //this.propertyChanged();
+    this.propertyChanged();
     //this.propertyChangeCompleted(evt);
 
     let action = new PropertyChangeAction(
