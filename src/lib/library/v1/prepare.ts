@@ -72,6 +72,19 @@ export class PrepareNode extends DesignerNode implements ITransformable {
 
       this.requestUpdateWidget();
     };
+
+    this.onPropertyLoaded = () => {
+      this.properties
+        .filter((p) => p.name === "transform2d")[0]
+        .setValue(this.getTransform());
+      this.desiredWidth = parseInt(this.getProperty("width"));
+      this.desiredHeight = parseInt(this.getProperty("height"));
+      this.inheritParentSize = this.getProperty("inherit");
+
+      this.resize(this.getWidth(), this.getHeight());
+      this.requestUpdate();
+      this.requestUpdateWidget();
+    };
   }
 
   init() {
@@ -105,13 +118,6 @@ export class PrepareNode extends DesignerNode implements ITransformable {
 
       this.createTexture();
       this.requestUpdate();
-    };
-
-    this.onPropertyLoadFinished = () => {
-      this.properties
-        .filter((p) => p.name === "transform2d")[0]
-        .setValue(this.getTransform());
-      this.requestUpdateWidget();
     };
 
     this.onItemSelected = () => {

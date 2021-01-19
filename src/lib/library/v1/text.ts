@@ -69,7 +69,7 @@ export class TextNode extends DesignerNode {
       }
     };
 
-    this.onPropertyLoadFinished = () => {
+    this.onPropertyLoaded = () => {
       this.textGeom.updateText(this.getProperty("text"));
       this.textGeom.updateSize(this.getProperty("size"));
       this.textGeom.updateLetterSpacing(this.getProperty("letterSpacing"));

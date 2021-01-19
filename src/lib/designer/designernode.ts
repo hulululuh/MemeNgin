@@ -114,7 +114,7 @@ export class DesignerNode implements IPropertyHolder {
 
   onConnected?: (leftNode: DesignerNode, rightIndex: string) => void;
   onResized?: (width: number, height: number) => void;
-  onPropertyLoadFinished?: () => void;
+  onPropertyLoaded?: () => void;
   onWidgetDragged?: (evt: WidgetEvent) => void;
   // default behaviour: turn off transform widget
   onItemSelected(): void {
@@ -718,7 +718,7 @@ export class DesignerNode implements IPropertyHolder {
   connected(leftNode: DesignerNode, rightIndex: string) {
     if (this.isParentIndex(rightIndex) && this.inheritParentSize) {
       // fit the size to parent node - try resize
-      this.resize(leftNode.width, leftNode.height);
+      this.resize(leftNode.getWidth(), leftNode.getHeight());
     }
 
     if (this.createTextureAsync) {

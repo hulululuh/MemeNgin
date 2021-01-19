@@ -79,7 +79,7 @@ export class OverlayNode extends DesignerNode implements ITransformable {
       this.requestUpdate();
     };
 
-    this.onPropertyLoadFinished = () => {
+    this.onPropertyLoaded = () => {
       this.properties
         .filter((p) => p.name === "transform2d")[0]
         .setValue(this.getTransform());

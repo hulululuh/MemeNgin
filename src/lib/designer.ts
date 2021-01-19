@@ -406,7 +406,7 @@ export class Designer {
         let parent = node.getParentNode();
 
         if (parent && node.inheritParentSize) {
-          node.resize(parent.width, parent.height);
+          node.resize(parent.getWidth(), parent.getHeight());
         }
 
         if (node.createTextureAsync) {
@@ -824,8 +824,8 @@ export class Designer {
         n.setProperty(prop, properties[prop]);
       }
 
-      if (n.onPropertyLoadFinished) {
-        n.onPropertyLoadFinished();
+      if (n.onPropertyLoaded) {
+        n.onPropertyLoaded();
       }
     }
 
