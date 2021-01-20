@@ -233,7 +233,7 @@ export class ColorProperty extends Property {
       value.r = val.r || 0;
       value.g = val.g || 0;
       value.b = val.b || 0;
-      value.a = val.a || 1.0;
+      value.a = val.a || 0;
 
       this.value = value;
     }
