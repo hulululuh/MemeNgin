@@ -138,11 +138,12 @@ export default class ColorPicker extends Vue {
   }
   updateFromPicker(color) {
     this.colors = color;
-    this.colorValue = color.hex;
+    this.colorValue = color.hex8;
   }
   documentClick(e) {
-    let el = this.$refs.colorpicker,
-      target = e.target;
+    let el = this.$refs.colorpicker;
+    if (!el) return;
+    let target = e.target;
     let sketch = (<Vue>this.$refs.sketch).$el;
 
     // if (el !== target && !el.contains(target)) {

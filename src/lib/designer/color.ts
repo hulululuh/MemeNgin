@@ -35,12 +35,15 @@ export class Color {
   }
 
   static parse(hex: string): Color {
-    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+      hex
+    );
     if (result) {
       let c = new Color();
       c.r = parseInt(result[1], 16) / 255;
       c.g = parseInt(result[2], 16) / 255;
       c.b = parseInt(result[3], 16) / 255;
+      c.a = result[4].length == 0 ? 1.0 : parseInt(result[4], 16) / 255;
       return c;
     } else {
       return new Color();
@@ -48,10 +51,14 @@ export class Color {
   }
 
   toHex(): string {
-    //https://stackoverflow.com/questions/596467/how-do-i-convert-a-float-number-to-a-whole-number-in-javascript
-    let r = ~~(this.r * 255);
-    let g = ~~(this.g * 255);
-    let b = ~~(this.b * 255);
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    // forcing return value to '8' hex number, otherwise alpha value handling become quite messed up.
+    let hex =
+      "#" +
+      ("00" + (this.r * 255.0).toString(16)).slice(-2) +
+      ("00" + (this.g * 255.0).toString(16)).slice(-2) +
+      ("00" + (this.b * 255.0).toString(16)).slice(-2) +
+      ("00" + (this.a * 255.0).toString(16)).slice(-2);
+
+    return hex;
   }
 }
