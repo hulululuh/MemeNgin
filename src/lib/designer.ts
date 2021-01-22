@@ -805,6 +805,7 @@ export class Designer {
     console.log(data);
     let d = new Designer();
     let nodes = data["nodes"];
+
     for (let node of nodes) {
       let n = lib.create(node["typeName"]);
       n.exportName = node["exportName"];
@@ -909,6 +910,9 @@ export class Designer {
       }
     }
 
+    console.log("Designer Loaded");
+    console.log(nodes.length + " nodes");
+    console.log(connections.length + " connections");
     return d;
   }
 
