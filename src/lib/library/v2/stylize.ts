@@ -1,7 +1,6 @@
 import { DesignerNode, NodeType } from "../../designer/designernode";
 //import { Property } from "@/lib/designer/properties";
 import * as mi from "@magenta/image";
-import { delete } from "vue/types/umd";
 
 const NativeImage = require("electron").nativeImage;
 
