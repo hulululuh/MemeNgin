@@ -40,6 +40,7 @@ import { AdvanceSplatterV2 } from "./v2/advancesplatter";
 import { SlopeBlur } from "./v2/slopeblur";
 import { TileSampler } from "./v2/tilesampler";
 import { DetectNode } from "./v2/detect";
+import { StylizeNode } from "./v2/stylize";
 import { NodeCategory } from "../designer/designernode";
 
 export function createLibrary() {
@@ -149,6 +150,7 @@ export function createLibrary() {
     NodeCategory.Composite
   );
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Think);
+  lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Think);
 
   return lib;
 }

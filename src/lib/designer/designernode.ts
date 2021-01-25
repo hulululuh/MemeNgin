@@ -111,6 +111,7 @@ export class DesignerNode implements IPropertyHolder {
   // tells scene to update the texture next frame
   needsUpdate: boolean = true;
   isEditing: boolean = false;
+  isAsyncWorkPending: boolean = false;
 
   onConnected?: (leftNode: DesignerNode, rightIndex: string) => void;
   onResized?: (width: number, height: number) => void;

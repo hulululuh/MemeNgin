@@ -30,7 +30,6 @@ export class DetectNode extends DesignerNode {
   protected output: Promise<DeepLabOutput>;
   protected inferenceTime: number;
   protected sessionRunning: boolean;
-  protected isSegmentationReady: boolean;
   static verticesBuffer: WebGLBuffer;
   static vertices: number[];
   static model: deeplab.SemanticSegmentation;
@@ -38,12 +37,9 @@ export class DetectNode extends DesignerNode {
   constructor() {
     super();
     this.nodeType = NodeType.Texture;
-    this.isSegmentationReady = false;
-
-    this.onnodepropertychanged = (prop: Property) => {};
 
     this.createTextureAsync = async () => {
-      this.isSegmentationReady = false;
+      this.isAsyncWorkPending = true;
       await this.createTexture();
       return this;
     };
@@ -68,7 +64,7 @@ export class DetectNode extends DesignerNode {
 
   async createTexture() {
     // if segmentation ready, skip update this node.
-    if (this.isSegmentationReady) {
+    if (!this.isAsyncWorkPending) {
       return;
     }
 
@@ -243,7 +239,7 @@ export class DetectNode extends DesignerNode {
             );
 
             this.isTextureReady = true;
-            this.isSegmentationReady = true;
+            this.isAsyncWorkPending = false;
             this.resize(w, h);
             //this.requestUpdate();
           }
