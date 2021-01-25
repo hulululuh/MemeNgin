@@ -19,7 +19,6 @@
 // https://codepen.io/Brownsugar/pen/NaGPKy
 import { Vue, Prop, Component, Emit } from "vue-property-decorator";
 import { Designer } from "@/lib/designer";
-import { DesignerNode } from "@/lib/designer/designernode";
 import { IPropertyHolder } from "@/lib/designer/properties";
 import ColorPicker from "@/components/ColorPicker.vue";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";

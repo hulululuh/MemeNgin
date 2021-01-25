@@ -26,7 +26,6 @@ export class TextNode extends DesignerNode {
     const fontPath = path.join(
       remote.app.getAppPath() +
         "/../src/assets/fonts/East_Sea_Dokdo/EastSeaDokdo-Regular.ttf"
-      //"/../src/assets/fonts/Roboto/Roboto-Regular.ttf"
     );
 
     this.textGeom = new TextGeometry(
