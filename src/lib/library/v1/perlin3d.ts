@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class Perlin3DNode extends DesignerNode {
+export class Perlin3DNode extends ImageDesignerNode {
   init() {
     this.title = "Perlin 3D";
 

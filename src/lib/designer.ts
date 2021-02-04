@@ -1,5 +1,5 @@
-import * as THREE from "three";
 import { DesignerNode, NodeType, NodeInput } from "./designer/designernode";
+import { ImageDesignerNode } from "./designer/imagedesignernode";
 import { DesignerNodeConn } from "./designer/designerconnection";
 import { DesignerLibrary } from "./designer/library";
 import { Guid } from "./utils";
@@ -11,7 +11,6 @@ import {
   BoolProperty,
   EnumProperty,
   ColorProperty,
-  Property,
 } from "./designer/properties";
 import { Color } from "./designer/color";
 import {
@@ -135,7 +134,8 @@ export class Designer {
           // technically all the child nodes should be updated here, so this.updateList
           // wont be touched in this function
           // so we avoid messing up our loop since the length of this.updateList wont change
-          this.generateImageFromNode(node);
+          if (node instanceof ImageDesignerNode)
+            this.generateImageFromNode(node);
 
           // remove from list
           this.updateList.splice(this.updateList.indexOf(node), 1);
@@ -375,11 +375,12 @@ export class Designer {
   // for every node updated in this function, it emits onthumbnailgenerated(node, thumbnail)
   // it returns a thumbnail (an html image)
 
-  async generateImageFromNode(node: DesignerNode): Promise<HTMLImageElement> {
+  async generateImageFromNode(dnode: DesignerNode): Promise<HTMLImageElement> {
     // Procedural : Render >> Get fbo texture then use it as thumbnail
     // Text : bind text layout as baseTex >> Render >> Get fbo texture then use it as thumbnail
     // Texture : textures already loaded into node.tex (skip the rendering)
     let thumb;
+    let node = dnode as ImageDesignerNode;
 
     if (
       node.nodeType === NodeType.Procedural ||
@@ -409,16 +410,19 @@ export class Designer {
           node.resize(parent.getWidth(), parent.getHeight());
         }
 
+        // Async work required before render: detect, stylize
         if (node.createTextureAsync) {
           await node.createTextureAsync();
           Editor.getDesigner().requestUpdateChilds(node);
           thumb = this.prepareThumbnail(node);
         } else {
+          // default
           node.createTexture();
           node.requestUpdate();
           thumb = this.prepareThumbnail(node);
         }
       } else {
+        // no input: texture
         thumb = this.prepareThumbnail(node);
       }
     }
@@ -426,7 +430,8 @@ export class Designer {
     return thumb;
   }
 
-  prepareThumbnail(node: DesignerNode) {
+  prepareThumbnail(dnode: DesignerNode) {
+    let node = dnode as ImageDesignerNode;
     let inputs: NodeInput[] = this.getNodeInputs(node);
     let gl = this.gl;
 
@@ -458,43 +463,11 @@ export class Designer {
     return thumb;
   }
 
-  createImageFromTexture(gl, texture, width, height) {
-    // Create a framebuffer backed by the texture
-    let framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
-      gl.COLOR_ATTACHMENT0,
-      gl.TEXTURE_2D,
-      texture,
-      0
-    );
-
-    // Read the contents of the framebuffer
-    let data = new Uint8Array(width * height * 4);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
-    gl.deleteFramebuffer(framebuffer);
-
-    // Create a 2D canvas to store the result
-    let canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    let context = canvas.getContext("2d");
-
-    // Copy the pixels to a 2D canvas
-    let imageData = context.createImageData(width, height);
-    imageData.data.set(data);
-    context.putImageData(imageData, 0, 0);
-
-    let img = new Image();
-    img.src = canvas.toDataURL();
-    return img;
-  }
-
   // renders node's texture to an image object
   // ensure the node is updated before calling this function
   // this function doesnt try to update child nodes
-  generateThumbnailFromNode(node: DesignerNode) {
+  generateThumbnailFromNode(dnode: DesignerNode) {
+    let node = dnode as ImageDesignerNode;
     let gl = this.gl;
 
     //gl.clearColor(1, 0, 0, 1);
@@ -544,7 +517,8 @@ export class Designer {
   // render's node's texture then draws it on the given canvas
   // used as an alternative to move textures since toDataUrl is
   // so computationally expensive
-  copyNodeTextureToImageCanvas(node: DesignerNode, canvas: ImageCanvas) {
+  copyNodeTextureToImageCanvas(dnode: DesignerNode, canvas: ImageCanvas) {
+    let node = dnode as ImageDesignerNode;
     let gl = this.gl;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -747,6 +721,7 @@ export class Designer {
       n["typeName"] = node.typeName;
       n["exportName"] = node.exportName;
       n["nodeType"] = node.nodeType;
+
       if (node.nodeType === NodeType.Texture) {
         n["texPath"] = node.texPath;
       } else if (node.nodeType === NodeType.Text) {
@@ -811,6 +786,7 @@ export class Designer {
       n.exportName = node["exportName"];
       n.id = node["id"];
       n.nodeType = node["nodeType"];
+
       if (n.nodeType === NodeType.Texture) {
         n.texPath = node["texPath"];
       }

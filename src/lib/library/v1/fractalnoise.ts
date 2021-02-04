@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // https://thebookofshaders.com/11/
-export class FractalNoiseNode extends DesignerNode {
+export class FractalNoiseNode extends ImageDesignerNode {
   init() {
     this.title = "Fractal Noise";
 

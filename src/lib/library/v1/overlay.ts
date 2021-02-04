@@ -1,4 +1,5 @@
 import { DesignerNode, NodeInput } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { Editor } from "@/lib/editor";
 import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
@@ -7,7 +8,7 @@ import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
 import { ITransformable } from "@/lib/designer/transformable";
 
-export class OverlayNode extends DesignerNode implements ITransformable {
+export class OverlayNode extends ImageDesignerNode implements ITransformable {
   inputASize: Vector2;
   inputBSize: Vector2;
   relPos: Vector2;
@@ -26,7 +27,10 @@ export class OverlayNode extends DesignerNode implements ITransformable {
 
     this.onResized = (width: number, height: number) => {
       // background has changed
-      const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
+      const srcNode = Editor.getDesigner().findLeftNode(
+        this.id,
+        "colorA"
+      ) as ImageDesignerNode;
       if (!srcNode) return;
       let lw = srcNode.getWidth();
       let lh = srcNode.getHeight();
@@ -94,14 +98,17 @@ export class OverlayNode extends DesignerNode implements ITransformable {
     };
 
     this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
-      let lw = leftNode.getWidth();
-      let lh = leftNode.getHeight();
+      const leftImageNode = leftNode as ImageDesignerNode;
+      const srcNode = Editor.getDesigner().findLeftNode(
+        this.id,
+        "colorA"
+      ) as ImageDesignerNode;
 
       // background has changed
-      const srcNode = Editor.getDesigner().findLeftNode(this.id, "colorA");
-      if (!srcNode) return;
-      lw = srcNode.getWidth();
-      lh = srcNode.getHeight();
+      if (!srcNode || !leftImageNode) return;
+
+      let lw = srcNode.getWidth();
+      let lh = srcNode.getHeight();
 
       const w = this.getWidth();
       const h = this.getHeight();

@@ -1,5 +1,8 @@
+import {
+  ImageDesignerNode,
+  UpdateTexture,
+} from "@/lib/designer/imagedesignernode";
 import { DesignerNode, NodeType } from "../../designer/designernode";
-import { Property } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
 
 import { DeepLabOutput } from "@tensorflow-models/deeplab/dist/types";
@@ -26,7 +29,7 @@ const loadModel = async () => {
   }
 };
 
-export class DetectNode extends DesignerNode {
+export class DetectNode extends ImageDesignerNode {
   protected output: Promise<DeepLabOutput>;
   protected inferenceTime: number;
   protected sessionRunning: boolean;
@@ -125,7 +128,7 @@ export class DetectNode extends DesignerNode {
     }
 
     // 1. Find if there are input node
-    let leftNode = designer.findLeftNode(this.id, "image");
+    let leftNode = designer.findLeftNode(this.id, "image") as ImageDesignerNode;
     if (!leftNode) {
       // abort - no connected input yet
       return;
@@ -211,7 +214,7 @@ export class DetectNode extends DesignerNode {
         // create texture for debug
         if (resultImg) {
           if (!this.isTextureReady) {
-            this.tex = DesignerNode.updateTexture(
+            this.tex = UpdateTexture(
               level,
               internalFormat,
               w,
@@ -223,7 +226,7 @@ export class DetectNode extends DesignerNode {
               NodeType.Procedural,
               this.gl
             );
-            this.baseTex = DesignerNode.updateTexture(
+            this.baseTex = UpdateTexture(
               level,
               internalFormat,
               output.width,
@@ -264,7 +267,7 @@ export class DetectNode extends DesignerNode {
     const nodetype = this.nodeType;
     let data = null;
 
-    this.tex = DesignerNode.updateTexture(
+    this.tex = UpdateTexture(
       level,
       internalFormat,
       imgSize[0],

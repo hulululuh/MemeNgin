@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "../../designer/imagedesignernode";
 
-export class TileSampler extends DesignerNode {
+export class TileSampler extends ImageDesignerNode {
   init() {
     this.title = "Tile Sampler";
 

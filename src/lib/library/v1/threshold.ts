@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class ThresholdNode extends DesignerNode {
+export class ThresholdNode extends ImageDesignerNode {
   init() {
     this.title = "Threshold";
 

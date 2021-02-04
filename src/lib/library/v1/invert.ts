@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class InvertNode extends DesignerNode {
+export class InvertNode extends ImageDesignerNode {
   init() {
     this.title = "Invert";
 

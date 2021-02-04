@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class WaveNode extends DesignerNode {
+export class WaveNode extends ImageDesignerNode {
   init() {
     this.title = "Wave";
 

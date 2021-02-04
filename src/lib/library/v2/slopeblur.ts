@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // multiple pass warp
-export class SlopeBlur extends DesignerNode {
+export class SlopeBlur extends ImageDesignerNode {
   init() {
     this.title = "Slope Blur";
 

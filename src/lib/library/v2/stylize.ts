@@ -1,10 +1,13 @@
 import { DesignerNode, NodeType } from "../../designer/designernode";
-//import { Property } from "@/lib/designer/properties";
+import {
+  ImageDesignerNode,
+  UpdateTexture,
+} from "@/lib/designer/imagedesignernode";
 import * as mi from "@magenta/image";
 
 const NativeImage = require("electron").nativeImage;
 
-export class StylizeNode extends DesignerNode {
+export class StylizeNode extends ImageDesignerNode {
   static verticesBuffer: WebGLBuffer;
   static vertices: number[];
 
@@ -35,7 +38,10 @@ export class StylizeNode extends DesignerNode {
   }
 
   convertToImageDataByName(inputName: string): ImageData {
-    const inputNode = this.designer.findLeftNode(this.id, inputName);
+    const inputNode = this.designer.findLeftNode(
+      this.id,
+      inputName
+    ) as ImageDesignerNode;
     if (inputNode) {
       return this.convertToImageData(inputNode);
     } else {
@@ -43,7 +49,7 @@ export class StylizeNode extends DesignerNode {
     }
   }
 
-  convertToImageData(node: DesignerNode): ImageData {
+  convertToImageData(node: ImageDesignerNode): ImageData {
     const gl = this.gl;
 
     const texW = node.getWidth();
@@ -170,7 +176,7 @@ export class StylizeNode extends DesignerNode {
           const h = parentNode.getHeight();
           // create texture for debug
           if (!self.isTextureReady) {
-            self.tex = DesignerNode.updateTexture(
+            self.tex = UpdateTexture(
               level,
               internalFormat,
               w,
@@ -182,7 +188,7 @@ export class StylizeNode extends DesignerNode {
               NodeType.Procedural,
               self.gl
             );
-            self.baseTex = DesignerNode.updateTexture(
+            self.baseTex = UpdateTexture(
               level,
               internalFormat,
               imageData.width,
@@ -224,7 +230,7 @@ export class StylizeNode extends DesignerNode {
     const nodetype = this.nodeType;
     let data = null;
 
-    this.tex = DesignerNode.updateTexture(
+    this.tex = UpdateTexture(
       level,
       internalFormat,
       imgSize[0],

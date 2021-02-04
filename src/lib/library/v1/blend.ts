@@ -1,6 +1,6 @@
-import { DesignerNode, NodeInput } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class BlendNode extends DesignerNode {
+export class BlendNode extends ImageDesignerNode {
   init() {
     this.title = "Blend";
     this.parentIndex = "colorB";

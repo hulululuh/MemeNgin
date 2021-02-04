@@ -4,6 +4,7 @@ import path from "path";
 //import * as scene from "./scene";
 import { Designer } from "./designer";
 import { DesignerNode } from "./designer/designernode";
+import { ImageDesignerNode } from "./designer/imagedesignernode";
 import { Property, PropertyType } from "./designer/properties";
 import { Guid } from "./utils";
 import { DesignerVariableType } from "./designer/designervariable";
@@ -292,13 +293,13 @@ export class Editor {
 
     // input
     let inputNode = this.library.create("texture");
-    inputNode.setAsInput();
+    //inputNode.setAsInput();
     let inputNodeView = this.addNode(inputNode, 0, 0);
     inputNodeView.setCenter(centerX, centerY);
 
     // output
     let node = this.library.create("output");
-    node.setAsResult();
+    //node.setAsResult();
     let nodeView = this.addNode(node, 0, 0);
     // figure out why this doesnt work before adding addNode:
     node.setProperty("color", new Color(1, 1, 1, 1));
@@ -713,7 +714,10 @@ export class Editor {
 
     // create node from designer
     let node = new NodeGraphicsItem(dNode.title);
-    node.setVirtualSize(dNode.getWidth(), dNode.getHeight());
+    let imgdNode = dNode as ImageDesignerNode;
+    if (imgdNode) {
+      node.setVirtualSize(imgdNode.getWidth(), imgdNode.getHeight());
+    }
 
     for (let input of dNode.getInputs()) {
       node.addSocket(input, input, SocketType.In);

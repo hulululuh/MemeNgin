@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // https://thebookofshaders.com/07/
-export class PolygonNode extends DesignerNode {
+export class PolygonNode extends ImageDesignerNode {
   init() {
     this.title = "Polygon";
 
@@ -42,7 +42,7 @@ export class PolygonNode extends DesignerNode {
   }
 }
 
-export class CircleNode extends DesignerNode {
+export class CircleNode extends ImageDesignerNode {
   init() {
     this.title = "Circle";
 

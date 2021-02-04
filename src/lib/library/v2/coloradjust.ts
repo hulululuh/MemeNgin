@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // https://github.com/evanw/glfx.js/blob/master/src/filters/adjust/brightnesscontrast.js
-export class ColorAdjustNode extends DesignerNode {
+export class ColorAdjustNode extends ImageDesignerNode {
   init() {
     this.title = "Color Adjust";
 

@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class MirrorNode extends DesignerNode {
+export class MirrorNode extends ImageDesignerNode {
   init() {
     this.title = "Mirror";
 

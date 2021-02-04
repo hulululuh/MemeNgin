@@ -35,7 +35,6 @@
 <script lang="ts">
 import { Vue, Prop, Component, Emit } from "vue-property-decorator";
 import { Designer } from "@/lib/designer";
-import { DesignerNode } from "@/lib/designer/designernode";
 import { IPropertyHolder } from "../../lib/designer/properties";
 import { PropertyChangeComplete } from "./ipropertyui";
 import { UndoStack } from "@/lib/undostack";

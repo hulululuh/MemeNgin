@@ -1,15 +1,15 @@
+import { NodeType, NodeCategory } from "../../designer/designernode";
 import {
-  DesignerNode,
-  NodeType,
+  ImageDesignerNode,
   TexPrecision,
-  NodeCategory,
-} from "../../designer/designernode";
+  UpdateTexture,
+} from "@/lib/designer/imagedesignernode";
 
 let parseCubeLUT = require("parse-cube-lut");
 import * as fs from "fs";
 import { Property, FileProperty } from "@/lib/designer/properties";
 
-export class ColorGradeNode extends DesignerNode {
+export class ColorGradeNode extends ImageDesignerNode {
   constructor() {
     super();
     this.nodeType = NodeType.Texture;
@@ -50,7 +50,7 @@ export class ColorGradeNode extends DesignerNode {
     const type = gl.UNSIGNED_BYTE;
     const nodetype = NodeType.Procedural;
     let data = null;
-    this.tex = DesignerNode.updateTexture(
+    this.tex = UpdateTexture(
       level,
       internalFormat,
       this.getWidth(),

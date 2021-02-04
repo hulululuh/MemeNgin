@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // https://thebookofshaders.com/edit.php#12/tissue.frag
-export class LineCellNode extends DesignerNode {
+export class LineCellNode extends ImageDesignerNode {
   init() {
     this.title = "Lined Cell";
 

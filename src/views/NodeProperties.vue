@@ -28,7 +28,7 @@ import TextureChannelPropertyView from "@/components/properties/TextureChannelPr
 import Accordion from "@/components/Accordion.vue";
 import { Editor } from "@/lib/editor";
 import { DesignerNode } from "@/lib/designer/designernode";
-import { Property, IPropertyHolder, Transform2DProperty } from "@/lib/designer/properties";
+import { Property, IPropertyHolder } from "@/lib/designer/properties";
 import GradientPropertyView from "@/components/properties/GradientProp.vue";
 import StringPropertyView from "@/components/properties/StringProp.vue";
 import FilePropertyView from "@/components/properties/FileProp.vue";

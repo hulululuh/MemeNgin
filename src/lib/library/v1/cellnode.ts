@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // https://thebookofshaders.com/12/
-export class CellNode extends DesignerNode {
+export class CellNode extends ImageDesignerNode {
   init() {
     this.title = "Cell";
 

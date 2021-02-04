@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class MapRangeNode extends DesignerNode {
+export class MapRangeNode extends ImageDesignerNode {
   init() {
     this.title = "Map Range";
 

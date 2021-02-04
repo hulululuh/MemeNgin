@@ -1,9 +1,9 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // uses single pass gaussian
 // https://www.shadertoy.com/view/4tSyzy
 // https://stackoverflow.com/questions/2157920/why-define-pi-4atan1-d0
-export class BlurV2 extends DesignerNode {
+export class BlurV2 extends ImageDesignerNode {
   init() {
     this.title = "Blur";
 

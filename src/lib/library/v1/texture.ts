@@ -3,10 +3,14 @@ import {
   NodeCategory,
   NodeType,
 } from "@/lib/designer/designernode";
+import {
+  ImageDesignerNode,
+  UpdateTexture,
+} from "@/lib/designer/imagedesignernode";
 import { Property, FileProperty } from "@/lib/designer/properties";
 const NativeImage = require("electron").nativeImage;
 
-export class TextureNode extends DesignerNode {
+export class TextureNode extends ImageDesignerNode {
   protected img: Electron.NativeImage;
 
   // constructor
@@ -59,7 +63,7 @@ export class TextureNode extends DesignerNode {
         this.width = imgSize.width;
         this.height = imgSize.height;
 
-        this.tex = DesignerNode.updateTexture(
+        this.tex = UpdateTexture(
           level,
           internalFormat,
           imgSize.width,
@@ -71,7 +75,7 @@ export class TextureNode extends DesignerNode {
           NodeType.Procedural,
           this.gl
         );
-        this.baseTex = DesignerNode.updateTexture(
+        this.baseTex = UpdateTexture(
           level,
           internalFormat,
           imgSize.width,

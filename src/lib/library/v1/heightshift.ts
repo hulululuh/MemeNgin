@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class HeightShiftNode extends DesignerNode {
+export class HeightShiftNode extends ImageDesignerNode {
   init() {
     this.title = "Height Shift";
 

@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { Color } from "@/lib/designer/color";
 
-export class GradientNode extends DesignerNode {
+export class GradientNode extends ImageDesignerNode {
   init() {
     this.title = "Gradient";
 
@@ -99,7 +99,7 @@ export class GradientNode extends DesignerNode {
   }
 }
 
-export class TriGradientNode extends DesignerNode {
+export class TriGradientNode extends ImageDesignerNode {
   init() {
     this.title = "TriGradient";
 

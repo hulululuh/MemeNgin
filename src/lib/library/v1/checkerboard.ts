@@ -1,8 +1,8 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { Color } from "@/lib/designer/color";
 
 // https://stackoverflow.com/questions/4694608/glsl-checkerboard-pattern
-export class CheckerBoardNode extends DesignerNode {
+export class CheckerBoardNode extends ImageDesignerNode {
   init() {
     this.title = "CheckerBoard";
 

@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class Transform2DNode extends DesignerNode {
+export class Transform2DNode extends ImageDesignerNode {
   init() {
     this.title = "Transform2D";
 

@@ -114,7 +114,6 @@ import { createLibrary as createV1Library } from "@/lib/library/libraryv1";
 import NodePropertiesView from "./views/NodeProperties.vue";
 import Preview2D from "./views/Preview2D.vue";
 import { DesignerLibrary } from "./lib/designer/library";
-import { DesignerNode } from "./lib/designer/designernode";
 import { Designer } from "./lib/designer";
 import { Project, ProjectManager } from "./lib/project";
 import { Titlebar, Color } from "custom-electron-titlebar";
@@ -150,7 +149,6 @@ export default class App extends Vue {
   editor!: Editor;
   library!: DesignerLibrary;
 
-  //selectedNode: DesignerNode = null;
   propHolder: IPropertyHolder = null;
 
   //designer!: Designer;

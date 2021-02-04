@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class BrickGeneratorNode extends DesignerNode {
+export class BrickGeneratorNode extends ImageDesignerNode {
   init() {
     this.title = "Brick Generator";
 

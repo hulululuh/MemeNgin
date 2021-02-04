@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class SolidCellNode extends DesignerNode {
+export class SolidCellNode extends ImageDesignerNode {
   init() {
     this.title = "Solid Cell";
 

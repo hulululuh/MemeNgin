@@ -1,4 +1,8 @@
 import { DesignerNode, NodeType } from "../../designer/designernode";
+import {
+  ImageDesignerNode,
+  UpdateTexture,
+} from "@/lib/designer/imagedesignernode";
 import { remote, app } from "electron";
 import path from "path";
 import { buildShaderProgram } from "../../designer/gl";
@@ -11,7 +15,7 @@ const placeholderSize = 72;
 const placeholderLetterSpacing = 0;
 const placeholderLineHeight = 1.175;
 
-export class TextNode extends DesignerNode {
+export class TextNode extends ImageDesignerNode {
   textGeom: TextGeometry;
   textFbo: WebGLFramebuffer;
   textProgram: WebGLShader;
@@ -174,7 +178,7 @@ export class TextNode extends DesignerNode {
 
     const width = this.getWidth();
     const height = this.getHeight();
-    this.tex = DesignerNode.updateTexture(
+    this.tex = UpdateTexture(
       level,
       internalFormat,
       width,
@@ -187,7 +191,7 @@ export class TextNode extends DesignerNode {
       this.gl
     );
 
-    this.baseTex = DesignerNode.updateTexture(
+    this.baseTex = UpdateTexture(
       level,
       internalFormat,
       width,

@@ -18,7 +18,6 @@ import FloatVariableView from "@/components/variables/FloatVar.vue";
 import BoolVariableView from "@/components/variables/BoolVar.vue";
 import EnumVariableView from "@/components/variables/EnumVar.vue";
 import ColorVariableView from "@/components/variables/ColorVar.vue";
-import { Editor } from "@/lib/editor";
 import { DesignerVariable } from "@/lib/designer/designervariable";
 import { DesignerNode } from "@/lib/designer/designernode";
 import { Designer } from "@/lib/designer";

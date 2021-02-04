@@ -1,7 +1,7 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 // https://thebookofshaders.com/11/
-export class SimplexNoiseNode extends DesignerNode {
+export class SimplexNoiseNode extends ImageDesignerNode {
   init() {
     this.title = "Simplex Noise";
 

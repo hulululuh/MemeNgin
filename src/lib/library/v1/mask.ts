@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class MaskNode extends DesignerNode {
+export class MaskNode extends ImageDesignerNode {
   init() {
     this.title = "Mask";
     this.parentIndex = "textureB";

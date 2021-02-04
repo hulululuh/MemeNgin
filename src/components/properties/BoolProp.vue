@@ -10,7 +10,6 @@
 <script lang="ts">
 import { Vue, Prop, Component, Emit, Model } from "vue-property-decorator";
 import { Designer } from "@/lib/designer";
-import { DesignerNode } from "@/lib/designer/designernode";
 import { IPropertyHolder } from "../../lib/designer/properties";
 import { PropertyChangeComplete } from "./ipropertyui";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";

@@ -1,6 +1,6 @@
-import { DesignerNode } from "../../designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class CopyNode extends DesignerNode {
+export class CopyNode extends ImageDesignerNode {
   init() {
     this.title = "Copy";
 

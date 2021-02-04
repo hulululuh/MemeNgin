@@ -12,7 +12,6 @@
 <script lang="ts">
 import { Vue, Prop, Component, Emit, Watch } from "vue-property-decorator";
 import { Designer } from "@/lib/designer";
-import { DesignerNode } from "@/lib/designer/designernode";
 import { Gradient, GradientPoint } from "@/lib/designer/gradient";
 import { Color } from "@/lib/designer/color";
 import elementResizeDetectorMaker from "element-resize-detector";
