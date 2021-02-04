@@ -1,51 +1,59 @@
-import { BrickGeneratorNode } from "./v1/brickgenerator";
-import { NormalMapNode, BetterWarpNode } from "./v1/normalmap";
-import { CellNode } from "./v1/cellnode";
-import { SolidCellNode } from "./v1/solidcell";
-import { LineCellNode } from "./v1/linecell";
-import { PolygonNode, CircleNode } from "./v1/shapes";
-import { BlendNode } from "./v1/blend";
-import { OverlayNode } from "./v1/overlay";
-import { PrepareNode } from "./v1/prepare";
-import { InvertNode } from "./v1/invert";
-import { WarpNode } from "./v1/warp";
-import { ColorNode, ColorizeNode } from "./v1/color";
-import { TextNode } from "./v1/text";
-import { SimplexNoiseNode } from "./v1/simplexnoise";
-import { MaskNode } from "./v1/mask";
-import { Transform2DNode } from "./v1/transform2d";
-import { MapRangeNode } from "./v1/maprange";
-import { Perlin3DNode } from "./v1/perlin3d";
-import { HexagonNode } from "./v1/hexagon";
-import { FractalNoiseNode } from "./v1/fractalnoise";
-import { TileNode } from "./v1/tile";
-import { ThresholdNode } from "./v1/threshold";
-import { HeightShiftNode } from "./v1/heightshift";
-import { CheckerBoardNode } from "./v1/checkerboard";
-import { DirectionalWarpNode } from "./v1/directionalwarp";
-import { MirrorNode } from "./v1/mirror";
-import { BrightnessContrastNode } from "./v1/brightnesscontrast";
-import { ColorGradeNode } from "./v1/colorgrade";
-import { ColorAdjustNode } from "./v2/coloradjust";
-import { WaveNode } from "./v1/wave";
-import { CopyNode } from "./v1/copy";
-import { TextureNode } from "./v1/texture";
-import { GradientNode, TriGradientNode } from "./v1/gradient";
-import { DesignerLibrary } from "../designer/library";
-import { OutputNode } from "./v1/output";
-import { GradientMapNode } from "./v1/gradientmap";
-import { SplatNodeV2 } from "./v2/splat";
-import { BlurV2 } from "./v2/blur";
-import { AdvanceSplatterV2 } from "./v2/advancesplatter";
-import { SlopeBlur } from "./v2/slopeblur";
-import { TileSampler } from "./v2/tilesampler";
-import { DetectNode } from "./v2/detect";
-import { StylizeNode } from "./v2/stylize";
+import { BrickGeneratorNode } from "./nodes/brickgenerator";
+import { NormalMapNode, BetterWarpNode } from "./nodes/normalmap";
+import { CellNode } from "./nodes/cellnode";
+import { SolidCellNode } from "./nodes/solidcell";
+import { LineCellNode } from "./nodes/linecell";
+import { PolygonNode, CircleNode } from "./nodes/shapes";
+import { BlendNode } from "./nodes/blend";
+import { OverlayNode } from "./nodes/overlay";
+import { PrepareNode } from "./nodes/prepare";
+import { InvertNode } from "./nodes/invert";
+import { WarpNode } from "./nodes/warp";
+import { ColorNode, ColorizeNode } from "./nodes/color";
+import { TextNode } from "./nodes/text";
+import { SimplexNoiseNode } from "./nodes/simplexnoise";
+import { MaskNode } from "./nodes/mask";
+import { Transform2DNode } from "./nodes/transform2d";
+import { MapRangeNode } from "./nodes/maprange";
+import { Perlin3DNode } from "./nodes/perlin3d";
+import { HexagonNode } from "./nodes/hexagon";
+import { FractalNoiseNode } from "./nodes/fractalnoise";
+import { TileNode } from "./nodes/tile";
+import { ThresholdNode } from "./nodes/threshold";
+import { HeightShiftNode } from "./nodes/heightshift";
+import { CheckerBoardNode } from "./nodes/checkerboard";
+import { DirectionalWarpNode } from "./nodes/directionalwarp";
+import { MirrorNode } from "./nodes/mirror";
+import { BrightnessContrastNode } from "./nodes/brightnesscontrast";
+import { ColorGradeNode } from "./nodes/colorgrade";
+import { ColorAdjustNode } from "./nodes/coloradjust";
+import { WaveNode } from "./nodes/wave";
+import { CopyNode } from "./nodes/copy";
+import { TextureNode } from "./nodes/texture";
+import { GradientNode, TriGradientNode } from "./nodes/gradient";
+import { OutputNode } from "./nodes/output";
+import { GradientMapNode } from "./nodes/gradientmap";
+import { SplatNode } from "./nodes/splat";
+import { BlurNode } from "./nodes/blur";
+import { AdvanceSplatterNode } from "./nodes/advancesplatter";
+import { SlopeBlurNode } from "./nodes/slopeblur";
+import { TileSamplerNode } from "./nodes/tilesampler";
+import { DetectNode } from "./nodes/detect";
+import { StylizeNode } from "./nodes/stylize";
+
 import { NodeCategory } from "../designer/designernode";
+import { DesignerLibrary } from "../designer/library";
+
+export const libraryMajorVersion = 0;
+export const libraryMinorVersion = 1;
+
+export function getCurrentLibraryVersion() {
+  return libraryMajorVersion.toString() + "." + libraryMinorVersion.toString();
+}
 
 export function createLibrary() {
   let lib = new DesignerLibrary();
-  lib.versionName = "v2";
+  lib.versionName = getCurrentLibraryVersion();
   lib.addNode(
     "brickgenerator",
     "Brick Generator",
@@ -78,7 +86,7 @@ export function createLibrary() {
     NodeCategory.Shape
   );
   lib.addNode("maprange", "Map Range", MapRangeNode, NodeCategory.Color);
-  lib.addNode("splat", "Splat", SplatNodeV2, NodeCategory.Composite);
+  lib.addNode("splat", "Splat", SplatNode, NodeCategory.Composite);
   lib.addNode("perlin3d", "Perlin 3D", Perlin3DNode, NodeCategory.Create);
   lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Create);
   lib.addNode(
@@ -115,7 +123,12 @@ export function createLibrary() {
     NodeCategory.Shape
   );
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
-  lib.addNode("tilesampler", "Tile Sampler", TileSampler, NodeCategory.Shape);
+  lib.addNode(
+    "tilesampler",
+    "Tile Sampler",
+    TileSamplerNode,
+    NodeCategory.Shape
+  );
   lib.addNode("normalmap", "Normal Map", NormalMapNode, NodeCategory.Shape);
   lib.addNode(
     "brightnesscontrast",
@@ -141,12 +154,12 @@ export function createLibrary() {
     NodeCategory.Create
   );
   lib.addNode("output", "Output", OutputNode, NodeCategory.Think);
-  lib.addNode("blurv2", "Blur", BlurV2, NodeCategory.Shape);
-  lib.addNode("slopeblur", "Slope Blur", SlopeBlur, NodeCategory.Shape);
+  lib.addNode("blurnodes", "Blur", BlurNode, NodeCategory.Shape);
+  lib.addNode("slopeblur", "Slope Blur", SlopeBlurNode, NodeCategory.Shape);
   lib.addNode(
     "advancesplatter",
     "Advance Splatter",
-    AdvanceSplatterV2,
+    AdvanceSplatterNode,
     NodeCategory.Composite
   );
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Think);

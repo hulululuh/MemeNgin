@@ -110,7 +110,6 @@ import EditorView from "@/views/Editor.vue";
 import LibraryView from "@/views/Library.vue";
 import LibraryMenu from "@/components/LibraryMenu.vue";
 import { Editor } from "@/lib/editor";
-import { createLibrary as createV1Library } from "@/lib/library/libraryv1";
 import NodePropertiesView from "./views/NodeProperties.vue";
 import Preview2D from "./views/Preview2D.vue";
 import { DesignerLibrary } from "./lib/designer/library";

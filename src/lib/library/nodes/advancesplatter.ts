@@ -1,12 +1,16 @@
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
-export class SplatNode extends ImageDesignerNode {
+export class AdvanceSplatterNode extends ImageDesignerNode {
   init() {
-    this.title = "Splat";
+    this.title = "Advance Splatter";
 
     this.addInput("image");
+    this.addInput("mask");
+    this.addInput("size");
+    this.addInput("intensity");
 
     this.addIntProperty("count", "Count", 50, 0, 1000, 1);
+    this.addFloatProperty("rot", "Rotation", 0, 0, 360, 0.1);
 
     let source = `
         // https://github.com/glslify/glsl-inverse/blob/master/index.glsl
@@ -64,7 +68,7 @@ export class SplatNode extends ImageDesignerNode {
         }
 
         // if uv is out of bounds then return vec4(0)
-        vec4 sampleImage(vec2 uv)
+        vec4 sampleImage(sampler2D image, vec2 uv)
         {
             if (uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0)
                 return texture(image, uv);
@@ -76,7 +80,7 @@ export class SplatNode extends ImageDesignerNode {
         // https://stackoverflow.com/questions/38986208/webgl-loop-index-cannot-be-compared-with-non-constant-expression
         vec4 process(vec2 uv)
         {
-            vec4 color = vec4(0.0);
+            vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
             for(int i = 0; i<MAX_ITER; i++)
             {
                 if (i >= prop_count)
@@ -85,19 +89,34 @@ export class SplatNode extends ImageDesignerNode {
                 float x = randomFloatRange(i*10 + 1, -0.5, 0.5);
                 float y = randomFloatRange(i*13 + 2, -0.5, 0.5);
                 float r = randomFloatRange(i*15 + 3, 0.0, 360.0);
+                float s = 1.0;
 
-                vec2 sampleUV = transformUV(uv, vec2(x,y), r, vec2(1.0));
-                color += sampleImage(sampleUV);
+                //vec2 center = transformUV(vec2(0.5, 0.5), vec2(x,y), r + prop_rot, vec2(1.0));
+
+                if (mask_connected) {
+                    float mask = texture(mask, vec2(x,y) + vec2(0.5)).r;
+                    if (mask < 0.001f)
+                        continue;
+                }
+
+                if (size_connected) {
+                    s = s * texture(size, vec2(x,y) + vec2(0.5)).r;
+                }
+
+                vec2 sampleUV = transformUV(uv, vec2(x,y), r + prop_rot, vec2(s));
+                color = max(color, sampleImage(image, sampleUV));
 
                 //sample 4 sides
                 sampleUV = transformUV(uv, vec2(x,y) + vec2(-1.0,  0.0), r, vec2(1.0));
-                color += sampleImage(sampleUV);
+                color = max(color, sampleImage(image, sampleUV));
                 sampleUV = transformUV(uv, vec2(x,y) + vec2( 1.0,  0.0), r, vec2(1.0));
-                color += sampleImage(sampleUV);
+                color = max(color, sampleImage(image, sampleUV));
                 sampleUV = transformUV(uv, vec2(x,y) + vec2( 0.0,  1.0), r, vec2(1.0));
-                color += sampleImage(sampleUV);
+                color = max(color, sampleImage(image, sampleUV));
                 sampleUV = transformUV(uv, vec2(x,y) + vec2( 0.0, -1.0), r, vec2(1.0));
-                color += sampleImage(sampleUV); 
+                color = max(color, sampleImage(image, sampleUV));
+
+                // todo: sample 4 diagonal sides
             }
 
             //color = color / vec4(float(prop_count));

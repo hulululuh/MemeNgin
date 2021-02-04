@@ -15,8 +15,7 @@ import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
 import { SocketType } from "./scene/socketgraphicsitem";
 import { ImageCanvas } from "./designer/imagecanvas";
 
-import { createLibrary as createV1Library } from "@/lib/library/libraryv1";
-import { createLibrary as createV2Library } from "@/lib/library/libraryv2";
+import { createLibrary, getCurrentLibraryVersion } from "@/lib/library/library";
 import { Color } from "./designer/color";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
 import { FrameGraphicsItem } from "./scene/framegraphicsitem";
@@ -26,7 +25,7 @@ import { ItemClipboard } from "./clipboard";
 import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
-import { DetectNode } from "./library/v2/detect";
+import { DetectNode } from "./library/nodes/detect";
 
 function hexToRgb(hex) {
   let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -281,7 +280,7 @@ export class Editor {
   createEmptyScene() {
     this.clearTextureChannels();
 
-    this.library = createV2Library();
+    this.library = createLibrary();
     this.setDesigner(new Designer());
     this.setScene(new NodeScene(this.canvas));
 
@@ -324,7 +323,7 @@ export class Editor {
   createNewTexture() {
     this.clearTextureChannels();
 
-    this.library = createV2Library();
+    this.library = createLibrary();
     this.setDesigner(new Designer());
     this.setScene(new NodeScene(this.canvas));
 
@@ -879,10 +878,10 @@ export class Editor {
 
     let library;
     if (!data["libraryVersion"]) {
-      library = createV2Library();
+      library = createLibrary();
     } else {
       // library = this.createLibrary(data["libraryVersion"]);
-      library = createV2Library();
+      library = createLibrary();
     }
     // load scene
     let d = Designer.load(data, library);
@@ -944,7 +943,7 @@ export class Editor {
     };
 
     //data["libraryVersion"] = this.library.getVersionName();
-    data["libraryVersion"] = "v1";
+    data["libraryVersion"] = getCurrentLibraryVersion();
 
     return data;
   }
