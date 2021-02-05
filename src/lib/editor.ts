@@ -465,7 +465,12 @@ export class Editor {
       let getFileType = (filePath: string) => {
         const ext = path.extname(filePath).toLowerCase();
 
-        if (ext === ".png" || ext === ".jpg" || ext === ".jpeg") {
+        if (
+          ext === ".png" ||
+          ext === ".jpg" ||
+          ext === ".jpeg"
+          //TODO: ext === ".webp"
+        ) {
           return FileType.Texture;
         } else if (ext === ".cube") {
           return FileType.LUT;
@@ -487,6 +492,8 @@ export class Editor {
             node = self.library.create("texture", file.path);
           } else if (fileType === FileType.LUT) {
             node = self.library.create("colorgrade", file.path);
+          } else if (!fileType) {
+            continue;
           }
           let nodeView = self.addNode(node, 0, 0);
           nodeView.setCenter(x + offset[0], y + offset[1]);
