@@ -35,14 +35,23 @@ export class DesignerLibrary {
     return this.versionName;
   }
 
-  create(name: string, path?: string): DesignerNode {
+  create(name: string, path?: string, isUrl?: boolean): DesignerNode {
     //if (this.nodes.indexOf(name) == -1)
     //    return null;
 
     let node = this.nodes[name].create();
     if (path) {
-      node.texPath = path;
+      if (isUrl) {
+        node.imgData = path;
+      } else {
+        node.texPath = path;
+      }
     }
+
+    if (isUrl !== undefined) {
+      node.isUrl = isUrl;
+    }
+
     node.typeName = name;
 
     return node;

@@ -6,31 +6,65 @@ import {
 import { Property, FileProperty } from "@/lib/designer/properties";
 import path from "path";
 
-const fs = require("fs");
+const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
 
-function loadImage(imgPath: string) {
-  const ext = path.extname(imgPath).toLowerCase();
-  let img = null;
-  let w = 0;
-  let h = 0;
+async function loadLocalWebp(path: string) {
+  let blob = await fetch(path).then((r) => r.blob());
+  let reader = new FileReader();
+  await reader.readAsDataURL(blob);
+  let dataUrl = reader.result.toString();
 
-  if (ext === ".webp") {
-    console.warn("webp - currently not supported");
-    return [null, 0, 0];
+  if (isDataUri(dataUrl)) {
+    let img = NativeImage.createFromDataURL(dataUrl);
+    return img;
   } else {
-    img = NativeImage.createFromPath(imgPath);
-    const size = img.getSize();
-    w = size.width;
-    h = size.height;
-    return [img.getBitmap(), w, h];
+    console.warn("something went wrong loading local webp file");
   }
+}
+
+async function loadImage(imgPath: string, isUrl: boolean) {
+  let img = null;
+
+  if (isUrl) {
+    img = NativeImage.createFromDataURL(imgPath);
+  } else {
+    const ext = path.extname(imgPath).toLowerCase();
+    if (ext === ".webp") {
+      //img = await loadLocalWebp(imgPath);
+      console.warn("local webp image is not supported yet.");
+    } else {
+      img = NativeImage.createFromPath(imgPath);
+    }
+  }
+  return img;
 }
 
 export class TextureNode extends ImageDesignerNode {
   protected bmp: Uint8Array = null;
   protected imgWidth: number = 0;
   protected imgHeight: number = 0;
+  isUrl: boolean = false;
+
+  loadTexture() {
+    let target = this.isUrl ? this.imgData : this.texPath;
+    if (!target) return;
+
+    loadImage(target, this.isUrl).then((img) => {
+      if (!img) return;
+      this.bmp = img.getBitmap();
+      const size = img.getSize();
+      this.imgWidth = size.width;
+      this.imgHeight = size.height;
+
+      if (!this.bmp) {
+        console.log("load image failed");
+      }
+      this.resize(this.imgWidth, this.imgHeight);
+      this.createTexture();
+      this.requestUpdate();
+    });
+  }
 
   // constructor
   constructor() {
@@ -41,16 +75,12 @@ export class TextureNode extends ImageDesignerNode {
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "file") {
         if (prop) {
-          this.texPath = (prop as FileProperty).value;
-          if (this.texPath) {
-            [this.bmp, this.imgWidth, this.imgHeight] = loadImage(this.texPath);
-
-            if (!this.bmp) {
-              console.log("load image failed");
+          // update local file path
+          if (!this.isUrl) {
+            this.texPath = (prop as FileProperty).value;
+            if (this.texPath) {
+              this.loadTexture();
             }
-            this.resize(this.imgWidth, this.imgHeight);
-            this.createTexture();
-            this.requestUpdate();
           }
         }
       }
@@ -58,6 +88,8 @@ export class TextureNode extends ImageDesignerNode {
   }
 
   createTexture() {
+    if (!this.bmp) return;
+
     let gl = this.gl;
     this.isTextureReady = false;
 
@@ -74,50 +106,37 @@ export class TextureNode extends ImageDesignerNode {
     const nodetype = this.nodeType;
     let data = null;
 
-    if (!this.bmp && this.texPath) {
-      [this.bmp, this.imgWidth, this.imgHeight] = loadImage(this.texPath);
+    this.width = this.imgWidth;
+    this.height = this.imgHeight;
 
-      if (!this.bmp) {
-        console.log("load image failed");
-        return;
-      }
-    }
-
-    if (this.bmp) {
-      if (this.bmp.length > 0) {
-        this.width = this.imgWidth;
-        this.height = this.imgHeight;
-
-        this.tex = UpdateTexture(
-          level,
-          internalFormat,
-          this.imgWidth,
-          this.imgHeight,
-          border,
-          format,
-          type,
-          data,
-          NodeType.Procedural,
-          this.gl
-        );
-        this.baseTex = UpdateTexture(
-          level,
-          internalFormat,
-          this.imgWidth,
-          this.imgHeight,
-          border,
-          format,
-          type,
-          Uint8Array.from(this.bmp),
-          NodeType.Texture,
-          this.gl,
-          true,
-          true
-        );
-        this.isTextureReady = true;
-        this.requestUpdate();
-      }
-    }
+    this.tex = UpdateTexture(
+      level,
+      internalFormat,
+      this.imgWidth,
+      this.imgHeight,
+      border,
+      format,
+      type,
+      data,
+      NodeType.Procedural,
+      this.gl
+    );
+    this.baseTex = UpdateTexture(
+      level,
+      internalFormat,
+      this.imgWidth,
+      this.imgHeight,
+      border,
+      format,
+      type,
+      Uint8Array.from(this.bmp),
+      NodeType.Texture,
+      this.gl,
+      true,
+      true
+    );
+    this.isTextureReady = true;
+    this.requestUpdate();
   }
 
   init() {
@@ -143,5 +162,7 @@ export class TextureNode extends ImageDesignerNode {
         `;
 
     this.buildShader(source);
+
+    this.loadTexture();
   }
 }

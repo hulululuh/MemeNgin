@@ -26,6 +26,10 @@ import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detect";
+import { inferFromImplicitShape } from "@tensorflow/tfjs-core/dist/util";
+
+const isDataUri = require("is-data-uri");
+const NativeImage = require("electron").nativeImage;
 
 function hexToRgb(hex) {
   let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -452,7 +456,53 @@ export class Editor {
       const x = (ev.offsetX - self.nodeScene.view.offset[0]) / zoomFactor;
       const y = (ev.offsetY - self.nodeScene.view.offset[1]) / zoomFactor;
 
-      let isValidImagePath = (filePath: string) => {
+      let viewNodes = [];
+      let nodes = [];
+
+      let offset = [0, 0];
+
+      let droppedHtml = ev.dataTransfer.getData("text/html");
+
+      // dragged from web browser
+      if (droppedHtml) {
+        let dropContext = $("<div>").append(droppedHtml);
+        let imgUrl = $(dropContext)
+          .find("img")
+          .attr("src");
+
+        let createTextureNodeFromUrl = (dataUrl: string) => {
+          let node;
+          node = self.library.create("texture", dataUrl, true);
+
+          let nodeView = self.addNode(node, 0, 0);
+          nodeView.setCenter(x + offset[0], y + offset[1]);
+
+          nodes.push(node);
+          viewNodes.push(nodeView);
+
+          offset = [offset[0] + 15, offset[1] + 15];
+        };
+
+        if (isDataUri(imgUrl)) {
+          createTextureNodeFromUrl(imgUrl);
+        } else {
+          (async function() {
+            let blob = await fetch(imgUrl).then((r) => r.blob());
+            await new Promise(() => {
+              let reader = new FileReader();
+              reader.onload = () => {
+                let dataUrl = reader.result.toString();
+                if (isDataUri(dataUrl)) {
+                  createTextureNodeFromUrl(dataUrl);
+                }
+              };
+              reader.readAsDataURL(blob);
+            });
+          })();
+        }
+      }
+
+      const isValidImagePath = (filePath: string) => {
         let isValid = filePath.length > 0;
         if (isValid) {
           // TODO: check the path indicates proper image path
@@ -462,14 +512,14 @@ export class Editor {
         return isValid;
       };
 
-      let getFileType = (filePath: string) => {
+      const getFileType = (filePath: string) => {
         const ext = path.extname(filePath).toLowerCase();
 
         if (
           ext === ".png" ||
           ext === ".jpg" ||
-          ext === ".jpeg"
-          //TODO: ext === ".webp"
+          ext === ".jpeg" ||
+          ext === ".webp"
         ) {
           return FileType.Texture;
         } else if (ext === ".cube") {
@@ -479,11 +529,7 @@ export class Editor {
         }
       };
 
-      let viewNodes = [];
-      let nodes = [];
-
-      let offset = [0, 0];
-      // for (let idx = 0; idx < ev.dataTransfer.files.length; idx++) {
+      // dragged local files
       for (let file of ev.dataTransfer.files) {
         if (isValidImagePath(file.path)) {
           const fileType = getFileType(file.path);
