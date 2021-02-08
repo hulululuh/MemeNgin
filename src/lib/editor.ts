@@ -26,7 +26,6 @@ import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detect";
-import { inferFromImplicitShape } from "@tensorflow/tfjs-core/dist/util";
 
 const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
@@ -290,12 +289,11 @@ export class Editor {
 
     // refresh everything
     this.designer.invalidateAllNodes();
-
     const centerX = 0;
     const centerY = 0;
 
     // input
-    let inputNode = this.library.create("texture");
+    let inputNode = this.library.create("color");
     //inputNode.setAsInput();
     let inputNodeView = this.addNode(inputNode, 0, 0);
     inputNodeView.setCenter(centerX, centerY);
@@ -304,15 +302,16 @@ export class Editor {
     let node = this.library.create("output");
     //node.setAsResult();
     let nodeView = this.addNode(node, 0, 0);
-    // figure out why this doesnt work before adding addNode:
-    node.setProperty("color", new Color(1, 1, 1, 1));
     nodeView.setCenter(centerX + 150, centerY);
-    console.log(nodeView);
+
     this.assignNodeToTextureChannel(nodeView.id, "albedo");
     this.nodeScene.view.reset();
 
     // connection
     this.nodeScene.createConnection(inputNode.id, node.id, 0);
+
+    // setup properties
+    inputNode.setProperty("color", new Color(1, 1, 1, 1));
 
     const dnode = this.designer.getNodeById(node.id);
     const graphNode = this.nodeScene.getNodeById(dnode.id);

@@ -491,7 +491,7 @@ export default class App extends Vue {
         {
           filters: [
             {
-              name: "TextureLab Texture",
+              name: "MemeEngineer Project",
               extensions: ["texture"],
             },
           ],
@@ -530,7 +530,7 @@ export default class App extends Vue {
       {
         filters: [
           {
-            name: "TextureLab Texture",
+            name: "MemeEngineer Project",
             extensions: ["texture"],
           },
         ],
@@ -543,14 +543,14 @@ export default class App extends Vue {
         console.log(project);
 
         // ensure library exists
-        let libName = project.data["libraryVersion"];
-        let libraries = ["v0", "v1"];
-        if (libraries.indexOf(libName) == -1) {
-          alert(
-            `Project contains unknown library version '${libName}'. It must have been created with a new version of TextureLab`
-          );
-          return;
-        }
+        // let libName = project.data["libraryVersion"];
+        // let libraries = ["v0", "v1"];
+        // if (libraries.indexOf(libName) == -1) {
+        //   alert(
+        //     `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
+        //   );
+        //   return;
+        // }
 
         remote.getCurrentWindow().setTitle(project.name);
         this.editor.load(project.data);
@@ -684,7 +684,7 @@ export default class App extends Vue {
     let libraries = ["v0", "v1"];
     if (libraries.indexOf(libName) == -1) {
       alert(
-        `Project contains unknown library version '${libName}'. It must have been created with a new version of TextureLab`
+        `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
       );
       return;
     }

@@ -7,8 +7,6 @@ import { Editor } from "@/lib/editor";
 
 import { DeepLabOutput } from "@tensorflow-models/deeplab/dist/types";
 import * as deeplab from "@tensorflow-models/deeplab";
-//import { getLabels, getColormap } from "@tensorflow-models/deeplab";
-//import * as tf from "@tensorflow/tfjs-core";
 import path from "path";
 
 const NativeImage = require("electron").nativeImage;
@@ -51,10 +49,6 @@ export class DetectNode extends ImageDesignerNode {
       if (name === "image") {
         const gl = this.gl;
         this.isTextureReady = false;
-        gl.uniform1i(
-          gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
-          0
-        );
       }
     };
   }
@@ -147,7 +141,7 @@ export class DetectNode extends ImageDesignerNode {
       gl.FRAMEBUFFER,
       gl.COLOR_ATTACHMENT0,
       gl.TEXTURE_2D,
-      leftNode.tex,
+      leftNode.getBaseTexture(),
       0
     );
 

@@ -29,10 +29,6 @@ export class StylizeNode extends ImageDesignerNode {
       if (name === "image") {
         const gl = this.gl;
         this.isTextureReady = false;
-        gl.uniform1i(
-          gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
-          0
-        );
       }
     };
   }
@@ -64,7 +60,7 @@ export class StylizeNode extends ImageDesignerNode {
       gl.FRAMEBUFFER,
       gl.COLOR_ATTACHMENT0,
       gl.TEXTURE_2D,
-      node.tex,
+      node.getBaseTexture(),
       0
     );
 

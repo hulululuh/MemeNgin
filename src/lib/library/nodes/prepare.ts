@@ -27,29 +27,17 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
     this.desiredHeight = 1024;
 
     this.onnodepropertychanged = (prop: Property) => {
-      const checkAndApplyResize = function(node: PrepareNode) {
-        if (
-          !node.inheritParentSize &&
-          node.desiredWidth > 0 &&
-          node.desiredHeight > 0
-        ) {
-          node.resize(node.getWidth(), node.getHeight());
-          node.requestUpdate();
-          node.requestUpdateWidget();
-        }
-      };
-
       if (prop.name === "transform2d") {
         this.requestUpdateWidget();
       } else if (prop.name === "width") {
         this.desiredWidth = parseInt(prop.getValue());
-        checkAndApplyResize(this);
+        this.checkAndApplyResize();
       } else if (prop.name === "height") {
         this.desiredHeight = parseInt(prop.getValue());
-        checkAndApplyResize(this);
+        this.checkAndApplyResize();
       } else if (prop.name === "inherit") {
         this.inheritParentSize = prop.getValue();
-        checkAndApplyResize(this);
+        this.checkAndApplyResize();
       }
     };
 
@@ -59,6 +47,7 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
         this.id,
         "colorA"
       ) as ImageDesignerNode;
+
       if (!srcNode) return;
       let lw = srcNode.getWidth();
       let lh = srcNode.getHeight();
@@ -132,14 +121,10 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
     };
 
     this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
-      const leftImageNode = leftNode as ImageDesignerNode;
-      const srcNode = Editor.getDesigner().findLeftNode(
-        this.id,
-        "colorA"
-      ) as ImageDesignerNode;
+      const srcNode = leftNode as ImageDesignerNode;
 
       // background has changed
-      if (!srcNode || !leftImageNode) return;
+      if (!srcNode) return;
 
       let lw = srcNode.getWidth();
       let lh = srcNode.getHeight();
@@ -196,6 +181,23 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
         `;
 
     this.buildShader(source);
+  }
+
+  checkAndApplyResize() {
+    if (
+      !this.inheritParentSize &&
+      this.desiredWidth > 0 &&
+      this.desiredHeight > 0
+    ) {
+      this.resize(this.getWidth(), this.getHeight());
+      this.requestUpdate();
+      this.requestUpdateWidget();
+    }
+  }
+
+  createTexture() {
+    this.checkAndApplyResize();
+    super.createTexture();
   }
 
   render(inputs: NodeInput[]) {

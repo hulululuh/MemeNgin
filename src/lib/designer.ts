@@ -405,7 +405,6 @@ export class Designer {
 
       if (inputs.length > 0) {
         let parent = node.getParentNode();
-
         if (parent && node.inheritParentSize) {
           node.resize(parent.getWidth(), parent.getHeight());
         }
@@ -442,7 +441,7 @@ export class Designer {
       gl.FRAMEBUFFER,
       gl.COLOR_ATTACHMENT0,
       gl.TEXTURE_2D,
-      node.tex,
+      node.getBaseTexture(),
       0
     );
 
@@ -494,7 +493,7 @@ export class Designer {
     gl.activeTexture(gl.TEXTURE0);
 
     // TODO: check from here
-    gl.bindTexture(gl.TEXTURE_2D, node.tex);
+    gl.bindTexture(gl.TEXTURE_2D, node.getBaseTexture());
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -542,7 +541,7 @@ export class Designer {
     // send texture
     gl.uniform1i(gl.getUniformLocation(this.thumbnailProgram, "tex"), 0);
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, node.tex);
+    gl.bindTexture(gl.TEXTURE_2D, node.getBaseTexture());
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 

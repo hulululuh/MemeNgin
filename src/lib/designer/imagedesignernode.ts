@@ -182,6 +182,10 @@ export class ImageDesignerNode extends DesignerNode {
     }
   }
 
+  getBaseTexture(): WebGLTexture {
+    return this.tex ? this.tex : Designer.dummyTex;
+  }
+
   getBaseTextureType(): number {
     return this.gl.TEXTURE_2D;
   }
@@ -343,7 +347,7 @@ export class ImageDesignerNode extends DesignerNode {
       if (!(input.node instanceof ImageDesignerNode)) continue;
 
       let node = input.node as ImageDesignerNode;
-      const tex = node.tex ? node.tex : Designer.dummyTex;
+      const tex = node.getBaseTexture();
       const texW = node.tex ? node.getWidth() : 100;
       const texH = node.tex ? node.getHeight() : 100;
 
