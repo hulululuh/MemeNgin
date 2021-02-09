@@ -287,7 +287,7 @@ export class ImageDesignerNode extends DesignerNode {
     this.height = height;
 
     if (this.onResized) {
-      this.onResized(width, height);
+      this.onResized();
     }
 
     // find a corresponding NodeGraphicsItem

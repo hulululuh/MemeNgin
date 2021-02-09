@@ -174,75 +174,74 @@ export class DetectNode extends ImageDesignerNode {
     );
 
     // *********** deeplab ***********
-    await this.doSegmentation(imageData).then((output) => {
-      if (output.segmentationMap.length > 1) {
-        let resultImg = NativeImage.createFromBuffer(
-          Buffer.from(output.segmentationMap.buffer),
-          { width: output.width, height: output.height }
-        );
+    let output = await this.doSegmentation(imageData);
+    if (output.segmentationMap.length > 1) {
+      let resultImg = NativeImage.createFromBuffer(
+        Buffer.from(output.segmentationMap.buffer),
+        { width: output.width, height: output.height }
+      );
 
-        const w = this.getWidth();
-        const h = this.getHeight();
+      const w = this.getWidth();
+      const h = this.getHeight();
 
-        let bitmap = resultImg.getBitmap();
-        const n = bitmap.length;
+      let bitmap = resultImg.getBitmap();
+      const n = bitmap.length;
 
-        for (let idx = 0; idx < n / 4; idx++) {
-          const pixelIdx = idx * 4;
-          const iR = pixelIdx + 0;
-          const iG = pixelIdx + 1;
-          const iB = pixelIdx + 2;
-          const iA = pixelIdx + 3;
+      for (let idx = 0; idx < n / 4; idx++) {
+        const pixelIdx = idx * 4;
+        const iR = pixelIdx + 0;
+        const iG = pixelIdx + 1;
+        const iB = pixelIdx + 2;
+        const iA = pixelIdx + 3;
 
-          // make background pixel transparent
-          if (bitmap[iR] == 0 && bitmap[iG] == 0 && bitmap[iB] == 0) {
-            bitmap[iA] = 0;
-          }
-        }
-
-        resultImg = NativeImage.createFromBuffer(bitmap, {
-          width: output.width,
-          height: output.height,
-        });
-
-        // create texture for debug
-        if (resultImg) {
-          if (!this.isTextureReady) {
-            this.tex = UpdateTexture(
-              level,
-              internalFormat,
-              w,
-              h,
-              border,
-              format,
-              type,
-              data,
-              NodeType.Procedural,
-              this.gl
-            );
-            this.baseTex = UpdateTexture(
-              level,
-              internalFormat,
-              output.width,
-              output.height,
-              border,
-              format,
-              type,
-              Uint8Array.from(resultImg.getBitmap()),
-              NodeType.Texture,
-              this.gl,
-              false,
-              false
-            );
-
-            this.isTextureReady = true;
-            this.isAsyncWorkPending = false;
-            this.resize(w, h);
-            //this.requestUpdate();
-          }
+        // make background pixel transparent
+        if (bitmap[iR] == 0 && bitmap[iG] == 0 && bitmap[iB] == 0) {
+          bitmap[iA] = 0;
         }
       }
-    });
+
+      resultImg = NativeImage.createFromBuffer(bitmap, {
+        width: output.width,
+        height: output.height,
+      });
+
+      // create texture for debug
+      if (resultImg) {
+        if (!this.isTextureReady) {
+          this.tex = UpdateTexture(
+            level,
+            internalFormat,
+            w,
+            h,
+            border,
+            format,
+            type,
+            data,
+            NodeType.Procedural,
+            this.gl
+          );
+          this.baseTex = UpdateTexture(
+            level,
+            internalFormat,
+            output.width,
+            output.height,
+            border,
+            format,
+            type,
+            Uint8Array.from(resultImg.getBitmap()),
+            NodeType.Texture,
+            this.gl,
+            false,
+            false
+          );
+
+          this.isTextureReady = true;
+          this.isAsyncWorkPending = false;
+          this.resize(w, h);
+          //this.requestUpdate();
+        }
+      }
+    }
   }
 
   clearTexture() {

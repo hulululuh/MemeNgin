@@ -539,7 +539,7 @@ export class NodeScene {
       const rightNode = con.rightNode;
 
       if (rightNode.onResized) {
-        rightNode.onResized(0, 0);
+        rightNode.onResized();
       }
 
       // if (rightNode.isParentIndex(leftNode.id)) {

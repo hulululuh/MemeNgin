@@ -77,7 +77,7 @@ export class DesignerNode implements IPropertyHolder {
   needsUpdate: boolean = true;
 
   onPropertyLoaded?: () => void;
-  onResized?: (width: number, height: number) => void;
+  onResized?: () => void;
   onConnected?: (leftNode: DesignerNode, rightIndex: string) => void;
   onWidgetDragged?: (evt: WidgetEvent) => void;
 

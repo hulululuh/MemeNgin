@@ -25,7 +25,7 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
       }
     };
 
-    this.onResized = (width: number, height: number) => {
+    this.onResized = () => {
       // background has changed
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,

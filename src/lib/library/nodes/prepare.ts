@@ -41,7 +41,7 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
       }
     };
 
-    this.onResized = (width: number, height: number) => {
+    this.onResized = () => {
       // background has changed
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
@@ -184,11 +184,7 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
   }
 
   checkAndApplyResize() {
-    if (
-      !this.inheritParentSize &&
-      this.desiredWidth > 0 &&
-      this.desiredHeight > 0
-    ) {
+    if (this.width != this.getWidth() || this.height != this.getHeight()) {
       this.resize(this.getWidth(), this.getHeight());
       this.requestUpdate();
       this.requestUpdateWidget();
@@ -197,6 +193,7 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
 
   createTexture() {
     this.checkAndApplyResize();
+    this.refreshInputSize();
     super.createTexture();
   }
 
@@ -216,6 +213,21 @@ export class PrepareNode extends ImageDesignerNode implements ITransformable {
     };
 
     super.render(inputs, option);
+  }
+
+  refreshInputSize(): void {
+    const srcNode = this.getParentNode() as ImageDesignerNode;
+    // background has changed
+    if (srcNode) {
+      let lw = srcNode.getWidth();
+      let lh = srcNode.getHeight();
+
+      const w = this.getWidth();
+      const h = this.getHeight();
+
+      this.inputASize = new Vector2(lw, lh);
+      this.inputBSize = new Vector2(w, h);
+    }
   }
 
   requestUpdateWidget(): void {
