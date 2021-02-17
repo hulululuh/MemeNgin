@@ -67,6 +67,9 @@ export class DesignerNode implements IPropertyHolder {
   nodeType: NodeType;
   nodeCategory: NodeCategory;
 
+  // this indicates which node should we use, when it needs to be resized
+  parentIndex: string;
+
   gl: WebGL2RenderingContext;
   designer: Designer;
 
@@ -118,6 +121,20 @@ export class DesignerNode implements IPropertyHolder {
   onnodepropertychanged?: (prop: Property) => void;
   ondisconnected?: (node: DesignerNode, name: string) => void;
 
+  onnodeexposechanged(prop: Property) {
+    const scene = Editor.getScene();
+    const item = scene.nodes.filter((item) => item.id === this.id)[0];
+
+    // expose turned off - remove active connections
+    if (!prop.getExposed()) {
+      let leftNode = this.designer.findLeftNode(this.id, prop.name);
+      this.designer.removeConnection(leftNode, this, prop.name);
+      scene.removeAssociatedConnections(item, prop.name);
+    }
+
+    item.setupSockets(this);
+  }
+
   // an update is requested when:
   // a property is changed
   // a new connection is made
@@ -136,6 +153,10 @@ export class DesignerNode implements IPropertyHolder {
     this.inputs.push(name);
   }
 
+  getExposedProperties(): Array<Property> {
+    return this.properties.filter((x) => x.getExposed());
+  }
+
   getProperty(name: string): any {
     let prop = this.properties.find((x) => x.name === name);
     if (prop) {
@@ -152,7 +173,8 @@ export class DesignerNode implements IPropertyHolder {
     });
 
     if (prop) {
-      prop.setValue(value);
+      prop.setValue(value["value"]);
+      prop.setExposed(value["exposed"]);
       this.requestUpdate();
     }
   }
@@ -163,6 +185,18 @@ export class DesignerNode implements IPropertyHolder {
 
   connected(leftNode: DesignerNode, rightIndex: string) {}
 
+  isParentIndex(name: string): boolean {
+    // if the node has one input then it is a prime index
+    if (this.inputs.length < 2) {
+      return true;
+    } else {
+      return name === this.parentIndex;
+    }
+  }
+
+  getParentNode(): any {
+    return Editor.getDesigner().findLeftNode(this.id, this.parentIndex);
+  }
   // PROPERTY FUNCTIONS
   addIntProperty(
     id: string,

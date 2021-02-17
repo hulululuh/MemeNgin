@@ -12,6 +12,7 @@
         :editor="editor"
         @propertyChanged="propertyChanged"
         @property-change-completed="propertyChangeCompleted"
+        @propertyExposeChanged="propertyExposeChanged"
         :key="index"
       ></component>
     </accordion>
@@ -19,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Model, Prop, Component } from "vue-property-decorator";
+import { Vue, Prop, Component } from "vue-property-decorator";
 import FloatPropertyView from "@/components/properties/FloatProp.vue";
 import BoolPropertyView from "@/components/properties/BoolProp.vue";
 import EnumPropertyView from "@/components/properties/EnumProp.vue";
@@ -37,9 +38,6 @@ import {
   IProperyUi,
   PropertyChangeComplete,
 } from "../components/properties/ipropertyui";
-import { UndoStack } from "@/lib/undostack";
-import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
-import { Transform2D } from '@/lib/math/transform2d';
 
 /* eslint-disable */
 
@@ -77,6 +75,12 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
     }
     // if (this.editor.onnodepropertychanged)
     //   this.editor.onnodepropertychanged(self.node, prop);
+  }
+
+  propertyExposeChanged(prop: Property) {
+    if (this.node.onnodeexposechanged) {
+      this.node.onnodeexposechanged(prop);
+    }
   }
 
   // this is needed for undo-redo

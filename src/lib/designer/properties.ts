@@ -20,6 +20,11 @@ export class Property {
   name: string;
   displayName: string;
   type: string;
+  exposed: boolean;
+
+  constructor() {
+    this.exposed = false;
+  }
 
   // to be overriden
   getValue(): any {
@@ -31,12 +36,21 @@ export class Property {
   clone(): Property {
     return null;
   }
+
+  getExposed() {
+    return this.exposed;
+  }
+
+  setExposed(val: boolean) {
+    this.exposed = val;
+  }
 }
 
 export interface IPropertyHolder {
   properties: Property[];
   setProperty(name: string, value: any);
   onnodepropertychanged?: (prop: Property) => void;
+  onnodeexposechanged?: (prop: Property) => void;
 }
 
 export class FloatProperty extends Property {

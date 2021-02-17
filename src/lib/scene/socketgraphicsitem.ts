@@ -9,9 +9,7 @@ import {
   NodeGraphicsItemRenderState,
 } from "./nodegraphicsitem";
 import { ConnectionGraphicsItem } from "./connectiongraphicsitem";
-import { AddConnectionAction } from "../actions/addconnectionaction";
 import { UndoStack } from "../undostack";
-import { RemoveConnectionAction } from "../actions/removeconnectionaction";
 import {
   ConnectionSwitchAction,
   SwitchConnectionAction,

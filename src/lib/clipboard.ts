@@ -7,6 +7,8 @@ import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
 import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
 import { Designer } from "./designer";
 import { DesignerNode } from "./designer/designernode";
+import { ImageDesignerNode } from "./designer/imagedesignernode";
+import { LogicDesignerNode } from "./designer/logicdesignernode";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
 import { DesignerNodeConn } from "./designer/designerconnection";
 import { SocketType } from "./scene/socketgraphicsitem";
@@ -195,19 +197,18 @@ export class ItemClipboard {
       }
 
       // create scene version
-      let node = new NodeGraphicsItem(dNode.title);
-      for (let input of dNode.getInputs()) {
-        node.addSocket(input, input, SocketType.In);
-      }
-      node.addSocket("output", "output", SocketType.Out);
-      node.id = dNode.id;
+      let node = new NodeGraphicsItem(dNode);
       scene.addNode(node);
       focusItems.push(node);
 
       // generate thumbnail
-      designer.generateImageFromNode(dNode).then((thumb) => {
-        node.setThumbnail(thumb);
-      });
+      if (dNode instanceof ImageDesignerNode) {
+        designer.generateImageFromNode(dNode).then((thumb) => {
+          node.setThumbnail(thumb);
+        });
+      } else if (dNode instanceof LogicDesignerNode) {
+        designer.generateDataFromNode(dNode);
+      }
 
       node.setCenter(n.x, n.y);
 
@@ -305,7 +306,11 @@ export class ItemClipboard {
 
       let props = {};
       for (let prop of node.properties) {
-        props[prop.name] = prop.getValue();
+        //let exposed = prop.exposed ? prop.getExposed() : false;
+        props[prop.name] = {
+          value: prop.getValue(),
+          exposed: prop.getExposed(),
+        };
       }
       n["properties"] = props;
 

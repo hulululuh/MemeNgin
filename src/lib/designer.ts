@@ -19,6 +19,7 @@ import {
   DesignerNodePropertyMap,
 } from "./designer/designervariable";
 import { Editor } from "./editor";
+import { LogicDesignerNode } from "./designer/logicdesignernode";
 
 const HALF = 0.5;
 
@@ -136,6 +137,8 @@ export class Designer {
           // so we avoid messing up our loop since the length of this.updateList wont change
           if (node instanceof ImageDesignerNode)
             this.generateImageFromNode(node);
+          else if (node instanceof LogicDesignerNode)
+            this.generateDataFromNode(node);
 
           // remove from list
           this.updateList.splice(this.updateList.indexOf(node), 1);
@@ -368,6 +371,38 @@ export class Designer {
   generateImage(name: string): Promise<HTMLImageElement> {
     let node: DesignerNode = this.getNodeByName(name);
     return this.generateImageFromNode(node);
+  }
+
+  generateDataFromNode(dNode: DesignerNode): any {
+    if (!(dNode instanceof LogicDesignerNode)) {
+      console.warn("Trying to generate data of Non-Logic node. aborting...");
+      return;
+    }
+
+    let graphNode = Editor.getInstance().nodeScene.getNodeById(dNode.id);
+    if (!graphNode) return; // node could have been deleted
+
+    let node = dNode as LogicDesignerNode;
+    if (node instanceof LogicDesignerNode) {
+      let prop = node.properties[0];
+      let inputNode = this.findLeftNode(node.id, "value");
+      // update parentNode if exists
+      if (inputNode && inputNode.needsUpdate) {
+        this.generateDataFromNode(inputNode);
+        inputNode.needsUpdate = false;
+        this.updateList.splice(this.updateList.indexOf(inputNode), 1);
+      }
+
+      if (prop.exposed && inputNode) {
+        let graphNodeParent = Editor.getInstance().nodeScene.getNodeById(
+          inputNode.id
+        );
+        graphNode.value = graphNodeParent.value;
+        //graphNode.value = inputNode.properties[0].getValue();
+      } else {
+        graphNode.value = node.properties[0].getValue();
+      }
+    }
   }
 
   // this function generates the image of the node given its input nodes
@@ -679,7 +714,6 @@ export class Designer {
   }
 
   //todo: remove property map
-
   setVariable(name: string, value: any) {
     let variable = this.findVariable(name);
     if (variable) {
@@ -730,7 +764,9 @@ export class Designer {
 
       let props = {};
       for (let prop of node.properties) {
-        props[prop.name] = prop.getValue();
+        props[prop.name] = {};
+        props[prop.name]["value"] = prop.getValue();
+        props[prop.name]["exposed"] = prop.getExposed();
       }
       n["properties"] = props;
 
@@ -898,7 +934,7 @@ export class Designer {
         conn.rightNodeInput === rightNodeInput
     );
 
-    let leftNode;
+    let leftNode = null;
 
     if (conns.length > 0) leftNode = conns[0].leftNode;
     return leftNode;

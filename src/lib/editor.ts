@@ -26,6 +26,7 @@ import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detect";
+import { LogicDesignerNode } from "./designer/logicdesignernode";
 
 const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
@@ -764,18 +765,8 @@ export class Editor {
     this.designer.addNode(dNode);
 
     // create node from designer
-    let node = new NodeGraphicsItem(dNode.title);
-    let imgdNode = dNode as ImageDesignerNode;
-    if (imgdNode) {
-      node.setVirtualSize(imgdNode.getWidth(), imgdNode.getHeight());
-    }
-
-    for (let input of dNode.getInputs()) {
-      node.addSocket(input, input, SocketType.In);
-    }
-    node.addSocket("output", "output", SocketType.Out);
+    let node = new NodeGraphicsItem(dNode);
     this.nodeScene.addNode(node);
-    node.id = dNode.id;
 
     let pos = this.nodeScene.view.canvasToSceneXY(screenX, screenY);
     node.setCenter(pos.x, pos.y);

@@ -4,6 +4,13 @@
       <label>{{ prop.displayName }}</label>
     </div>
     <div class="input-holder">
+      <input type="checkbox" id="expose" name="scales" unchecked
+        :value="prop.exposed"
+        :checked="prop.exposed"
+        @input="updateExposed"
+        @focus="focus"
+        @blur="blur">
+      <!-- <label for="expose">Expose</label> -->
       <div style="width:100%; margin-right:10px;padding:0.4em;">
         <input
           type="range"
@@ -52,7 +59,7 @@ export default class FloatPropertyView extends Vue {
   @Prop()
   propHolder: IPropertyHolder;
 
-  oldValue: number;
+  oldValue: any;
 
   @Emit()
   propertyChanged() {
@@ -65,13 +72,24 @@ export default class FloatPropertyView extends Vue {
     return evt;
   }
 
+  @Emit()
+  propertyExposeChanged() {
+    this.$emit("propertyExposeChanged", this.prop);
+    return this.prop.name;
+  }
+
+  updateExposed(evt) { 
+    this.propHolder.setProperty(this.prop.name, {value: this.prop.getValue(), exposed: evt.target.checked});
+    this.propertyExposeChanged();
+  }
+
   updateValue(evt) {
-    this.propHolder.setProperty(this.prop.name, evt.target.value);
+    this.propHolder.setProperty(this.prop.name, {value: evt.target.value, exposed: this.prop.getExposed()});
     this.propertyChanged();
   }
 
   focus() {
-    this.oldValue = this.prop.value;
+    this.oldValue = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
   }
 
   blur() {
@@ -80,7 +98,7 @@ export default class FloatPropertyView extends Vue {
       this.prop.name,
       this.propHolder,
       this.oldValue,
-      this.prop.value
+      {value: this.prop.getValue(), exposed: this.prop.getExposed()}
     );
     UndoStack.current.push(action);
   }

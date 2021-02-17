@@ -2,6 +2,7 @@ import { DesignerNode, NodeType, NodeInput } from "@/lib/designer/designernode";
 import { Designer } from "@/lib/designer";
 import { buildShaderProgram } from "@/lib/designer/gl";
 import {
+  Property,
   FloatProperty,
   IntProperty,
   BoolProperty,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
 import { Matrix4 } from "@math.gl/core";
+import { LogicDesignerNode } from "./logicdesignernode";
 
 export enum TexPrecision {
   lowp,
@@ -125,9 +127,6 @@ export class ImageDesignerNode extends DesignerNode {
   width: number;
   height: number;
 
-  // this indicates which node should we use, when it needs to be resized
-  parentIndex: string;
-
   //program:WebGLShader;
   source: string; // shader code
   shaderProgram: WebGLProgram;
@@ -151,19 +150,6 @@ export class ImageDesignerNode extends DesignerNode {
   _init() {
     this.createTexture();
     this.init();
-  }
-
-  isParentIndex(name: string): boolean {
-    // if the node has one input then it is a prime index
-    if (this.inputs.length < 2) {
-      return true;
-    } else {
-      return name === this.parentIndex;
-    }
-  }
-
-  getParentNode(): any {
-    return Editor.getDesigner().findLeftNode(this.id, this.parentIndex);
   }
 
   getWidth(): number {
@@ -245,8 +231,7 @@ export class ImageDesignerNode extends DesignerNode {
   connected(leftNode: DesignerNode, rightIndex: string) {
     if (this.isParentIndex(rightIndex) && this.inheritParentSize) {
       // fit the size to parent node - try resize
-      let parentNode = leftNode as ImageDesignerNode;
-      if (parentNode) {
+      if (leftNode instanceof ImageDesignerNode) {
         this.resizeByNode(leftNode);
       }
     }
@@ -367,7 +352,6 @@ export class ImageDesignerNode extends DesignerNode {
         texH
       );
 
-      input.name;
       console.log("bound texture " + texIndex);
       texIndex++;
     }
@@ -437,10 +421,12 @@ export class ImageDesignerNode extends DesignerNode {
 
     // pass properties
     for (let prop of this.properties) {
+      let value = this.evaluatePropertyValue(prop);
+
       if (prop instanceof FloatProperty) {
         gl.uniform1f(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          (prop as FloatProperty).value
+          value
         );
       }
       if (prop instanceof IntProperty) {
@@ -1273,5 +1259,24 @@ export class ImageDesignerNode extends DesignerNode {
 
   setAsResult() {
     this.isResult = true;
+  }
+
+  evaluatePropertyValue(prop: Property) {
+    let value;
+    let leftNode = this.designer.findLeftNode(this.id, prop.name);
+    if (
+      leftNode &&
+      leftNode instanceof LogicDesignerNode &&
+      prop.getExposed()
+    ) {
+      let graphNodeParent = Editor.getInstance().nodeScene.getNodeById(
+        leftNode.id
+      );
+      value = graphNodeParent.value;
+    } else {
+      value = (prop as FloatProperty).value;
+    }
+
+    return value;
   }
 }

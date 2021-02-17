@@ -41,6 +41,8 @@ import { TileSamplerNode } from "./nodes/tilesampler";
 import { DetectNode } from "./nodes/detect";
 import { StylizeNode } from "./nodes/stylize";
 
+import { FloatPropertyNode } from "./nodes/floatpropertynode";
+
 import { NodeCategory } from "../designer/designernode";
 import { DesignerLibrary } from "../designer/library";
 
@@ -164,6 +166,13 @@ export function createLibrary() {
   );
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Think);
   lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Think);
+
+  lib.addNode(
+    "floatproperty",
+    "FloatProperty",
+    FloatPropertyNode,
+    NodeCategory.Think
+  );
 
   return lib;
 }

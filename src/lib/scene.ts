@@ -1,4 +1,5 @@
 import { Designer } from "./designer";
+import { LogicDesignerNode } from "./designer/logicdesignernode";
 import {
   NodeGraphicsItem,
   NodeGraphicsItemRenderState,
@@ -408,18 +409,48 @@ export class NodeScene {
     if (i !== -1) this.navigations.splice(i, 1);
   }
 
+  removeAssociatedConnections(item: NodeGraphicsItem, propName: string) {
+    // delete connections
+    let toRemove = this.conns.filter(
+      (con) =>
+        (con.socketA &&
+          con.socketA.node.id == item.id &&
+          con.socketA.id == propName) ||
+        (con.socketB &&
+          con.socketB.node.id == item.id &&
+          con.socketB.id == propName)
+    );
+
+    for (let con of toRemove) {
+      this.removeConnection(con);
+    }
+
+    toRemove = [];
+  }
+
   deleteNode(item: NodeGraphicsItem) {
     // delete connections
-    let conns = this.conns;
-    for (let i = this.conns.length - 1; i >= 0; i--) {
-      let con = this.conns[i];
-      if (
+    let toRemove = this.conns.filter(
+      (con) =>
         (con.socketA && con.socketA.node.id == item.id) ||
         (con.socketB && con.socketB.node.id == item.id)
-      ) {
-        this.removeConnection(con);
-      }
+    );
+
+    for (let con of toRemove) {
+      this.removeConnection(con);
     }
+
+    toRemove = [];
+
+    // for (let i = this.conns.length - 1; i >= 0; i--) {
+    //   let con = this.conns[i];
+    //   if (
+    //     (con.socketA && con.socketA.node.id == item.id) ||
+    //     (con.socketB && con.socketB.node.id == item.id)
+    //   ) {
+    //     this.removeConnection(con);
+    //   }
+    // }
 
     if (item.enabled) {
       const event = new WidgetEvent("widgetUpdate", {
@@ -1232,20 +1263,11 @@ export class NodeScene {
     // add nodes one by one
     for (let dNode of designer.nodes) {
       // create node from designer
-      let node = new NodeGraphicsItem(dNode.title);
-      for (let input of dNode.getInputs()) {
-        node.addSocket(input, input, SocketType.In);
-      }
-      node.addSocket("output", "output", SocketType.Out);
+      let node = new NodeGraphicsItem(dNode);
       s.addNode(node);
-      node.id = dNode.id;
 
       const nodeData = data["nodes"][node.id];
-      // get position
-      // let x = data["nodes"][node.id].x;
-      // let y = data["nodes"][node.id].y;
       node.setCenter(nodeData.x, nodeData.y);
-      node.setVirtualSize(nodeData.w, nodeData.h);
     }
 
     // add connection one by one

@@ -11,6 +11,9 @@ import { NodeScene } from "../scene";
 import { Vector2 } from "@math.gl/core";
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
+import { DesignerNode } from "@/lib/designer/designernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
 
 export class NodeGraphicsItemRenderState {
   hovered: boolean = false;
@@ -18,11 +21,13 @@ export class NodeGraphicsItemRenderState {
 }
 
 export class NodeGraphicsItem extends GraphicsItem {
+  isLogic: boolean;
   id!: string;
   sockets: SocketGraphicsItem[] = Array();
   title: string;
   thumbnail!: HTMLImageElement;
   imageCanvas: ImageCanvas;
+  value: string;
   relScale: number;
 
   hit: boolean;
@@ -32,16 +37,49 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   dragStartPos: Vector2;
 
-  constructor(title: string) {
+  constructor(node: DesignerNode) {
     super();
     this.width = 100;
     this.height = 100;
-    this.title = title;
+    this.title = node.title;
     this.imageCanvas = new ImageCanvas();
     this.hit = false;
+    this.isLogic = node instanceof LogicDesignerNode;
+    this.value = "";
+    this.id = node.id;
+
+    this.setupSize(node);
+    this.setupSockets(node);
 
     // const scale = Math.min(width, height);
     // this.relScale = 100 / scale;
+  }
+
+  setupSize(dNode: DesignerNode) {
+    if (!this.isLogic) {
+      let imgdNode = dNode as ImageDesignerNode;
+      this.setVirtualSize(imgdNode.getWidth(), imgdNode.getHeight());
+    } else {
+      //let logicdNode = dNode as LogicDesignerNode;
+      this.setSize(75, 50);
+    }
+  }
+
+  setupSockets(node: DesignerNode) {
+    // clear existing array
+    this.sockets = [];
+
+    for (let input of node.getInputs()) {
+      this.addSocket(input, input, SocketType.In);
+    }
+
+    for (let prop of node.getExposedProperties()) {
+      this.addSocket(prop.name, prop.name, SocketType.In);
+    }
+
+    this.addSocket("output", "output", SocketType.Out);
+
+    this.setScene(this.scene);
   }
 
   // resize graphics node by given image size
@@ -92,6 +130,73 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   draw(ctx: CanvasRenderingContext2D, renderData: any) {
+    if (this.isLogic) {
+      this.drawAsLogicNode(ctx, renderData);
+    } else {
+      this.drawAsImageNode(ctx, renderData);
+    }
+  }
+
+  drawAsLogicNode(ctx: CanvasRenderingContext2D, renderData: any) {
+    const renderState = <NodeGraphicsItemRenderState>renderData;
+
+    // border
+    if (renderState.selected) {
+      ctx.strokeStyle = "rgb(255, 255, 255)";
+      ctx.beginPath();
+      ctx.lineWidth = 8;
+      //ctx.rect(this.x, this.y, this.width, this.height);
+      this.roundRect(ctx, this.x, this.y, this.width, this.height, 2);
+      ctx.stroke();
+    }
+
+    // background
+    ctx.beginPath();
+    ctx.fillStyle = "rgb(0, 0, 0)";
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.fill();
+
+    //ctx.globalAlpha = 0.65;
+    // title
+    //if (!renderState.hovered) {
+    // ctx.beginPath();
+    // ctx.fillStyle = "rgb(0,0,0)";
+    // ctx.rect(this.x, this.y, this.width, 20);
+    // ctx.fill();
+
+    ctx.beginPath();
+    //ctx.font = "14px monospace";
+    ctx.font = "bold 14px 'Open Sans'";
+    ctx.fillStyle = "rgb(255,255,255)";
+    let size = ctx.measureText(this.value);
+    let textX = this.centerX() - size.width / 2;
+    let textY = this.centerY();
+    ctx.fillText(this.value, textX, textY);
+    //}
+
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgb(0, 0, 0)";
+
+    const offset = ctx.lineWidth / 2 - 0.0001;
+    this.roundRect(
+      ctx,
+      this.x - offset,
+      this.y - offset,
+      this.width + offset * 2,
+      this.height + offset * 2,
+      offset
+    );
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    for (let sock of this.sockets) {
+      sock.draw(ctx, renderState);
+    }
+  }
+
+  drawAsImageNode(ctx: CanvasRenderingContext2D, renderData: any) {
     const renderState = <NodeGraphicsItemRenderState>renderData;
 
     // border
