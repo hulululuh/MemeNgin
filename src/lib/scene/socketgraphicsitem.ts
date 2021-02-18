@@ -213,9 +213,14 @@ export class SocketGraphicsItem extends GraphicsItem {
     let actions: ConnectionSwitchAction[] = [];
 
     if (this.hitSocket) {
+      let closeSock: SocketGraphicsItem = this.scene.getHitSocket(
+        mouseX,
+        mouseY
+      );
+
       // remove previous connection
       // this block creates a new connection regardless of the outcome
-      if (this.hitConnection) {
+      if (this.hitConnection && ValidateConnection(this.hitSocket, closeSock)) {
         this.scene.removeConnection(this.hitConnection);
 
         // let action = new RemoveConnectionAction(
@@ -229,11 +234,6 @@ export class SocketGraphicsItem extends GraphicsItem {
 
         this.hitConnection = null;
       }
-
-      let closeSock: SocketGraphicsItem = this.scene.getHitSocket(
-        mouseX,
-        mouseY
-      );
 
       if (ValidateConnection(this.hitSocket, closeSock)) {
         // close socket

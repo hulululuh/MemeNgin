@@ -403,15 +403,27 @@ export class NodeGraphicsItem extends GraphicsItem {
     this.sockets.push(sock);
 
     this.sortSockets();
+
+    return sock;
   }
 
   addSocketByProp(propName: string, type: string) {
-    this.addSocket(propName, propName, SocketInOut.In, PropertyType[type]);
+    let socket = this.addSocket(
+      propName,
+      propName,
+      SocketInOut.In,
+      PropertyType[type]
+    );
+    if (this.scene) {
+      socket.setScene(this.scene);
+    } else {
+      console.error("scene is required");
+    }
   }
 
   removeSocketByProp(propName: string) {
     let idx = this.sockets.findIndex((sock) => sock.title == propName);
-    if (idx > -1) this.sockets.splice(idx);
+    if (idx > -1) this.sockets.splice(idx, 1);
   }
 
   // MOUSE EVENTS
