@@ -11,7 +11,7 @@ import { ImageDesignerNode } from "./designer/imagedesignernode";
 import { LogicDesignerNode } from "./designer/logicdesignernode";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
 import { DesignerNodeConn } from "./designer/designerconnection";
-import { SocketType } from "./scene/socketgraphicsitem";
+import { SocketInOut } from "./scene/socketgraphicsitem";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { Guid } from "./utils";
 import { AddItemsAction } from "./actions/additemsaction";

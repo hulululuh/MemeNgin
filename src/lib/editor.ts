@@ -12,7 +12,7 @@ import { DesignerLibrary } from "./designer/library";
 import { NodeScene } from "./scene";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
-import { SocketType } from "./scene/socketgraphicsitem";
+import { SocketInOut } from "./scene/socketgraphicsitem";
 import { ImageCanvas } from "./designer/imagecanvas";
 
 import { createLibrary, getCurrentLibraryVersion } from "@/lib/library/library";

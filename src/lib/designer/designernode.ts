@@ -125,14 +125,18 @@ export class DesignerNode implements IPropertyHolder {
     const scene = Editor.getScene();
     const item = scene.nodes.filter((item) => item.id === this.id)[0];
 
+    if (!item) return;
     // expose turned off - remove active connections
     if (!prop.getExposed()) {
       let leftNode = this.designer.findLeftNode(this.id, prop.name);
       this.designer.removeConnection(leftNode, this, prop.name);
       scene.removeAssociatedConnections(item, prop.name);
+      item.removeSocketByProp(prop.name);
+    } else {
+      item.addSocketByProp(prop.name, prop.type);
     }
 
-    item.setupSockets(this);
+    item.sortSockets();
   }
 
   // an update is requested when:

@@ -1,4 +1,4 @@
-import { SocketGraphicsItem, SocketType } from "./socketgraphicsitem";
+import { SocketGraphicsItem, SocketInOut } from "./socketgraphicsitem";
 import { ImageCanvas } from "../designer/imagecanvas";
 import {
   GraphicsItem,
@@ -14,6 +14,7 @@ import { UndoStack } from "../undostack";
 import { DesignerNode } from "@/lib/designer/designernode";
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
+import { PropertyType } from "@/lib/designer/properties";
 
 export class NodeGraphicsItemRenderState {
   hovered: boolean = false;
@@ -70,14 +71,30 @@ export class NodeGraphicsItem extends GraphicsItem {
     this.sockets = [];
 
     for (let input of node.getInputs()) {
-      this.addSocket(input, input, SocketType.In);
+      this.addSocket(input, input, SocketInOut.In, PropertyType.Image);
     }
 
     for (let prop of node.getExposedProperties()) {
-      this.addSocket(prop.name, prop.name, SocketType.In);
+      this.addSocket(
+        prop.name,
+        prop.name,
+        SocketInOut.In,
+        PropertyType[prop.type]
+      );
     }
 
-    this.addSocket("output", "output", SocketType.Out);
+    // Logic designer node
+    if (node instanceof LogicDesignerNode) {
+      let outputType = (node as LogicDesignerNode).properties[0].type;
+      this.addSocket(
+        "output",
+        "output",
+        SocketInOut.Out,
+        PropertyType[outputType]
+      );
+    } else {
+      this.addSocket("output", "output", SocketInOut.Out, PropertyType.Image);
+    }
 
     this.setScene(this.scene);
   }
@@ -322,7 +339,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   getInSockets() {
     let array = new Array();
     for (let sock of this.sockets) {
-      if (sock.socketType == SocketType.In) array.push(sock);
+      if (sock.socketInOut == SocketInOut.In) array.push(sock);
     }
 
     return array;
@@ -330,7 +347,7 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   getInSocketByName(name: string): SocketGraphicsItem {
     for (let sock of this.sockets) {
-      if (sock.socketType == SocketType.In)
+      if (sock.socketInOut == SocketInOut.In)
         if (sock.title == name)
           //todo: separate title from name
           return sock;
@@ -342,7 +359,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   getOutSockets() {
     let array = new Array();
     for (let sock of this.sockets) {
-      if (sock.socketType == SocketType.Out) array.push(sock);
+      if (sock.socketInOut == SocketInOut.Out) array.push(sock);
     }
 
     return array;
@@ -362,7 +379,7 @@ export class NodeGraphicsItem extends GraphicsItem {
     }
 
     for (let sock of this.sockets) {
-      if (sock.socketType == SocketType.Out)
+      if (sock.socketInOut == SocketInOut.Out)
         if (sock.title == name)
           //todo: separate title from name
           return sock;
@@ -372,15 +389,29 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   // adds socket to node
-  addSocket(name: string, id: string, type: SocketType) {
-    let sock = new SocketGraphicsItem();
+  addSocket(
+    name: string,
+    id: string,
+    type: SocketInOut,
+    propType: PropertyType
+  ) {
+    let sock = new SocketGraphicsItem(propType);
     sock.id = id;
     sock.title = name;
     sock.node = this;
-    sock.socketType = type;
+    sock.socketInOut = type;
     this.sockets.push(sock);
 
     this.sortSockets();
+  }
+
+  addSocketByProp(propName: string, type: string) {
+    this.addSocket(propName, propName, SocketInOut.In, PropertyType[type]);
+  }
+
+  removeSocketByProp(propName: string) {
+    let idx = this.sockets.findIndex((sock) => sock.title == propName);
+    if (idx > -1) this.sockets.splice(idx);
   }
 
   // MOUSE EVENTS

@@ -954,4 +954,10 @@ export class Designer {
 
     return rightNodes;
   }
+
+  getConnections(node: DesignerNode) {
+    return this.conns.filter(
+      (con) => con.leftNode == node || con.rightNode == node
+    );
+  }
 }

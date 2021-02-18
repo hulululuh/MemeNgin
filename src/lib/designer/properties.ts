@@ -14,6 +14,9 @@ export enum PropertyType {
   Gradient = "gradient",
   File = "file",
   Transform2D = "transform2d",
+
+  // use it on the socket
+  Image = "image",
 }
 
 export class Property {

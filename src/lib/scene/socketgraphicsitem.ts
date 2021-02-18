@@ -15,16 +15,32 @@ import {
   SwitchConnectionAction,
 } from "../actions/switchconnectionaction";
 
-export enum SocketType {
+import { PropertyType } from "@/lib/designer/properties";
+
+export enum SocketInOut {
   In,
   Out,
+}
+
+export function ValidateConnection(
+  sockA: SocketGraphicsItem,
+  sockB: SocketGraphicsItem
+): boolean {
+  return (
+    sockB &&
+    sockB != sockA &&
+    sockB.socketInOut != sockA.socketInOut &&
+    sockB.propertyType == sockA.propertyType &&
+    sockB.node != sockA.node
+  );
 }
 
 export class SocketGraphicsItem extends GraphicsItem {
   id!: string;
   title!: string;
   node!: NodeGraphicsItem;
-  socketType!: SocketType;
+  socketInOut!: SocketInOut;
+  propertyType!: PropertyType;
   radius: number = 8;
 
   // only in sockets store the connection
@@ -72,13 +88,15 @@ export class SocketGraphicsItem extends GraphicsItem {
     return this.conns.length > 0;
   }
 
-  constructor() {
+  constructor(propType: PropertyType) {
     super();
     this.width = this.radius * 2;
     this.height = this.radius * 2;
 
     this.hit = false;
     this.hitSocket = null;
+
+    this.propertyType = propType;
   }
 
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
@@ -113,7 +131,7 @@ export class SocketGraphicsItem extends GraphicsItem {
     if (renderState.hovered) {
       ctx.fillStyle = "rgb(150,150,150)";
       ctx.font = "9px 'Open Sans'";
-      if (this.socketType == SocketType.Out) {
+      if (this.socketInOut == SocketInOut.Out) {
         let w = ctx.measureText(this.title).width;
         ctx.fillText(this.title, this.x + this.width + 4, this.y + 12);
       } else {
@@ -133,7 +151,7 @@ export class SocketGraphicsItem extends GraphicsItem {
       ctx.lineWidth = 4;
       ctx.moveTo(this.hitSocket.centerX(), this.hitSocket.centerY());
 
-      if (this.hitSocket.socketType == SocketType.Out) {
+      if (this.hitSocket.socketInOut == SocketInOut.Out) {
         ctx.bezierCurveTo(
           this.hitSocket.centerX() + 60,
           this.hitSocket.centerY(), // control point 1
@@ -167,7 +185,7 @@ export class SocketGraphicsItem extends GraphicsItem {
     this.mouseDragY = evt.globalY;
 
     // if socket is an in socket with a connection, make hitsocket the connected out socket
-    if (this.socketType == SocketType.In && this.hasConnections()) {
+    if (this.socketInOut == SocketInOut.In && this.hasConnections()) {
       this.hitSocket = this.getConnection(0).socketA; // insockets should only have one connection
       // store connection for removal as well
       this.hitConnection = this.getConnection(0);
@@ -217,16 +235,11 @@ export class SocketGraphicsItem extends GraphicsItem {
         mouseY
       );
 
-      if (
-        closeSock &&
-        closeSock != this.hitSocket &&
-        closeSock.socketType != this.hitSocket.socketType &&
-        closeSock.node != this.hitSocket.node
-      ) {
+      if (ValidateConnection(this.hitSocket, closeSock)) {
         // close socket
         let con: ConnectionGraphicsItem = new ConnectionGraphicsItem();
         // out socket should be on the left, socketA
-        if (this.hitSocket.socketType == SocketType.Out) {
+        if (this.hitSocket.socketInOut == SocketInOut.Out) {
           // out socket
           con.socketA = this.hitSocket;
           con.socketB = closeSock;
@@ -268,7 +281,7 @@ export class SocketGraphicsItem extends GraphicsItem {
         // 2: we're breaking a previously formed connection, which can only be done
         // by dragging from an insock that already has a connection
 
-        if (this.hitSocket.socketType == SocketType.Out) {
+        if (this.hitSocket.socketInOut == SocketInOut.Out) {
           /*
 			                if (this.hitSocket.hasConnections()) {
 			                    // remove connection

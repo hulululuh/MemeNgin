@@ -5,7 +5,11 @@ import {
   NodeGraphicsItemRenderState,
 } from "./scene/nodegraphicsitem";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
-import { SocketGraphicsItem, SocketType } from "./scene/socketgraphicsitem";
+import {
+  SocketGraphicsItem,
+  SocketInOut,
+  ValidateConnection,
+} from "./scene/socketgraphicsitem";
 import {
   GraphicsItem,
   MouseMoveEvent,
@@ -605,10 +609,16 @@ export class NodeScene {
     let rightNode = this.getNodeById(rightId);
 
     // get sockets
-    con.socketA = leftNode.sockets.find((x) => x.socketType == SocketType.Out);
+    con.socketA = leftNode.sockets.find(
+      (x) => x.socketInOut == SocketInOut.Out
+    );
     con.socketB = rightNode.sockets[rightIndex];
 
-    this.addConnection(con);
+    if (ValidateConnection(con.socketA, con.socketB)) {
+      this.addConnection(con);
+    } else {
+      console.warn("invalid connection detected, please check socket type");
+    }
   }
 
   removeConnection(con: ConnectionGraphicsItem) {
@@ -635,7 +645,7 @@ export class NodeScene {
       ctx.lineWidth = 4;
       ctx.moveTo(this.hitSocket.centerX(), this.hitSocket.centerY());
 
-      if (this.hitSocket.socketType == SocketType.Out) {
+      if (this.hitSocket.socketInOut == SocketInOut.Out) {
         ctx.bezierCurveTo(
           this.hitSocket.centerX() + 60,
           this.hitSocket.centerY(), // control point 1
