@@ -15,8 +15,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component, Emit, Watch } from "vue-property-decorator";
-import { Designer } from "@/lib/designer";
+import { Vue, Prop, Component } from "vue-property-decorator";
 import { DesignerNode } from "@/lib/designer/designernode";
 import { Editor } from "@/lib/editor";
 import { ChangeTextureChannelAction } from "../../lib/actions/changetexturechannelaction";

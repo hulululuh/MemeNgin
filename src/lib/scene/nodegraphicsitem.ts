@@ -15,6 +15,7 @@ import { DesignerNode } from "@/lib/designer/designernode";
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
 import { PropertyType } from "@/lib/designer/properties";
+import { Editor } from "../editor";
 
 export class NodeGraphicsItemRenderState {
   hovered: boolean = false;
@@ -313,10 +314,30 @@ export class NodeGraphicsItem extends GraphicsItem {
 
     // sort in sockets
     let socks = this.getInSockets();
-    let incr = (this.height - pad * 2) / socks.length;
+
+    let imgSocks = socks.filter(
+      (sock) => sock.propertyType == PropertyType.Image
+    );
+    let propSocks = socks.filter(
+      (sock) => sock.propertyType != PropertyType.Image
+    );
+
+    let node = Editor.getDesigner().nodes.find((node) => node.id == this.id);
+    let orderList = [];
+    for (let prop of node.getExposedProperties()) {
+      let idx = propSocks.findIndex((sock) => sock.title == prop.name);
+      if (idx != -1) orderList.push(idx);
+    }
+
+    let orderedSocks = imgSocks;
+    for (let order of orderList) {
+      orderedSocks.push(propSocks[order]);
+    }
+
+    let incr = (this.height - pad * 2) / orderedSocks.length;
     let mid = incr / 2.0;
     let i = 0;
-    for (let sock of socks) {
+    for (let sock of orderedSocks) {
       let y = pad + i * incr + mid;
       let x = this.x;
       sock.setCenter(x, this.y + y);
