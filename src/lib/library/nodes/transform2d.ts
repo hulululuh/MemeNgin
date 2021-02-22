@@ -1,93 +1,344 @@
+import { DesignerNode, NodeInput } from "../../designer/designernode";
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+import { Editor } from "@/lib/editor";
+import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
+import { Transform2D } from "@/lib/math/transform2d";
+import { Property } from "@/lib/designer/properties";
+import { Vector2, Matrix3 } from "@math.gl/core";
+import { MathUtils } from "three";
+import { ITransformable } from "@/lib/designer/transformable";
+import { Color } from "@/lib/designer/color";
 
-export class Transform2DNode extends ImageDesignerNode {
+export class Transform2DNode extends ImageDesignerNode
+  implements ITransformable {
+  inputASize: Vector2;
+  inputBSize: Vector2;
+  relPos: Vector2;
+  baseScale: Vector2;
+  dragStartRelScale: Vector2;
+  item: GraphicsItem;
+
+  desiredWidth: number;
+  desiredHeight: number;
+
+  constructor() {
+    super();
+
+    this.desiredWidth = 1024;
+    this.desiredHeight = 1024;
+
+    this.onnodepropertychanged = (prop: Property) => {
+      if (prop.name === "transform2d") {
+        this.requestUpdateWidget();
+      } else if (prop.name === "width") {
+        this.desiredWidth = parseInt(prop.getValue());
+        this.checkAndApplyResize();
+      } else if (prop.name === "height") {
+        this.desiredHeight = parseInt(prop.getValue());
+        this.checkAndApplyResize();
+      } else if (prop.name === "inherit") {
+        this.inheritParentSize = prop.getValue();
+        this.checkAndApplyResize();
+      }
+    };
+
+    this.onResized = () => {
+      // background has changed
+      const srcNode = Editor.getDesigner().findLeftNode(
+        this.id,
+        "colorA"
+      ) as ImageDesignerNode;
+
+      if (!srcNode) return;
+      let lw = srcNode.getWidth();
+      let lh = srcNode.getHeight();
+
+      const w = this.getWidth();
+      const h = this.getHeight();
+
+      this.inputASize = new Vector2(lw, lh);
+      this.inputBSize = new Vector2(w, h);
+
+      const scale = Math.min(w, h);
+      const scaleFactor = 100 / scale;
+
+      this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
+
+      this.requestUpdateWidget();
+    };
+
+    this.onPropertyLoaded = () => {
+      this.properties
+        .filter((p) => p.name === "transform2d")[0]
+        .setValue(this.getTransform());
+      this.desiredWidth = parseInt(this.getProperty("width"));
+      this.desiredHeight = parseInt(this.getProperty("height"));
+      this.inheritParentSize = this.getProperty("inherit");
+
+      this.resize(this.getWidth(), this.getHeight());
+      this.requestUpdate();
+      this.requestUpdateWidget();
+    };
+  }
+
   init() {
     this.title = "Transform2D";
+    this.parentIndex = "colorA";
+    this.isEditing = true;
+    this.inputASize = new Vector2(100, 100);
+    this.inputBSize = new Vector2(100, 100);
 
-    this.addInput("image");
+    this.baseScale = new Vector2(1, 1);
+    this.dragStartRelScale = new Vector2(1, 1);
 
-    this.addFloatProperty("translateX", "Translate X", 0, -1.0, 1.0, 0.01);
-    this.addFloatProperty("translateY", "Translate Y", 0, -1.0, 1.0, 0.01);
+    this.onWidgetDragged = (evt: WidgetEvent) => {
+      if (!this.item) {
+        this.item = Editor.getScene().getNodeById(this.id);
+      }
 
-    this.addFloatProperty("scaleX", "Scale X", 1, -2.0, 2.0, 0.01);
-    this.addFloatProperty("scaleY", "Scale Y", 1, -2.0, 2.0, 0.01);
+      this.relPos = new Vector2(evt.detail.transform2d.position)
+        .sub(new Vector2(this.item.centerX(), this.item.centerY()))
+        .divide(new Vector2(this.item.getWidth(), this.item.getHeight() * -1));
 
-    this.addFloatProperty("rot", "Rotation", 0, 0.0, 360.0, 0.01);
+      const xf = new Transform2D(
+        this.relPos,
+        evt.detail.transform2d.scale,
+        evt.detail.transform2d.rotation * MathUtils.RAD2DEG
+      );
 
-    this.addBoolProperty("clamp", "Clamp", true);
+      this.properties.filter((p) => p.name === "transform2d")[0].setValue(xf);
+
+      this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
+
+      this.createTexture();
+      this.requestUpdate();
+    };
+
+    this.onItemSelected = () => {
+      this.properties
+        .filter((p) => p.name === "transform2d")[0]
+        .setValue(this.getTransform());
+      this.requestUpdateWidget();
+    };
+
+    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
+      // background has changed
+
+      let parentNode = this.getParentNode();
+      if (!parentNode) return;
+
+      const srcNode = parentNode as ImageDesignerNode;
+
+      let lw = srcNode.getWidth();
+      let lh = srcNode.getHeight();
+
+      const w = this.getWidth();
+      const h = this.getHeight();
+
+      this.inputASize = new Vector2(lw, lh);
+      this.inputBSize = new Vector2(w, h);
+
+      const scale = Math.min(w, h);
+      const scaleFactor = 100 / scale;
+
+      this.baseScale = new Vector2(lw * scaleFactor, lh * scaleFactor);
+      this.dragStartRelScale = new Vector2(1, 1);
+
+      if (this.isWidgetAvailable()) {
+        Editor.getInstance().selectedDesignerNode = this;
+        this.requestUpdateWidget();
+      }
+    };
+
+    this.addInput("colorA"); // foreground
+
+    this.addBoolProperty("inherit", "Inherit", true);
+    this.addIntProperty("width", "Width", 1024, 256, 2048);
+    this.addIntProperty("height", "Height", 1024, 256, 2048);
+    this.addColorProperty("background", "Background", new Color(0, 0, 0, 0));
+
+    this.addTransform2DProperty(
+      "transform2d",
+      "Transform",
+      Transform2D.IDENTITY
+    );
 
     let source = `
-        // https://github.com/glslify/glsl-inverse/blob/master/index.glsl
-        // mat3 inverse(mat3 m) {
-        //     float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
-        //     float a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];
-        //     float a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];
-          
-        //     float b01 = a22 * a11 - a12 * a21;
-        //     float b11 = -a22 * a10 + a12 * a20;
-        //     float b21 = a21 * a10 - a11 * a20;
-          
-        //     float det = a00 * b01 + a01 * b11 + a02 * b21;
-          
-        //     return mat3(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11),
-        //                 b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),
-        //                 b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;
-        //   }
-
-        mat2 buildScale(float sx, float sy)
-        {
-            return mat2(sx, 0.0, 0.0, sy);
-        }
-
-        // rot is in degrees
-        mat2 buildRot(float rot)
-        {
-            float r = radians(rot);
-            return mat2(cos(r), -sin(r), sin(r), cos(r));
-        }
+        uniform mat3 srcTransform;
         
-        mat3 transMat(vec2 t)
-        {
-            return mat3(vec3(1.0,0.0,0.0), vec3(0.0,1.0,0.0), vec3(t, 1.0));
-        }
-
-        mat3 scaleMat(vec2 s)
-        {
-            return mat3(vec3(s.x,0.0,0.0), vec3(0.0,s.y,0.0), vec3(0.0, 0.0, 1.0));
-        }
-
-        mat3 rotMat(float rot)
-        {
-            float r = radians(rot);
-            return mat3(vec3(cos(r), -sin(r),0.0), vec3(sin(r), cos(r),0.0), vec3(0.0, 0.0, 1.0));
-        }
-
         vec4 process(vec2 uv)
         {
-            // transform by (-0.5, -0.5)
-            // scale
-            // rotate
-            // transform
-            // transform by (0.5, 0.5)  
+            // foreground uv
+            vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
+            vec4 colA = vec4(0.0);
+            if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
+              colA = texture(colorA, fuv);
+            vec4 colB = prop_background;
+            vec4 col = vec4(1.0);
 
-            mat3 trans = transMat(vec2(0.5, 0.5)) *
-                transMat(vec2(prop_translateX, prop_translateY)) *
-                scaleMat(vec2(0.5, 1.0)) * 
-                rotMat(prop_rot) *
-                scaleMat(vec2(2.0, 1.0)) * 
-                //scaleMat(vec2(prop_scaleX, prop_scaleY)) *
-                transMat(vec2(-0.5, -0.5));
+            float final_alpha = colA.a + colB.a * (1.0 - colA.a);
+            col = vec4(mix(colB, colA, colA.a).rgb, final_alpha);
 
-            vec3 res = inverse(trans) * vec3(uv, 1.0);
-            uv = res.xy;
-
-
-            if (prop_clamp)
-                return texture(image, clamp(uv,vec2(0.0), vec2(1.0)));
-            return texture(image, uv);
+            return col;
         }
         `;
 
     this.buildShader(source);
+  }
+
+  checkAndApplyResize() {
+    if (this.width != this.getWidth() || this.height != this.getHeight()) {
+      this.resize(this.getWidth(), this.getHeight());
+      this.requestUpdate();
+      this.requestUpdateWidget();
+    }
+  }
+
+  createTexture() {
+    this.checkAndApplyResize();
+    this.refreshInputSize();
+    super.createTexture();
+  }
+
+  render(inputs: NodeInput[]) {
+    const designer = Editor.getDesigner();
+    designer.findLeftNode(this.id, "colorA");
+
+    const option = () => {
+      if (this.isEditing) {
+        const gl = this.gl;
+        gl.uniformMatrix3fv(
+          gl.getUniformLocation(this.shaderProgram, "srcTransform"),
+          false,
+          this.getTransformGL().toFloat32Array()
+        );
+      }
+    };
+
+    super.render(inputs, option);
+  }
+
+  refreshInputSize(): void {
+    const srcNode = this.getParentNode() as ImageDesignerNode;
+    // background has changed
+    if (srcNode) {
+      let lw = srcNode.getWidth();
+      let lh = srcNode.getHeight();
+
+      const w = this.getWidth();
+      const h = this.getHeight();
+
+      this.inputASize = new Vector2(lw, lh);
+      this.inputBSize = new Vector2(w, h);
+    }
+  }
+
+  requestUpdateWidget(): void {
+    if (!document) return;
+    if (this.isWidgetAvailable()) {
+      // select this in order to activate transform2d widget
+      Editor.getInstance().selectedDesignerNode = this;
+
+      const event = new WidgetEvent("widgetUpdate", {
+        detail: {
+          transform2d: this.getTransformWidget(),
+          dragStartRelScale: this.dragStartRelScale,
+          relScale: this.getTransform().scale,
+          enable: true,
+        },
+      });
+
+      document.dispatchEvent(event);
+    } else {
+      const event = new WidgetEvent("widgetUpdate", {
+        detail: {
+          enable: false,
+        },
+      });
+
+      document.dispatchEvent(event);
+    }
+  }
+
+  isWidgetAvailable(): boolean {
+    const colA = Editor.getDesigner().findLeftNode(this.id, "colorA");
+
+    if (colA) {
+      return true;
+    }
+    return false;
+  }
+
+  getWidth(): number {
+    if (this.inheritParentSize) {
+      return super.getWidth();
+    } else {
+      return this.desiredWidth;
+    }
+  }
+
+  getHeight(): number {
+    if (this.inheritParentSize) {
+      return super.getHeight();
+    } else {
+      return this.desiredHeight;
+    }
+  }
+
+  getTransformWidget(): Transform2D {
+    const xf = this.getTransform();
+    if (!this.item) {
+      this.item = Editor.getScene().getNodeById(this.id);
+    }
+    const offsetPos = new Vector2(xf.position).multiply(
+      new Vector2(this.item.getWidth(), this.item.getHeight() * -1)
+    );
+    return new Transform2D(
+      new Vector2(this.getCenter()).add(offsetPos),
+      new Vector2(this.baseScale).multiply(xf.scale),
+      xf.rotation * MathUtils.DEG2RAD
+    );
+  }
+
+  getTransform(): Transform2D {
+    return this.properties
+      .filter((p) => p.name === "transform2d")[0]
+      .getValue();
+  }
+
+  getTransformGL(): Matrix3 {
+    if (!this.item) {
+      this.item = Editor.getScene().getNodeById(this.id);
+    }
+
+    const xf = this.properties
+      .filter((p) => p.name === "transform2d")[0]
+      .getValue();
+
+    this.relPos = new Vector2(xf.position);
+
+    const scale = new Vector2(xf.scale);
+    const rotation = xf.rotation * MathUtils.DEG2RAD;
+
+    const prop = this.inputASize[0] / this.inputASize[1];
+    const transMat = new Matrix3()
+      .translate(new Vector2(this.relPos))
+      .multiplyRight(new Matrix3().translate(new Vector2(0.5, 0.5)))
+      .multiplyRight(
+        new Matrix3().scale(
+          new Vector2(this.inputASize).divide(this.inputBSize)
+        )
+      )
+      .multiplyRight(new Matrix3().scale(new Vector2(1 / prop, 1)))
+      .multiplyRight(new Matrix3().rotate(rotation).transpose())
+      .multiplyRight(
+        new Matrix3()
+          .scale(new Vector2(prop, 1))
+          .multiplyRight(new Matrix3().scale(new Vector2(scale)))
+      )
+      .multiplyRight(new Matrix3().translate(new Vector2(-0.5, -0.5)));
+    transMat.invert();
+
+    return transMat;
   }
 }

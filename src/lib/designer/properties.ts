@@ -24,9 +24,14 @@ export class Property {
   displayName: string;
   type: string;
   exposed: boolean;
+  parentValue: any;
 
   constructor() {
     this.exposed = false;
+  }
+
+  getParentValue(): any {
+    return this.parentValue;
   }
 
   // to be overriden
@@ -71,6 +76,7 @@ export class FloatProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.step = step;
     this.type = PropertyType.Float;
   }
@@ -120,6 +126,7 @@ export class IntProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.step = step;
     this.type = PropertyType.Int;
   }
@@ -161,6 +168,7 @@ export class BoolProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.type = PropertyType.Bool;
   }
 
@@ -192,6 +200,7 @@ export class EnumProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.values = values;
+    this.parentValue = this.index;
     this.type = PropertyType.Enum;
   }
 
@@ -232,6 +241,7 @@ export class ColorProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.type = PropertyType.Color;
   }
 
@@ -280,6 +290,7 @@ export class StringProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.type = PropertyType.String;
     this.isMultiline = isMultiline;
   }
@@ -317,6 +328,7 @@ export class FileProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.extensions = extensions;
     this.type = PropertyType.File;
   }
@@ -348,6 +360,7 @@ export class GradientProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.type = PropertyType.Gradient;
   }
 
@@ -389,6 +402,7 @@ export class Transform2DProperty extends Property {
     this.name = name;
     this.displayName = displayName;
     this.value = value;
+    this.parentValue = value;
     this.type = PropertyType.Transform2D;
   }
 

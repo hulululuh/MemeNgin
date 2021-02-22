@@ -16,8 +16,8 @@ export class BrickGeneratorNode extends ImageDesignerNode {
     this.addFloatProperty("heightBalance", "Height Balance", 1.0, 0, 1, 0.05);
     this.addFloatProperty("heightVariance", "Height Variance", 0, 0, 1, 0.05);
 
-    this.addFloatProperty("rows", "Rows", 6, 1, 20, 1);
-    this.addFloatProperty("columns", "Columns", 6, 1, 20, 1);
+    this.addIntProperty("rows", "Rows", 6, 1, 20, 1);
+    this.addIntProperty("columns", "Columns", 6, 1, 20, 1);
 
     let source = `
         //vec2 brickSize = vec2(prop_brickWidth, prop_brickHeight);

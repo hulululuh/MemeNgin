@@ -25,7 +25,7 @@ import { Transform2dWidget } from "./scene/Transform2dWidget";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
 import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
 import { SelectionGraphicsItem } from "./scene/selectiongraphicsitem";
-import { Color } from "./designer/color";
+import { Color } from "@/lib/designer/color";
 import { Vector2 } from "@math.gl/core";
 import { BoundingBox } from "@/lib/math/boundingbox";
 import { Rect } from "@/lib/math/rect";

@@ -6,7 +6,6 @@ import { LineCellNode } from "./nodes/linecell";
 import { PolygonNode, CircleNode } from "./nodes/shapes";
 import { BlendNode } from "./nodes/blend";
 import { OverlayNode } from "./nodes/overlay";
-import { PrepareNode } from "./nodes/prepare";
 import { InvertNode } from "./nodes/invert";
 import { WarpNode } from "./nodes/warp";
 import { ColorNode, ColorizeNode } from "./nodes/color";
@@ -41,7 +40,11 @@ import { TileSamplerNode } from "./nodes/tilesampler";
 import { DetectNode } from "./nodes/detect";
 import { StylizeNode } from "./nodes/stylize";
 
+import { BoolPropertyNode } from "./nodes/boolpropertynode";
 import { FloatPropertyNode } from "./nodes/floatpropertynode";
+import { IntPropertyNode } from "./nodes/intpropertynode";
+import { StringPropertyNode } from "./nodes/stringpropertynode";
+import { ColorPropertyNode } from "./nodes/colorpropertynode";
 
 import { NodeCategory } from "../designer/designernode";
 import { DesignerLibrary } from "../designer/library";
@@ -69,7 +72,6 @@ export function createLibrary() {
   lib.addNode("polygon", "Polygon", PolygonNode, NodeCategory.Create);
   lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
   lib.addNode("overlay", "Overlay", OverlayNode, NodeCategory.Composite);
-  lib.addNode("prepare", "Prepare", PrepareNode, NodeCategory.Shape);
   lib.addNode("invert", "Invert", InvertNode, NodeCategory.Color);
   lib.addNode("color", "Color", ColorNode, NodeCategory.Color);
   lib.addNode("colorize", "Colorize", ColorizeNode, NodeCategory.Color);
@@ -166,11 +168,34 @@ export function createLibrary() {
   );
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Think);
   lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Think);
-
+  lib.addNode(
+    "boolProperty",
+    "BoolProperty",
+    BoolPropertyNode,
+    NodeCategory.Think
+  );
   lib.addNode(
     "floatproperty",
     "FloatProperty",
     FloatPropertyNode,
+    NodeCategory.Think
+  );
+  lib.addNode(
+    "intproperty",
+    "IntProperty",
+    IntPropertyNode,
+    NodeCategory.Think
+  );
+  lib.addNode(
+    "stringproperty",
+    "StringProperty",
+    StringPropertyNode,
+    NodeCategory.Think
+  );
+  lib.addNode(
+    "colorproperty",
+    "ColorProperty",
+    ColorPropertyNode,
     NodeCategory.Think
   );
 

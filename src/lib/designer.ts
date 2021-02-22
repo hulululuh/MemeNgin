@@ -379,30 +379,37 @@ export class Designer {
       return;
     }
 
-    let graphNode = Editor.getInstance().nodeScene.getNodeById(dNode.id);
+    let graphNode = Editor.getScene().getNodeById(dNode.id);
     if (!graphNode) return; // node could have been deleted
 
     let node = dNode as LogicDesignerNode;
-    if (node instanceof LogicDesignerNode) {
-      let prop = node.properties[0];
-      let inputNode = this.findLeftNode(node.id, "value");
-      // update parentNode if exists
-      if (inputNode && inputNode.needsUpdate) {
-        this.generateDataFromNode(inputNode);
-        inputNode.needsUpdate = false;
-        this.updateList.splice(this.updateList.indexOf(inputNode), 1);
-      }
-
-      if (prop.exposed && inputNode) {
-        let graphNodeParent = Editor.getInstance().nodeScene.getNodeById(
-          inputNode.id
-        );
-        graphNode.value = graphNodeParent.value;
-        //graphNode.value = inputNode.properties[0].getValue();
-      } else {
-        graphNode.value = node.properties[0].getValue();
-      }
+    let prop = node.properties[0];
+    let inputNode = this.findLeftNode(node.id, "value");
+    // update parentNode if exists
+    if (inputNode && inputNode.needsUpdate) {
+      this.generateDataFromNode(inputNode);
+      inputNode.needsUpdate = false;
+      this.updateList.splice(this.updateList.indexOf(inputNode), 1);
     }
+
+    if (prop.exposed && inputNode instanceof LogicDesignerNode) {
+      prop.parentValue = (inputNode as LogicDesignerNode).getPropertyValue();
+      graphNode.value = prop.getParentValue();
+    } else {
+      graphNode.value = prop.getValue();
+    }
+
+    // if (prop.exposed && inputNode) {
+    //   //prop.parentValue = inp
+    //   let graphNodeParent = Editor.getScene().getNodeById(inputNode.id);
+    //   if (graphNode.value != graphNodeParent.value) {
+    //     graphNode.value = graphNodeParent.value;
+    //     dNode.onnodepropertychanged(prop);
+    //   }
+    //   //graphNode.value = inputNode.properties[0].getValue();
+    // } else {
+    //   graphNode.value = node.properties[0].getValue();
+    // }
   }
 
   // this function generates the image of the node given its input nodes
@@ -435,6 +442,20 @@ export class Designer {
           // remove from update list since thumbnail has now been generated
           input.node.needsUpdate = false;
           this.updateList.splice(this.updateList.indexOf(input.node), 1);
+        }
+      }
+
+      for (let prop of node.getExposedProperties()) {
+        let propNode = this.findLeftNode(node.id, prop.name);
+        if (propNode instanceof LogicDesignerNode) {
+          let propValFromParent = (propNode as LogicDesignerNode).getPropertyValue();
+          if (prop.getParentValue() != propValFromParent) {
+            prop.parentValue = propValFromParent;
+
+            if (node.onnodepropertychanged) {
+              node.onnodepropertychanged(prop);
+            }
+          }
         }
       }
 

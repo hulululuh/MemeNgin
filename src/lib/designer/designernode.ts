@@ -164,7 +164,7 @@ export class DesignerNode implements IPropertyHolder {
   getProperty(name: string): any {
     let prop = this.properties.find((x) => x.name === name);
     if (prop) {
-      return prop.getValue();
+      return this.evaluatePropertyValue(prop);
     } else {
       console.error("can not find property: " + name);
       return "";
@@ -201,6 +201,19 @@ export class DesignerNode implements IPropertyHolder {
   getParentNode(): any {
     return Editor.getDesigner().findLeftNode(this.id, this.parentIndex);
   }
+
+  evaluatePropertyValue(prop: Property) {
+    let value;
+    let leftNode = this.designer.findLeftNode(this.id, prop.name);
+    if (leftNode && prop.getExposed()) {
+      value = prop.getParentValue();
+    } else {
+      value = prop.getValue();
+    }
+
+    return value;
+  }
+
   // PROPERTY FUNCTIONS
   addIntProperty(
     id: string,

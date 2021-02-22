@@ -16,6 +16,7 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
 import { PropertyType } from "@/lib/designer/properties";
 import { Editor } from "../editor";
+import { Color } from "@/lib/designer/color";
 
 export class NodeGraphicsItemRenderState {
   hovered: boolean = false;
@@ -29,7 +30,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   title: string;
   thumbnail!: HTMLImageElement;
   imageCanvas: ImageCanvas;
-  value: string;
+  value: any;
   relScale: number;
 
   hit: boolean;
@@ -76,23 +77,13 @@ export class NodeGraphicsItem extends GraphicsItem {
     }
 
     for (let prop of node.getExposedProperties()) {
-      this.addSocket(
-        prop.name,
-        prop.name,
-        SocketInOut.In,
-        PropertyType[prop.type]
-      );
+      this.addSocket(prop.name, prop.name, SocketInOut.In, prop.type);
     }
 
     // Logic designer node
     if (node instanceof LogicDesignerNode) {
       let outputType = (node as LogicDesignerNode).properties[0].type;
-      this.addSocket(
-        "output",
-        "output",
-        SocketInOut.Out,
-        PropertyType[outputType]
-      );
+      this.addSocket("output", "output", SocketInOut.Out, outputType);
     } else {
       this.addSocket("output", "output", SocketInOut.Out, PropertyType.Image);
     }
@@ -168,9 +159,17 @@ export class NodeGraphicsItem extends GraphicsItem {
       ctx.stroke();
     }
 
+    let fillColor = "rgb(0, 0, 0)";
+    // convert to text
+    let value = this.value;
+    if (this.value instanceof Color) {
+      value = this.value.toHex();
+      fillColor = this.value.toHex();
+    }
+
     // background
     ctx.beginPath();
-    ctx.fillStyle = "rgb(0, 0, 0)";
+    ctx.fillStyle = fillColor;
     ctx.rect(this.x, this.y, this.width, this.height);
     ctx.fill();
 
@@ -183,14 +182,17 @@ export class NodeGraphicsItem extends GraphicsItem {
     // ctx.fill();
 
     ctx.beginPath();
-    //ctx.font = "14px monospace";
     ctx.font = "bold 14px 'Open Sans'";
     ctx.fillStyle = "rgb(255,255,255)";
-    let size = ctx.measureText(this.value);
+    ctx.strokeStyle = "rgb(0,0,0, 0.5)";
+    ctx.lineWidth = 0.8;
+
+    // draw text
+    let size = ctx.measureText(value);
     let textX = this.centerX() - size.width / 2;
     let textY = this.centerY();
-    ctx.fillText(this.value, textX, textY);
-    //}
+    ctx.strokeText(value, textX, textY);
+    ctx.fillText(value, textX, textY);
 
     ctx.globalAlpha = 0.5;
     ctx.beginPath();
@@ -322,7 +324,7 @@ export class NodeGraphicsItem extends GraphicsItem {
       (sock) => sock.propertyType != PropertyType.Image
     );
 
-    let node = Editor.getDesigner().nodes.find((node) => node.id == this.id);
+    let node = Editor.getDesigner().getNodeById(this.id);
     let orderList = [];
     for (let prop of node.getExposedProperties()) {
       let idx = propSocks.findIndex((sock) => sock.title == prop.name);
@@ -410,12 +412,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   // adds socket to node
-  addSocket(
-    name: string,
-    id: string,
-    type: SocketInOut,
-    propType: PropertyType
-  ) {
+  addSocket(name: string, id: string, type: SocketInOut, propType: any) {
     let sock = new SocketGraphicsItem(propType);
     sock.id = id;
     sock.title = name;
@@ -429,12 +426,7 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   addSocketByProp(propName: string, type: string) {
-    let socket = this.addSocket(
-      propName,
-      propName,
-      SocketInOut.In,
-      PropertyType[type]
-    );
+    let socket = this.addSocket(propName, propName, SocketInOut.In, type);
     if (this.scene) {
       socket.setScene(this.scene);
     } else {

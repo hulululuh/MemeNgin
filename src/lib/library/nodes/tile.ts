@@ -12,8 +12,8 @@ export class TileNode extends ImageDesignerNode {
     this.addFloatProperty("brickWidth", "Tile Width", 1.0, 0, 1, 0.01);
     this.addFloatProperty("brickHeight", "Tile Height", 1.0, 0, 1, 0.01);
 
-    this.addFloatProperty("rows", "Rows", 6, 1, 20, 1);
-    this.addFloatProperty("columns", "Columns", 6, 1, 20, 1);
+    this.addIntProperty("rows", "Rows", 6, 1, 20, 1);
+    this.addIntProperty("columns", "Columns", 6, 1, 20, 1);
 
     let source = `
         // offset for alternating rows
@@ -37,7 +37,7 @@ export class TileNode extends ImageDesignerNode {
         vec4 process(vec2 uv)
         {
             float offset = prop_offset;
-            vec2 tileSize = vec2(prop_rows, prop_columns);
+            vec2 tileSize = vec2(float(prop_rows), float(prop_columns));
             vec2 pos = uv * tileSize;
             
             float xOffset = 0.0;

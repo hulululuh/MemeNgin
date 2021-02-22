@@ -4,8 +4,8 @@ export class HexagonNode extends ImageDesignerNode {
   init() {
     this.title = "Hexagon";
 
-    this.addFloatProperty("scaleX", "X Scale", 2, 1, 32, 1);
-    this.addFloatProperty("scaleY", "Y Scale", 2, 1, 32, 1);
+    this.addIntProperty("scaleX", "X Scale", 2, 1, 32, 1);
+    this.addIntProperty("scaleY", "Y Scale", 2, 1, 32, 1);
     this.addFloatProperty("margin", "Margin", 0.9, 0.0, 1.0, 0.01);
     this.addFloatProperty("gradient", "Gradient", 0, 0, 1.0, 0.01);
 
@@ -44,7 +44,7 @@ export class HexagonNode extends ImageDesignerNode {
             //uv.y *= 2.0/s.y;
 
             // it
-            vec4 h = getHex(uv*vec2(prop_scaleX, prop_scaleY * ratio));
+            vec4 h = getHex(uv*vec2(float(prop_scaleX), float(prop_scaleY) * ratio));
             float dist = hex(h.xy) * 2.0;// result range from hex function is 0.0-0.5
             float finalDist = 1.0 - linearstep(prop_margin - prop_margin*prop_gradient, prop_margin, dist);
             

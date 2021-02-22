@@ -5,7 +5,7 @@ export class SimplexNoiseNode extends ImageDesignerNode {
   init() {
     this.title = "Simplex Noise";
 
-    this.addFloatProperty("scale", "Scale", 100, 1, 1000, 0.01);
+    this.addIntProperty("scale", "Scale", 100, 1, 1000, 0.01);
 
     let source = `
         float random (in vec2 st) {
@@ -60,7 +60,7 @@ export class SimplexNoiseNode extends ImageDesignerNode {
 
         vec4 process(vec2 uv)
         {
-            vec3 color = vec3(noise(uv * prop_scale));
+            vec3 color = vec3(noise(uv * float(prop_scale)));
 
             return vec4(color,1.0);
         }

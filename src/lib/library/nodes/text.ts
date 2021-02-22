@@ -54,20 +54,22 @@ export class TextNode extends ImageDesignerNode {
     };
 
     this.onnodepropertychanged = (prop: Property) => {
+      let value = this.evaluatePropertyValue(prop);
+
       if (prop.name === "text") {
-        this.textGeom.updateText(prop.getValue());
+        this.textGeom.updateText(value);
         updateGeom();
       } else if (prop.name === "size") {
-        this.textGeom.updateSize(prop.getValue());
+        this.textGeom.updateSize(value);
         updateGeom();
       } else if (prop.name === "letterSpacing") {
-        this.textGeom.updateLetterSpacing(prop.getValue());
+        this.textGeom.updateLetterSpacing(value);
         updateGeom();
       } else if (prop.name === "lineHeight") {
-        this.textGeom.updateLineHeight(prop.getValue());
+        this.textGeom.updateLineHeight(value);
         updateGeom();
       } else if (prop.name === "color") {
-        this.color = prop.getValue();
+        this.color = value;
         this.drawFont();
       }
     };
@@ -79,7 +81,12 @@ export class TextNode extends ImageDesignerNode {
       this.textGeom.updateLineHeight(this.getProperty("lineHeight"));
       this.color = this.getProperty("color");
       updateGeom();
-      this.drawFont();
+      //this.drawFont();
+    };
+
+    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
+      let textProp = this.properties.find((prop) => prop.name == "text");
+      this.onnodepropertychanged(textProp);
     };
   }
 

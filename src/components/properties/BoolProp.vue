@@ -1,7 +1,11 @@
 <template>
   <div class="field">
     <label>{{ prop.displayName }}</label>
-    <div>
+    <div class="input-holder">
+      <input type="checkbox" id="expose" name="scales" unchecked
+        :value="prop.exposed"
+        :checked="prop.exposed"
+        @input="updateExposed">
       <button class="bool" @click="toggleValue()">{{ valueText }}</button>
     </div>
   </div>
@@ -38,6 +42,17 @@ export default class BoolPropertyView extends Vue {
     return evt;
   }
 
+  @Emit()
+  propertyExposeChanged() {
+    this.$emit("propertyExposeChanged", this.prop);
+    return this.prop.name;
+  }
+
+  updateExposed(evt) { 
+    this.propHolder.setProperty(this.prop.name, {value: this.prop.getValue(), exposed: evt.target.checked});
+    this.propertyExposeChanged();
+  }
+
   //value: boolean = true;
   get valueText() {
     return this.prop.value ? "True" : "False";
@@ -52,7 +67,7 @@ export default class BoolPropertyView extends Vue {
     evt.newValue = !this.prop.value;
 
     //this.value = !this.value;
-    this.propHolder.setProperty(this.prop.name, !this.prop.value);
+    this.propHolder.setProperty(this.prop.name, {value: !this.prop.value, exposed: this.prop.getExposed()});
     this.propertyChanged();
     //this.propertyChangeCompleted(evt);
 

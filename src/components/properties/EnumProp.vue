@@ -39,8 +39,8 @@ export default class EnumPropertyView extends Vue {
   }
 
   updateValue(evt) {
-    let oldVal = this.prop.getValue();
-    this.propHolder.setProperty(this.prop.name, parseInt(evt.target.value));
+    let oldVal = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
+    this.propHolder.setProperty(this.prop.name, {value: parseInt(evt.target.value), exposed: this.prop.getExposed()});
     this.propertyChanged();
 
     let action = new PropertyChangeAction(
@@ -48,7 +48,7 @@ export default class EnumPropertyView extends Vue {
       this.prop.name,
       this.propHolder,
       oldVal,
-      evt.target.value
+      {value: this.prop.getValue(), exposed: this.prop.getExposed()}
     );
     UndoStack.current.push(action);
   }

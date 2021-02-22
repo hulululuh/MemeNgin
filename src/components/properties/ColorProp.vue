@@ -1,15 +1,11 @@
-,
 <template>
   <div class="field">
     <label>{{ prop.displayName }}</label>
     <div>
-      <!-- <input
-				class="color"
-				type="color"
-				:value="prop.value.toHex()"
-				@input="onInput"
-				@change="onValue"
-      />-->
+      <input type="checkbox" id="expose" name="scales" unchecked
+        :value="prop.exposed"
+        :checked="prop.exposed"
+        @input="updateExposed">
       <color-picker :value="prop.value.toHex()" @input="onInput" @change="onValue" />
     </div>
   </div>
@@ -34,7 +30,7 @@ export default class ColorPropertyView extends Vue {
   // ColorProperty
   prop: any;
 
-  oldValue: string;
+  oldValue: any;
 
   @Prop()
   designer: Designer;
@@ -54,31 +50,36 @@ export default class ColorPropertyView extends Vue {
     return this.prop.name;
   }
 
+  @Emit()
+  propertyExposeChanged() {
+    this.$emit("propertyExposeChanged", this.prop);
+    return this.prop.name;
+  }
+
+  updateExposed(evt) { 
+    this.propHolder.setProperty(this.prop.name, {value: this.prop.getValue(), exposed: evt.target.checked});
+    this.propertyExposeChanged();
+  }
+
   onInput(value) {
     //console.log(value);
-    this.propHolder.setProperty(this.prop.name, value);
+    this.propHolder.setProperty(this.prop.name, {value: value, exposed: this.prop.getExposed()});
     this.propertyChanged();
   }
 
   onValue(value) {
-    //let oldValue = this.prop.value.toHex();
-    this.propHolder.setProperty(this.prop.name, value);
+    this.propHolder.setProperty(this.prop.name, {value: value, exposed: this.prop.getExposed()});
 
     let action = new PropertyChangeAction(
       null,
       this.prop.name,
       this.propHolder,
       this.oldValue,
-      this.prop.value.toHex()
+      {value: this.prop.getValue(), exposed: this.prop.getExposed()}
     );
     UndoStack.current.push(action);
 
-    // console.log(
-    // 	"color change: " + this.oldValue + " > " + this.prop.value.toHex()
-    // );
-
-    this.oldValue = this.prop.value.toHex();
-    //this.propertyChanged();
+    this.oldValue = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
   }
 
   // onInput(evt) {

@@ -432,13 +432,13 @@ export class ImageDesignerNode extends DesignerNode {
       if (prop instanceof IntProperty) {
         gl.uniform1i(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          (prop as IntProperty).value
+          value
         );
       }
       if (prop instanceof BoolProperty) {
         gl.uniform1i(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          (prop as BoolProperty).value == false ? 0 : 1
+          value == false ? 0 : 1
         );
       }
       if (prop instanceof EnumProperty) {
@@ -448,14 +448,12 @@ export class ImageDesignerNode extends DesignerNode {
         );
       }
       if (prop instanceof ColorProperty) {
-        let col = (prop as ColorProperty).value;
-        //console.log("color: ", col);
         gl.uniform4f(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          col.r,
-          col.g,
-          col.b,
-          col.a
+          value.r,
+          value.g,
+          value.b,
+          value.a
         );
       }
       if (prop instanceof GradientProperty) {
@@ -1259,24 +1257,5 @@ export class ImageDesignerNode extends DesignerNode {
 
   setAsResult() {
     this.isResult = true;
-  }
-
-  evaluatePropertyValue(prop: Property) {
-    let value;
-    let leftNode = this.designer.findLeftNode(this.id, prop.name);
-    if (
-      leftNode &&
-      leftNode instanceof LogicDesignerNode &&
-      prop.getExposed()
-    ) {
-      let graphNodeParent = Editor.getInstance().nodeScene.getNodeById(
-        leftNode.id
-      );
-      value = graphNodeParent.value;
-    } else {
-      value = (prop as FloatProperty).value;
-    }
-
-    return value;
   }
 }

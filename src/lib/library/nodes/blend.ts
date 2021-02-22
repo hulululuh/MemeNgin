@@ -7,7 +7,7 @@ export class BlendNode extends ImageDesignerNode {
 
     this.addInput("colorA"); // foreground
     this.addInput("colorB"); // background
-    this.addInput("opacity");
+    this.addInput("opacityMap");
 
     this.addEnumProperty("type", "Type", [
       "Multiply",
@@ -32,7 +32,6 @@ export class BlendNode extends ImageDesignerNode {
     );
 
     let source = `
-
         float screen(float fg, float bg) {
             float res = (1.0 - fg) * (1.0 - bg);
             return 1.0 - res;
@@ -40,8 +39,8 @@ export class BlendNode extends ImageDesignerNode {
         vec4 process(vec2 uv)
         {
             float finalOpacity = prop_opacity;
-            if (opacity_connected)
-                finalOpacity *= texture(opacity, uv).r;
+            if (opacityMap_connected)
+                finalOpacity *= texture(opacityMap, uv).r;
 
             // foreground uv
             vec2 fuv = uv * (colorB_size / colorA_size);

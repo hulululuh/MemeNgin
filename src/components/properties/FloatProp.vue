@@ -10,7 +10,6 @@
         @input="updateExposed"
         @focus="focus"
         @blur="blur">
-      <!-- <label for="expose">Expose</label> -->
       <div style="width:100%; margin-right:10px;padding:0.4em;">
         <input
           type="range"
