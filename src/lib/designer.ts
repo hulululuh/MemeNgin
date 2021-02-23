@@ -20,6 +20,8 @@ import {
 } from "./designer/designervariable";
 import { Editor } from "./editor";
 import { LogicDesignerNode } from "./designer/logicdesignernode";
+import { FloatPropertyNode } from "./library/nodes/floatpropertynode";
+import { StringPropertyNode } from "./library/nodes/stringpropertynode";
 
 const HALF = 0.5;
 
@@ -392,24 +394,33 @@ export class Designer {
       this.updateList.splice(this.updateList.indexOf(inputNode), 1);
     }
 
+    let propValue;
     if (prop.exposed && inputNode instanceof LogicDesignerNode) {
       prop.parentValue = (inputNode as LogicDesignerNode).getPropertyValue();
-      graphNode.value = prop.getParentValue();
+      propValue = prop.getParentValue();
     } else {
-      graphNode.value = prop.getValue();
+      propValue = prop.getValue();
     }
 
-    // if (prop.exposed && inputNode) {
-    //   //prop.parentValue = inp
-    //   let graphNodeParent = Editor.getScene().getNodeById(inputNode.id);
-    //   if (graphNode.value != graphNodeParent.value) {
-    //     graphNode.value = graphNodeParent.value;
-    //     dNode.onnodepropertychanged(prop);
-    //   }
-    //   //graphNode.value = inputNode.properties[0].getValue();
-    // } else {
-    //   graphNode.value = node.properties[0].getValue();
-    // }
+    // format property value for display
+    if (dNode instanceof FloatPropertyNode) {
+      if (typeof propValue === "string") {
+        propValue = parseFloat(propValue);
+      }
+      propValue = propValue.toFixed(2);
+    } else if (dNode instanceof StringPropertyNode) {
+      // in case prop is empty string
+      if (typeof propValue === "string" && propValue.length === 0) {
+        propValue = "${string}";
+      }
+
+      const prevLength = 9;
+      if (propValue.length > prevLength) {
+        propValue = propValue.substring(0, prevLength - 1) + "...";
+      }
+    }
+
+    graphNode.value = propValue;
   }
 
   // this function generates the image of the node given its input nodes

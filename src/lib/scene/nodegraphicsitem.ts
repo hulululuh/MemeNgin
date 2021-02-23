@@ -64,7 +64,7 @@ export class NodeGraphicsItem extends GraphicsItem {
       this.setVirtualSize(imgdNode.getWidth(), imgdNode.getHeight());
     } else {
       //let logicdNode = dNode as LogicDesignerNode;
-      this.setSize(75, 50);
+      this.setSize(75, 36);
     }
   }
 
@@ -182,7 +182,8 @@ export class NodeGraphicsItem extends GraphicsItem {
     // ctx.fill();
 
     ctx.beginPath();
-    ctx.font = "bold 14px 'Open Sans'";
+    let fontSize = 12;
+    ctx.font = `bold ${fontSize}px 'Open Sans'`;
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.strokeStyle = "rgb(0,0,0, 0.5)";
     ctx.lineWidth = 0.8;
@@ -190,7 +191,7 @@ export class NodeGraphicsItem extends GraphicsItem {
     // draw text
     let size = ctx.measureText(value);
     let textX = this.centerX() - size.width / 2;
-    let textY = this.centerY();
+    let textY = this.centerY() + fontSize / 4;
     ctx.strokeText(value, textX, textY);
     ctx.fillText(value, textX, textY);
 
