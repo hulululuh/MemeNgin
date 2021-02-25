@@ -1,28 +1,28 @@
-import { DesignerNode, NodeType, NodeInput } from "./designer/designernode";
-import { ImageDesignerNode } from "./designer/imagedesignernode";
-import { DesignerNodeConn } from "./designer/designerconnection";
-import { DesignerLibrary } from "./designer/library";
-import { Guid } from "./utils";
-import { ImageCanvas } from "./designer/imagecanvas";
-import { buildShaderProgram } from "./designer/gl";
-import {
-  IntProperty,
-  FloatProperty,
-  BoolProperty,
-  EnumProperty,
-  ColorProperty,
-} from "./designer/properties";
 import { Color } from "./designer/color";
+import { DesignerNodeConn } from "./designer/designerconnection";
+import { DesignerNode, NodeInput, NodeType } from "./designer/designernode";
 import {
+  DesignerNodePropertyMap,
   DesignerVariable,
   DesignerVariableType,
-  DesignerNodePropertyMap,
 } from "./designer/designervariable";
-import { Editor } from "./editor";
+import { buildShaderProgram } from "./designer/gl";
+import { ImageCanvas } from "./designer/imagecanvas";
+import { ImageDesignerNode } from "./designer/imagedesignernode";
+import { DesignerLibrary } from "./designer/library";
 import { LogicDesignerNode } from "./designer/logicdesignernode";
+import {
+  BoolProperty,
+  ColorProperty,
+  EnumProperty,
+  FloatProperty,
+  IntProperty,
+} from "./designer/properties";
+import { Editor } from "./editor";
 import { FloatPropertyNode } from "./library/nodes/floatpropertynode";
 import { StringPropertyNode } from "./library/nodes/stringpropertynode";
-import { TextNode } from "./library/nodes/text";
+import { TextNode } from "./library/nodes/textnode";
+import { Guid } from "./utils";
 
 const HALF = 0.5;
 

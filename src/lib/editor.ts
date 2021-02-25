@@ -25,8 +25,7 @@ import { ItemClipboard } from "./clipboard";
 import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
-import { DetectNode } from "./library/nodes/detect";
-import { LogicDesignerNode } from "./designer/logicdesignernode";
+import { DetectNode } from "./library/nodes/detectnode";
 
 const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
