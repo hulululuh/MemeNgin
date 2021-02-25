@@ -156,6 +156,8 @@ export class Transform2DNode extends ImageDesignerNode
     this.addIntProperty("width", "Width", 1024, 256, 2048);
     this.addIntProperty("height", "Height", 1024, 256, 2048);
     this.addColorProperty("background", "Background", new Color(0, 0, 0, 0));
+    this.addBoolProperty("flipX", "FlipX", false);
+    this.addBoolProperty("flipY", "FlipY", false);
 
     this.addTransform2DProperty(
       "transform2d",
@@ -170,6 +172,10 @@ export class Transform2DNode extends ImageDesignerNode
         {
             // foreground uv
             vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
+            // apply flip
+            fuv.x = prop_flipX ? 1.0 - fuv.x : fuv.x;
+            fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
+
             vec4 colA = vec4(0.0);
             if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
               colA = texture(colorA, fuv);
