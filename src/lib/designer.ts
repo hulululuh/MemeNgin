@@ -22,6 +22,7 @@ import { Editor } from "./editor";
 import { LogicDesignerNode } from "./designer/logicdesignernode";
 import { FloatPropertyNode } from "./library/nodes/floatpropertynode";
 import { StringPropertyNode } from "./library/nodes/stringpropertynode";
+import { TextNode } from "./library/nodes/text";
 
 const HALF = 0.5;
 
@@ -480,6 +481,9 @@ export class Designer {
         if (node.createTextureAsync) {
           await node.createTextureAsync();
           Editor.getDesigner().requestUpdateChilds(node);
+          thumb = this.prepareThumbnail(node);
+        } else if (node instanceof TextNode) {
+          // default
           thumb = this.prepareThumbnail(node);
         } else {
           // default

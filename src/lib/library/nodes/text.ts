@@ -9,6 +9,7 @@ import { buildShaderProgram } from "../../designer/gl";
 import { Property } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
 import { TextGeometry } from "@/lib/geometry/textGeometry";
+import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
 
 const placeholderText = "Lorem ipsum Dolor sit amet.";
 const placeholderSize = 72;
@@ -56,19 +57,25 @@ export class TextNode extends ImageDesignerNode {
     this.onnodepropertychanged = (prop: Property) => {
       let value = this.evaluatePropertyValue(prop);
 
-      if (prop.name === "text") {
+      if (prop.name === "text" && value != this.textGeom.text) {
         this.textGeom.updateText(value);
         updateGeom();
-      } else if (prop.name === "size") {
+      } else if (prop.name === "size" && value != this.textGeom.size) {
         this.textGeom.updateSize(value);
         updateGeom();
-      } else if (prop.name === "letterSpacing") {
+      } else if (
+        prop.name === "letterSpacing" &&
+        value != this.textGeom.letterSpacing
+      ) {
         this.textGeom.updateLetterSpacing(value);
         updateGeom();
-      } else if (prop.name === "lineHeight") {
+      } else if (
+        prop.name === "lineHeight" &&
+        value != this.textGeom.lineHeignt
+      ) {
         this.textGeom.updateLineHeight(value);
         updateGeom();
-      } else if (prop.name === "color") {
+      } else if (prop.name === "color" && this.color != value) {
         this.color = value;
         this.drawFont();
       }
@@ -81,12 +88,6 @@ export class TextNode extends ImageDesignerNode {
       this.textGeom.updateLineHeight(this.getProperty("lineHeight"));
       this.color = this.getProperty("color");
       updateGeom();
-      //this.drawFont();
-    };
-
-    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
-      let textProp = this.properties.find((prop) => prop.name == "text");
-      this.onnodepropertychanged(textProp);
     };
   }
 

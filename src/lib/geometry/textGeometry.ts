@@ -188,8 +188,6 @@ export class TextGeometry {
     }
     this.needsUpdate = false;
 
-    const glyphs = this.font.stringToGlyphs(this.text);
-
     // create path layout
     let scale = (1 / this.font.unitsPerEm) * this.size;
     let theta = 1024;

@@ -40,6 +40,9 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   dragStartPos: Vector2;
 
+  // TODO: it seems NodeGraphicsItem and DesignerNode better be de-coupled
+  dNode: DesignerNode;
+
   constructor(node: DesignerNode) {
     super();
     this.width = 100;
@@ -50,26 +53,28 @@ export class NodeGraphicsItem extends GraphicsItem {
     this.isLogic = node instanceof LogicDesignerNode;
     this.value = "";
     this.id = node.id;
+    this.dNode = node;
 
-    this.setupSize(node);
-    this.setupSockets(node);
+    this.setupSize();
+    this.setupSockets();
 
     // const scale = Math.min(width, height);
     // this.relScale = 100 / scale;
   }
 
-  setupSize(dNode: DesignerNode) {
+  setupSize() {
     if (!this.isLogic) {
-      let imgdNode = dNode as ImageDesignerNode;
-      this.setVirtualSize(imgdNode.getWidth(), imgdNode.getHeight());
+      let node = this.dNode as ImageDesignerNode;
+      this.setVirtualSize(node.getWidth(), node.getHeight());
     } else {
       //let logicdNode = dNode as LogicDesignerNode;
       this.setSize(75, 36);
     }
   }
 
-  setupSockets(node: DesignerNode) {
+  setupSockets() {
     // clear existing array
+    let node = this.dNode;
     this.sockets = [];
 
     for (let input of node.getInputs()) {
@@ -88,6 +93,7 @@ export class NodeGraphicsItem extends GraphicsItem {
       this.addSocket("output", "output", SocketInOut.Out, PropertyType.Image);
     }
 
+    this.sortSockets();
     this.setScene(this.scene);
   }
 
@@ -325,9 +331,8 @@ export class NodeGraphicsItem extends GraphicsItem {
       (sock) => sock.propertyType != PropertyType.Image
     );
 
-    let node = Editor.getDesigner().getNodeById(this.id);
     let orderList = [];
-    for (let prop of node.getExposedProperties()) {
+    for (let prop of this.dNode.getExposedProperties()) {
       let idx = propSocks.findIndex((sock) => sock.title == prop.name);
       if (idx != -1) orderList.push(idx);
     }
@@ -420,9 +425,6 @@ export class NodeGraphicsItem extends GraphicsItem {
     sock.node = this;
     sock.socketInOut = type;
     this.sockets.push(sock);
-
-    this.sortSockets();
-
     return sock;
   }
 
