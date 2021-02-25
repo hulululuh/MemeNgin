@@ -1,21 +1,23 @@
-import { SocketGraphicsItem, SocketInOut } from "./socketgraphicsitem";
-import { ImageCanvas } from "../designer/imagecanvas";
+import {
+  SocketGraphicsItem,
+  SocketInOut,
+} from "@/lib/scene/socketgraphicsitem";
+import { ImageCanvas } from "@/lib/designer/imagecanvas";
 import {
   GraphicsItem,
   MouseDownEvent,
   MouseMoveEvent,
   MouseUpEvent,
   WidgetEvent,
-} from "./graphicsitem";
-import { NodeScene } from "../scene";
+} from "@/lib/scene/graphicsitem";
+import { NodeScene } from "@/lib/scene";
 import { Vector2 } from "@math.gl/core";
-import { MoveItemsAction } from "../actions/moveItemsaction";
-import { UndoStack } from "../undostack";
+import { MoveItemsAction } from "@/lib/actions/moveItemsaction";
+import { UndoStack } from "@/lib/undostack";
 import { DesignerNode } from "@/lib/designer/designernode";
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
 import { PropertyType } from "@/lib/designer/properties";
-import { Editor } from "../editor";
 import { Color } from "@/lib/designer/color";
 
 export class NodeGraphicsItemRenderState {
@@ -400,8 +402,8 @@ export class NodeGraphicsItem extends GraphicsItem {
       let socks = this.getOutSockets();
       if (socks.length > 0) return socks[0];
       else {
-        console.log(
-          "[warning] attempting to get  output socket from node with no output sockets"
+        console.warn(
+          "attempting to get output socket from node with no output sockets"
         );
         return null;
       }
