@@ -143,11 +143,10 @@ export default class ColorPicker extends Vue {
     let el = this.$refs.colorpicker;
     if (!el) return;
     let target = e.target;
-    let sketch = (<Vue>this.$refs.sketch).$el;
+    let sketch = (this.$refs.sketch as Vue).$el;
 
     // if (el !== target && !el.contains(target)) {
-    if (
-      target !== el &&
+    if (target !== el &&
       target !== this.$refs.span &&
       target !== this.$refs.input &&
       !sketch.contains(target)

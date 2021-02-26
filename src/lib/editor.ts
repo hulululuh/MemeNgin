@@ -1,10 +1,8 @@
 import fs from "fs";
 import path from "path";
 
-//import * as scene from "./scene";
 import { Designer } from "./designer";
 import { DesignerNode } from "./designer/designernode";
-import { ImageDesignerNode } from "./designer/imagedesignernode";
 import { Property, PropertyType } from "./designer/properties";
 import { Guid } from "./utils";
 import { DesignerVariableType } from "./designer/designervariable";
@@ -12,7 +10,6 @@ import { DesignerLibrary } from "./designer/library";
 import { NodeScene } from "./scene";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
-import { SocketInOut } from "./scene/socketgraphicsitem";
 import { ImageCanvas } from "./designer/imagecanvas";
 
 import { createLibrary, getCurrentLibraryVersion } from "@/lib/library/library";
@@ -26,7 +23,6 @@ import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detect";
-import { LogicDesignerNode } from "./designer/logicdesignernode";
 
 const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
@@ -578,7 +574,8 @@ export class Editor {
         let dnode = self.designer.getNodeById(node.id);
         self.selectedDesignerNode = dnode;
 
-        dnode?.onItemSelected();
+        if (dnode) dnode.onItemSelected();
+
         if (self.preview2DCtx) {
           self.preview2DCtx.drawImage(
             node.imageCanvas.canvas,

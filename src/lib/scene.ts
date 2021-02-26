@@ -1,15 +1,14 @@
-import { Designer } from "./designer";
-import { LogicDesignerNode } from "./designer/logicdesignernode";
+import { Designer } from "@/lib/designer";
 import {
   NodeGraphicsItem,
   NodeGraphicsItemRenderState,
-} from "./scene/nodegraphicsitem";
-import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
+} from "@/lib/scene/nodegraphicsitem";
+import { ConnectionGraphicsItem } from "@/lib/scene/connectiongraphicsitem";
 import {
   SocketGraphicsItem,
   SocketInOut,
   ValidateConnection,
-} from "./scene/socketgraphicsitem";
+} from "@/lib/scene/socketgraphicsitem";
 import {
   GraphicsItem,
   MouseMoveEvent,
@@ -17,19 +16,19 @@ import {
   MouseUpEvent,
   MouseOverEvent,
   WidgetEvent,
-} from "./scene/graphicsitem";
+} from "@/lib/scene/graphicsitem";
 
-import { SceneView } from "./scene/view";
-import { FrameGraphicsItem } from "./scene/framegraphicsitem";
-import { Transform2dWidget } from "./scene/Transform2dWidget";
-import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
-import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
-import { SelectionGraphicsItem } from "./scene/selectiongraphicsitem";
+import { SceneView } from "@/lib/scene/view";
+import { FrameGraphicsItem } from "@/lib/scene/framegraphicsitem";
+import { Transform2dWidget } from "@/lib/scene/Transform2dWidget";
+import { CommentGraphicsItem } from "@/lib/scene/commentgraphicsitem";
+import { NavigationGraphicsItem } from "@/lib/scene/navigationgraphicsitem";
+import { SelectionGraphicsItem } from "@/lib/scene/selectiongraphicsitem";
 import { Color } from "@/lib/designer/color";
 import { Vector2 } from "@math.gl/core";
 import { BoundingBox } from "@/lib/math/boundingbox";
 import { Rect } from "@/lib/math/rect";
-import { Editor } from "./editor";
+import { Editor } from "@/lib/editor";
 
 import {
   colorGridBackground,

@@ -124,7 +124,7 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
   }
 
   get getNode(): DesignerNode {
-    return <DesignerNode>this.node;
+    return this.node as DesignerNode;
   }
 
   refresh() {

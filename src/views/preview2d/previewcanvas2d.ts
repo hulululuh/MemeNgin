@@ -218,7 +218,7 @@ export class DragZoom {
     if (this.panning) return;
 
     let pos = _getMousePos(this.canvas, evt);
-    let delta = (<any>evt).wheelDelta > 0 ? 1.1 : 1.0 / 1.1;
+    let delta = (evt as any).wheelDelta > 0 ? 1.1 : 1.0 / 1.1;
 
     // offset from mouse pos
     // find offset from previous zoom then move offset by that value

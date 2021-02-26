@@ -75,11 +75,12 @@ app.on("activate", () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+app.removeAllListeners("ready");
 app.on("ready", async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
-      await session.defaultSession.loadExtension(vueDevToolsPath);
+      //await session.defaultSession.loadExtension(vueDevToolsPath);
       //await installVueDevtools();
     } catch (e) {
       console.error("Vue Devtools failed to install:", e.toString());

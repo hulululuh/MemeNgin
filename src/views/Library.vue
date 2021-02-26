@@ -196,7 +196,7 @@ export default class LibraryView extends Vue {
 
   get items() {
     let items = Object.values(this.library.nodes).map((n) => {
-      let item = new LibraryItem(LibraryItemType.Node, <LibraryItemCategory>(n.category));
+      let item = new LibraryItem(LibraryItemType.Node, n.category as LibraryItemCategory);
       item.name = n.name;
       item.displayName = n.displayName;
 

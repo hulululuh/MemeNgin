@@ -10,8 +10,8 @@ require("typeface-open-sans");
 
 // https://github.com/EmbeddedEnterprises/ng6-golden-layout/blob/master/README.md
 import * as $ from "jquery";
-(<any>window).$ = $;
-(<any>window).JQuery = $;
+(window as any).$ = $;
+(window as any).JQuery = $;
 
 import App from "./App.vue";
 import router from "./router";

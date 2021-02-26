@@ -37,7 +37,7 @@ export default class GradientPropertyView extends Vue {
 
   mounted() {
     this.widget = new GradientWidget({
-      width: (<HTMLDivElement>this.$refs.inputHolder).offsetWidth,
+      width: (this.$refs.inputHolder as HTMLDivElement).offsetWidth,
       canvas: this.$refs.canvas,
     });
 

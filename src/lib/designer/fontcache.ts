@@ -48,7 +48,6 @@ export class FontCache {
 
   async getFont(fontUrl: string): Promise<any> {
     const key = hash(fontUrl);
-    let retFont;
     // use if font exits on the cache
     if (this._fonts[key]) {
       return this._fonts[key];

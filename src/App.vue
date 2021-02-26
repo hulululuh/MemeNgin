@@ -256,7 +256,7 @@ export default class App extends Vue {
       this.mouseY = evt.pageY;
     });
 
-    const canv = <HTMLCanvasElement>document.getElementById("editor");
+    const canv = document.getElementById("editor") as HTMLCanvasElement;
     canv.ondrop = (evt) => {
       evt.preventDefault();
 
@@ -416,7 +416,7 @@ export default class App extends Vue {
   showLibraryMenu() {
     // ensure mouse is in canvas bounds
     //if (this.$refs.canvas.offset)
-    let lib = <any>this.$refs.libraryMenu;
+    let lib = this.$refs.libraryMenu as any;
     console.log("show menu");
     if (lib.show == false) lib.showModal(this.mouseX, this.mouseY);
   }
@@ -426,7 +426,7 @@ export default class App extends Vue {
     if (item.config.title == "Editor") {
       let container = item.container;
       item.container.on("resize", function() {
-        const canvas = <HTMLCanvasElement>document.getElementById("editor");
+        const canvas = document.getElementById("editor") as HTMLCanvasElement;
         canvas.width = container.width;
         canvas.height = container.height;
       });

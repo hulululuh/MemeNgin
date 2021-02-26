@@ -2,7 +2,6 @@ import { DesignerNode, NodeType, NodeInput } from "@/lib/designer/designernode";
 import { Designer } from "@/lib/designer";
 import { buildShaderProgram } from "@/lib/designer/gl";
 import {
-  Property,
   FloatProperty,
   IntProperty,
   BoolProperty,
@@ -13,7 +12,6 @@ import {
 } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
 import { Matrix4 } from "@math.gl/core";
-import { LogicDesignerNode } from "./logicdesignernode";
 
 export enum TexPrecision {
   lowp,
@@ -292,7 +290,7 @@ export class ImageDesignerNode extends DesignerNode {
         },
       });
 
-      document?.dispatchEvent(event);
+      if (document) document.dispatchEvent(event);
     }
 
     return true;
