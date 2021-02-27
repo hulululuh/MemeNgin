@@ -1,12 +1,11 @@
 import Vue from "vue";
 import vgl from "vue-golden-layout";
-//import vgl from "vue-golden-layout/src";
 import "golden-layout/src/css/goldenlayout-dark-theme.css";
-//import "golden-layout/src/css/goldenlayout-light-theme.css";
 import "../public/scss/scrollbar.scss";
 import "./utils/inspectelement";
 import "boxicons/css/boxicons.css";
 require("typeface-open-sans");
+require("typeface-roboto");
 
 // https://github.com/EmbeddedEnterprises/ng6-golden-layout/blob/master/README.md
 import * as $ from "jquery";
@@ -20,13 +19,9 @@ import store from "./store";
 Vue.config.productionTip = false;
 Vue.use(vgl);
 
-import { Titlebar, Color } from "custom-electron-titlebar";
+import { Titlebar } from "custom-electron-titlebar";
+import { readProperty, readPropertyAsColor } from "./utils/scsshelper";
 import "../public/scss/scrollbar.scss";
-import {
-  readProperty,
-  readPropertyAsColor,
-  readPropertyAsNumber,
-} from "./utils/scsshelper";
 
 import { ApplicationSettings } from "@/settings";
 const settings = ApplicationSettings.getInstance();

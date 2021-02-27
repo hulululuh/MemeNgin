@@ -14,13 +14,13 @@
     <golden-layout
       class="container"
       @itemCreated="itemCreated"
-      :headerHeight="32"
+      :headerHeight=32
       :showPopoutIcon="false"
       :showMaximiseIcon="false"
       ref="GL"
     >
       <gl-row>
-        <gl-col width="8.4">
+        <gl-col width=8.4>
           <gl-component title="Library" :closable="false">
             <library-view
               :editor="this.editor"
@@ -30,7 +30,7 @@
           </gl-component>
         </gl-col>
 
-        <gl-col width="55" ref="canvas">
+        <gl-col width=55 ref="canvas">
           <gl-component title="Editor" class="test-component" :closable="false">
             <library-menu
               :editor="this.editor"
@@ -66,7 +66,7 @@
           </gl-component>-->
         </gl-col>
 
-        <gl-col width="15">
+        <gl-col width=15>
           <!-- 
           <gl-component title="3D View" class="test-component" :closable="false">
             <canvas width="100" height="100" id="_3dview" /> 

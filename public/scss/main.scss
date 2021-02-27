@@ -1,4 +1,5 @@
 @import "variables";
+@import "~@fontsource/roboto/index.css";
 
 body {
   overflow: hidden;
@@ -30,6 +31,7 @@ body {
   height: 24px !important;
   line-height: 24px;
   font-weight: bold;
+  user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;
@@ -46,6 +48,7 @@ body {
 }
 
 .no-select {
+  user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;
