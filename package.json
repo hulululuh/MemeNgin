@@ -53,9 +53,9 @@
     "vue": "^2.6.12",
     "vue-class-component": "^7.0.2",
     "vue-color": "^2.7.1",
-    "vue-golden-layout": "1.6.0",
     "vue-property-decorator": "6.0.0",
     "vue-router": "^3.0.3",
+    "vuetify": "^2.4.0",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
@@ -76,9 +76,13 @@
     "electron-devtools-installer": "^3.1.0",
     "eslint": "7.0.0",
     "eslint-plugin-vue": "^5.0.0",
+    "sass": "^1.32.0",
+    "sass-loader": "^10.0.0",
     "ts-jest": "23.1",
     "typescript": "^4.2.2",
     "vue-cli-plugin-electron-builder": "^1.4.6",
-    "vue-template-compiler": "^2.6.10"
+    "vue-cli-plugin-vuetify": "^2.1.0",
+    "vue-template-compiler": "^2.6.10",
+    "vuetify-loader": "^1.7.0"
   }
 }

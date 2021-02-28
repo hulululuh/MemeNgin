@@ -1,6 +1,6 @@
 import Vue from "vue";
-import vgl from "vue-golden-layout";
-import "golden-layout/src/css/goldenlayout-dark-theme.css";
+//import vgl from "vue-golden-layout";
+//import "golden-layout/src/css/goldenlayout-dark-theme.css";
 import "../public/scss/scrollbar.scss";
 import "./utils/inspectelement";
 import "boxicons/css/boxicons.css";
@@ -17,13 +17,14 @@ import router from "./router";
 import store from "./store";
 
 Vue.config.productionTip = false;
-Vue.use(vgl);
+//Vue.use(vgl);
 
 import { Titlebar } from "custom-electron-titlebar";
 import { readProperty, readPropertyAsColor } from "./utils/scsshelper";
 import "../public/scss/scrollbar.scss";
 
 import { ApplicationSettings } from "@/settings";
+import vuetify from './plugins/vuetify';
 const settings = ApplicationSettings.getInstance();
 settings.load();
 
@@ -41,5 +42,6 @@ let titleBar = new Titlebar({
 new Vue({
   router,
   store,
-  render: (h) => h(App),
+  vuetify,
+  render: (h) => h(App)
 }).$mount("#app");
