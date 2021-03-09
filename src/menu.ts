@@ -80,14 +80,14 @@ export function setupMenu() {
       submenu: [
         {
           label: "Undo",
-          accelerator: "CmdOrCtrl+Z",
+          //accelerator: "CmdOrCtrl+Z",
           click: (item, focusedWindow) => {
             focusedWindow.webContents.send(MenuCommands.EditUndo);
           },
         },
         {
           label: "Redo",
-          accelerator: "CmdOrCtrl+Shift+Z",
+          //accelerator: "CmdOrCtrl+Shift+Z",
           click: (item, focusedWindow) => {
             focusedWindow.webContents.send(MenuCommands.EditRedo);
           },

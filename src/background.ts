@@ -1,8 +1,14 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, session } from "electron";
+import {
+  app,
+  protocol,
+  BrowserWindow,
+  session,
+  globalShortcut,
+} from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { setupMenu } from "./menu";
+import { MenuCommands, setupMenu } from "./menu";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -24,6 +30,8 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 function createWindow() {
+  setupMenu();
+
   // Create the browser window.
   win = new BrowserWindow({
     width: 1280,
@@ -38,8 +46,6 @@ function createWindow() {
     },
   });
   win.maximize();
-
-  setupMenu();
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -78,6 +84,14 @@ app.on("activate", () => {
 // Some APIs can only be used after this event occurs.
 app.removeAllListeners("ready");
 app.on("ready", async () => {
+  // TODO: better way to do this?
+  // https://github.com/electron/electron/issues/3682
+  globalShortcut.register("CmdOrCtrl+Z", () =>
+    win.webContents.send(MenuCommands.EditUndo)
+  );
+  globalShortcut.register("CmdOrCtrl+Shift+Z", () =>
+    win.webContents.send(MenuCommands.EditRedo)
+  );
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
