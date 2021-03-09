@@ -47,7 +47,7 @@
     "sass": "^1.32.0",
     "sass-loader": "^10.0.0",
     "scss": "^0.2.4",
-    "three": "^0.118.3",
+    "three": "^0.125.0",
     "typeface-open-sans": "^0.0.75",
     "typeface-roboto": "^1.1.13",
     "vue": "^2.6.12",
