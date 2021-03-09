@@ -1,0 +1,91 @@
+.v-file-input {
+  flex-direction: row-reverse;
+}
+
+.v-subheader {
+  max-height: 32px;
+}
+
+.properties {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+}
+
+.propertyList {
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.field {
+  font-size: 12px;
+  //padding: 0.9em 0.5em;
+  // color: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px rgb(61, 61, 61) solid;
+  height: min-content;
+}
+
+.field label {
+  font-weight: bold;
+  padding: 0.4em;
+  padding-left: 0;
+}
+
+.input-holder {
+  display: flex;
+}
+
+.block {
+  display: flex;
+}
+
+.bool {
+  margin-top: 0.4em;
+  width: 100%;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  background: #222;
+  padding: 4px;
+  outline: none;
+}
+
+.color {
+  margin-top: 0.4em;
+  width: 100%;
+  width: calc(100% - 4px - 1px);
+  appearance: none;
+}
+
+.enum {
+  outline: 0;
+  box-shadow: none;
+  border: 0 !important;
+
+  margin-top: 0.4em;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  background: #222;
+  padding: 0.5em;
+  font-family: "Open Sans";
+}
+
+.number {
+  width: calc(100% - 4px - 1px);
+  border: solid gray 1px;
+  padding: 2px;
+  border-radius: 2px;
+}
+
+.color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color::-webkit-color-swatch {
+  border: none;
+}

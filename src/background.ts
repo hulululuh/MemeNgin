@@ -1,12 +1,16 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
-import {
-  createProtocol,
-  installVueDevtools,
-} from "vue-cli-plugin-electron-builder/lib";
+import { app, protocol, BrowserWindow, session } from "electron";
+import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { setupMenu } from "./menu";
+
 const isDevelopment = process.env.NODE_ENV !== "production";
+
+let vueDevToolsPath = null;
+if (process.platform === "win32") {
+  vueDevToolsPath =
+    "C:/Users/hulul/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.3.4_0";
+}
 
 app.commandLine.appendSwitch("--disable-seccomp-filter-sandbox");
 
@@ -22,13 +26,15 @@ protocol.registerSchemesAsPrivileged([
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 720,
     frame: false,
+    titleBarStyle: "hidden",
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
       enableRemoteModule: true,
+      contextIsolation: false,
     },
   });
   win.maximize();
@@ -70,11 +76,13 @@ app.on("activate", () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+app.removeAllListeners("ready");
 app.on("ready", async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
-      await installVueDevtools();
+      await session.defaultSession.loadExtension(vueDevToolsPath);
+      //await installVueDevtools();
     } catch (e) {
       console.error("Vue Devtools failed to install:", e.toString());
     }

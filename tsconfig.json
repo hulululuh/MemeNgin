@@ -12,7 +12,7 @@
 		"sourceMap": true,
 		"skipLibCheck": true,
 		"baseUrl": ".",
-		"types": ["webpack-env", "jest"],
+		"types": ["webpack-env", "jest", "vuetify"],
 		"paths": {
 			"@/*": ["src/*"]
 		},

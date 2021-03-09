@@ -4,6 +4,7 @@ module.exports = {
   configureWebpack: {
     devtool: "source-map",
   },
+
   pluginOptions: {
     electronBuilder: {
       chainWebpackMainProcess: (config) => {
@@ -14,4 +15,8 @@ module.exports = {
       },
     },
   },
+
+  transpileDependencies: [
+    'vuetify'
+  ]
 };

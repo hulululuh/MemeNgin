@@ -67,7 +67,7 @@ export default class LibraryMenu extends Vue {
 
   get items() {
     let items = Object.values(this.library.nodes).map((n) => {
-      let item = new LibraryItem(LibraryItemType.Node, <LibraryItemCategory>(n.NodeCategory));
+      let item = new LibraryItem(LibraryItemType.Node, n.NodeCategory as LibraryItemCategory);
       item.name = n.name;
       item.displayName = n.displayName;
 
@@ -104,7 +104,7 @@ export default class LibraryMenu extends Vue {
     this.show = true;
     this.selectedItem = null;
 
-    let el = <HTMLElement>this.$refs.menu;
+    let el = this.$refs.menu as HTMLElement;
     console.log(x + " " + y);
 
     el.style.left = x + "px";
@@ -115,8 +115,8 @@ export default class LibraryMenu extends Vue {
 
     //
     window.setTimeout((x) => {
-      console.log(<HTMLInputElement>this.$refs["search"]);
-      (<HTMLInputElement>this.$refs["search"]).focus();
+      console.log(this.$refs["search"] as HTMLInputElement);
+      (this.$refs["search"] as HTMLInputElement).focus();
     }, 0);
   }
 

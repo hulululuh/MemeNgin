@@ -1,99 +1,87 @@
 <template>
-  <div>
-    <div class="topbar no-select">
-      <a class="button" href="#" @click="undoAction()">
-        <i class="bx bx-undo" style="font-size:1.4rem !important;"></i>Undo
-      </a>
-      <a class="button" href="#" @click="redoAction()">
-        <i class="bx bx-redo" style="font-size:1.4rem !important;"></i>Redo
-      </a>
-
-      <a class="right button" href="#" @click="exportUnity()">Unity Export</a>
-      <a class="right button" href="#" @click="exportZip()">Zip Export</a>
-    </div>
-    <golden-layout
-      class="container"
-      @itemCreated="itemCreated"
-      :headerHeight="32"
-      :showPopoutIcon="false"
-      :showMaximiseIcon="false"
-      ref="GL"
+  <v-app id="inspire">
+    <v-system-bar
+      app
+      height="26"
+    />
+    
+    <v-app-bar
+      app
+      clipped-left
+      clipped-right
+      dense
     >
-      <gl-row>
-        <gl-col width="8.4">
-          <gl-component title="Library" :closable="false">
-            <library-view
-              :editor="this.editor"
-              :library="this.library"
-              v-if="this.library != null"
-            />
-          </gl-component>
-        </gl-col>
+      <v-toolbar-title>
+        Application
+      </v-toolbar-title>
+    </v-app-bar>
 
-        <gl-col width="55" ref="canvas">
-          <gl-component title="Editor" class="test-component" :closable="false">
-            <library-menu
-              :editor="this.editor"
-              :library="this.library"
-              v-if="this.library != null"
-              ref="libraryMenu"
-            />
-            <!-- <div class="editor-menu" style="height:2em;">
-              <select class="enum" :value="resolution" @change="setResolution">
-                <option value="32">Resolution: 32x32</option>
-                <option value="64">Resolution: 64x64</option>
-                <option value="128">Resolution: 128x128</option>
-                <option value="256">Resolution: 256x256</option>
-                <option value="512">Resolution: 512x512</option>
-                <option value="1024">Resolution: 1024x1024</option>
-                <option value="2048">Resolution: 2048x2048</option>
-                <option value="4096">Resolution: 4096x4096</option>
-              </select>
-              <span>RandomSeed:</span>
-              <input
-                type="number"
-                :value="randomSeed"
-                @change="setRandomSeed"
-              />
-            </div> -->
-            <canvas
-              id="editor"
-              ondragover="event.preventDefault()"
-            />
-          </gl-component>
-          <!-- <gl-component title="Library" height="30" :closable="false">
-            <library-view :editor="this.editor" :library="this.library" />
-          </gl-component>-->
-        </gl-col>
+    <v-navigation-drawer
+      app
+      clipped
+      width="300"
+      >
+      <library-view
+        :editor="this.editor"
+        :library="this.library"
+        v-if="this.library != null"
+      />
+    </v-navigation-drawer>
 
-        <gl-col width="15">
-          <!-- 
-          <gl-component title="3D View" class="test-component" :closable="false">
-            <canvas width="100" height="100" id="_3dview" /> 
-            <preview3d ref="preview3d" />
-          </gl-component>-->
-          <gl-component title="Properties" :closable="false">
-            <node-properties-view
-              ref="properties"
-              v-if="this.propHolder != null"
-              :editor="this.editor"
-              :node="this.propHolder"
-            />
-          </gl-component>
-          
-          <gl-component
-            title="2D View"
-            class="test-component"
-            :closable="false"
-          >
-            <!-- <canvas width="100" height="100" id="_2dview" /> -->
-            <preview2d ref="preview2d" />
-          </gl-component>
-          <!-- <gl-component title="Texture Properties" class="test-component" :closable="false"></gl-component> -->
-        </gl-col>
-      </gl-row>
-    </golden-layout>
-  </div>
+    <v-navigation-drawer
+      app
+      clipped
+      right
+      width="360"
+      class="fill-width"
+    >
+      <v-row no-gutters>
+        <node-properties-view fluid
+          class="d-flex"
+          ref="properties"
+          v-if="this.propHolder != null"
+          :editor="this.editor"
+          :node="this.propHolder"
+        />
+      </v-row>
+      <v-spacer />
+      <v-row app
+        class="align-end justify-center"
+        height="360">
+        <preview2d ref="preview2d" />
+      </v-row>
+    </v-navigation-drawer>
+
+    <v-main fluid
+      app
+      bottom
+      clipped
+      style="padding-top:52; display:flex;"
+      >
+      <v-container fluid 
+        app
+        bottom
+        clipped
+        id="editor-view"
+        class="pa-0 ma-0"
+        v-resize="onResize">
+        <canvas
+          app
+          bottom
+          clipped
+          id="editor"
+          class="pa-0 ma-0"
+          ondragover="event.preventDefault()"
+        />
+        <library-menu
+          :editor="this.editor"
+          :library="this.library"
+          v-if="this.library != null"
+          ref="libraryMenu"
+        />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <style lang="scss">
@@ -105,7 +93,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch, Model } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import EditorView from "@/views/Editor.vue";
 import LibraryView from "@/views/Library.vue";
 import LibraryMenu from "@/components/LibraryMenu.vue";
@@ -113,14 +101,11 @@ import { Editor } from "@/lib/editor";
 import NodePropertiesView from "./views/NodeProperties.vue";
 import Preview2D from "./views/Preview2D.vue";
 import { DesignerLibrary } from "./lib/designer/library";
-import { Designer } from "./lib/designer";
 import { Project, ProjectManager } from "./lib/project";
-import { Titlebar, Color } from "custom-electron-titlebar";
 import { MenuCommands } from "./menu";
 import { unityExport } from "@/lib/export/unityexporter.js";
 import { unityZipExport } from "@/lib/export/unityzipexporter.js";
 import { zipExport } from "@/lib/export/zipexporter.js";
-import { shell } from "electron";
 import fs from "fs";
 import path from "path";
 import { IPropertyHolder } from "./lib/designer/properties";
@@ -248,6 +233,14 @@ export default class App extends Vue {
     });
   }
 
+  onResize() {
+    const canvas = document.getElementById("editor") as HTMLCanvasElement;
+    const view = document.getElementById("editor-view");
+    canvas.width = view.clientWidth;
+    canvas.height = view.clientHeight;
+    if (this.editor.nodeScene) this.editor.nodeScene.view.onResized();
+  }
+
   mounted() {
     this.setupMenu();
 
@@ -256,13 +249,13 @@ export default class App extends Vue {
       this.mouseY = evt.pageY;
     });
 
-    const canv = <HTMLCanvasElement>document.getElementById("editor");
-    canv.ondrop = (evt) => {
+    const canvas = document.getElementById("editor") as HTMLCanvasElement;
+    canvas.ondrop = (evt) => {
       evt.preventDefault();
 
       let itemJson = evt.dataTransfer.getData("text/plain");
       let item = JSON.parse(itemJson);
-      let rect = canv.getBoundingClientRect();
+      let rect = canvas.getBoundingClientRect();
       let pos = this.editor.nodeScene.view.canvasToSceneXY(
         evt.clientX - rect.left,
         evt.clientY - rect.top
@@ -340,7 +333,7 @@ export default class App extends Vue {
         UndoStack.current.push(action);
       }
     };
-    this.editor.setSceneCanvas(canv);
+    this.editor.setSceneCanvas(canvas);
 
     //this.designer = this.editor.designer;
     this.editor.onnodeselected = (node) => {
@@ -387,6 +380,8 @@ export default class App extends Vue {
     window.addEventListener("resize", () => {
       console.log(this.$refs.GL);
     });
+
+    this.onResize();
   }
 
   undoAction() {
@@ -416,7 +411,7 @@ export default class App extends Vue {
   showLibraryMenu() {
     // ensure mouse is in canvas bounds
     //if (this.$refs.canvas.offset)
-    let lib = <any>this.$refs.libraryMenu;
+    let lib = this.$refs.libraryMenu as any;
     console.log("show menu");
     if (lib.show == false) lib.showModal(this.mouseX, this.mouseY);
   }
@@ -426,7 +421,7 @@ export default class App extends Vue {
     if (item.config.title == "Editor") {
       let container = item.container;
       item.container.on("resize", function() {
-        const canvas = <HTMLCanvasElement>document.getElementById("editor");
+        const canvas = document.getElementById("editor") as HTMLCanvasElement;
         canvas.width = container.width;
         canvas.height = container.height;
       });
@@ -713,3 +708,4 @@ export default class App extends Vue {
   }
 }
 </script>
+

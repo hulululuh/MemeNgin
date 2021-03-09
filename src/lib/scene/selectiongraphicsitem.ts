@@ -1,4 +1,3 @@
-import { SocketGraphicsItem } from "./socketgraphicsitem";
 import {
   GraphicsItem,
   MouseDownEvent,
@@ -9,11 +8,6 @@ import { SceneView } from "./view";
 import { Rect } from "@/lib/math/rect";
 import { Vector2 } from "@math.gl/core";
 import { Color } from "../designer/color";
-import {
-  IPropertyHolder,
-  Property,
-  StringProperty,
-} from "../designer/properties";
 import { NodeScene } from "../scene";
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";

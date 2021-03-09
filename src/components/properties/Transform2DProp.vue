@@ -1,102 +1,162 @@
 <template>
-  <div class="field">
-    <div>
+  <v-container class="field ma-0 pa-0">
+    <v-subheader class="ma-0 pa-0">
       <label>{{ prop.displayName }}</label>
-    </div>
-    <br>
+    </v-subheader>
 
-    <div style="width:100%">
-      <table id="transform">
-        <tr>
-            <td>Position</td>
-            <td>x:</td>
-            <td>
-            <input
-              id="posX"
-              type="number"
-              :value="parseFloat(prop.value.position[0]).toFixed(3)"
-              :step="0.001"
-              @input="updateValuePX"
-              @keydown="updateValuePX"
-              class="number"
-              @focus="focus"
-              @blur="blurPX"
-              min="-10"
-              max="10"
-              /></td>
-            <td>y:</td>
-            <td>
-            <input
-              id="posY"
-              type="number"
-              :value="parseFloat(prop.value.position[1]).toFixed(3)"
-              :step="0.001"
-              @input="updateValuePY"
-              @keydown="updateValuePY"
-              class="number"
-              @focus="focus"
-              @blur="blurPY"
-              min="-10"
-              max="10"
-            /></td>
-        </tr>
-        <tr>
-          <td>Scale</td>
-          <td>x:</td>
-          <td>
-            <input
-              id="scaleX"
-              type="number"
-              :value="parseFloat(prop.value.scale[0]).toFixed(3)"
-              :step="0.001"
-              @input="updateValueSX"
-              @keydown="updateValueSX"
-              class="number"
-              @focus="focus"
-              @blur="blurSX"
-              min="0.1"
-              max="5"
-            /></td>
-          <td>y:</td>
-          <td>
-            <input
-              id="scaleY"
-              type="number"
-              :value="parseFloat(prop.value.scale[1]).toFixed(3)"
-              :step="0.001"
-              @input="updateValueSY"
-              @keydown="updateValueSY"
-              class="number"
-              @focus="focus"
-              @blur="blurSY"
-              min="0.1"
-              max="5"
-            /></td>
-        </tr>
-        <tr>
-          <td>Rotation</td>
-          <td></td>
-          <td>
-            <input
-              id="rotaiton"
-              type="number"
-              :value="parseFloat(prop.value.rotation).toFixed(1)"
-              :step="0.1"
-              @input="updateValueR"
-              @keydown="updateValueR"
-              class="number"
-              @focus="focus"
-              @blur="blurR"
-              min="0"
-              max="360"
-            /></td>
-          <td></td>
-        </tr>
-      </table>
-    </div>
-  </div>
-  
+    <v-container>
+      <v-row no-gutters>
+        <v-col
+          class="ma-0 pa-0 width=10%"
+          md="2">
+          Pos
+        </v-col>
+        <v-col
+          class="ma-0 pa-0"
+          md="5">
+          <v-text-field
+            class=" ma-0 pa-0"
+            step="0.001"
+            reverse
+            :value="parseFloat(prop.value.position[0]).toFixed(3)"
+            @input="onInputPosX"
+            @blur="blur"
+            @change="blur"
+            @focus="focus"
+            hide-details>
+            <template v-slot:prepend class="ma-0 pa-0">
+              <v-checkbox
+                v-model="prop.exposed"
+                @change="updateExposed"
+                class="ma-0 pa-0"
+                type="number"
+                hide-details
+              />
+              x:
+            </template>
+          </v-text-field>
+        </v-col>
+        <v-col
+          class="ma-0 pa-0"
+          md="5">
+          <v-text-field
+            class="ma-0 pa-0"
+            step="0.001"
+            reverse
+            :value="parseFloat(prop.value.position[1]).toFixed(3)"
+            @input="onInputPosY"
+            @blur="blur"
+            @change="blur"
+            hide-details>
+            <template v-slot:prepend class="ma-0 pa-0">
+              <v-checkbox
+                v-model="prop.exposed"
+                @change="updateExposed"
+                class="ma-0 pa-0"
+                type="number"
+                hide-details
+              />
+              y:
+            </template>
+          </v-text-field>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col
+          class="ma-0 pa-0 width=10%"
+          md="2">
+          Scale
+        </v-col>
+        <v-col
+          class="ma-0 pa-0"
+          md="5">
+          <v-text-field
+            class="text-aligned-right ma-0 pa-0"
+            step="0.001"
+            reverse
+            :value="parseFloat(prop.value.scale[0]).toFixed(3)"
+            @input="onInputScaleX"
+            @blur="blur"
+            @change="blur"
+            hide-details>
+            <template v-slot:prepend class="ma-0 pa-0">
+              <v-checkbox
+                v-model="prop.exposed"
+                @change="updateExposed"
+                class="ma-0 pa-0"
+                type="number"
+                hide-details
+              />
+              x:
+            </template>
+          </v-text-field>
+        </v-col>
+        <v-col
+          class="ma-0 pa-0"
+          md="5">
+          <v-text-field
+            class="text-aligned-right ma-0 pa-0"
+            step="0.001"
+            reverse
+            :value="parseFloat(prop.value.scale[1]).toFixed(3)"
+            @input="onInputScaleY"
+            @blur="blur"
+            @change="blur"
+            hide-details>
+            <template v-slot:prepend class="ma-0 pa-0">
+              <v-checkbox
+                v-model="prop.exposed"
+                @change="updateExposed"
+                class="ma-0 pa-0"
+                type="number"
+                hide-details
+              />
+              y:
+            </template>
+          </v-text-field>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col
+          class="ma-0 pa-0 width=10%"
+          md="2">
+          Rot
+        </v-col>
+        <v-col
+          class="ma-0 pa-0"
+          md="5">
+          <v-text-field
+            class="text-aligned-right ma-0 pa-0"
+            step="0.1"
+            reverse
+            :value="parseFloat(prop.value.rotation).toFixed(1)"
+            @input="onInputRotation"
+            @blur="blur"
+            @change="blur"
+            hide-details>
+            <template v-slot:prepend class="ma-0 pa-0">
+              <v-checkbox
+                v-model="prop.exposed"
+                @change="updateExposed"
+                class="ma-0 pa-0"
+                type="number"
+                hide-details
+              />
+            </template>
+          </v-text-field>
+        </v-col>
+        <v-col
+          class="ma-0 pa-0 width=10%"
+          md="5">
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-container>
 </template>
+
+<style scoped lang="scss">
+@import "../../../public/scss/property.scss";
+</style>
 
 <script lang="ts">
 import { Vue, Prop, Component, Emit } from "vue-property-decorator";
@@ -107,13 +167,16 @@ import { UndoStack } from "@/lib/undostack";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
 import { Transform2D } from '@/lib/math/transform2d';
 import { Vector2 } from "@math.gl/core";
+import { transcode } from "node:buffer";
+import { Transform } from "node:stream";
 
 export enum Transform2DComponent {
   PositionX,
   PositionY,
   ScaleX,
   ScaleY,
-  Rotation
+  Rotation,
+  None,
 } 
 
 function getUpdatedTransform(xf: Transform2D, val: number, comp: Transform2DComponent) {
@@ -135,6 +198,13 @@ function getUpdatedTransform(xf: Transform2D, val: number, comp: Transform2DComp
 
 @Component
 export default class Transform2DPropertyView extends Vue {
+  positionX: number;
+  positionY: number;
+  scaleX: number;
+  scaleY: number;
+  rotation: number;
+  dirtyComponent: Transform2DComponent; // this flag set to true when the input form is edited
+
   @Prop()
   // FloatProperty
   prop: any;
@@ -145,7 +215,25 @@ export default class Transform2DPropertyView extends Vue {
   @Prop()
   propHolder: IPropertyHolder;
 
-  oldValue: Transform2D;
+  oldValue: any;
+
+  calcTransform() {
+    return new Transform2D(new Vector2(this.positionX, this.positionY), new Vector2(this.scaleX, this.scaleY), this.rotation);
+  }
+
+  mounted() {
+    const transform = this.prop.value;
+    this.positionX = transform.position[0];
+    this.positionY = transform.position[1];
+    this.scaleX = transform.scale[0];
+    this.scaleY = transform.scale[1];
+    this.rotation = transform.rotation;
+    this.dirtyComponent = Transform2DComponent.None;
+  }
+
+  focus() { 
+    this.oldValue = {value: this.calcTransform(), exposed: false};
+  }
 
   @Emit()
   propertyChanged() {
@@ -158,107 +246,94 @@ export default class Transform2DPropertyView extends Vue {
     return evt;
   }
 
-  updateValue(value: number, comp: Transform2DComponent) {
-    const xf = getUpdatedTransform(this.prop.value, value, comp);
-    this.propHolder.setProperty(this.prop.name, xf);
+  @Emit()
+  propertyExposeChanged() {
+    this.$emit("propertyExposeChanged", this.prop);
+    return this.prop.name;
+  }
+
+  updateExposed(value) {
+    this.propHolder.setProperty(this.prop.name, {
+      value: this.prop.getValue(),
+      exposed: value
+    });
+    this.propertyExposeChanged();
+  }
+
+  onInputPosX(value) {
+    const parsed = parseFloat(value);
+    if(!isNaN(parsed)) {
+      this.positionX = parsed;
+      this.dirtyComponent = Transform2DComponent.PositionX;
+    }
+  }
+
+  onInputPosY(value) {
+    const parsed = parseFloat(value);
+    if(!isNaN(parsed)) {
+      this.positionY = parsed; 
+      this.dirtyComponent = Transform2DComponent.PositionY;
+    }
+  }
+
+  onInputScaleX(value) {
+    const parsed = parseFloat(value);
+    if(!isNaN(parsed)) {
+      this.scaleX = parsed; 
+      this.dirtyComponent = Transform2DComponent.ScaleX;
+    }
+  }
+
+  onInputScaleY(value) {
+    const parsed = parseFloat(value);
+    if(!isNaN(parsed)) {
+      this.scaleY = parsed; 
+      this.dirtyComponent = Transform2DComponent.ScaleY;
+    }
+  }
+
+  onInputRotation(value) {
+    const parsed = parseFloat(value);
+    if(!isNaN(parsed)) {
+      this.rotation = parsed; 
+      this.dirtyComponent = Transform2DComponent.Rotation;
+    }
+  }
+
+  blur(evt) {
+    let xf = this.prop.getValue().clone();
     
-    this.propertyChanged();
-    //this.onValueChanged();
-  }
+    // if input form has changed
+    if (this.dirtyComponent != Transform2DComponent.None) {
+      this.oldValue = { value:xf, exposed:false };
 
-  updateValuePX(evt) {
-    const comp = Transform2DComponent.PositionX;
-    if (evt.key === "Enter") {
-      const val = parseFloat(evt.target.value);
-      if (isNaN(val)) return;
-      this.updateValue(val, comp);
-    } else if(evt.inputType === "historyUndo") {
-      const val = parseFloat(evt.detail);
-      this.updateValue(val, comp);
+      if (this.dirtyComponent != Transform2DComponent.PositionX) this.positionX = xf.position[0];
+      if (this.dirtyComponent != Transform2DComponent.PositionY) this.positionY = xf.position[1];
+      if (this.dirtyComponent != Transform2DComponent.ScaleX) this.scaleX = xf.scale[0];
+      if (this.dirtyComponent != Transform2DComponent.ScaleY) this.scaleY = xf.scale[1];
+      if (this.dirtyComponent != Transform2DComponent.Rotation) this.rotation = xf.rotation;
+
+      xf = this.calcTransform();
+    } else {
+      this.oldValue = { value:xf, exposed:false };
     }
-  }
+    
+    if (!xf.equals(this.prop.getValue())) {
+      this.propHolder.setProperty(this.prop.name, {value: xf, exposed: false});
+      this.propertyChanged();
 
-  updateValuePY(evt) {
-    const comp = Transform2DComponent.PositionY;
-    if (evt.key === "Enter") {
-      const val = parseFloat(evt.target.value);
-      if (isNaN(val)) return;
-      this.updateValue(val, comp);
-    } else if(evt.inputType === "historyUndo") {
-      const val = parseFloat(evt.detail);
-      this.updateValue(val, comp);
+      // todo: make it happen!
+      let action = new PropertyChangeAction(
+        null,
+        this.prop.name,
+        this.propHolder,
+        this.oldValue,
+        {value: xf, exposed: false}
+      );
+      UndoStack.current.push(action);
     }
-  }
 
-  updateValueSX(evt) {
-    const comp = Transform2DComponent.ScaleX;
-    if (evt.key === "Enter") {
-      const val = parseFloat(evt.target.value);
-      if (isNaN(val)) return;
-      this.updateValue(val, comp);
-    } else if(evt.inputType === "historyUndo") {
-      const val = parseFloat(evt.detail);
-      this.updateValue(val, comp);
-    }
-  }
-
-  updateValueSY(evt) {
-    const comp = Transform2DComponent.ScaleY;
-    if (evt.key === "Enter") {
-      const val = parseFloat(evt.target.value);
-      if (isNaN(val)) return;
-      this.updateValue(val, comp);
-    } else if(evt.inputType === "historyUndo") {
-      const val = parseFloat(evt.detail);
-      this.updateValue(val, comp);
-    }
-  }
-
-  updateValueR(evt) {
-    const comp = Transform2DComponent.Rotation;
-    if (evt.key === "Enter") {
-      const val = parseFloat(evt.target.value);
-      if (isNaN(val)) return;
-      this.updateValue(val, comp);
-    } else if(evt.inputType === "historyUndo") {
-      const val = parseFloat(evt.detail);
-      this.updateValue(val, comp);
-    }
-  }
-
-  focus(evt) {
-    this.oldValue = this.prop.value.clone();
-  }
-
-  blurPX(evt) {
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.PositionX);
-  }
-
-  blurPY(evt) {
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.PositionY);
-  }
-
-  blurSX(evt) {
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.ScaleX);
-  }
-
-  blurSY(evt) {
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.ScaleY);
-  }
-
-  blurR(evt) {
-    this.updateValue(parseFloat(evt.target.value), Transform2DComponent.Rotation);
-  }
-
-  onValueChanged() {
-    let action = new PropertyChangeAction(
-      null,
-      this.prop.name,
-      this.propHolder,
-      this.oldValue.clone(),
-      this.prop.value
-    );
-    UndoStack.current.push(action);
+    this.dirtyComponent = Transform2DComponent.None;
   }
 }
 </script>
@@ -267,7 +342,7 @@ export default class Transform2DPropertyView extends Vue {
 .field {
   font-size: 12px;
   padding: 0.9em 0.5em;
-  color: rgba(255, 255, 255, 0.7);
+  /* color: rgba(255, 255, 255, 0.7); */
   border-bottom: 1px rgb(61, 61, 61) solid;
 }
 

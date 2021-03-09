@@ -1,12 +1,5 @@
 <template>
   <div class="input-group color-picker" ref="colorpicker">
-    <!-- <input
-			type="text"
-			class="form-control"
-			v-model="colorValue"
-			@focus="showPicker()"
-			ref="input"
-    />-->
     <span class="input-group-addon color-picker-container">
       <span
         ref="span"
@@ -143,11 +136,10 @@ export default class ColorPicker extends Vue {
     let el = this.$refs.colorpicker;
     if (!el) return;
     let target = e.target;
-    let sketch = (<Vue>this.$refs.sketch).$el;
+    let sketch = (this.$refs.sketch as Vue).$el;
 
     // if (el !== target && !el.contains(target)) {
-    if (
-      target !== el &&
+    if (target !== el &&
       target !== this.$refs.span &&
       target !== this.$refs.input &&
       !sketch.contains(target)

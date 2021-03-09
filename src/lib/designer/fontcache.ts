@@ -1,12 +1,17 @@
 import opentype from "opentype.js";
 import hash from "object-hash";
 import path from "path";
-
-import { remote } from "electron";
 import { Dictionary } from "dictionary-types";
 
 // const fontUrl =
 //   "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf";
+
+export function CalcFontPath(pathToFont: string) {
+  //return `./assets/nodes/${node}.png`;
+  if (process.env.NODE_ENV == "production")
+    return "file://" + path.join(process.env.BASE_URL, pathToFont);
+  return path.join(process.env.BASE_URL, pathToFont);
+}
 
 async function loadFont(url): Promise<any> {
   return await new Promise((resolve, reject) =>
@@ -17,22 +22,21 @@ async function loadFont(url): Promise<any> {
 export class FontCache {
   private static _instance: FontCache = new FontCache();
   private _fonts: Dictionary<any> = {};
-
   private _fallbackFont: any;
 
   constructor() {
-    const fontPath = path.join(
-      remote.app.getAppPath() + "/../src/assets/fonts/Roboto/Roboto-Regular.ttf"
-    );
+    let fontPath = CalcFontPath("fonts/open-sans-latin-400.33543c5c.woff2");
+    //let fontkit = require("fontkit");
+    //let font = fontkit.openSync(fontPath);
 
-    let self = this;
-    opentype.load(fontPath, function(err, font) {
-      if (err) {
-        alert("Font could not be loaded: " + err);
-      } else {
-        self._fallbackFont = font;
-      }
-    });
+    // let self = this;
+    // opentype.load(fontPath, function(err, font) {
+    //   if (err) {
+    //     alert("Font could not be loaded: " + err);
+    //   } else {
+    //     self._fallbackFont = font;
+    //   }
+    // });
   }
 
   static getInstance() {
@@ -48,7 +52,6 @@ export class FontCache {
 
   async getFont(fontUrl: string): Promise<any> {
     const key = hash(fontUrl);
-    let retFont;
     // use if font exits on the cache
     if (this._fonts[key]) {
       return this._fonts[key];

@@ -1,50 +1,40 @@
 import Vue from "vue";
-import vgl from "vue-golden-layout";
-//import vgl from "vue-golden-layout/src";
-import "golden-layout/src/css/goldenlayout-dark-theme.css";
-//import "golden-layout/src/css/goldenlayout-light-theme.css";
+//import vgl from "vue-golden-layout";
+//import "golden-layout/src/css/goldenlayout-dark-theme.css";
 import "../public/scss/scrollbar.scss";
 import "./utils/inspectelement";
 import "boxicons/css/boxicons.css";
 require("typeface-open-sans");
+require("typeface-roboto");
 
 // https://github.com/EmbeddedEnterprises/ng6-golden-layout/blob/master/README.md
 import * as $ from "jquery";
-(<any>window).$ = $;
-(<any>window).JQuery = $;
+(window as any).$ = $;
+(window as any).JQuery = $;
 
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 
+import Vuetify from "vuetify/lib";
+import vuetify from "./plugins/vuetify";
+
 Vue.config.productionTip = false;
-Vue.use(vgl);
+Vue.use(Vuetify);
 
-import { Titlebar, Color } from "custom-electron-titlebar";
-import "../public/scss/scrollbar.scss";
-import {
-  readProperty,
-  readPropertyAsColor,
-  readPropertyAsNumber,
-} from "./utils/scsshelper";
-
+import { Titlebar } from "custom-electron-titlebar";
 import { ApplicationSettings } from "@/settings";
+
 const settings = ApplicationSettings.getInstance();
 settings.load();
 
-const colorTitle = readPropertyAsColor("colorTitle");
-export const colorGridBackground = readProperty("colorGridBackground");
-export const colorGridPrimary = readProperty("colorGridPrimary");
-export const colorGridSecondary = readProperty("colorGridSecondary");
-
-let titleBar = new Titlebar({
-  backgroundColor: colorTitle,
-  icon: "./favicon.svg",
-  shadow: true,
+new Titlebar({
+  backgroundColor: settings.colorTitle,
 });
 
 new Vue({
   router,
   store,
+  vuetify,
   render: (h) => h(App),
 }).$mount("#app");

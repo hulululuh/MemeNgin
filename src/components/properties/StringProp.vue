@@ -1,38 +1,28 @@
 <template>
-  <div class="field">
-    <div>
-      <label>{{ prop.displayName }}</label>
-    </div>
-    <div class="input-holder">
-      <input type="checkbox" id="expose" name="scales" unchecked
-        :value="prop.exposed"
-        :checked="prop.exposed"
-        @input="updateExposed"
-        @focus="focus"
-        @blur="blur">
-      <div style="width:95%; margin-right:10px">
-        <textarea
-          v-if="prop.isMultiline"
-          :value="prop.value"
-          @input="updateValue"
-          style="width:100%"
-          rows="5"
-          @focus="focus"
-          @blur="blur"
-        ></textarea>
-        <input
-          v-if="!prop.isMultiline"
-          type="text"
-          :value="prop.value"
-          @input="updateValue"
-          style="width:100%"
-          @focus="focus"
-          @blur="blur"
-        />
-      </div>
-    </div>
-  </div>
+  <v-container class="field ma-0 pa-0">
+    <v-subheader class="ma-0 pa-0">
+      {{prop.displayName}}
+    </v-subheader>
+      <v-text-field
+        v-model="prop.value"
+        v-on:input="updateValue"
+        hide-details
+      >
+        <template v-slot:prepend>
+          <v-checkbox
+            v-model="prop.exposed"
+            v-on:change="updateExposed"
+            class="ma-0 pa-0"
+            hide-details>
+          </v-checkbox>
+        </template>
+      </v-text-field>
+  </v-container>
 </template>
+
+<style scoped lang="scss">
+@import "../../../public/scss/property.scss";
+</style>
 
 <script lang="ts">
 import { Vue, Prop, Component, Emit } from "vue-property-decorator";
@@ -67,13 +57,13 @@ export default class StringPropertyView extends Vue {
     return this.prop.name;
   }
 
-  updateExposed(evt) { 
-    this.propHolder.setProperty(this.prop.name, {value: this.prop.getValue(), exposed: evt.target.checked});
+  updateExposed(value) { 
+    this.propHolder.setProperty(this.prop.name, {value: this.prop.getValue(), exposed: value});
     this.propertyExposeChanged();
   }
 
-  updateValue(evt) {
-    this.propHolder.setProperty(this.prop.name, {value: evt.target.value, exposed: this.prop.getExposed()});
+  updateValue(value) {
+    this.propHolder.setProperty(this.prop.name, {value: value, exposed: this.prop.getExposed()});
     this.propertyChanged();
   }
 

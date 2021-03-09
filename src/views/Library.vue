@@ -1,130 +1,41 @@
 <template>
   <div class="library-container">
-    <div class style="padding-bottom:1em; display:flex;margin:0.5em;">
-      <div class="search-container">
-        <input type="text" placeholder="Filter.." v-model="filter" />
-      </div>
-      <!-- <div class="size-container">
-        <select>
-          <option>Small Icons</option>
-          <option>Medium Icons</option>
-          <option>Large Icons</option>
-          <option>Exra Large Icons</option>
-        </select>
-      </div>-->
+    <div class style="padding-bottom:1em; display:flex; margin:0.5em;">
+        <v-text-field label="Filter..." v-model="filter" />
     </div>
-    <div class="node-list">
-      <accordion header="Shape">
-        <div style="overflow:hidden;">
-          <span
-            v-for="item in filteredListShape"
-            v-on:click="addItem(item.type, item.name)"
-            v-on:dragstart="dragStart($event, item)"
-            :key="item.name"
-            class="libcard"
-            href="#"
-            draggable="true"
-            width="33%"
-          >
-            <img
-              v-if="imageExists(item.name)"
-              v-bind:src="calcImagePath(item.name)"
-              class="thumbnail"
-            />
-            <div v-else class="thumbnail" />
-
-            <!-- <div class="node-name">{{ item.displayName }}</div> -->
-          </span>
-        </div>
-      </accordion>
-      <accordion header="Color">
-        <div style="overflow:hidden;">
-          <span
-            v-for="item in filteredListColor"
-            v-on:click="addItem(item.type, item.name)"
-            v-on:dragstart="dragStart($event, item)"
-            :key="item.name"
-            class="libcard"
-            href="#"
-            draggable="true"
-          >
-            <img
-              v-if="imageExists(item.name)"
-              v-bind:src="calcImagePath(item.name)"
-              class="thumbnail"
-            />
-            <div v-else class="thumbnail" />
-
-            <!-- <div class="node-name">{{ item.displayName }}</div> -->
-          </span>
-        </div>
-      </accordion>
-      <accordion header="Composite">
-        <div style="overflow:hidden;">
-          <span
-            v-for="item in filteredListComposite"
-            v-on:click="addItem(item.type, item.name)"
-            v-on:dragstart="dragStart($event, item)"
-            :key="item.name"
-            class="libcard"
-            href="#"
-            draggable="true"
-          >
-            <img
-              v-if="imageExists(item.name)"
-              v-bind:src="calcImagePath(item.name)"
-              class="thumbnail"
-            />
-            <div v-else class="thumbnail" />
-
-            <!-- <div class="node-name">{{ item.displayName }}</div> -->
-          </span>
-        </div>
-      </accordion>
-      <accordion header="Create">
-        <div style="overflow:hidden;">
-          <span
-            v-for="item in filteredListCreate"
-            v-on:click="addItem(item.type, item.name)"
-            v-on:dragstart="dragStart($event, item)"
-            :key="item.name"
-            class="libcard"
-            href="#"
-            draggable="true"
-          >
-            <img
-              v-if="imageExists(item.name)"
-              v-bind:src="calcImagePath(item.name)"
-              class="thumbnail"
-            />
-            <div v-else class="thumbnail" />
-
-            <!-- <div class="node-name">{{ item.displayName }}</div> -->
-          </span>
-        </div>
-      </accordion>
-      <accordion header="Think">
-        <div style="overflow:hidden;">
-          <span
-            v-for="item in filteredListThink"
-            v-on:click="addItem(item.type, item.name)"
-            v-on:dragstart="dragStart($event, item)"
-            :key="item.name"
-            class="libcard"
-            href="#"
-            draggable="true"
-          >
-            <img
-              v-if="imageExists(item.name)"
-              v-bind:src="calcImagePath(item.name)"
-              class="thumbnail"
-            />
-            <div v-else class="thumbnail" />
-
-            <!-- <div class="node-name">{{ item.displayName }}</div> -->
-          </span>
-        </div>
-      </accordion>
+    <div id="app" class="node-list">
+      <v-expansion-panels
+        v-model="panel"
+        multiple
+        accordion
+      >
+        <v-expansion-panel
+          v-for="(item,i) in items"
+          :key="i">
+          <v-expansion-panel-header>{{item.name}}</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <div style="overflow:hidden;">
+              <span
+                v-for="listItem in getFilteredListByName(item.name)"
+                v-on:click="addItem(listItem.type, listItem.name)"
+                v-on:dragstart="dragStart($event, listItem)"
+                :key="listItem.name"
+                class="libcard"
+                href="#"
+                draggable="true"
+                width="33%"
+              >
+                <img
+                  v-if="imageExists(listItem.name)"
+                  v-bind:src="calcImagePath(listItem.name)"
+                  class="thumbnail"
+                />
+                <div v-else class="thumbnail" />
+              </span>
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </div>
   </div>
 </template>
@@ -192,11 +103,32 @@ export default class LibraryView extends Vue {
 
   filter: string = "";
 
-  created() {}
+  items: any;
+  
+  panel: any;
 
-  get items() {
+  created () { 
+    this.items = [
+        {name: "Shape"},
+        {name: "Color"},
+        {name: "Composite"},
+        {name: "Create"},
+        {name: "Think"}
+      ];
+    
+    this.panel = [...Array(this.items.length).keys()];
+  }
+
+  data () {
+    return {
+      panel: this.panel,
+      items: this.items,
+    }
+  }
+
+  get libItems() {
     let items = Object.values(this.library.nodes).map((n) => {
-      let item = new LibraryItem(LibraryItemType.Node, <LibraryItemCategory>(n.category));
+      let item = new LibraryItem(LibraryItemType.Node, n.category as LibraryItemCategory);
       item.name = n.name;
       item.displayName = n.displayName;
 
@@ -216,41 +148,21 @@ export default class LibraryView extends Vue {
     return items;
   }
 
-  get filteredList() {
-    let kw = this.filter;
-    let list = Object.values(this.items).filter(function(item) {
-      return item.name.toLowerCase().includes(kw.toLowerCase());
-    });
-    return list;
-  }
+  // get filteredList() {
+  //   let kw = this.filter;
+  //   let list = Object.values(this.libItems).filter(function(item) {
+  //     return item.name.toLowerCase().includes(kw.toLowerCase());
+  //   });
+  //   return list;
+  // }
 
-  get filteredListUndefined() {
-    return this.getFilteredList(LibraryItemCategory.Undefined);
-  }
-
-  get filteredListShape() {
-    return this.getFilteredList(LibraryItemCategory.Shape);
-  }
-
-  get filteredListColor() {
-    return this.getFilteredList(LibraryItemCategory.Color);
-  }
-
-  get filteredListComposite() {
-    return this.getFilteredList(LibraryItemCategory.Composite);
-  }
-
-  get filteredListCreate() {
-    return this.getFilteredList(LibraryItemCategory.Create);
-  }
-
-  get filteredListThink() {
-    return this.getFilteredList(LibraryItemCategory.Think);
+  getFilteredListByName(name: string){
+    return this.getFilteredList(name.toLowerCase() as LibraryItemCategory);
   }
 
   getFilteredList(category: LibraryItemCategory) {
     let kw = this.filter;
-    let list = Object.values(this.items).filter(function(item) {
+    let list = Object.values(this.libItems).filter(function(item) {
       return item.name.toLowerCase().includes(kw.toLowerCase()) && item.category === category;
     });
     return list;

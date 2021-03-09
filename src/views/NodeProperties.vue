@@ -1,23 +1,38 @@
 <template>
   <form class="properties" @submit.prevent="cancelSubmit" :key="node.id" v-if="node != null">
-    <accordion header="Base Properties" v-if="isInstanceNode">
-      <texture-channel :node="getNode" :editor="editor" />
-    </accordion>
-    <accordion header="Properties">
-      <component
-        v-for="(p, index) in this.properties"
-        :is="p.componentName"
-        :prop="p.prop"
-        :propHolder="node"
-        :editor="editor"
-        @propertyChanged="propertyChanged"
-        @property-change-completed="propertyChangeCompleted"
-        @propertyExposeChanged="propertyExposeChanged"
-        :key="index"
-      ></component>
-    </accordion>
+    <v-expansion-panels
+        v-model="panel"
+        multiple
+        accordion>
+      <v-expansion-panel>
+          <v-expansion-panel-header class="propertyList">Base Properties</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <texture-channel :node="getNode" :editor="editor" />
+          </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+          <v-expansion-panel-header class="propertyList">Properties</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <component
+              v-for="(p, index) in this.properties"
+              :is="p.componentName"
+              :prop="p.prop"
+              :propHolder="node"
+              :editor="editor"
+              @propertyChanged="propertyChanged"
+              @property-change-completed="propertyChangeCompleted"
+              @propertyExposeChanged="propertyExposeChanged"
+              :key="index"
+            ></component>
+          </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
   </form>
 </template>
+
+<style scoped lang="scss">
+@import "../../public/scss/property.scss";
+</style>
 
 <script lang="ts">
 import { Vue, Prop, Component } from "vue-property-decorator";
@@ -68,6 +83,26 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
 
   @Prop()
   editor: Editor;
+
+  items: any;
+  
+  panel: any;
+
+  created () { 
+    this.items = [
+        {name: "Base Properties"},
+        {name: "Properties"},
+      ];
+    
+    this.panel = [...Array(this.items.length).keys()];
+  }
+
+  data () {
+    return {
+      panel: this.panel,
+      items: this.items,
+    }
+  }
 
   propertyChanged(prop: Property) {
     if (this.node.onnodepropertychanged) {
@@ -124,7 +159,7 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
   }
 
   get getNode(): DesignerNode {
-    return <DesignerNode>this.node;
+    return this.node as DesignerNode;
   }
 
   refresh() {
@@ -132,9 +167,3 @@ export default class NodePropertiesView extends Vue implements IProperyUi {
   }
 }
 </script>
-
-<style scoped>
-/* .properties {
-  background: #333;
-} */
-</style>

@@ -9,6 +9,10 @@
   </div>
 </template>
 
+<style scoped lang="scss">
+@import "../../../public/scss/property.scss";
+</style>
+
 <script lang="ts">
 import { Vue, Prop, Component, Emit, Watch } from "vue-property-decorator";
 import { Designer } from "@/lib/designer";
@@ -37,7 +41,7 @@ export default class GradientPropertyView extends Vue {
 
   mounted() {
     this.widget = new GradientWidget({
-      width: (<HTMLDivElement>this.$refs.inputHolder).offsetWidth,
+      width: (this.$refs.inputHolder as HTMLDivElement).offsetWidth,
       canvas: this.$refs.canvas,
     });
 

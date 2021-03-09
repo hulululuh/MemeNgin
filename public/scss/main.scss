@@ -1,9 +1,24 @@
 @import "variables";
+@import "~@fontsource/roboto/index.css";
+
+html{
+  overflow: hidden !important;
+}
 
 body {
-  overflow: hidden;
+  overflow: hidden !important;
   padding: 0;
   margin: 0;
+}
+
+.header {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.container-after-titlebar {
+  overflow: hidden !important; // custom-electron-titlebar possible bug!
 }
 
 .titlebar {
@@ -30,6 +45,7 @@ body {
   height: 24px !important;
   line-height: 24px;
   font-weight: bold;
+  user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;
@@ -46,6 +62,7 @@ body {
 }
 
 .no-select {
+  user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;

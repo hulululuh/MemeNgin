@@ -194,12 +194,15 @@ export class BoolProperty extends Property {
 
 export class EnumProperty extends Property {
   values: string[];
-  index: number = 0;
+  index: number;
+  value: string;
   constructor(name: string, displayName: string, values: string[]) {
     super();
     this.name = name;
     this.displayName = displayName;
+    this.index = 0;
     this.values = values;
+    this.value = this.values[this.index];
     this.parentValue = this.index;
     this.type = PropertyType.Enum;
   }
@@ -213,8 +216,7 @@ export class EnumProperty extends Property {
   }
 
   setValue(val: any) {
-    // todo: validate
-    this.index = val;
+    this.index = this.values.indexOf(val);
   }
 
   clone(): Property {
@@ -391,11 +393,11 @@ export class GradientProperty extends Property {
 
 export class Transform2DProperty extends Property {
   value: Transform2D;
-  positionX: number;
-  positionY: number;
-  scaleX: number;
-  scaleY: number;
-  rotation: number;
+  // positionX: number;
+  // positionY: number;
+  // scaleX: number;
+  // scaleY: number;
+  // rotation: number;
 
   constructor(name: string, displayName: string, value: Transform2D) {
     super();

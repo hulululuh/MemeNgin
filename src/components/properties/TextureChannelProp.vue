@@ -1,18 +1,21 @@
 <template>
-  <div class="field">
-    <label>Texture Channel</label>
-    <div>
-      <select class="enum" @change="updateValue">
-        <option
-          v-for="(opt, index) in channelNames"
-          :value="index"
-          :key="index"
-          :selected="index == channelIndex"
-        >{{ opt }}</option>
-      </select>
-    </div>
-  </div>
+  <v-container class="field ma-0 pa-0">
+    <v-subheader class="ma-0 pa-0">
+      Texture Channel
+    </v-subheader>
+    <v-select 
+        v-model="channelIndex"
+        :items="channelNames"
+        v-on:change="updateValue"
+        dense
+        disabled>
+    </v-select>
+  </v-container>
 </template>
+
+<style scoped lang="scss">
+@import "../../../public/scss/property.scss";
+</style>
 
 <script lang="ts">
 import { Vue, Prop, Component } from "vue-property-decorator";
@@ -52,8 +55,8 @@ export default class TextureChannelPropertyView extends Vue {
     }
   }
 
-  updateValue(evt) {
-    let index = evt.currentTarget.value;
+  updateValue(value) {
+    let index = this.channelNames.indexOf(value);
     //set channel in editor
     let channelName = this.channelNames[index];
 

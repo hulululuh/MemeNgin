@@ -1,4 +1,5 @@
 import { Vector2, Matrix3 } from "@math.gl/core";
+import { Transform } from "node:stream";
 
 export class Transform2D {
   position: Vector2;
@@ -19,8 +20,8 @@ export class Transform2D {
   }
 
   constructor(p: Vector2, s: Vector2, r: number) {
-    this.position = new Vector2(p);
-    this.scale = new Vector2(s);
+    this.position = new Vector2(p[0], p[1]);
+    this.scale = new Vector2(s[0], s[1]);
     this.rotation = r;
   }
 
@@ -45,5 +46,13 @@ export class Transform2D {
       .translate([this.position[0], this.position[1]])
       .rotate(this.rotation)
       .scale([this.scale[0], this.scale[1]]);
+  }
+
+  equals(other: Transform2D) {
+    return (
+      this.position.equals(other.position) &&
+      this.scale.equals(other.scale) &&
+      this.rotation == other.rotation
+    );
   }
 }

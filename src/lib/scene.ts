@@ -1,15 +1,14 @@
-import { Designer } from "./designer";
-import { LogicDesignerNode } from "./designer/logicdesignernode";
+import { Designer } from "@/lib/designer";
 import {
   NodeGraphicsItem,
   NodeGraphicsItemRenderState,
-} from "./scene/nodegraphicsitem";
-import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
+} from "@/lib/scene/nodegraphicsitem";
+import { ConnectionGraphicsItem } from "@/lib/scene/connectiongraphicsitem";
 import {
   SocketGraphicsItem,
   SocketInOut,
   ValidateConnection,
-} from "./scene/socketgraphicsitem";
+} from "@/lib/scene/socketgraphicsitem";
 import {
   GraphicsItem,
   MouseMoveEvent,
@@ -17,25 +16,20 @@ import {
   MouseUpEvent,
   MouseOverEvent,
   WidgetEvent,
-} from "./scene/graphicsitem";
+} from "@/lib/scene/graphicsitem";
 
-import { SceneView } from "./scene/view";
-import { FrameGraphicsItem } from "./scene/framegraphicsitem";
-import { Transform2dWidget } from "./scene/Transform2dWidget";
-import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
-import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
-import { SelectionGraphicsItem } from "./scene/selectiongraphicsitem";
+import { SceneView } from "@/lib/scene/view";
+import { FrameGraphicsItem } from "@/lib/scene/framegraphicsitem";
+import { Transform2dWidget } from "@/lib/scene/Transform2dWidget";
+import { CommentGraphicsItem } from "@/lib/scene/commentgraphicsitem";
+import { NavigationGraphicsItem } from "@/lib/scene/navigationgraphicsitem";
+import { SelectionGraphicsItem } from "@/lib/scene/selectiongraphicsitem";
 import { Color } from "@/lib/designer/color";
 import { Vector2 } from "@math.gl/core";
 import { BoundingBox } from "@/lib/math/boundingbox";
 import { Rect } from "@/lib/math/rect";
-import { Editor } from "./editor";
+import { Editor } from "@/lib/editor";
 
-import {
-  colorGridBackground,
-  colorGridPrimary,
-  colorGridSecondary,
-} from "../main";
 import { ApplicationSettings } from "@/settings";
 const settings = ApplicationSettings.getInstance();
 
@@ -147,6 +141,8 @@ export class NodeScene {
   _pasteEvent: (evt: ClipboardEvent) => void;
   _widgetUpdate: (evt: WidgetEvent) => void;
   _widgetDragged: (evt: WidgetEvent) => void;
+  _widgetDragStarted: (evt: WidgetEvent) => void;
+  _widgetDragEnded: (evt: WidgetEvent) => void;
   copyElement: HTMLInputElement;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -326,9 +322,28 @@ export class NodeScene {
       if (node && node.onWidgetDragged) {
         node.onWidgetDragged(evt);
       }
-      //self.selectedItems[0]?.onWidgetDragged(evt);
     };
     document.addEventListener("widgetDragged", this._widgetDragged);
+
+    self._widgetDragStarted = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedDesignerNode;
+
+      // TODO: Complete this condition
+      if (node && node.onWidgetDragStarted) {
+        node.onWidgetDragStarted(evt);
+      }
+    };
+    document.addEventListener("widgetDragStarted", this._widgetDragStarted);
+
+    self._widgetDragEnded = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedDesignerNode;
+
+      // TODO: Complete this condition
+      if (node && node.onWidgetDragEnded) {
+        node.onWidgetDragEnded(evt);
+      }
+    };
+    document.addEventListener("widgetDragEnded", this._widgetDragEnded);
 
     this.copyElement = document.createElement("input");
     self.copyElement.value = " ";
@@ -354,6 +369,8 @@ export class NodeScene {
     document.removeEventListener("paste", this._pasteEvent);
     document.removeEventListener("widgetUpdate", this._widgetUpdate);
     document.removeEventListener("widgetDragged", this._widgetDragged);
+    document.removeEventListener("widgetDragStarted", this._widgetDragStarted);
+    document.removeEventListener("widgetDragEnded", this._widgetDragEnded);
     // this.copyElement.removeEventListener("copy", this._copyEvent);
     // this.copyElement.removeEventListener("paste", this._copyEvent);
   }
@@ -695,10 +712,10 @@ export class NodeScene {
 
     // todo: draw grid
 
-    this.view.clear(this.context, colorGridBackground);
+    this.view.clear(this.context, settings.colorGridBackground);
     this.view.setViewMatrix(this.context);
-    this.view.drawGrid(this.context, 33.33333, colorGridSecondary, 1);
-    this.view.drawGrid(this.context, 100, colorGridPrimary, 3);
+    this.view.drawGrid(this.context, 33.33333, settings.colorGridSecondary, 1);
+    this.view.drawGrid(this.context, 100, settings.colorGridPrimary, 3);
   }
 
   draw() {

@@ -950,7 +950,7 @@ export class Designer {
         }
 
         // link properties
-        for (let lp of (<any>v).linkedProperties) {
+        for (let lp of (v as any).linkedProperties) {
           let node = d.getNodeById(lp.nodeId);
           d.mapNodePropertyToVariable(v.property.name, node, lp.name);
         }
