@@ -93,7 +93,14 @@ export class SceneView {
     this.mousePos = new Vector2(0, 0);
     this.globalMousePos = new Vector2(0, 0);
     const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
-    this.changeView(center, 1);
+    this.changeView(center, 1, false);
+  }
+
+  onResized() {
+    if (!this.offset) {
+      this.offset = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+    }
+    this.changeView(this.offset, this.zoomFactor, false);
   }
 
   getAbsPos() {
@@ -201,10 +208,13 @@ export class SceneView {
     this.changeView(targetOffset, zoomFactor);
   }
 
-  changeView(targetOffset: Vector2, targetZoomFactor: number) {
-    const doAnimate = true;
+  changeView(
+    targetOffset: Vector2,
+    targetZoomFactor: number,
+    doAnimate: boolean = true
+  ) {
     if (!doAnimate) {
-      this.offset = targetOffset.clone();
+      this.offset = new Vector2(targetOffset[0], targetOffset[1]);
       this.zoomFactor = targetZoomFactor;
     } else {
       const start = {

@@ -1,10 +1,24 @@
 @import "variables";
 @import "~@fontsource/roboto/index.css";
 
+html{
+  overflow: hidden !important;
+}
+
 body {
-  overflow: hidden;
+  overflow: hidden !important;
   padding: 0;
   margin: 0;
+}
+
+.header {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.container-after-titlebar {
+  overflow: hidden !important; // custom-electron-titlebar possible bug!
 }
 
 .titlebar {

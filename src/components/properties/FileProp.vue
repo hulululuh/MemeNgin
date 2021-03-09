@@ -1,26 +1,17 @@
 <template>
-  <div class="field">
-    <div>
-      <label>{{ prop.displayName }}</label>
-    </div>
-    <div class="input-holder">
-      <div style="width:100%;">
-        <input
-          type="text"
-          :value="prop.value"
-          @input="updateValue"
-          style="width:100%"
-          @focus="focus"
-          @blur="blur"
-          disabled
-        />
-      </div>
-      <div style="width:8%;" float="right;">
-        <button class="block" @click="onclick">...</button>
-      </div>
-    </div>
-  </div>
+  <v-container class="field ma-0 pa-0">
+    <v-subheader class="ma-0 pa-0">
+      {{ prop.displayName }}
+    </v-subheader>
+    <v-file-input
+      v-on:change="updateValue"
+      />
+  </v-container>
 </template>
+
+<style scoped lang="scss">
+@import "../../../public/scss/property.scss";
+</style>
 
 <script lang="ts">
 import { Vue, Prop, Component, Emit } from "vue-property-decorator";
@@ -45,17 +36,26 @@ export default class FilePropertyView extends Vue {
   @Prop()
   propHolder: IPropertyHolder;
 
-  oldValue: number;
+  oldValue: any;
 
-  @Emit()
+  path: string = "";
+
+  // mounted() {
+  //   this.propertyChanged();
+  // }
+
+  @Emit() 
   propertyChanged() {
     this.$emit("propertyChanged", this.prop);
     return this.prop.name;
   }
 
-  updateValue(evt) {
-    this.propHolder.setProperty(this.prop.name, evt.target.value);
-    this.propertyChanged();
+  updateValue(value) {
+    this.path = value.path;
+    if (this.path && fs.existsSync(this.path)) {
+      this.propHolder.setProperty(this.prop.name, {value: this.path, exposed: false});
+      this.propertyChanged();
+    }
   }
 
   onclick() {
@@ -81,39 +81,11 @@ export default class FilePropertyView extends Vue {
       this.prop.name,
       this.propHolder,
       this.oldValue,
-      this.prop.value
+      this.oldValue = {value: this.prop.getValue(), exposed: this.prop.getExposed()}
     );
     UndoStack.current.push(action);
+
+    this.oldValue = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
   }
 }
 </script>
-
-<style scoped>
-.field {
-  font-size: 12px;
-  padding: 0.9em 0.5em;
-  color: rgba(255, 255, 255, 0.7);
-  border-bottom: 1px rgb(61, 61, 61) solid;
-}
-
-.field label {
-  font-weight: bold;
-  padding: 0.4em;
-  padding-left: 0;
-}
-
-.number {
-  width: calc(100% - 4px - 1px);
-  border: solid gray 1px;
-  padding: 2px;
-  border-radius: 2px;
-}
-
-.input-holder {
-  display: flex;
-}
-
-.block {
-  display: flex;
-}
-</style>

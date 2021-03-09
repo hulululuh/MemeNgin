@@ -1,4 +1,7 @@
 <template>
+  <!-- <v-container>
+    
+  </v-container> -->
   <div style="height:100%">
     <div style="height:2em;">
       <a
@@ -8,18 +11,11 @@
       >
         <i class="bx bx-save bx-sm"></i>
       </a>
-      <a
-        :class="{ btn: true, toggled: isTiling }"
-        href="#"
-        @click="toggleNineTexures()"
-      >
-        <i class="bx bx-grid bx-sm"></i>
-      </a>
       <a class="btn" href="#" @click="centerTexture()">
         <i class="bx bx-exit-fullscreen bx-sm"></i>
       </a>
     </div>
-    <canvas id="_2dpreview" ref="canvas" style="display:block;"></canvas>
+    <canvas id="_2dpreview" ref="canvas" style="display:flex;"></canvas>
   </div>
 </template>
 
@@ -133,12 +129,6 @@ export default {
           });
         }
       );
-    },
-    toggleNineTexures() {
-      // todo: display nine textures instead of one to show tiling
-      if (this.dragZoom.drawMode == DrawMode.Single)
-        this.dragZoom.drawMode = DrawMode.Nine;
-      else this.dragZoom.drawMode = DrawMode.Single;
     },
     centerTexture() {
       // todo: center texture in canvas

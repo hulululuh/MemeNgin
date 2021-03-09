@@ -30,11 +30,6 @@ import { BoundingBox } from "@/lib/math/boundingbox";
 import { Rect } from "@/lib/math/rect";
 import { Editor } from "@/lib/editor";
 
-import {
-  colorGridBackground,
-  colorGridPrimary,
-  colorGridSecondary,
-} from "../main";
 import { ApplicationSettings } from "@/settings";
 const settings = ApplicationSettings.getInstance();
 
@@ -146,6 +141,8 @@ export class NodeScene {
   _pasteEvent: (evt: ClipboardEvent) => void;
   _widgetUpdate: (evt: WidgetEvent) => void;
   _widgetDragged: (evt: WidgetEvent) => void;
+  _widgetDragStarted: (evt: WidgetEvent) => void;
+  _widgetDragEnded: (evt: WidgetEvent) => void;
   copyElement: HTMLInputElement;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -325,9 +322,28 @@ export class NodeScene {
       if (node && node.onWidgetDragged) {
         node.onWidgetDragged(evt);
       }
-      //self.selectedItems[0]?.onWidgetDragged(evt);
     };
     document.addEventListener("widgetDragged", this._widgetDragged);
+
+    self._widgetDragStarted = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedDesignerNode;
+
+      // TODO: Complete this condition
+      if (node && node.onWidgetDragStarted) {
+        node.onWidgetDragStarted(evt);
+      }
+    };
+    document.addEventListener("widgetDragStarted", this._widgetDragStarted);
+
+    self._widgetDragEnded = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedDesignerNode;
+
+      // TODO: Complete this condition
+      if (node && node.onWidgetDragEnded) {
+        node.onWidgetDragEnded(evt);
+      }
+    };
+    document.addEventListener("widgetDragEnded", this._widgetDragEnded);
 
     this.copyElement = document.createElement("input");
     self.copyElement.value = " ";
@@ -353,6 +369,8 @@ export class NodeScene {
     document.removeEventListener("paste", this._pasteEvent);
     document.removeEventListener("widgetUpdate", this._widgetUpdate);
     document.removeEventListener("widgetDragged", this._widgetDragged);
+    document.removeEventListener("widgetDragStarted", this._widgetDragStarted);
+    document.removeEventListener("widgetDragEnded", this._widgetDragEnded);
     // this.copyElement.removeEventListener("copy", this._copyEvent);
     // this.copyElement.removeEventListener("paste", this._copyEvent);
   }
@@ -694,10 +712,10 @@ export class NodeScene {
 
     // todo: draw grid
 
-    this.view.clear(this.context, colorGridBackground);
+    this.view.clear(this.context, settings.colorGridBackground);
     this.view.setViewMatrix(this.context);
-    this.view.drawGrid(this.context, 33.33333, colorGridSecondary, 1);
-    this.view.drawGrid(this.context, 100, colorGridPrimary, 3);
+    this.view.drawGrid(this.context, 33.33333, settings.colorGridSecondary, 1);
+    this.view.drawGrid(this.context, 100, settings.colorGridPrimary, 3);
   }
 
   draw() {

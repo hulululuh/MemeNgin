@@ -310,7 +310,9 @@ export class SocketGraphicsItem extends GraphicsItem {
     this.hitConnection = null;
 
     // undo-redo
-    let action = new SwitchConnectionAction(this.scene, movedCons, actions);
-    UndoStack.current.push(action);
+    if (actions.length > 0) {
+      let action = new SwitchConnectionAction(this.scene, movedCons, actions);
+      UndoStack.current.push(action);
+    }
   }
 }

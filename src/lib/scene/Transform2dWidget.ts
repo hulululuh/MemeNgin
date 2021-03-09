@@ -385,6 +385,16 @@ export class Transform2dWidget extends GraphicsItem {
         this.view.canvas.style.cursor = "grabbing";
       }
     }
+
+    // catch the first frame of valid transform
+    if (this.dragMode != DragMode.None) {
+      console.warn("valid drag started");
+      // send a event to focus event to property
+      if (document) {
+        const event = new WidgetEvent("widgetDragStarted", {});
+        document.dispatchEvent(event);
+      }
+    }
   }
 
   mouseOver(evt: MouseOverEvent) {
@@ -580,6 +590,16 @@ export class Transform2dWidget extends GraphicsItem {
     //   }
     // }
 
+    if (this.dragged) {
+      console.warn("valid drag ended");
+      // send a event to blur event to property
+      if (document) {
+        const event = new WidgetEvent("widgetDragEnded", {});
+        document.dispatchEvent(event);
+      }
+    }
+
+    this.dragged = false;
     this.hit = false;
     this.scaleMode = ScaleMode.None;
     this.dragMode = DragMode.None;

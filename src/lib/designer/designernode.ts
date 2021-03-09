@@ -83,6 +83,8 @@ export class DesignerNode implements IPropertyHolder {
   onResized?: () => void;
   onConnected?: (leftNode: DesignerNode, rightIndex: string) => void;
   onWidgetDragged?: (evt: WidgetEvent) => void;
+  onWidgetDragStarted?: (evt: WidgetEvent) => void;
+  onWidgetDragEnded?: (evt: WidgetEvent) => void;
 
   // default behaviour: turn off transform widget
   onItemSelected(): void {

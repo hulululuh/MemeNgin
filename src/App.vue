@@ -1,42 +1,96 @@
 <template>
-<v-app>
-  <v-navigation-drawer app>
-    <!-- -->
-  </v-navigation-drawer>
+  <v-app id="inspire">
+    <v-system-bar
+      app
+      height="26"
+    />
+    
+    <v-app-bar
+      app
+      clipped-left
+      clipped-right
+      dense
+    >
+      <v-toolbar-title>
+        Application
+      </v-toolbar-title>
+    </v-app-bar>
 
-  <v-app-bar app>
-    <!-- -->
-  </v-app-bar>
-
-  <!-- Sizes your content based upon application components -->
-  <v-main>
-
-    <!-- Provides the application the proper gutter -->
-    <v-container fluid>
-      
+    <v-navigation-drawer
+      app
+      clipped
+      width="300"
+      >
       <library-view
         :editor="this.editor"
         :library="this.library"
         v-if="this.library != null"
       />
+    </v-navigation-drawer>
 
-      <library-menu
-        :editor="this.editor"
-        :library="this.library"
-        v-if="this.library != null"
-        ref="libraryMenu"
-      />
-      
-      <!-- <router-view></router-view> -->
-    </v-container>
-  </v-main>
+    <v-navigation-drawer
+      app
+      clipped
+      right
+      width="360"
+      class="fill-width"
+    >
+      <v-row no-gutters>
+        <node-properties-view fluid
+          class="d-flex"
+          ref="properties"
+          v-if="this.propHolder != null"
+          :editor="this.editor"
+          :node="this.propHolder"
+        />
+      </v-row>
+      <v-spacer />
+      <v-row app
+        class="align-end justify-center"
+        height="360">
+        <preview2d ref="preview2d" />
+      </v-row>
+    </v-navigation-drawer>
 
-  <v-footer app>
-    <!-- -->
-  </v-footer>
-</v-app>
+    <v-main fluid
+      app
+      bottom
+      clipped
+      style="padding-top:52; display:flex;"
+      >
+      <v-container fluid 
+        app
+        bottom
+        clipped
+        id="editor-view"
+        class="pa-0 ma-0"
+        v-resize="onResize">
+        <canvas
+          app
+          bottom
+          clipped
+          id="editor"
+          class="pa-0 ma-0"
+          ondragover="event.preventDefault()"
+        />
+        <library-menu
+          :editor="this.editor"
+          :library="this.library"
+          v-if="this.library != null"
+          ref="libraryMenu"
+        />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
+<style lang="scss">
+@import "../public/scss/main.scss";
+</style>
+
+<style scoped lang="scss">
+@import "../public/scss/app.scss";
+</style>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
@@ -179,6 +233,14 @@ export default class App extends Vue {
     });
   }
 
+  onResize() {
+    const canvas = document.getElementById("editor") as HTMLCanvasElement;
+    const view = document.getElementById("editor-view");
+    canvas.width = view.clientWidth;
+    canvas.height = view.clientHeight;
+    if (this.editor.nodeScene) this.editor.nodeScene.view.onResized();
+  }
+
   mounted() {
     this.setupMenu();
 
@@ -187,13 +249,13 @@ export default class App extends Vue {
       this.mouseY = evt.pageY;
     });
 
-    const canv = document.getElementById("editor") as HTMLCanvasElement;
-    canv.ondrop = (evt) => {
+    const canvas = document.getElementById("editor") as HTMLCanvasElement;
+    canvas.ondrop = (evt) => {
       evt.preventDefault();
 
       let itemJson = evt.dataTransfer.getData("text/plain");
       let item = JSON.parse(itemJson);
-      let rect = canv.getBoundingClientRect();
+      let rect = canvas.getBoundingClientRect();
       let pos = this.editor.nodeScene.view.canvasToSceneXY(
         evt.clientX - rect.left,
         evt.clientY - rect.top
@@ -271,7 +333,7 @@ export default class App extends Vue {
         UndoStack.current.push(action);
       }
     };
-    this.editor.setSceneCanvas(canv);
+    this.editor.setSceneCanvas(canvas);
 
     //this.designer = this.editor.designer;
     this.editor.onnodeselected = (node) => {
@@ -318,6 +380,8 @@ export default class App extends Vue {
     window.addEventListener("resize", () => {
       console.log(this.$refs.GL);
     });
+
+    this.onResize();
   }
 
   undoAction() {

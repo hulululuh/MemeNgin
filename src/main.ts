@@ -16,32 +16,25 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 
+import Vuetify from "vuetify/lib";
+import vuetify from "./plugins/vuetify";
+
 Vue.config.productionTip = false;
-//Vue.use(vgl);
+Vue.use(Vuetify);
 
 import { Titlebar } from "custom-electron-titlebar";
-import { readProperty, readPropertyAsColor } from "./utils/scsshelper";
-import "../public/scss/scrollbar.scss";
-
 import { ApplicationSettings } from "@/settings";
-import vuetify from './plugins/vuetify';
+
 const settings = ApplicationSettings.getInstance();
 settings.load();
 
-const colorTitle = readPropertyAsColor("colorTitle");
-export const colorGridBackground = readProperty("colorGridBackground");
-export const colorGridPrimary = readProperty("colorGridPrimary");
-export const colorGridSecondary = readProperty("colorGridSecondary");
-
-let titleBar = new Titlebar({
-  backgroundColor: colorTitle,
-  icon: "./favicon.svg",
-  shadow: true,
+new Titlebar({
+  backgroundColor: settings.colorTitle,
 });
 
 new Vue({
   router,
   store,
   vuetify,
-  render: (h) => h(App)
+  render: (h) => h(App),
 }).$mount("#app");

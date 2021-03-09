@@ -29,6 +29,7 @@ function createWindow() {
     width: 1280,
     height: 720,
     frame: false,
+    titleBarStyle: "hidden",
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
@@ -80,7 +81,7 @@ app.on("ready", async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
-      //await session.defaultSession.loadExtension(vueDevToolsPath);
+      await session.defaultSession.loadExtension(vueDevToolsPath);
       //await installVueDevtools();
     } catch (e) {
       console.error("Vue Devtools failed to install:", e.toString());

@@ -3,11 +3,13 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { Editor } from "@/lib/editor";
 import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
-import { Property } from "@/lib/designer/properties";
+import { Property, Transform2DProperty } from "@/lib/designer/properties";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
 import { ITransformable } from "@/lib/designer/transformable";
 import { Color } from "@/lib/designer/color";
+import { UndoStack } from "@/lib/undostack";
+import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
 
 export class Transform2DNode extends ImageDesignerNode
   implements ITransformable {
@@ -20,6 +22,8 @@ export class Transform2DNode extends ImageDesignerNode
 
   desiredWidth: number;
   desiredHeight: number;
+
+  private _xfStarted: Transform2D;
 
   constructor() {
     super();
@@ -112,6 +116,33 @@ export class Transform2DNode extends ImageDesignerNode
 
       this.createTexture();
       this.requestUpdate();
+    };
+
+    this.onWidgetDragStarted = (evt: WidgetEvent) => {
+      const prop = this.properties.find((item) => item.name === "transform2d");
+      this._xfStarted = (prop as Transform2DProperty).getValue().clone();
+    };
+
+    this.onWidgetDragEnded = (evt: WidgetEvent) => {
+      const prop = this.properties.find((item) => item.name === "transform2d");
+
+      // todo: make it happen!
+      let action = new PropertyChangeAction(
+        null,
+        prop.name,
+        this,
+        { value: this._xfStarted, exposed: false },
+        {
+          value: (prop as Transform2DProperty).getValue().clone(),
+          exposed: false,
+        }
+      );
+      UndoStack.current.push(action);
+
+      this.properties
+        .filter((p) => p.name === "transform2d")[0]
+        .setValue(this.getTransform());
+      this.requestUpdateWidget();
     };
 
     this.onItemSelected = () => {

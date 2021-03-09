@@ -145,7 +145,7 @@ export class TextureNode extends ImageDesignerNode {
 
     // this happens when we drop image file into canvas
     if (this.texPath !== "") {
-      fileProp.setValue(this.texPath);
+      this.setProperty(fileProp.name, { value: this.texPath, exposed: false });
     }
 
     let source = `

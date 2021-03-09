@@ -1,12 +1,5 @@
 <template>
   <div class="input-group color-picker" ref="colorpicker">
-    <!-- <input
-			type="text"
-			class="form-control"
-			v-model="colorValue"
-			@focus="showPicker()"
-			ref="input"
-    />-->
     <span class="input-group-addon color-picker-container">
       <span
         ref="span"

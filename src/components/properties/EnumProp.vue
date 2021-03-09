@@ -1,18 +1,31 @@
 <template>
-  <div class="field">
-    <label>{{ prop.displayName }}</label>
-    <div>
-      <select class="enum" @change="updateValue">
-        <option
-          v-for="(opt, index) in prop.values"
-          :value="index"
-          :key="index"
-          :selected="index == prop.index"
-        >{{ opt }}</option>
-      </select>
-    </div>
-  </div>
+  <v-container class="field ma-0 pa-0">
+    <v-subheader class="ma-0 pa-0">
+      {{prop.displayName}}
+    </v-subheader>
+    <v-input class="ma-0 pa-0" hide-details>
+      <template v-slot:prepend>
+        <v-checkbox
+          disabled
+          v-model="prop.exposed"
+          v-on:change="updateExposed"
+          class="ma-0 pa-0"
+          hide-details>
+        </v-checkbox>
+      </template>
+      <v-select 
+          v-model="prop.value"
+          :items="prop.values"
+          v-on:change="updateValue"
+          dense>
+      </v-select>
+    </v-input>
+  </v-container>
 </template>
+
+<style scoped lang="scss">
+@import "../../../public/scss/property.scss";
+</style>
 
 <script lang="ts">
 import { Vue, Prop, Component, Emit } from "vue-property-decorator";
@@ -38,9 +51,20 @@ export default class EnumPropertyView extends Vue {
     return this.prop.name;
   }
 
-  updateValue(evt) {
-    let oldVal = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
-    this.propHolder.setProperty(this.prop.name, {value: parseInt(evt.target.value), exposed: this.prop.getExposed()});
+  @Emit()
+  propertyExposeChanged() {
+    this.$emit("propertyExposeChanged", this.prop);
+    return this.prop.name;
+  }
+
+  updateExposed(value) { 
+    this.propHolder.setProperty(this.prop.name, {value: this.prop.getValue(), exposed: value});
+    this.propertyExposeChanged();
+  }
+
+  updateValue(value) {
+    let oldVal = {value: value, exposed: this.prop.getExposed()};
+    this.propHolder.setProperty(this.prop.name, {value: value, exposed: this.prop.getExposed()});
     this.propertyChanged();
 
     let action = new PropertyChangeAction(
@@ -54,33 +78,3 @@ export default class EnumPropertyView extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.field {
-  font-size: 12px;
-  padding: 0.9em 0.5em;
-  color: rgba(255, 255, 255, 0.7);
-  border-bottom: 1px rgb(61, 61, 61) solid;
-}
-
-.field label {
-  font-weight: bold;
-  padding: 0.4em;
-  padding-left: 0;
-}
-
-.enum {
-  outline: 0;
-  box-shadow: none;
-  border: 0 !important;
-
-  margin-top: 0.4em;
-  width: 100%;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  background: #222;
-  padding: 0.5em;
-  font-family: "Open Sans";
-}
-</style>

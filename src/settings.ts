@@ -1,4 +1,5 @@
 //import settings from "electron-settings";
+import { Color } from "custom-electron-titlebar";
 import {
   readProperty,
   readPropertyAsColor,
@@ -13,6 +14,9 @@ export class ApplicationSettings {
   colorAccent2: string = "#2196f3";
   colorAccent3: string = "#4caf50";
   colorFont: string = "#f8f4f4";
+  colorGridBackground: string;
+  colorGridPrimary: string;
+  colorGridSecondary: string;
 
   lineWidthNormal: number = 2;
   lineWidthThick: number = 3;
@@ -26,6 +30,7 @@ export class ApplicationSettings {
   colorWidgetShadow: string = "#1e1e1e";
   colorSelectedItem: string = "#bbe1fa";
   colorSelectedItemBackground: string = "#3282b84c";
+  colorTitle: Color = Color.fromHex("#3c3c3c");
 
   widgetThickness: number = 3.0;
   widgetShadowThickness: number = 2.0;
@@ -39,8 +44,12 @@ export class ApplicationSettings {
     this.colorSelectedItemBackground = readProperty(
       "colorSelectedItemBackground"
     );
+    this.colorGridBackground = readProperty("colorGridBackground");
+    this.colorGridPrimary = readProperty("colorGridPrimary");
+    this.colorGridSecondary = readProperty("colorGridSecondary");
     this.widgetThickness = readPropertyAsNumber("widgetThickness");
     this.widgetShadowThickness = readPropertyAsNumber("widgetShadowThickness");
+    this.colorTitle = readPropertyAsColor("colorTitle");
   }
 
   static _instance: ApplicationSettings;

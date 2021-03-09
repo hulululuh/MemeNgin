@@ -9,6 +9,10 @@
   </div>
 </template>
 
+<style scoped lang="scss">
+@import "../../../public/scss/property.scss";
+</style>
+
 <script lang="ts">
 import { Vue, Prop, Component, Emit, Watch } from "vue-property-decorator";
 import { Designer } from "@/lib/designer";
