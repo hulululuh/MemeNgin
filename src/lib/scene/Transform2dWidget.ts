@@ -388,7 +388,6 @@ export class Transform2dWidget extends GraphicsItem {
 
     // catch the first frame of valid transform
     if (this.dragMode != DragMode.None) {
-      console.warn("valid drag started");
       // send a event to focus event to property
       if (document) {
         const event = new WidgetEvent("widgetDragStarted", {});
@@ -591,7 +590,6 @@ export class Transform2dWidget extends GraphicsItem {
     // }
 
     if (this.dragged) {
-      console.warn("valid drag ended");
       // send a event to blur event to property
       if (document) {
         const event = new WidgetEvent("widgetDragEnded", {});
