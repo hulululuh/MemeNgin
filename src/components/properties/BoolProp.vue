@@ -7,7 +7,7 @@
       <template v-slot:prepend>
         <v-checkbox
           v-model="prop.exposed"
-          v-on:change="updateExposed"
+          @change="updateExposed"
           class="ma-0 pa-0"
           hide-details>
         </v-checkbox>

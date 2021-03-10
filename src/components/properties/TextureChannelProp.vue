@@ -6,7 +6,7 @@
     <v-select 
         v-model="channelIndex"
         :items="channelNames"
-        v-on:change="updateValue"
+        @change="updateValue"
         dense
         disabled>
     </v-select>

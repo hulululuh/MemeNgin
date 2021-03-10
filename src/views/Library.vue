@@ -17,8 +17,8 @@
             <div style="overflow:hidden;">
               <span
                 v-for="listItem in getFilteredListByName(item.name)"
-                v-on:click="addItem(listItem.type, listItem.name)"
-                v-on:dragstart="dragStart($event, listItem)"
+                @click="addItem(listItem.type, listItem.name)"
+                @dragstart="dragStart($event, listItem)"
                 :key="listItem.name"
                 class="libcard"
                 href="#"

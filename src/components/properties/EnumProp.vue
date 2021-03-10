@@ -8,7 +8,7 @@
         <v-checkbox
           disabled
           v-model="prop.exposed"
-          v-on:change="updateExposed"
+          @change="updateExposed"
           class="ma-0 pa-0"
           hide-details>
         </v-checkbox>
@@ -16,7 +16,7 @@
       <v-select 
           v-model="prop.value"
           :items="prop.values"
-          v-on:change="updateValue"
+          @change="updateValue"
           dense>
       </v-select>
     </v-input>

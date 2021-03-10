@@ -10,9 +10,9 @@
         :max="prop.maxValue"
         :min="prop.minValue"
         :value="prop.value"
-        v-on:mouseup="blur"
-        v-on:mousedown="focus"
-        v-on:input="updateValue"
+        @mouseup="blur"
+        @mousedown="focus"
+        @input="updateValue"
         hide-details
       >
         <template v-slot:prepend>
@@ -32,11 +32,11 @@
             :max="prop.maxValue"
             :min="prop.minValue"
             :value="prop.value.toString()"
-            v-on:click="blurText"
-            v-on:change="blurText"
-            v-on:blur="blurText"
-            v-on:focus="focus"
-            v-on:input="updateText"
+            @click="blurText"
+            @change="blurText"
+            @blur="blurText"
+            @focus="focus"
+            @input="updateText"
             hide-details
             single-line
           />

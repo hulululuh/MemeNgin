@@ -4,7 +4,7 @@
       {{ prop.displayName }}
     </v-subheader>
     <v-file-input
-      v-on:change="updateValue"
+      @change="updateValue"
       />
   </v-container>
 </template>
