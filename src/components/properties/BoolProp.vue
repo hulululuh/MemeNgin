@@ -77,21 +77,21 @@ export default class BoolPropertyView extends Vue {
   }
 
   toggleValue() {
-    let evt = { propName: this.prop.name, oldValue: null, newValue: null };
-    let oldValue = this.prop.value;
-    evt.newValue = !this.prop.value;
+    const oldValue = this.prop.value;
+    const newValue = !this.prop.value;
 
-    //this.value = !this.value;
-    this.propHolder.setProperty(this.prop.name, {value: !this.prop.value, exposed: this.prop.getExposed()});
+    this.propHolder.setProperty(this.prop.name, {value: newValue, exposed: this.prop.getExposed()});
     this.propertyChanged();
-    //this.propertyChangeCompleted(evt);
+    
+    // let evt = { propName: this.prop.name, oldValue: oldValue, newValue: null };
+    // this.propertyChangeCompleted(evt);
 
     let action = new PropertyChangeAction(
       null,
       this.prop.name,
       this.propHolder,
-      oldValue,
-      this.prop.value
+      {value: oldValue, exposed: this.prop.getExposed()},
+      {value: newValue, exposed: this.prop.getExposed()}
     );
     UndoStack.current.push(action);
   }

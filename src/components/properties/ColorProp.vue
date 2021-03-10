@@ -18,7 +18,7 @@
     </v-input>
     <v-color-picker
       block
-      v-click-outside="closeIfOpen"
+      v-click-outside="blur"
       v-if="isOpen"
       :value="prop.value.toHex()"
       @input="onInput"
@@ -62,9 +62,11 @@ export default class ColorPropertyView extends Vue {
 
   ColorPropertyView() {}
 
-  closeIfOpen() {
-    if (this.open)
+  blur() {
+    if (this.open) {
       this.open = false;
+    }
+    this.UpdateValue();
   }
   
   get isOpen() {
@@ -77,7 +79,7 @@ export default class ColorPropertyView extends Vue {
 
   mounted() {
     this.open = false;
-    this.oldValue = this.prop.value.toHex();
+    this.oldValue = {value: this.prop.value.toHex(), exposed: this.prop.getExposed()};
   }
 
   @Emit()
@@ -103,19 +105,21 @@ export default class ColorPropertyView extends Vue {
     this.propertyChanged();
   }
 
-  onValue(value) {
-    this.propHolder.setProperty(this.prop.name, {value: value, exposed: this.prop.getExposed()});
+  UpdateValue() {
+    const newValue = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
 
-    let action = new PropertyChangeAction(
-      null,
-      this.prop.name,
-      this.propHolder,
-      this.oldValue,
-      {value: this.prop.getValue(), exposed: this.prop.getExposed()}
-    );
-    UndoStack.current.push(action);
-
-    this.oldValue = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
+    if(newValue.value != this.oldValue.value || newValue.exposed != this.oldValue.exposed) {
+      this.propHolder.setProperty(this.prop.name, newValue);
+      let action = new PropertyChangeAction(
+        null,
+        this.prop.name,
+        this.propHolder,
+        this.oldValue,
+        newValue
+      );
+      UndoStack.current.push(action);
+      this.oldValue = {value: this.prop.getValue(), exposed: this.prop.getExposed()};
+    }
   }
 
   // onInput(evt) {
