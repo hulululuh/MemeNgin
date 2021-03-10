@@ -215,7 +215,12 @@ export default class App extends Vue {
     const view = document.getElementById("editor-view");
     canvas.width = view.clientWidth;
     canvas.height = view.clientHeight;
-    if (this.editor.nodeScene) this.editor.nodeScene.view.onResized();
+
+    let scene = this.editor.nodeScene;
+    if (scene) {
+      scene.view.onResized();
+      scene.view.reset();
+    }
   }
 
   mounted() {
@@ -358,7 +363,7 @@ export default class App extends Vue {
       console.log(this.$refs.GL);
     });
 
-    this.onResize();
+    this.$nextTick(()=>this.onResize());
   }
 
   undoAction() {
