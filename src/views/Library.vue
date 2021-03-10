@@ -175,7 +175,9 @@ export default class LibraryView extends Vue {
       let dnode = this.library.create(nodeName);
       let canvas = this.editor.canvas;
       let n = this.editor.addNode(dnode, canvas.width / 2, canvas.height / 2);
-      n.setCenter(200, 200);
+      
+      const viewCenter = this.editor.nodeScene.view.sceneCenter;
+      n.setCenter(viewCenter[0], viewCenter[1]);
 
       action = new AddItemsAction(
         this.editor.nodeScene,
