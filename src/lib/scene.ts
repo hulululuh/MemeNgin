@@ -376,6 +376,14 @@ export class NodeScene {
   }
 
   setSelectedItems(items: GraphicsItem[], createSelection: boolean = false) {
+    let item = null;
+    if (items.length == 1) {
+      item = items[0];
+      const designer = Editor.getDesigner();
+      const selctedNode = designer.nodes.find((node) => node.id === item.id);
+      Editor.getInstance().onnodeselected(selctedNode);
+    }
+
     this.selectedItems = items;
 
     // create actual selection object to encapsulate items
@@ -847,8 +855,7 @@ export class NodeScene {
             this.moveNodeToTop(hitNode);
 
             if (this.onnodeselected) {
-              if (hitNode) this.onnodeselected(hitNode);
-              else this.onnodeselected(hitNode);
+              this.onnodeselected(hitNode);
             }
           }
 
@@ -904,6 +911,8 @@ export class NodeScene {
 
         this.selection = hitItem;
         this.hitItem = hitItem;
+
+        Editor.getInstance().onnodeselected(null);
         //console.log(hitItem);
       }
 
