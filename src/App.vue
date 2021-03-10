@@ -199,29 +199,6 @@ export default class App extends Vue {
       await this.exportUnityZip();
     });
 
-    // samples
-    electron.ipcRenderer.on(
-      MenuCommands.ExamplesGoldLinesMarbleTiles,
-      async (evt, arg) => {
-        this.openExample("GoldLinedMarbleTiles.texture");
-      }
-    );
-
-    electron.ipcRenderer.on(MenuCommands.ExamplesGrenade, async (evt, arg) => {
-      this.openExample("Grenade.texture");
-    });
-
-    electron.ipcRenderer.on(MenuCommands.ExamplesScrews, async (evt, arg) => {
-      this.openExample("Screws.texture");
-    });
-
-    electron.ipcRenderer.on(
-      MenuCommands.ExamplesWoodenPlanks,
-      async (evt, arg) => {
-        this.openExample("WoodenPlanks.texture");
-      }
-    );
-
     electron.ipcRenderer.on(MenuCommands.HelpTutorials, (evt, arg) => {
       this.showTutorials();
     });
