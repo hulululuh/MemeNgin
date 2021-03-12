@@ -11,6 +11,8 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { MenuCommands, setupMenu } from "./menu";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
+const undoShortcut = "CmdOrCtrl+Z";
+const redoShortcut = "CmdOrCtrl+Shift+Z";
 
 let vueDevToolsPath = null;
 if (process.platform === "win32") {
@@ -62,6 +64,31 @@ function createWindow() {
   });
 }
 
+app.on("browser-window-focus", () => {
+  // TODO: better way to do this?
+  // https://github.com/electron/electron/issues/3682
+  if (!globalShortcut.isRegistered(undoShortcut)) {
+    globalShortcut.register(undoShortcut, () =>
+      win.webContents.send(MenuCommands.EditUndo)
+    );
+  }
+
+  if (!globalShortcut.isRegistered(redoShortcut)) {
+    globalShortcut.register(redoShortcut, () =>
+      win.webContents.send(MenuCommands.EditRedo)
+    );
+  }
+});
+
+app.on("browser-window-blur", () => {
+  if (globalShortcut.isRegistered(undoShortcut)) {
+    globalShortcut.unregister(undoShortcut);
+  }
+  if (globalShortcut.isRegistered(redoShortcut)) {
+    globalShortcut.unregister(redoShortcut);
+  }
+});
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
@@ -84,14 +111,6 @@ app.on("activate", () => {
 // Some APIs can only be used after this event occurs.
 app.removeAllListeners("ready");
 app.on("ready", async () => {
-  // TODO: better way to do this?
-  // https://github.com/electron/electron/issues/3682
-  globalShortcut.register("CmdOrCtrl+Z", () =>
-    win.webContents.send(MenuCommands.EditUndo)
-  );
-  globalShortcut.register("CmdOrCtrl+Shift+Z", () =>
-    win.webContents.send(MenuCommands.EditRedo)
-  );
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
