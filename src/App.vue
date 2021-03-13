@@ -1,26 +1,14 @@
 <template>
   <v-app id="inspire">
-    <v-system-bar
-      app
-      height="26"
-    />
-    
-    <v-app-bar
-      app
-      clipped-left
-      clipped-right
-      dense
-    >
+    <v-system-bar app height="26" />
+
+    <v-app-bar app clipped-left clipped-right dense>
       <v-toolbar-title>
         Application
       </v-toolbar-title>
     </v-app-bar>
 
-    <v-navigation-drawer
-      app
-      clipped
-      width="300"
-      >
+    <v-navigation-drawer app clipped width="300">
       <library-view
         :editor="this.editor"
         :library="this.library"
@@ -28,15 +16,10 @@
       />
     </v-navigation-drawer>
 
-    <v-navigation-drawer
-      app
-      clipped
-      right
-      width="360"
-      class="fill-width"
-    >
+    <v-navigation-drawer app clipped right width="360" class="fill-width">
       <v-row no-gutters>
-        <node-properties-view fluid
+        <node-properties-view
+          fluid
           class="d-flex"
           ref="properties"
           v-if="this.propHolder != null"
@@ -45,26 +28,21 @@
         />
       </v-row>
       <v-spacer />
-      <v-row app
-        class="align-end justify-center"
-        height="360">
+      <v-row app class="align-end justify-center" height="360">
         <preview2d ref="preview2d" />
       </v-row>
     </v-navigation-drawer>
 
-    <v-main fluid
-      app
-      bottom
-      clipped
-      style="padding-top:52; display:flex;"
-      >
-      <v-container fluid 
+    <v-main fluid app bottom clipped style="padding-top:52; display:flex;">
+      <v-container
+        fluid
         app
         bottom
         clipped
         id="editor-view"
         class="pa-0 ma-0"
-        v-resize="onResize">
+        v-resize="onResize"
+      >
         <canvas
           app
           bottom
@@ -85,385 +63,429 @@
 </template>
 
 <style lang="scss">
-@import "../public/scss/main.scss";
+  @import "../public/scss/main.scss";
 </style>
 
 <style scoped lang="scss">
-@import "../public/scss/app.scss";
+  @import "../public/scss/app.scss";
 </style>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import EditorView from "@/views/Editor.vue";
-import LibraryView from "@/views/Library.vue";
-import LibraryMenu from "@/components/LibraryMenu.vue";
-import { Editor } from "@/lib/editor";
-import NodePropertiesView from "./views/NodeProperties.vue";
-import Preview2D from "./views/Preview2D.vue";
-import { DesignerLibrary } from "./lib/designer/library";
-import { Project, ProjectManager } from "./lib/project";
-import { MenuCommands } from "./menu";
-import { unityExport } from "@/lib/export/unityexporter.js";
-import { unityZipExport } from "@/lib/export/unityzipexporter.js";
-import { zipExport } from "@/lib/export/zipexporter.js";
-import fs from "fs";
-import path from "path";
-import { IPropertyHolder } from "./lib/designer/properties";
-import { AddItemsAction } from "./lib/actions/additemsaction";
-import { UndoStack } from "./lib/undostack";
-import { ApplicationSettings } from "./settings";
+  /* eslint-disable */
+  import { Component, Vue } from "vue-property-decorator";
+  import EditorView from "@/views/Editor.vue";
+  import LibraryView from "@/views/Library.vue";
+  import LibraryMenu from "@/components/LibraryMenu.vue";
+  import { Editor } from "@/lib/editor";
+  import NodePropertiesView from "./views/NodeProperties.vue";
+  import Preview2D from "./views/Preview2D.vue";
+  import { DesignerLibrary } from "./lib/designer/library";
+  import { Project, ProjectManager } from "./lib/project";
+  import { MenuCommands } from "./menu";
+  import { unityExport } from "@/lib/export/unityexporter.js";
+  import { unityZipExport } from "@/lib/export/unityzipexporter.js";
+  import { zipExport } from "@/lib/export/zipexporter.js";
+  import fs from "fs";
+  import path from "path";
+  import { IPropertyHolder } from "./lib/designer/properties";
+  import { AddItemsAction } from "./lib/actions/additemsaction";
+  import { UndoStack } from "./lib/undostack";
+  import { ApplicationSettings } from "./settings";
+  import TWEEN from "@tweenjs/tween.js";
 
-const electron = require("electron");
-const remote = electron.remote;
-const { dialog, app, BrowserWindow, Menu } = remote;
+  const electron = require("electron");
+  const remote = electron.remote;
+  const { dialog, app, BrowserWindow, Menu } = remote;
 
-declare let __static: any;
+  declare let __static: any;
 
-@Component({
-  components: {
-    EditorView,
-    LibraryView,
-    NodePropertiesView,
-    LibraryMenu,
-    preview2d: Preview2D,
-  },
-})
-export default class App extends Vue {
-  settings!: ApplicationSettings;
-  editor!: Editor;
-  library!: DesignerLibrary;
+  @Component({
+    components: {
+      EditorView,
+      LibraryView,
+      NodePropertiesView,
+      LibraryMenu,
+      preview2d: Preview2D,
+    },
+  })
+  export default class App extends Vue {
+    settings!: ApplicationSettings;
+    editor!: Editor;
+    library!: DesignerLibrary;
 
-  propHolder: IPropertyHolder = null;
+    propHolder: IPropertyHolder = null;
 
-  //designer!: Designer;
+    //designer!: Designer;
 
-  project: Project;
+    project: Project;
 
-  isMenuSetup: boolean = false;
+    isMenuSetup: boolean = false;
 
-  resolution: number = 1024;
-  randomSeed: number = 32;
+    resolution: number = 1024;
+    randomSeed: number = 32;
 
-  mouseX: number = 0;
-  mouseY: number = 0;
+    mouseX: number = 0;
+    mouseY: number = 0;
 
-  version: string = "0.1.0";
+    version: string = "0.1.0";
 
-  constructor() {
-    super();
+    constructor() {
+      super();
 
-    this.editor = new Editor();
-    this.library = null;
+      this.editor = new Editor();
+      this.library = null;
 
-    this.project = new Project();
-  }
+      this.project = new Project();
+    }
 
-  created() {
-    electron.ipcRenderer.on(MenuCommands.FileNew, (evt, arg) => {
+    created() {
+      electron.ipcRenderer.on(MenuCommands.FileNew, (evt, arg) => {
+        this.newProject();
+      });
+      electron.ipcRenderer.on(MenuCommands.FileOpen, (evt, arg) => {
+        this.openProject();
+      });
+      electron.ipcRenderer.on(MenuCommands.FileSave, (evt, arg) => {
+        this.saveProject();
+      });
+      electron.ipcRenderer.on(MenuCommands.FileSaveAs, (evt, arg) => {
+        this.saveProject(true);
+      });
+
+      electron.ipcRenderer.on(MenuCommands.EditUndo, async (evt, arg) => {
+        this.undoAction();
+      });
+      electron.ipcRenderer.on(MenuCommands.EditRedo, async (evt, arg) => {
+        this.redoAction();
+      });
+
+      electron.ipcRenderer.on(MenuCommands.EditCopy, async (evt, arg) => {
+        document.execCommand("copy");
+      });
+      electron.ipcRenderer.on(MenuCommands.EditCut, async (evt, arg) => {
+        document.execCommand("cut");
+      });
+      electron.ipcRenderer.on(MenuCommands.EditPaste, async (evt, arg) => {
+        document.execCommand("paste");
+      });
+
+      electron.ipcRenderer.on(MenuCommands.ExportZip, async (evt, arg) => {
+        await this.exportZip();
+      });
+      electron.ipcRenderer.on(MenuCommands.ExportUnity, async (evt, arg) => {
+        await this.exportUnity();
+      });
+      electron.ipcRenderer.on(MenuCommands.ExportUnityZip, async (evt, arg) => {
+        await this.exportUnityZip();
+      });
+
+      electron.ipcRenderer.on(MenuCommands.HelpTutorials, (evt, arg) => {
+        this.showTutorials();
+      });
+      electron.ipcRenderer.on(MenuCommands.HelpAbout, (evt, arg) => {
+        this.showAboutDialog();
+      });
+      electron.ipcRenderer.on(MenuCommands.HelpSubmitBug, (evt, arg) => {
+        this.submitBugs();
+      });
+    }
+
+    onResize() {
+      const canvas = document.getElementById("editor") as HTMLCanvasElement;
+      const view = document.getElementById("editor-view");
+      canvas.width = view.clientWidth;
+      canvas.height = view.clientHeight;
+
+      let scene = this.editor.nodeScene;
+      if (scene) {
+        scene.view.onResized();
+        scene.view.reset();
+      }
+    }
+
+    mounted() {
+      this.setupMenu();
+
+      document.addEventListener("mousemove", (evt) => {
+        this.mouseX = evt.pageX;
+        this.mouseY = evt.pageY;
+      });
+
+      const canvas = document.getElementById("editor") as HTMLCanvasElement;
+      canvas.ondrop = (evt) => {
+        evt.preventDefault();
+
+        let itemJson = evt.dataTransfer.getData("text/plain");
+        let item = JSON.parse(itemJson);
+        let rect = canvas.getBoundingClientRect();
+        let pos = this.editor.nodeScene.view.canvasToSceneXY(
+          evt.clientX - rect.left,
+          evt.clientY - rect.top
+        );
+
+        let action: AddItemsAction = null;
+
+        if (item.type == "node") {
+          let nodeName = item.name;
+
+          let dnode = this.library.create(nodeName);
+          // let n = this.editor.addNode(
+          // 	dnode,
+          // 	evt.clientX - rect.left,
+          // 	evt.clientY - rect.top
+          // );
+          let n = this.editor.addNode(dnode);
+          n.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            this.editor.nodeScene,
+            this.editor.designer,
+            [],
+            [],
+            [],
+            [],
+            [n],
+            [dnode]
+          );
+        } else if (item.type == "comment") {
+          let d = this.editor.createComment();
+          d.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            this.editor.nodeScene,
+            this.editor.designer,
+            [],
+            [d],
+            [],
+            [],
+            [],
+            []
+          );
+        } else if (item.type == "frame") {
+          let d = this.editor.createFrame();
+          d.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            this.editor.nodeScene,
+            this.editor.designer,
+            [d],
+            [],
+            [],
+            [],
+            [],
+            []
+          );
+        } else if (item.type == "navigation") {
+          let d = this.editor.createNavigation();
+          d.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            this.editor.nodeScene,
+            this.editor.designer,
+            [],
+            [],
+            [d],
+            [],
+            [],
+            []
+          );
+        }
+
+        if (action != null) {
+          UndoStack.current.push(action);
+        }
+      };
+      this.editor.setSceneCanvas(canvas);
+
+      //this.designer = this.editor.designer;
+      this.editor.onnodeselected = (node) => {
+        //this.selectedNode = node;
+        this.propHolder = node;
+      };
+      this.editor.oncommentselected = (comment) => {
+        this.propHolder = comment;
+        console.log("comment selected");
+      };
+      this.editor.onframeselected = (frame) => {
+        this.propHolder = frame;
+      };
+      // this.editor.onnavigationselected = nav => {
+      //   this.propHolder = nav;
+      // };
+      this.editor.onlibrarymenu = this.showLibraryMenu;
+
+      // const _2dview = <HTMLCanvasElement>document.getElementById("_2dview");
+      // this.editor.set2DPreview(_2dview);
+      (this.$refs.preview2d as any).setEditor(this.editor);
+
+      // const _3dview = <HTMLCanvasElement>document.getElementById("_3dview");
+      // this.view3d = new View3D();
+      // this.view3d.setCanvas(_3dview);
+      //this.editor.set3DScene(scene3D);
+      //(this.$refs.preview3d as any).setEditor(this.editor);
+
+      //this.editor.createNewTexture();
       this.newProject();
-    });
-    electron.ipcRenderer.on(MenuCommands.FileOpen, (evt, arg) => {
-      this.openProject();
-    });
-    electron.ipcRenderer.on(MenuCommands.FileSave, (evt, arg) => {
-      this.saveProject();
-    });
-    electron.ipcRenderer.on(MenuCommands.FileSaveAs, (evt, arg) => {
-      this.saveProject(true);
-    });
 
-    electron.ipcRenderer.on(MenuCommands.EditUndo, async (evt, arg) => {
-      this.undoAction();
-    });
-    electron.ipcRenderer.on(MenuCommands.EditRedo, async (evt, arg) => {
-      this.redoAction();
-    });
-
-    electron.ipcRenderer.on(MenuCommands.EditCopy, async (evt, arg) => {
-      document.execCommand("copy");
-    });
-    electron.ipcRenderer.on(MenuCommands.EditCut, async (evt, arg) => {
-      document.execCommand("cut");
-    });
-    electron.ipcRenderer.on(MenuCommands.EditPaste, async (evt, arg) => {
-      document.execCommand("paste");
-    });
-
-    electron.ipcRenderer.on(MenuCommands.ExportZip, async (evt, arg) => {
-      await this.exportZip();
-    });
-    electron.ipcRenderer.on(MenuCommands.ExportUnity, async (evt, arg) => {
-      await this.exportUnity();
-    });
-    electron.ipcRenderer.on(MenuCommands.ExportUnityZip, async (evt, arg) => {
-      await this.exportUnityZip();
-    });
-
-    electron.ipcRenderer.on(MenuCommands.HelpTutorials, (evt, arg) => {
-      this.showTutorials();
-    });
-    electron.ipcRenderer.on(MenuCommands.HelpAbout, (evt, arg) => {
-      this.showAboutDialog();
-    });
-    electron.ipcRenderer.on(MenuCommands.HelpSubmitBug, (evt, arg) => {
-      this.submitBugs();
-    });
-  }
-
-  onResize() {
-    const canvas = document.getElementById("editor") as HTMLCanvasElement;
-    const view = document.getElementById("editor-view");
-    canvas.width = view.clientWidth;
-    canvas.height = view.clientHeight;
-
-    let scene = this.editor.nodeScene;
-    if (scene) {
-      scene.view.onResized();
-      scene.view.reset();
-    }
-  }
-
-  mounted() {
-    this.setupMenu();
-
-    document.addEventListener("mousemove", (evt) => {
-      this.mouseX = evt.pageX;
-      this.mouseY = evt.pageY;
-    });
-
-    const canvas = document.getElementById("editor") as HTMLCanvasElement;
-    canvas.ondrop = (evt) => {
-      evt.preventDefault();
-
-      let itemJson = evt.dataTransfer.getData("text/plain");
-      let item = JSON.parse(itemJson);
-      let rect = canvas.getBoundingClientRect();
-      let pos = this.editor.nodeScene.view.canvasToSceneXY(
-        evt.clientX - rect.left,
-        evt.clientY - rect.top
-      );
-
-      let action: AddItemsAction = null;
-
-      if (item.type == "node") {
-        let nodeName = item.name;
-
-        let dnode = this.library.create(nodeName);
-        // let n = this.editor.addNode(
-        // 	dnode,
-        // 	evt.clientX - rect.left,
-        // 	evt.clientY - rect.top
-        // );
-        let n = this.editor.addNode(dnode);
-        n.setCenter(pos.x, pos.y);
-
-        action = new AddItemsAction(
-          this.editor.nodeScene,
-          this.editor.designer,
-          [],
-          [],
-          [],
-          [],
-          [n],
-          [dnode]
-        );
-      } else if (item.type == "comment") {
-        let d = this.editor.createComment();
-        d.setCenter(pos.x, pos.y);
-
-        action = new AddItemsAction(
-          this.editor.nodeScene,
-          this.editor.designer,
-          [],
-          [d],
-          [],
-          [],
-          [],
-          []
-        );
-      } else if (item.type == "frame") {
-        let d = this.editor.createFrame();
-        d.setCenter(pos.x, pos.y);
-
-        action = new AddItemsAction(
-          this.editor.nodeScene,
-          this.editor.designer,
-          [d],
-          [],
-          [],
-          [],
-          [],
-          []
-        );
-      } else if (item.type == "navigation") {
-        let d = this.editor.createNavigation();
-        d.setCenter(pos.x, pos.y);
-
-        action = new AddItemsAction(
-          this.editor.nodeScene,
-          this.editor.designer,
-          [],
-          [],
-          [d],
-          [],
-          [],
-          []
-        );
-      }
-
-      if (action != null) {
-        UndoStack.current.push(action);
-      }
-    };
-    this.editor.setSceneCanvas(canvas);
-
-    //this.designer = this.editor.designer;
-    this.editor.onnodeselected = (node) => {
-      //this.selectedNode = node;
-      this.propHolder = node;
-    };
-    this.editor.oncommentselected = (comment) => {
-      this.propHolder = comment;
-      console.log("comment selected");
-    };
-    this.editor.onframeselected = (frame) => {
-      this.propHolder = frame;
-    };
-    // this.editor.onnavigationselected = nav => {
-    //   this.propHolder = nav;
-    // };
-    this.editor.onlibrarymenu = this.showLibraryMenu;
-
-    // const _2dview = <HTMLCanvasElement>document.getElementById("_2dview");
-    // this.editor.set2DPreview(_2dview);
-    (this.$refs.preview2d as any).setEditor(this.editor);
-
-    // const _3dview = <HTMLCanvasElement>document.getElementById("_3dview");
-    // this.view3d = new View3D();
-    // this.view3d.setCanvas(_3dview);
-    //this.editor.set3DScene(scene3D);
-    //(this.$refs.preview3d as any).setEditor(this.editor);
-
-    //this.editor.createNewTexture();
-    this.newProject();
-
-    // start animation
-    const draw = () => {
-      if (this.editor) {
-        // might not be loaded as yet
-        this.editor.update();
-        this.editor.draw();
-      }
+      // start animation
+      const draw = () => {
+        if (this.editor) {
+          // might not be loaded as yet
+          this.editor.update();
+          this.editor.draw();
+        }
+        requestAnimationFrame(draw);
+      };
       requestAnimationFrame(draw);
-    };
-    requestAnimationFrame(draw);
 
-    // properly resize GL
-    window.addEventListener("resize", () => {
-      console.log(this.$refs.GL);
-    });
-
-    this.$nextTick(()=>this.onResize());
-  }
-
-  undoAction() {
-    if (document.activeElement instanceof HTMLElement)
-      (document.activeElement as HTMLElement).blur();
-    this.editor.undo();
-  }
-
-  redoAction() {
-    if (document.activeElement instanceof HTMLElement)
-      (document.activeElement as HTMLElement).blur();
-    this.editor.redo();
-  }
-
-  setupMenu() {
-    if (this.isMenuSetup) return;
-
-    // let titleBar = new Titlebar({
-    //   backgroundColor: Color.fromHex("#333333"),
-    //   icon: "./favicon.svg",
-    //   shadow: true
-    // });
-
-    this.isMenuSetup = true;
-  }
-
-  showLibraryMenu() {
-    // ensure mouse is in canvas bounds
-    //if (this.$refs.canvas.offset)
-    let lib = this.$refs.libraryMenu as any;
-    console.log("show menu");
-    if (lib.show == false) lib.showModal(this.mouseX, this.mouseY);
-  }
-
-  itemCreated(item: any) {
-    // editor
-    if (item.config.title == "Editor") {
-      let container = item.container;
-      item.container.on("resize", function() {
-        const canvas = document.getElementById("editor") as HTMLCanvasElement;
-        canvas.width = container.width;
-        canvas.height = container.height;
+      // properly resize GL
+      window.addEventListener("resize", () => {
+        console.log(this.$refs.GL);
       });
+
+      this.$nextTick(() => this.onResize());
     }
 
-    // 2d view
-    if (item.config.title == "2D View") {
-      let container = item.container;
-      item.container.on("resize", () => {
-        // const canvas = <HTMLCanvasElement>document.getElementById("_2dview");
-        // canvas.width = container.width;
-        // canvas.height = container.height;
-
-        (this.$refs.preview2d as any).resize(container.width, container.height);
-      });
+    undoAction() {
+      if (document.activeElement instanceof HTMLElement)
+        (document.activeElement as HTMLElement).blur();
+      this.editor.undo();
     }
 
-    // // 3d view
-    // if (item.config.title == "3D View") {
-    //   let container = item.container;
-    //   item.container.on("resize", () => {
-    //     // const canvas = <HTMLCanvasElement>document.getElementById("_3dview");
-    //     // canvas.width = container.width;
-    //     // canvas.height = container.height;
-    //     //if (this.view3d) this.view3d.resize(container.width, container.height);
-    //     (this.$refs.preview3d as any).resize(container.width, container.height);
-    //   });
-    // }
-  }
+    redoAction() {
+      if (document.activeElement instanceof HTMLElement)
+        (document.activeElement as HTMLElement).blur();
+      this.editor.redo();
+    }
 
-  resizeCanvas() {
-    console.log("resize!");
-  }
+    setupMenu() {
+      if (this.isMenuSetup) return;
 
-  newProject() {
-    // reset states of all components
-    // load default scene
-    //(this.$refs.preview3d as any).reset();
-    (this.$refs.preview2d as any).reset();
+      // let titleBar = new Titlebar({
+      //   backgroundColor: Color.fromHex("#333333"),
+      //   icon: "./favicon.svg",
+      //   shadow: true
+      // });
 
-    // an empty scene
-    this.editor.createEmptyScene();
-    // default material scene
-    //this.editor.createNewTexture();
+      this.isMenuSetup = true;
+    }
 
-    this.library = this.editor.library;
+    showLibraryMenu() {
+      // ensure mouse is in canvas bounds
+      //if (this.$refs.canvas.offset)
+      let lib = this.$refs.libraryMenu as any;
+      console.log("show menu");
+      if (lib.show == false) lib.showModal(this.mouseX, this.mouseY);
+    }
 
-    this.project.name = "New Texture";
-    this.project.path = null;
+    itemCreated(item: any) {
+      // editor
+      if (item.config.title == "Editor") {
+        let container = item.container;
+        item.container.on("resize", function() {
+          const canvas = document.getElementById("editor") as HTMLCanvasElement;
+          canvas.width = container.width;
+          canvas.height = container.height;
+        });
+      }
 
-    this.resolution = 1024;
-    this.randomSeed = 32;
+      // 2d view
+      if (item.config.title == "2D View") {
+        let container = item.container;
+        item.container.on("resize", () => {
+          // const canvas = <HTMLCanvasElement>document.getElementById("_2dview");
+          // canvas.width = container.width;
+          // canvas.height = container.height;
 
-    // todo: set title
-  }
+          (this.$refs.preview2d as any).resize(
+            container.width,
+            container.height
+          );
+        });
+      }
 
-  saveProject(saveAs: boolean = false) {
-    // if project has no name then it hasnt been saved yet
-    if (this.project.path == null || saveAs) {
-      dialog.showSaveDialog(
+      // // 3d view
+      // if (item.config.title == "3D View") {
+      //   let container = item.container;
+      //   item.container.on("resize", () => {
+      //     // const canvas = <HTMLCanvasElement>document.getElementById("_3dview");
+      //     // canvas.width = container.width;
+      //     // canvas.height = container.height;
+      //     //if (this.view3d) this.view3d.resize(container.width, container.height);
+      //     (this.$refs.preview3d as any).resize(container.width, container.height);
+      //   });
+      // }
+    }
+
+    resizeCanvas() {
+      console.log("resize!");
+    }
+
+    newProject() {
+      // reset states of all components
+      // load default scene
+      //(this.$refs.preview3d as any).reset();
+      (this.$refs.preview2d as any).reset();
+
+      // an empty scene
+      this.editor.createEmptyScene();
+      // default material scene
+      //this.editor.createNewTexture();
+
+      this.library = this.editor.library;
+
+      this.project.name = "New Texture";
+      this.project.path = null;
+
+      this.resolution = 1024;
+      this.randomSeed = 32;
+
+      // todo: set title
+    }
+
+    saveProject(saveAs: boolean = false) {
+      // if project has no name then it hasnt been saved yet
+      if (this.project.path == null || saveAs) {
+        dialog.showSaveDialog(
+          remote.getCurrentWindow(),
+          {
+            filters: [
+              {
+                name: "MemeEngineer Project",
+                extensions: ["texture"],
+              },
+            ],
+            defaultPath: "material.texture",
+          },
+          (path) => {
+            if (!path) return;
+            let data = this.editor.save();
+            console.log(data);
+            this.project.data = data;
+            this.project.data["appVersion"] = this.version;
+
+            //console.log(path);
+            if (!path.endsWith(".texture")) path += ".texture";
+
+            this.project.name = path.replace(/^.*[\\\/]/, "");
+            this.project.path = path;
+
+            ProjectManager.save(path, this.project);
+            remote.getCurrentWindow().setTitle(this.project.name);
+          }
+        );
+      } else {
+        let data = this.editor.save();
+        console.log(data);
+        this.project.data = data;
+        this.project.data["appVersion"] = this.version;
+        ProjectManager.save(this.project.path, this.project);
+      }
+    }
+
+    openProject() {
+      // ask if current project should be saved
+      dialog.showOpenDialog(
         remote.getCurrentWindow(),
         {
           filters: [
@@ -472,222 +494,182 @@ export default class App extends Vue {
               extensions: ["texture"],
             },
           ],
-          defaultPath: "material.texture",
+          defaultPath: "material",
+        },
+        (paths, bookmarks) => {
+          let path = paths[0];
+
+          let project = ProjectManager.load(path);
+          console.log(project);
+
+          // ensure library exists
+          // let libName = project.data["libraryVersion"];
+          // let libraries = ["v0", "v1"];
+          // if (libraries.indexOf(libName) == -1) {
+          //   alert(
+          //     `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
+          //   );
+          //   return;
+          // }
+
+          remote.getCurrentWindow().setTitle(project.name);
+          this.editor.load(project.data);
+          this.resolution = 1024;
+          this.randomSeed = 32;
+
+          this.project = project;
+          this.library = this.editor.library;
+        }
+      );
+    }
+
+    loadSample(name: string) {}
+
+    async exportUnity() {
+      let buffer = await unityExport(
+        this.editor,
+        this.project.name.replace(".texture", "")
+      );
+      //console.log(buffer);
+      dialog.showSaveDialog(
+        remote.getCurrentWindow(),
+        {
+          filters: [
+            {
+              name: "Unity Package",
+              extensions: ["unitypackage"],
+            },
+          ],
+          defaultPath:
+            (this.project.name
+              ? this.project.name.replace(".texture", "")
+              : "material") + ".unitypackage",
         },
         (path) => {
           if (!path) return;
-          let data = this.editor.save();
-          console.log(data);
-          this.project.data = data;
-          this.project.data["appVersion"] = this.version;
 
-          //console.log(path);
-          if (!path.endsWith(".texture")) path += ".texture";
+          fs.writeFile(path, buffer, function(err) {
+            if (err) alert("Error exporting texture: " + err);
+          });
 
-          this.project.name = path.replace(/^.*[\\\/]/, "");
-          this.project.path = path;
-
-          ProjectManager.save(path, this.project);
-          remote.getCurrentWindow().setTitle(this.project.name);
+          remote.shell.showItemInFolder(path);
         }
       );
-    } else {
-      let data = this.editor.save();
-      console.log(data);
-      this.project.data = data;
-      this.project.data["appVersion"] = this.version;
-      ProjectManager.save(this.project.path, this.project);
     }
-  }
 
-  openProject() {
-    // ask if current project should be saved
-    dialog.showOpenDialog(
-      remote.getCurrentWindow(),
-      {
-        filters: [
-          {
-            name: "MemeEngineer Project",
-            extensions: ["texture"],
-          },
-        ],
-        defaultPath: "material",
-      },
-      (paths, bookmarks) => {
-        let path = paths[0];
+    exportUnityZip() {
+      dialog.showSaveDialog(
+        remote.getCurrentWindow(),
+        {
+          filters: [
+            {
+              name: "Zip File",
+              extensions: ["zip"],
+            },
+          ],
+          defaultPath:
+            (this.project.name
+              ? this.project.name.replace(".texture", "")
+              : "material") + ".zip",
+        },
+        async (path) => {
+          if (!path) {
+            return;
+          }
 
-        let project = ProjectManager.load(path);
-        console.log(project);
+          console.log(path);
 
-        // ensure library exists
-        // let libName = project.data["libraryVersion"];
-        // let libraries = ["v0", "v1"];
-        // if (libraries.indexOf(libName) == -1) {
-        //   alert(
-        //     `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
-        //   );
-        //   return;
-        // }
+          let zip = await unityZipExport(
+            this.editor,
+            this.project.name.replace(".texture", "")
+          );
 
-        remote.getCurrentWindow().setTitle(project.name);
-        this.editor.load(project.data);
-        this.resolution = 1024;
-        this.randomSeed = 32;
-
-        this.project = project;
-        this.library = this.editor.library;
-      }
-    );
-  }
-
-  loadSample(name: string) {}
-
-  async exportUnity() {
-    let buffer = await unityExport(
-      this.editor,
-      this.project.name.replace(".texture", "")
-    );
-    //console.log(buffer);
-    dialog.showSaveDialog(
-      remote.getCurrentWindow(),
-      {
-        filters: [
-          {
-            name: "Unity Package",
-            extensions: ["unitypackage"],
-          },
-        ],
-        defaultPath:
-          (this.project.name
-            ? this.project.name.replace(".texture", "")
-            : "material") + ".unitypackage",
-      },
-      (path) => {
-        if (!path) return;
-
-        fs.writeFile(path, buffer, function(err) {
-          if (err) alert("Error exporting texture: " + err);
-        });
-
-        remote.shell.showItemInFolder(path);
-      }
-    );
-  }
-
-  exportUnityZip() {
-    dialog.showSaveDialog(
-      remote.getCurrentWindow(),
-      {
-        filters: [
-          {
-            name: "Zip File",
-            extensions: ["zip"],
-          },
-        ],
-        defaultPath:
-          (this.project.name
-            ? this.project.name.replace(".texture", "")
-            : "material") + ".zip",
-      },
-      async (path) => {
-        if (!path) {
-          return;
+          zip.writeZip(path);
+          remote.shell.showItemInFolder(path);
         }
-
-        console.log(path);
-
-        let zip = await unityZipExport(
-          this.editor,
-          this.project.name.replace(".texture", "")
-        );
-
-        zip.writeZip(path);
-        remote.shell.showItemInFolder(path);
-      }
-    );
-  }
-
-  exportZip() {
-    dialog.showSaveDialog(
-      remote.getCurrentWindow(),
-      {
-        filters: [
-          {
-            name: "Zip File",
-            extensions: ["zip"],
-          },
-        ],
-        defaultPath:
-          (this.project.name
-            ? this.project.name.replace(".texture", "")
-            : "material") + ".zip",
-      },
-      async (path) => {
-        if (!path) {
-          return;
-        }
-
-        console.log(path);
-
-        let zip = await zipExport(
-          this.editor,
-          this.project.name.replace(".texture", "")
-        );
-
-        zip.writeZip(path);
-        remote.shell.showItemInFolder(path);
-      }
-    );
-  }
-
-  showTutorials() {}
-
-  showAboutDialog() {}
-
-  submitBugs() {}
-
-  openExample(fileName: string) {
-    let fullPath = path.join(__static, "assets/examples/", fileName);
-
-    this._openSample(fullPath);
-  }
-
-  _openSample(path: string) {
-    let project = ProjectManager.load(path);
-    console.log(project);
-
-    // ensure library exists
-    let libName = project.data["libraryVersion"];
-    let libraries = ["v0", "v1"];
-    if (libraries.indexOf(libName) == -1) {
-      alert(
-        `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
       );
-      return;
     }
 
-    remote.getCurrentWindow().setTitle(project.name);
-    this.editor.load(project.data);
-    this.resolution = 1024;
-    this.randomSeed = 32;
+    exportZip() {
+      dialog.showSaveDialog(
+        remote.getCurrentWindow(),
+        {
+          filters: [
+            {
+              name: "Zip File",
+              extensions: ["zip"],
+            },
+          ],
+          defaultPath:
+            (this.project.name
+              ? this.project.name.replace(".texture", "")
+              : "material") + ".zip",
+        },
+        async (path) => {
+          if (!path) {
+            return;
+          }
 
-    project.path = null; // this ensures saving pops SaveAs dialog
-    this.project = project;
-    this.library = this.editor.library;
-  }
+          console.log(path);
 
-  setResolution(evt) {
-    let value = parseInt(evt.target.value);
-    //console.log(value);
-    this.resolution = value;
-    this.editor.designer.setTextureSize(value, value);
-  }
+          let zip = await zipExport(
+            this.editor,
+            this.project.name.replace(".texture", "")
+          );
 
-  setRandomSeed(evt) {
-    let seed = evt.target.value;
-    this.randomSeed = seed;
-    this.editor.designer.setRandomSeed(seed);
+          zip.writeZip(path);
+          remote.shell.showItemInFolder(path);
+        }
+      );
+    }
+
+    showTutorials() {}
+
+    showAboutDialog() {}
+
+    submitBugs() {}
+
+    openExample(fileName: string) {
+      let fullPath = path.join(__static, "assets/examples/", fileName);
+
+      this._openSample(fullPath);
+    }
+
+    _openSample(path: string) {
+      let project = ProjectManager.load(path);
+      console.log(project);
+
+      // ensure library exists
+      let libName = project.data["libraryVersion"];
+      let libraries = ["v0", "v1"];
+      if (libraries.indexOf(libName) == -1) {
+        alert(
+          `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
+        );
+        return;
+      }
+
+      remote.getCurrentWindow().setTitle(project.name);
+      this.editor.load(project.data);
+      this.resolution = 1024;
+      this.randomSeed = 32;
+
+      project.path = null; // this ensures saving pops SaveAs dialog
+      this.project = project;
+      this.library = this.editor.library;
+    }
+
+    setResolution(evt) {
+      let value = parseInt(evt.target.value);
+      //console.log(value);
+      this.resolution = value;
+      this.editor.designer.setTextureSize(value, value);
+    }
+
+    setRandomSeed(evt) {
+      let seed = evt.target.value;
+      this.randomSeed = seed;
+      this.editor.designer.setRandomSeed(seed);
+    }
   }
-}
 </script>
-

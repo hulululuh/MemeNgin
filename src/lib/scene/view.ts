@@ -108,9 +108,7 @@ export class SceneView {
   }
 
   isMouseOverCanvas() {
-    //let rect = this.canvas.getBoundingClientRect();
     let rect = this.canvas.getBoundingClientRect();
-    //console.log(rect);
     if (this.globalMousePos[0] < rect.left) return false;
     if (this.globalMousePos[1] < rect.top) return false;
     if (this.globalMousePos[0] > rect.right) return false;
@@ -173,11 +171,6 @@ export class SceneView {
         .sub(this.offset)
         .multiplyByScalar(delta)
     );
-    // this.offset.x = pos.x - (pos.x - this.offset.x) * delta; // * (factor);
-    // this.offset.y = pos.y - (pos.y - this.offset.y) * delta; // * (factor);
-
-    //this.zoom(pos.x, pos.y, delta);
-
     evt.preventDefault();
     return false;
   }

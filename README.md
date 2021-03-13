@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  Free, Cross-Platform, GPU-Accelerated Image effect design tools.<br/>
+  A node-based image editing tool<br/>
 </p>
 
 ![FxMixer]
@@ -38,9 +38,10 @@ npm run electron:serve
 
 Got ideas, suggestions or feedback? Reach out to me on [e-mail](hulululuh@gmail.com)
 
-## Built Using
 
+## Built Using
+- **[TextureLab](https://github.com/njbrown/texturelab)**
 - **[Vue.js](https://vuejs.org)**
 - **[THREE.js](https://threejs.org/)**
-- **[Golden Layout](https://golden-layout.com/)** via **[vue-golden-layout](https://github.com/emedware/vue-golden-layout)**
+- **[vuetify](https://vuetifyjs.com/en/)** via **[vue-cli-plugin-vuetify](https://github.com/vuetifyjs/vue-cli-plugins)**
 - **[Electron](https://electronjs.org)**

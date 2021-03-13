@@ -33,7 +33,6 @@ new Titlebar({
 });
 
 new Vue({
-  router,
   store,
   vuetify,
   render: (h) => h(App),
