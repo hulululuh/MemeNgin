@@ -9,10 +9,13 @@ import { Color } from "@/lib/designer/color";
 import { TextGeometry } from "@/lib/geometry/textGeometry";
 import { CalcFontPath } from "@/lib/designer/fontcache";
 
+let fontPath = "assets/fonts/East_Sea_Dokdo/EastSeaDokdo-Regular.ttf";
+
 const placeholderText = "Lorem ipsum Dolor sit amet.";
 const placeholderSize = 72;
 const placeholderLetterSpacing = 0;
 const placeholderLineHeight = 1.175;
+declare let __static: any;
 
 export class TextNode extends ImageDesignerNode {
   textGeom: TextGeometry;
@@ -25,15 +28,6 @@ export class TextNode extends ImageDesignerNode {
     super();
     this.nodeType = NodeType.Text;
     this.color = new Color(1.0, 1.0, 1.0);
-
-    // const fontPath = path.join(
-    //   remote.app.getAppPath() +
-    //     "/../src/assets/fonts/East_Sea_Dokdo/EastSeaDokdo-Regular.ttf"
-    // );
-
-    const fontPath = CalcFontPath(
-      "assets/fonts/East_Sea_Dokdo/EastSeaDokdo-Regular.ttf"
-    );
 
     this.textGeom = new TextGeometry(
       placeholderText,
