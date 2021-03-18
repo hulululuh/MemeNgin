@@ -897,6 +897,8 @@ export class Editor {
       return DesignerVariableType.Enum;
     } else if (prop.type == PropertyType.Color) {
       return DesignerVariableType.Color;
+    } else if (prop.type == PropertyType.Asset) {
+      return DesignerVariableType.Asset;
     } else {
       console.log("error: invalid property type for variable", prop);
     }

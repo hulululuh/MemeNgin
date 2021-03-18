@@ -13,7 +13,6 @@ import * as $ from "jquery";
 (window as any).JQuery = $;
 
 import App from "./App.vue";
-import router from "./router";
 import store from "./store";
 
 import Vuetify from "vuetify/lib";
@@ -24,8 +23,11 @@ Vue.use(Vuetify);
 
 import { Titlebar } from "custom-electron-titlebar";
 import { ApplicationSettings } from "@/settings";
+import { AssetManager } from "@/assets/assetmanager";
 
 const settings = ApplicationSettings.getInstance();
+AssetManager.getInstance();
+
 settings.load();
 
 new Titlebar({

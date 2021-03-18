@@ -15,11 +15,17 @@
         </v-checkbox>
       </template>
       <v-select
-        v-model="prop.value"
+        v-model="selected"
         :items="prop.values"
         @change="updateValue"
         dense
       >
+        <template v-slot:item="{ item }" :active="false">
+          <v-img :src="item.iconPath" max-height="48" max-width="192" />
+        </template>
+        <template v-slot:selection="{ item }">
+          <v-img :src="item.iconPath" max-height="48" max-width="192" />
+        </template>
       </v-select>
     </v-input>
   </v-container>
@@ -37,10 +43,11 @@
   import { UndoStack } from "@/lib/undostack";
 
   @Component
-  export default class EnumPropertyView extends Vue {
+  export default class AssetPropertyView extends Vue {
     @Prop()
-    // EnumProperty
+    // AssetProperty
     prop: any;
+    selected: any;
 
     @Prop()
     designer: Designer;
@@ -58,6 +65,10 @@
     propertyExposeChanged() {
       this.$emit("propertyExposeChanged", this.prop);
       return this.prop.name;
+    }
+
+    created() {
+      this.selected = this.prop.getValue();
     }
 
     updateExposed(value) {

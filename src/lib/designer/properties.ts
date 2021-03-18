@@ -2,6 +2,7 @@ import { Transform2D } from "../math/transform2d";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
 import { Vector2 } from "math.gl";
+import { Asset } from "@/assets/assetmanager";
 
 // for use in code after build
 export enum PropertyType {
@@ -14,6 +15,7 @@ export enum PropertyType {
   Gradient = "gradient",
   File = "file",
   Transform2D = "transform2d",
+  Asset = "asset",
 
   // use it on the socket
   Image = "image",
@@ -189,6 +191,57 @@ export class BoolProperty extends Property {
 
   copyValuesFrom(prop: BoolProperty) {
     this.value = prop.value;
+  }
+}
+
+export class AssetProperty extends Property {
+  values: Asset[];
+  index: number;
+  value: Asset;
+
+  constructor(name: string, displayName: string, values: Asset[]) {
+    super();
+    this.name = name;
+    this.displayName = displayName;
+    this.index = 0;
+    this.values = values;
+    this.value = this.values[this.index];
+    this.parentValue = this.index;
+    this.type = PropertyType.Asset;
+  }
+
+  getValues(): Asset[] {
+    return this.values;
+  }
+
+  getValue(): any {
+    return this.values[this.index];
+  }
+
+  setValue(val: any) {
+    let idx = this.values.indexOf(val);
+
+    // given valid value
+    if (idx != -1) {
+      this.index = this.values.indexOf(val);
+      this.value = this.values[this.index];
+    }
+  }
+
+  clone(): Property {
+    let prop = new AssetProperty(
+      this.name,
+      this.displayName,
+      this.values.slice(0)
+    );
+    prop.index = this.index;
+
+    return prop;
+  }
+
+  copyValuesFrom(prop: AssetProperty) {
+    this.values = prop.values;
+    this.index = prop.index;
   }
 }
 

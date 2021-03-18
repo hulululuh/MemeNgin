@@ -4,6 +4,8 @@
 
     <v-app-bar app clipped-left clipped-right dense>
       <v-toolbar-title>
+        <v-btn elevation="1"></v-btn>
+        <v-btn elevation="1"></v-btn>
         Application
       </v-toolbar-title>
     </v-app-bar>

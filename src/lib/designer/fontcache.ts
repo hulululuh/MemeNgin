@@ -2,6 +2,7 @@ import opentype from "opentype.js";
 import hash from "object-hash";
 import path from "path";
 import { Dictionary } from "dictionary-types";
+import { AssetManager, AssetType, ASSET_FOLDER } from "@/assets/assetmanager";
 
 const fontPath = "assets/fonts/Roboto/Roboto-Regular.ttf";
 
@@ -24,10 +25,6 @@ export class FontCache {
   private _fallbackFont: any;
 
   constructor() {
-    //let fontPath = CalcFontPath("fonts/open-sans-latin-400.33543c5c.woff2");
-    //let fontkit = require("fontkit");
-    //let font = fontkit.openSync(fontPath);
-
     let self = this;
     opentype.load(fontPath, function(err, font) {
       if (err) {
@@ -47,6 +44,29 @@ export class FontCache {
 
   get fallbackFont() {
     return this._fallbackFont;
+  }
+
+  async getFontById(id: string): Promise<any> {
+    const fonts = AssetManager.getInstance().assets.get(AssetType.Font);
+    const fontAsset = fonts.filter((item) => item.id === id)[0];
+    const fontUrl = path.join(
+      `assets/${ASSET_FOLDER.get(AssetType.Font)}/`,
+      fontAsset.path
+    );
+    const key = id;
+
+    // use if font exits on the cache
+    if (this._fonts[key]) {
+      return this._fonts[key];
+    } else {
+      let font = await loadFont(fontUrl);
+      if (font) {
+        this._fonts[key] = font;
+        return this._fonts[key];
+      } else {
+        return this._fallbackFont;
+      }
+    }
   }
 
   async getFont(fontUrl: string): Promise<any> {

@@ -169,8 +169,13 @@ export class TextGeometry {
     }
   }
 
-  async setupFont(fontUrl: string) {
-    let font = await FontCache.getInstance().getFont(fontUrl);
+  async setupFont(fontUrl: string, isId: boolean = false) {
+    let font = null;
+    if (isId) {
+      font = await FontCache.getInstance().getFontById(fontUrl);
+    } else {
+      font = await FontCache.getInstance().getFont(fontUrl);
+    }
     if (font) {
       this.font = font;
       this.needsUpdate = true;

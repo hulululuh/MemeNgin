@@ -12,6 +12,7 @@ import { ImageDesignerNode } from "./designer/imagedesignernode";
 import { DesignerLibrary } from "./designer/library";
 import { LogicDesignerNode } from "./designer/logicdesignernode";
 import {
+  AssetProperty,
   BoolProperty,
   ColorProperty,
   EnumProperty,
@@ -724,6 +725,9 @@ export class Designer {
       case DesignerVariableType.Enum:
         variable.property = new EnumProperty(name, displayName, []);
         break;
+      case DesignerVariableType.Asset:
+        variable.property = new AssetProperty(name, displayName, []);
+        break;
       case DesignerVariableType.Color:
         variable.property = new ColorProperty(name, displayName, new Color());
         break;
@@ -939,6 +943,12 @@ export class Designer {
           case DesignerVariableType.Enum:
             (<EnumProperty>dvar.property).copyValuesFrom(
               <EnumProperty>v.property
+            );
+            break;
+
+          case DesignerVariableType.Asset:
+            (<AssetProperty>dvar.property).copyValuesFrom(
+              <AssetProperty>v.property
             );
             break;
 

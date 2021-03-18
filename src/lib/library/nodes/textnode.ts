@@ -7,26 +7,28 @@ import { buildShaderProgram } from "@/lib/designer/gl";
 import { Property } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
 import { TextGeometry } from "@/lib/geometry/textGeometry";
-import { CalcFontPath } from "@/lib/designer/fontcache";
+import { AssetManager, AssetType } from "@/assets/assetmanager";
 
-let fontPath = "assets/fonts/East_Sea_Dokdo/EastSeaDokdo-Regular.ttf";
+let fontPath = "assets/fonts/Roboto/Roboto-Medium.ttf";
 
 const placeholderText = "Lorem ipsum Dolor sit amet.";
 const placeholderSize = 72;
 const placeholderLetterSpacing = 0;
 const placeholderLineHeight = 1.175;
-declare let __static: any;
 
 export class TextNode extends ImageDesignerNode {
   textGeom: TextGeometry;
   textFbo: WebGLFramebuffer;
   textProgram: WebGLShader;
 
+  selectedFontId: string;
+  fonts: Array<any>;
   color: Color;
 
   constructor() {
     super();
     this.nodeType = NodeType.Text;
+    this.fonts = new Array();
     this.color = new Color(1.0, 1.0, 1.0);
 
     this.textGeom = new TextGeometry(
@@ -53,7 +55,14 @@ export class TextNode extends ImageDesignerNode {
     this.onnodepropertychanged = (prop: Property) => {
       let value = this.evaluatePropertyValue(prop);
 
-      if (prop.name === "text" && value != this.textGeom.text) {
+      if (prop.name === "font") {
+        const asset = value;
+
+        if (asset && this.selectedFontId != asset.id) {
+          this.selectedFontId = asset.id;
+          this.textGeom.setupFont(this.selectedFontId, true);
+        }
+      } else if (prop.name === "text" && value != this.textGeom.text) {
         this.textGeom.updateText(value);
         updateGeom();
       } else if (prop.name === "size" && value != this.textGeom.size) {
@@ -222,7 +231,20 @@ export class TextNode extends ImageDesignerNode {
 
     this.title = "Text";
 
+    let fonts = AssetManager.getInstance().assets.get(AssetType.Font);
+    this.fonts = [];
+    for (let item of fonts) {
+      //this.fonts.push({ value: item.name, icon: `assets/fonts/${item.icon}` });
+      //this.fonts.push(item.name);
+    }
+
     // Font
+    this.addAssetProperty(
+      "font",
+      "Font",
+      AssetManager.getInstance().assets.get(AssetType.Font)
+    );
+    //this.addEnumProperty("font", "Font", this.fonts);
 
     // color
     this.addColorProperty("color", "Color", this.color);

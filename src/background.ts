@@ -8,7 +8,7 @@ import {
   globalShortcut,
 } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { MenuCommands, setupMenu } from "./menu";
+import { MenuCommands, setupMenu } from "@/menu";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const undoShortcut = "CmdOrCtrl+Z";
@@ -48,6 +48,7 @@ function createWindow() {
     },
   });
   win.maximize();
+  win.show();
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -120,6 +121,8 @@ app.on("ready", async () => {
       console.error("Vue Devtools failed to install:", e.toString());
     }
   }
+
+  // initialize assets
   createWindow();
 });
 
