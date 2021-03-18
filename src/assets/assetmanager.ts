@@ -369,4 +369,28 @@ export class AssetManager {
     );
     return asset;
   }
+
+  getAssetLists(type: AssetType) {
+    let list = this.assets.get(type);
+    let idList = [];
+    for (let item of list) {
+      idList.push(item.id);
+    }
+    return idList;
+  }
+
+  getAssetById(id: string, type?: AssetType) {
+    if (type) {
+      return this.assets.get(type).find((item) => item.id == id);
+    } else {
+      for (let list of this.assets) {
+        let item = list.find((item) => item.id == id);
+
+        if (item) return item;
+      }
+    }
+
+    console.log("no item found");
+    return null;
+  }
 }

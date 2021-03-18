@@ -15,7 +15,7 @@ import {
   Transform2DProperty,
   AssetProperty,
 } from "@/lib/designer/properties";
-import { Asset } from "@/assets/assetmanager";
+import { Asset, AssetType } from "@/assets/assetmanager";
 import { Color } from "@/lib/designer/color";
 import { Gradient } from "@/lib/designer/gradient";
 import { WidgetEvent } from "@/lib/scene/graphicsitem";
@@ -267,9 +267,10 @@ export class DesignerNode implements IPropertyHolder {
   addAssetProperty(
     id: string,
     displayName: string,
-    defaultVal: Asset[] = new Array()
+    defaultVal: string[] = [],
+    assetType: AssetType
   ): AssetProperty {
-    let prop = new AssetProperty(id, displayName, defaultVal);
+    let prop = new AssetProperty(id, displayName, defaultVal, assetType);
 
     this.properties.push(prop);
     return prop;

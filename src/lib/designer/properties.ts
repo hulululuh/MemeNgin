@@ -2,7 +2,7 @@ import { Transform2D } from "../math/transform2d";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
 import { Vector2 } from "math.gl";
-import { Asset } from "@/assets/assetmanager";
+import { Asset, AssetType } from "@/assets/assetmanager";
 
 // for use in code after build
 export enum PropertyType {
@@ -195,11 +195,17 @@ export class BoolProperty extends Property {
 }
 
 export class AssetProperty extends Property {
-  values: Asset[];
+  values: string[];
   index: number;
-  value: Asset;
+  value: string;
+  assetType: AssetType;
 
-  constructor(name: string, displayName: string, values: Asset[]) {
+  constructor(
+    name: string,
+    displayName: string,
+    values: string[],
+    assetType: AssetType
+  ) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -208,9 +214,10 @@ export class AssetProperty extends Property {
     this.value = this.values[this.index];
     this.parentValue = this.index;
     this.type = PropertyType.Asset;
+    this.assetType = assetType;
   }
 
-  getValues(): Asset[] {
+  getValues(): string[] {
     return this.values;
   }
 
@@ -219,20 +226,15 @@ export class AssetProperty extends Property {
   }
 
   setValue(val: any) {
-    let idx = this.values.indexOf(val);
-
-    // given valid value
-    if (idx != -1) {
-      this.index = this.values.indexOf(val);
-      this.value = this.values[this.index];
-    }
+    this.index = this.values.indexOf(val);
   }
 
   clone(): Property {
     let prop = new AssetProperty(
       this.name,
       this.displayName,
-      this.values.slice(0)
+      this.values.slice(0),
+      this.assetType
     );
     prop.index = this.index;
 

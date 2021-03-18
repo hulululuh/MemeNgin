@@ -21,10 +21,10 @@
         dense
       >
         <template v-slot:item="{ item }" :active="false">
-          <v-img :src="item.iconPath" max-height="48" max-width="192" />
+          <v-img :src="iconPath(item)" max-height="48" max-width="192" />
         </template>
         <template v-slot:selection="{ item }">
-          <v-img :src="item.iconPath" max-height="48" max-width="192" />
+          <v-img :src="iconPath(item)" max-height="48" max-width="192" />
         </template>
       </v-select>
     </v-input>
@@ -41,6 +41,7 @@
   import { IPropertyHolder } from "@/lib/designer/properties";
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
   import { UndoStack } from "@/lib/undostack";
+  import { AssetManager } from "@/assets/assetmanager";
 
   @Component
   export default class AssetPropertyView extends Vue {
@@ -95,6 +96,17 @@
         { value: this.prop.getValue(), exposed: this.prop.getExposed() }
       );
       UndoStack.current.push(action);
+    }
+
+    iconPath(id) {
+      let asset = AssetManager.getInstance().getAssetById(
+        id,
+        this.prop.assetType
+      );
+      if (asset) {
+        return asset.iconPath;
+      }
+      return "";
     }
   }
 </script>

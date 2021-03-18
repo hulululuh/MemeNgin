@@ -56,7 +56,10 @@ export class TextNode extends ImageDesignerNode {
       let value = this.evaluatePropertyValue(prop);
 
       if (prop.name === "font") {
-        const asset = value;
+        const asset = AssetManager.getInstance().getAssetById(
+          value,
+          AssetType.Font
+        );
 
         if (asset && this.selectedFontId != asset.id) {
           this.selectedFontId = asset.id;
@@ -228,22 +231,11 @@ export class TextNode extends ImageDesignerNode {
 
   init() {
     // defer node initialization until texture is ready
-
     this.title = "Text";
 
-    let fonts = AssetManager.getInstance().assets.get(AssetType.Font);
-    this.fonts = [];
-    for (let item of fonts) {
-      //this.fonts.push({ value: item.name, icon: `assets/fonts/${item.icon}` });
-      //this.fonts.push(item.name);
-    }
-
+    let assetList = AssetManager.getInstance().getAssetLists(AssetType.Font);
     // Font
-    this.addAssetProperty(
-      "font",
-      "Font",
-      AssetManager.getInstance().assets.get(AssetType.Font)
-    );
+    this.addAssetProperty("font", "Font", assetList, AssetType.Font);
     //this.addEnumProperty("font", "Font", this.fonts);
 
     // color
