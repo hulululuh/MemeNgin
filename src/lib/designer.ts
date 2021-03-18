@@ -24,6 +24,7 @@ import { FloatPropertyNode } from "./library/nodes/floatpropertynode";
 import { StringPropertyNode } from "./library/nodes/stringpropertynode";
 import { TextNode } from "./library/nodes/textnode";
 import { Guid } from "./utils";
+import { AssetType } from "@/assets/assetmanager";
 
 const HALF = 0.5;
 
@@ -726,7 +727,12 @@ export class Designer {
         variable.property = new EnumProperty(name, displayName, []);
         break;
       case DesignerVariableType.Asset:
-        variable.property = new AssetProperty(name, displayName, []);
+        variable.property = new AssetProperty(
+          name,
+          displayName,
+          [],
+          AssetType.Font
+        );
         break;
       case DesignerVariableType.Color:
         variable.property = new ColorProperty(name, displayName, new Color());

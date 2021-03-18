@@ -42,14 +42,8 @@ export class TextNode extends ImageDesignerNode {
       placeholderLineHeight
     );
 
-    const updateGeom = () => {
-      this.resize(this.getWidth(), this.getHeight());
-      this.createTexture();
-      this.createFontGeom();
-    };
-
     this.textGeom.onFontChanged = () => {
-      updateGeom();
+      this.updateGeom();
     };
 
     this.onnodepropertychanged = (prop: Property) => {
@@ -67,22 +61,22 @@ export class TextNode extends ImageDesignerNode {
         }
       } else if (prop.name === "text" && value != this.textGeom.text) {
         this.textGeom.updateText(value);
-        updateGeom();
+        this.updateGeom();
       } else if (prop.name === "size" && value != this.textGeom.size) {
         this.textGeom.updateSize(value);
-        updateGeom();
+        this.updateGeom();
       } else if (
         prop.name === "letterSpacing" &&
         value != this.textGeom.letterSpacing
       ) {
         this.textGeom.updateLetterSpacing(value);
-        updateGeom();
+        this.updateGeom();
       } else if (
         prop.name === "lineHeight" &&
         value != this.textGeom.lineHeignt
       ) {
         this.textGeom.updateLineHeight(value);
-        updateGeom();
+        this.updateGeom();
       } else if (prop.name === "color" && this.color != value) {
         this.color = value;
         this.drawFont();
@@ -95,8 +89,15 @@ export class TextNode extends ImageDesignerNode {
       this.textGeom.updateLetterSpacing(this.getProperty("letterSpacing"));
       this.textGeom.updateLineHeight(this.getProperty("lineHeight"));
       this.color = this.getProperty("color");
-      updateGeom();
+
+      this.updateGeom();
     };
+  }
+
+  updateGeom() {
+    this.resize(this.getWidth(), this.getHeight());
+    this.createTexture();
+    this.createFontGeom();
   }
 
   drawFont() {
@@ -233,10 +234,16 @@ export class TextNode extends ImageDesignerNode {
     // defer node initialization until texture is ready
     this.title = "Text";
 
-    let assetList = AssetManager.getInstance().getAssetLists(AssetType.Font);
     // Font
-    this.addAssetProperty("font", "Font", assetList, AssetType.Font);
-    //this.addEnumProperty("font", "Font", this.fonts);
+    let fontAssetList = AssetManager.getInstance().getAssetLists(
+      AssetType.Font
+    );
+    this.addAssetProperty("font", "Font", fontAssetList, AssetType.Font);
+
+    if (!this.selectedFontId) {
+      this.selectedFontId = fontAssetList[0];
+      this.textGeom.setupFont(this.selectedFontId, true);
+    }
 
     // color
     this.addColorProperty("color", "Color", this.color);
