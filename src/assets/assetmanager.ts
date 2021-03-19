@@ -85,8 +85,13 @@ export class Asset {
     const iconPath = path.join(__static, assetRoot, this.icon);
     const assetPath = path.join(__static, assetRoot, this.path);
     if (!fs.existsSync(iconPath)) {
-      let iconCreated = await this.buildIcon();
-      if (!iconCreated) return;
+      try {
+        let iconCreated = await this.buildIcon();
+        if (!iconCreated) return;
+      } catch (err) {
+        console.log(err);
+        return;
+      }
     }
 
     // save asset.json
@@ -103,7 +108,7 @@ export class Asset {
   load() {}
 
   async buildIcon(): Promise<boolean> {
-    return Promise.resolve(true);
+    return Promise.resolve(false);
   }
 
   get iconPath(): string {
@@ -285,7 +290,11 @@ export class FontAsset extends Asset {
   }
 }
 
-export class LutAsset extends Asset {}
+export class LutAsset extends Asset {
+  async buildIcon(): Promise<any> {
+    Promise.resolve(false);
+  }
+}
 
 export class IconAsset extends Asset {}
 
