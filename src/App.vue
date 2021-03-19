@@ -93,11 +93,11 @@
   import { AddItemsAction } from "./lib/actions/additemsaction";
   import { UndoStack } from "./lib/undostack";
   import { ApplicationSettings } from "./settings";
-  import TWEEN from "@tweenjs/tween.js";
 
   const electron = require("electron");
   const remote = electron.remote;
-  const { dialog, app, BrowserWindow, Menu } = remote;
+  //const { dialog, app, BrowserWindow, Menu } = remote;
+  const { dialog } = require("electron").remote;
 
   declare let __static: any;
 
@@ -169,16 +169,6 @@
       });
       electron.ipcRenderer.on(MenuCommands.EditPaste, async (evt, arg) => {
         document.execCommand("paste");
-      });
-
-      electron.ipcRenderer.on(MenuCommands.ExportZip, async (evt, arg) => {
-        await this.exportZip();
-      });
-      electron.ipcRenderer.on(MenuCommands.ExportUnity, async (evt, arg) => {
-        await this.exportUnity();
-      });
-      electron.ipcRenderer.on(MenuCommands.ExportUnityZip, async (evt, arg) => {
-        await this.exportUnityZip();
       });
 
       electron.ipcRenderer.on(MenuCommands.HelpTutorials, (evt, arg) => {
@@ -448,9 +438,8 @@
     saveProject(saveAs: boolean = false) {
       // if project has no name then it hasnt been saved yet
       if (this.project.path == null || saveAs) {
-        dialog.showSaveDialog(
-          remote.getCurrentWindow(),
-          {
+        dialog
+          .showSaveDialog({
             filters: [
               {
                 name: "MemeEngineer Project",
@@ -458,8 +447,9 @@
               },
             ],
             defaultPath: "material.texture",
-          },
-          (path) => {
+          })
+          .then((result) => {
+            let path = result.filePath;
             if (!path) return;
             let data = this.editor.save();
             console.log(data);
@@ -474,8 +464,10 @@
 
             ProjectManager.save(path, this.project);
             remote.getCurrentWindow().setTitle(this.project.name);
-          }
-        );
+          })
+          .catch((...args) => {
+            console.warn("failed/rejected with", args);
+          });
       } else {
         let data = this.editor.save();
         console.log(data);
@@ -487,9 +479,8 @@
 
     openProject() {
       // ask if current project should be saved
-      dialog.showOpenDialog(
-        remote.getCurrentWindow(),
-        {
+      dialog
+        .showOpenDialog({
           filters: [
             {
               name: "MemeEngineer Project",
@@ -497,22 +488,11 @@
             },
           ],
           defaultPath: "material",
-        },
-        (paths, bookmarks) => {
-          let path = paths[0];
-
+        })
+        .then((result) => {
+          let path = result.filePaths[0];
           let project = ProjectManager.load(path);
           console.log(project);
-
-          // ensure library exists
-          // let libName = project.data["libraryVersion"];
-          // let libraries = ["v0", "v1"];
-          // if (libraries.indexOf(libName) == -1) {
-          //   alert(
-          //     `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
-          //   );
-          //   return;
-          // }
 
           remote.getCurrentWindow().setTitle(project.name);
           this.editor.load(project.data);
@@ -521,109 +501,13 @@
 
           this.project = project;
           this.library = this.editor.library;
-        }
-      );
+        })
+        .catch((...args) => {
+          console.warn("failed/rejected with", args);
+        });
     }
 
     loadSample(name: string) {}
-
-    async exportUnity() {
-      let buffer = await unityExport(
-        this.editor,
-        this.project.name.replace(".texture", "")
-      );
-      //console.log(buffer);
-      dialog.showSaveDialog(
-        remote.getCurrentWindow(),
-        {
-          filters: [
-            {
-              name: "Unity Package",
-              extensions: ["unitypackage"],
-            },
-          ],
-          defaultPath:
-            (this.project.name
-              ? this.project.name.replace(".texture", "")
-              : "material") + ".unitypackage",
-        },
-        (path) => {
-          if (!path) return;
-
-          fs.writeFile(path, buffer, function(err) {
-            if (err) alert("Error exporting texture: " + err);
-          });
-
-          remote.shell.showItemInFolder(path);
-        }
-      );
-    }
-
-    exportUnityZip() {
-      dialog.showSaveDialog(
-        remote.getCurrentWindow(),
-        {
-          filters: [
-            {
-              name: "Zip File",
-              extensions: ["zip"],
-            },
-          ],
-          defaultPath:
-            (this.project.name
-              ? this.project.name.replace(".texture", "")
-              : "material") + ".zip",
-        },
-        async (path) => {
-          if (!path) {
-            return;
-          }
-
-          console.log(path);
-
-          let zip = await unityZipExport(
-            this.editor,
-            this.project.name.replace(".texture", "")
-          );
-
-          zip.writeZip(path);
-          remote.shell.showItemInFolder(path);
-        }
-      );
-    }
-
-    exportZip() {
-      dialog.showSaveDialog(
-        remote.getCurrentWindow(),
-        {
-          filters: [
-            {
-              name: "Zip File",
-              extensions: ["zip"],
-            },
-          ],
-          defaultPath:
-            (this.project.name
-              ? this.project.name.replace(".texture", "")
-              : "material") + ".zip",
-        },
-        async (path) => {
-          if (!path) {
-            return;
-          }
-
-          console.log(path);
-
-          let zip = await zipExport(
-            this.editor,
-            this.project.name.replace(".texture", "")
-          );
-
-          zip.writeZip(path);
-          remote.shell.showItemInFolder(path);
-        }
-      );
-    }
 
     showTutorials() {}
 

@@ -3,7 +3,7 @@
 // https://electronjs.org/docs/api/menu
 // https://alan.fyi/renderer-menu-functions-in-electron-vue/
 
-const { app, Menu, BrowserWindow, globalShortcut } = require("electron");
+const { Menu, BrowserWindow } = require("electron");
 
 export enum MenuCommands {
   FileNew = "file_new",
@@ -17,10 +17,6 @@ export enum MenuCommands {
   EditCut = "edit_cut",
   EditCopy = "edit_copy",
   EditPaste = "edit_paste",
-
-  ExportZip = "export_zip",
-  ExportUnity = "export_unity",
-  ExportUnityZip = "export_unity_zip",
 
   HelpTutorials = "help_tutorials",
   HelpAbout = "help_about",
@@ -106,29 +102,6 @@ export function setupMenu() {
           accelerator: "CmdOrCtrl+V",
           click: (item, focusedWindow) => {
             focusedWindow.webContents.send(MenuCommands.EditPaste);
-          },
-        },
-      ],
-    },
-    {
-      label: "Export",
-      submenu: [
-        {
-          label: "Zip",
-          click: (item, focusedWindow) => {
-            focusedWindow.webContents.send(MenuCommands.ExportZip);
-          },
-        },
-        {
-          label: "Unity Material",
-          click: (item, focusedWindow) => {
-            focusedWindow.webContents.send(MenuCommands.ExportUnity);
-          },
-        },
-        {
-          label: "Unity (Zip)",
-          click: (item, focusedWindow) => {
-            focusedWindow.webContents.send(MenuCommands.ExportUnityZip);
           },
         },
       ],
