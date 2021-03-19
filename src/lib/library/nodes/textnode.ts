@@ -9,8 +9,6 @@ import { Color } from "@/lib/designer/color";
 import { TextGeometry } from "@/lib/geometry/textGeometry";
 import { AssetManager, AssetType } from "@/assets/assetmanager";
 
-let fontPath = "assets/fonts/Roboto/Roboto-Medium.ttf";
-
 const placeholderText = "Lorem ipsum Dolor sit amet.";
 const placeholderSize = 72;
 const placeholderLetterSpacing = 0;
@@ -31,9 +29,18 @@ export class TextNode extends ImageDesignerNode {
     this.fonts = new Array();
     this.color = new Color(1.0, 1.0, 1.0);
 
+    // Font
+    let fontAssetList = AssetManager.getInstance().getAssetLists(
+      AssetType.Font
+    );
+
+    if (!this.selectedFontId) {
+      this.selectedFontId = fontAssetList[0];
+    }
+
     this.textGeom = new TextGeometry(
       placeholderText,
-      fontPath,
+      this.selectedFontId,
       placeholderSize,
       false,
       false,
@@ -57,7 +64,7 @@ export class TextNode extends ImageDesignerNode {
 
         if (asset && this.selectedFontId != asset.id) {
           this.selectedFontId = asset.id;
-          this.textGeom.setupFont(this.selectedFontId, true);
+          this.textGeom.setupFont(this.selectedFontId);
         }
       } else if (prop.name === "text" && value != this.textGeom.text) {
         this.textGeom.updateText(value);
@@ -239,11 +246,6 @@ export class TextNode extends ImageDesignerNode {
       AssetType.Font
     );
     this.addAssetProperty("font", "Font", fontAssetList, AssetType.Font);
-
-    if (!this.selectedFontId) {
-      this.selectedFontId = fontAssetList[0];
-      this.textGeom.setupFont(this.selectedFontId, true);
-    }
 
     // color
     this.addColorProperty("color", "Color", this.color);
