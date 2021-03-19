@@ -48,7 +48,7 @@ export class FontCache {
 
   async getFontById(id: string): Promise<any> {
     const fonts = AssetManager.getInstance().assets.get(AssetType.Font);
-    const fontAsset = fonts.filter((item) => item.id === id)[0];
+    const fontAsset = fonts.get(id);
     const fontUrl = path.join(
       `assets/${ASSET_FOLDER.get(AssetType.Font)}/`,
       fontAsset.path

@@ -296,7 +296,7 @@ export class AssetFactory {
 
 export class AssetManager {
   private static _instance: AssetManager = new AssetManager();
-  assets: Map<string, any>;
+  assets: Map<string, Map<string, Asset>>;
   factories: Map<string, any>;
 
   addFactory<T extends Asset>(name, type: { new (): T }) {
@@ -320,7 +320,7 @@ export class AssetManager {
     this.assets = new Map<string, any>();
     this.factories = new Map<string, any>();
     for (const value of Object.values(AssetType)) {
-      this.assets.set(value, []);
+      this.assets.set(value, new Map<string, any>());
     }
 
     this.addFactory("font", FontAsset);
@@ -344,7 +344,7 @@ export class AssetManager {
         fetch(relPath).then((res) => {
           return res.json().then((json) => {
             let asset = this.create(json);
-            if (asset) self.assets.get(json.type).push(asset);
+            if (asset) self.assets.get(json.type).set(asset.id, asset);
           });
         });
       }
@@ -373,20 +373,19 @@ export class AssetManager {
   getAssetLists(type: AssetType) {
     let list = this.assets.get(type);
     let idList = [];
-    for (let item of list) {
-      idList.push(item.id);
+    for (const key of list.keys()) {
+      idList.push(key);
     }
     return idList;
   }
 
   getAssetById(id: string, type?: AssetType) {
     if (type) {
-      return this.assets.get(type).find((item) => item.id == id);
+      return this.assets.get(type).get(id);
     } else {
-      for (let list of this.assets) {
-        let item = list.find((item) => item.id == id);
-
-        if (item) return item;
+      for (let key of this.assets.keys()) {
+        let assetOfType = this.assets.get(key);
+        if (assetOfType.has(id)) return assetOfType.get(id);
       }
     }
 
