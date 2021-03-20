@@ -4,9 +4,16 @@
 
     <v-app-bar app clipped-left clipped-right dense>
       <v-toolbar-title>
-        <v-btn elevation="1"></v-btn>
-        <v-btn elevation="1"></v-btn>
-        Application
+        <v-btn color="gray" @click="undoAction">
+          <v-icon dark>
+            mdi-undo
+          </v-icon></v-btn
+        >
+        <v-btn color="gray" @click="redoAction">
+          <v-icon dark>
+            mdi-redo
+          </v-icon></v-btn
+        >
       </v-toolbar-title>
     </v-app-bar>
 
@@ -84,10 +91,6 @@
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
-  import { unityExport } from "@/lib/export/unityexporter.js";
-  import { unityZipExport } from "@/lib/export/unityzipexporter.js";
-  import { zipExport } from "@/lib/export/zipexporter.js";
-  import fs from "fs";
   import path from "path";
   import { IPropertyHolder } from "./lib/designer/properties";
   import { AddItemsAction } from "./lib/actions/additemsaction";
