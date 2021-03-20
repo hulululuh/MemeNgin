@@ -2,6 +2,17 @@ import earcut from "earcut";
 import computeLayout from "opentype-layout-improved";
 import { FontCache } from "@/lib/designer/fontcache";
 
+export enum TextAlign {
+  Left = "left",
+  Center = "center",
+  Right = "right",
+}
+
+export enum TextAlignVertical {
+  Top = "top",
+  Center = "center",
+  Bottom = "bottom",
+}
 // font rendering from: https://codepen.io/Anemolo/pen/jOOYmEZ
 
 function distance(p1, p2) {
@@ -101,6 +112,8 @@ export class TextGeometry {
   quality: number;
   letterSpacing: number;
   lineHeignt: number;
+  align: TextAlign;
+  alignVertical: TextAlignVertical;
 
   font: any;
   vertices: any;
@@ -119,7 +132,9 @@ export class TextGeometry {
     italic?,
     quality?,
     letterSpacing?,
-    lineHeignt?
+    lineHeignt?,
+    align?,
+    alignVertical?
   ) {
     this.text = text;
     this.size = size;
@@ -128,6 +143,8 @@ export class TextGeometry {
     this.quality = quality;
     this.letterSpacing = letterSpacing;
     this.lineHeignt = lineHeignt;
+    this.align = align;
+    this.alignVertical = alignVertical;
 
     this.needsUpdate = true;
 
@@ -163,10 +180,37 @@ export class TextGeometry {
     }
   }
 
+  updateAlign(align: TextAlign) {
+    if (this.align !== align) {
+      this.align = align;
+      this.needsUpdate = true;
+    }
+  }
+
+  updateAlignVertical(alignVertical: TextAlignVertical) {
+    if (this.alignVertical !== alignVertical) {
+      this.alignVertical = Object.values(TextAlignVertical)[alignVertical];
+      this.needsUpdate = true;
+    }
+  }
+
   updateFont(fontUrl: string) {
     if (this.fontUrl !== fontUrl) {
       this.setupFont(fontUrl);
     }
+  }
+
+  getVerticalOffset(height: number): number {
+    let offset = 0;
+    let scale = (1 / this.font.unitsPerEm) * this.size;
+
+    const heightInPixel = 1024;
+    if (this.alignVertical === TextAlignVertical.Center) {
+      offset = -(heightInPixel - height * scale) / 2;
+    } else if (this.alignVertical === TextAlignVertical.Bottom) {
+      offset = -heightInPixel + height * scale;
+    }
+    return offset;
   }
 
   async setupFont(fontId: string) {
@@ -198,19 +242,26 @@ export class TextGeometry {
       lineHeight: this.lineHeignt * this.font.unitsPerEm, // '2.5em' in font units
       letterSpacing: this.letterSpacing * this.font.unitsPerEm,
       width: theta / scale, // '1024px' in font units
+      align: Object.values(TextAlign)[this.align],
     });
 
     // create a list of closed contours
     const polys = [];
+
+    const verticalOffset = this.getVerticalOffset(result.height);
+
     result.glyphs.forEach((glyph) => {
       const pos = glyph.position;
+      if (glyph.char == `\n`) {
+        return;
+      }
       glyph.data.path.commands.forEach(({ type, x, y, x1, y1, x2, y2 }) => {
         x = (x + pos[0]) * scale;
-        y = (y + pos[1]) * scale;
+        y = (y + pos[1]) * scale + verticalOffset;
         x1 = (x1 + pos[0]) * scale;
-        y1 = (y1 + pos[1]) * scale;
+        y1 = (y1 + pos[1]) * scale + verticalOffset;
         x2 = (x2 + pos[0]) * scale;
-        y2 = (y2 + pos[1]) * scale;
+        y2 = (y2 + pos[1]) * scale + verticalOffset;
 
         switch (type) {
           case "M":

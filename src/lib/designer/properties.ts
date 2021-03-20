@@ -251,11 +251,16 @@ export class EnumProperty extends Property {
   values: string[];
   index: number;
   value: string;
-  constructor(name: string, displayName: string, values: string[]) {
+  constructor(
+    name: string,
+    displayName: string,
+    values: string[],
+    initialIdx: number
+  ) {
     super();
     this.name = name;
     this.displayName = displayName;
-    this.index = 0;
+    this.index = initialIdx;
     this.values = values;
     this.value = this.values[this.index];
     this.parentValue = this.index;
@@ -278,7 +283,8 @@ export class EnumProperty extends Property {
     let prop = new EnumProperty(
       this.name,
       this.displayName,
-      this.values.slice(0)
+      this.values.slice(0),
+      0
     );
     prop.index = this.index;
 

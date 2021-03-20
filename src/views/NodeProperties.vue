@@ -6,14 +6,14 @@
     v-if="node != null"
   >
     <v-expansion-panels v-model="panel" multiple accordion>
-      <v-expansion-panel>
+      <!-- <v-expansion-panel>
         <v-expansion-panel-header class="propertyList"
           >Base Properties</v-expansion-panel-header
         >
         <v-expansion-panel-content>
           <texture-channel :node="getNode" :editor="editor" />
         </v-expansion-panel-content>
-      </v-expansion-panel>
+      </v-expansion-panel> -->
       <v-expansion-panel>
         <v-expansion-panel-header class="propertyList"
           >Properties</v-expansion-panel-header
@@ -41,6 +41,9 @@
 </style>
 
 <script lang="ts">
+  import { Editor } from "@/lib/editor";
+  import { DesignerNode } from "@/lib/designer/designernode";
+  import { Property, IPropertyHolder } from "@/lib/designer/properties";
   import { Vue, Prop, Component } from "vue-property-decorator";
   import FloatPropertyView from "@/components/properties/FloatProp.vue";
   import BoolPropertyView from "@/components/properties/BoolProp.vue";
@@ -49,9 +52,6 @@
   import ColorPropertyView from "@/components/properties/ColorProp.vue";
   import TextureChannelPropertyView from "@/components/properties/TextureChannelProp.vue";
   import Accordion from "@/components/Accordion.vue";
-  import { Editor } from "@/lib/editor";
-  import { DesignerNode } from "@/lib/designer/designernode";
-  import { Property, IPropertyHolder } from "@/lib/designer/properties";
   import GradientPropertyView from "@/components/properties/GradientProp.vue";
   import StringPropertyView from "@/components/properties/StringProp.vue";
   import FilePropertyView from "@/components/properties/FileProp.vue";

@@ -724,7 +724,7 @@ export class Designer {
         variable.property = new BoolProperty(name, displayName, false);
         break;
       case DesignerVariableType.Enum:
-        variable.property = new EnumProperty(name, displayName, []);
+        variable.property = new EnumProperty(name, displayName, [], 0);
         break;
       case DesignerVariableType.Asset:
         variable.property = new AssetProperty(

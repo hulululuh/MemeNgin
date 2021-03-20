@@ -1,7 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { Guid } from "@/lib/utils";
-import { TextGeometry } from "@/lib/geometry/textGeometry";
+import {
+  TextGeometry,
+  TextAlign,
+  TextAlignVertical,
+} from "@/lib/geometry/textGeometry";
 import { Editor } from "@/lib/editor";
 import { NodeType } from "@/lib/designer/designernode";
 import { Color } from "@/lib/designer/color";
@@ -168,7 +172,9 @@ export class FontAsset extends Asset {
       false,
       1,
       0,
-      1.5
+      1.5,
+      TextAlign.Left,
+      TextAlignVertical.Center
     );
 
     textGeom.onFontChanged = () => {

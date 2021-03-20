@@ -279,9 +279,10 @@ export class DesignerNode implements IPropertyHolder {
   addEnumProperty(
     id: string,
     displayName: string,
-    defaultVal: string[] = new Array()
+    defaultVal: string[] = new Array(),
+    initialIdx: number = 0
   ): EnumProperty {
-    let prop = new EnumProperty(id, displayName, defaultVal);
+    let prop = new EnumProperty(id, displayName, defaultVal, initialIdx);
 
     this.properties.push(prop);
     return prop;

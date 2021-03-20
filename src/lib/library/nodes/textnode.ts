@@ -6,7 +6,11 @@ import {
 import { buildShaderProgram } from "@/lib/designer/gl";
 import { Property } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
-import { TextGeometry } from "@/lib/geometry/textGeometry";
+import {
+  TextGeometry,
+  TextAlign,
+  TextAlignVertical,
+} from "@/lib/geometry/textGeometry";
 import { AssetManager, AssetType } from "@/assets/assetmanager";
 
 const placeholderText = "Lorem ipsum Dolor sit amet.";
@@ -46,7 +50,9 @@ export class TextNode extends ImageDesignerNode {
       false,
       1,
       placeholderLetterSpacing,
-      placeholderLineHeight
+      placeholderLineHeight,
+      TextAlign.Left,
+      TextAlignVertical.Center
     );
 
     this.textGeom.onFontChanged = () => {
@@ -83,6 +89,15 @@ export class TextNode extends ImageDesignerNode {
         value != this.textGeom.lineHeignt
       ) {
         this.textGeom.updateLineHeight(value);
+        this.updateGeom();
+      } else if (prop.name === "align" && value != this.textGeom.align) {
+        this.textGeom.updateAlign(value);
+        this.updateGeom();
+      } else if (
+        prop.name === "alignVertical" &&
+        value != this.textGeom.alignVertical
+      ) {
+        this.textGeom.updateAlignVertical(value);
         this.updateGeom();
       } else if (prop.name === "color" && this.color != value) {
         this.color = value;
@@ -252,6 +267,20 @@ export class TextNode extends ImageDesignerNode {
 
     // text
     this.addStringProperty("text", "Text", placeholderText);
+
+    // align
+    this.addEnumProperty("align", "Align", ["Left", "Center", "Right"]);
+
+    // align vertical
+    let vAlign = this.addEnumProperty(
+      "alignVertical",
+      "AlignVertical",
+      ["Top", "Center", "Bottom"],
+      1
+    );
+    // // default value should be set to 'center'
+    // vAlign.index = 1;
+    // vAlign.value = "Center";
 
     // size
     this.addBoolProperty("fitToFrame", "Fit to frame", false);
