@@ -1,31 +1,29 @@
 <template>
-  <!-- <v-container>
-    
-  </v-container> -->
-  <div style="height:100%">
-    <div style="height:2em;">
-      <a
-        :class="{ btn: true, toggled: !hasImage }"
-        href="#"
-        @click="saveTexture()"
-      >
-        <i class="bx bx-save bx-sm"></i>
-      </a>
-      <a class="btn" href="#" @click="centerTexture()">
-        <i class="bx bx-exit-fullscreen bx-sm"></i>
-      </a>
-    </div>
-    <canvas id="_2dpreview" ref="canvas" style="display:flex;"></canvas>
-  </div>
+  <v-container>
+    <v-flex>
+      <v-btn @click="saveTexture">
+        <v-icon dark>
+          mdi-save
+        </v-icon>
+      </v-btn>
+      <v-btn @click="centerTexture">
+        <v-icon dark>
+          mdi-fit-screen
+        </v-icon>
+      </v-btn>
+    </v-flex>
+    <v-flex fill-height justify-center v-resize="resize" ref="flex">
+      <canvas id="_2dpreview" ref="canvas"></canvas>
+    </v-flex>
+  </v-container>
 </template>
 
 <script>
   import { DragZoom, DrawMode } from "./preview2d/previewcanvas2d";
   const electron = require("electron");
   const remote = electron.remote;
-  const { dialog, app, BrowserWindow, Menu } = remote;
+  const { dialog } = remote;
   import fs from "fs";
-  let nativeImage = electron.nativeImage;
 
   export default {
     // props: {
@@ -40,6 +38,7 @@
         image: null,
         canvas: null,
         dragZoom: null,
+        flex: null,
       };
     },
     mounted() {
@@ -70,7 +69,12 @@
         };
       },
       resize(width, height) {
+        width = this.$refs.flex.clientWidth;
+        height = this.$refs.flex.clientHeight;
         fitCanvasToContainer(this.$refs.canvas);
+        if (!this.dragZoom) {
+          this.dragZoom = new DragZoom(this.$refs.canvas);
+        }
         this.dragZoom.onResize(width, height);
       },
       resizeImage(width, height) {

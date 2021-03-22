@@ -146,6 +146,7 @@ export class DragZoom {
 
   onResize(width: number, height: number) {
     this.offset = new Vector2(width * 0.5, height * 0.5);
+    this.centerImage();
   }
 
   // puts image in center and set appropriate zoom level
@@ -169,9 +170,16 @@ export class DragZoom {
   }
 
   setImage(image: HTMLCanvasElement) {
-    this.image = image;
+    if (image) {
+      this.image = image;
 
-    // center image in view
+      const w = this.canvas.width / this.image.width;
+      const h = this.canvas.height / this.image.height;
+      let zoomFactor = w > h ? h : w;
+
+      // center image in view
+      this.centerImage(zoomFactor);
+    }
   }
 
   getAbsPos() {

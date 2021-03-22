@@ -24,6 +24,7 @@ import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detectnode";
 import { LogicDesignerNode } from "./designer/logicdesignernode";
+import { ImageDesignerNode } from "./designer/imagedesignernode";
 const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
 
@@ -300,6 +301,7 @@ export class Editor {
     //node.setAsResult();
     let nodeView = this.addNode(node, 0, 0);
     nodeView.setCenter(centerX + 150, centerY);
+    (node as ImageDesignerNode).setAsResult();
 
     this.assignNodeToTextureChannel(nodeView.id, "albedo");
     this.nodeScene.view.reset();

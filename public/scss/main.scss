@@ -1,6 +1,10 @@
 @import "variables";
 @import "~@fontsource/roboto/index.css";
 
+.v-navigation-drawer__content{
+  overflow-y: hidden !important;
+}
+
 html{
   overflow: hidden !important;
 }

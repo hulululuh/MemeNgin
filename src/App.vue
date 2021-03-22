@@ -7,13 +7,13 @@
         <v-btn color="gray" @click="undoAction">
           <v-icon dark>
             mdi-undo
-          </v-icon></v-btn
-        >
+          </v-icon>
+        </v-btn>
         <v-btn color="gray" @click="redoAction">
           <v-icon dark>
             mdi-redo
-          </v-icon></v-btn
-        >
+          </v-icon>
+        </v-btn>
       </v-toolbar-title>
     </v-app-bar>
 
@@ -25,21 +25,38 @@
       />
     </v-navigation-drawer>
 
-    <v-navigation-drawer app clipped right width="360" class="fill-width">
-      <v-row no-gutters>
+    <v-navigation-drawer
+      app
+      clipped
+      right
+      width="360"
+      style="overflow: hidden;"
+    >
+      <v-card
+        app
+        clipped
+        justify="center"
+        align="end"
+        style="overflow: hidden;"
+      >
+        <preview2d
+          align="center"
+          justify="center"
+          ref="preview2d"
+          style="width:360px; max-height:400px; min-height:360px;"
+        />
+      </v-card>
+      <v-card no-gutters style="max-height:70%; overflow: auto;">
         <node-properties-view
           fluid
+          align="start"
           class="d-flex"
           ref="properties"
           v-if="this.propHolder != null"
           :editor="this.editor"
           :node="this.propHolder"
         />
-      </v-row>
-      <v-spacer />
-      <v-row app class="align-end justify-center" height="360">
-        <preview2d ref="preview2d" />
-      </v-row>
+      </v-card>
     </v-navigation-drawer>
 
     <v-main fluid app bottom clipped style="padding-top:52; display:flex;">
