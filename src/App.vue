@@ -29,8 +29,7 @@
       app
       clipped
       right
-      width="360"
-      style="overflow: hidden;"
+      style="overflow: hidden; width: 360px;"
     >
       <v-card
         app
@@ -46,7 +45,7 @@
           style="width:360px; max-height:400px; min-height:360px;"
         />
       </v-card>
-      <v-card no-gutters style="max-height:70%; overflow: auto;">
+      <v-card no-gutters style="max-height:60%; overflow: auto;">
         <node-properties-view
           fluid
           align="start"
@@ -59,7 +58,13 @@
       </v-card>
     </v-navigation-drawer>
 
-    <v-main fluid app bottom clipped style="padding-top:52; display:flex;">
+    <v-main
+      fluid
+      app
+      bottom
+      clipped
+      style="padding-top:52px !important; display:flex;"
+    >
       <v-container
         fluid
         app

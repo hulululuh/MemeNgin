@@ -134,8 +134,16 @@
           });
       },
       centerTexture() {
-        // todo: center texture in canvas
-        this.dragZoom.centerImage();
+        if (this.$refs.canvas && this.image) {
+          const w = this.$refs.canvas.width / this.image.width;
+          const h = this.$refs.canvas.height / this.image.height;
+          let zoomFactor = w > h ? h : w;
+
+          // todo: center texture in canvas
+          this.dragZoom.centerImage(zoomFactor);
+        } else {
+          this.dragZoom.centerImage();
+        }
       },
       reset() {
         this.dragZoom.centerImage();
