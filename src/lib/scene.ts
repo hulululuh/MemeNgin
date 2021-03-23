@@ -614,16 +614,42 @@ export class NodeScene {
     });
   }
 
+  isCausingCycle(con: ConnectionGraphicsItem) {
+    const leftNode = con.outNode;
+    const rightNode = con.inNode;
+
+    let self = this;
+    let traverse = function(node: NodeGraphicsItem, id: string) {
+      const nextConns = self.conns.filter((conn) => conn.outNode.id == node.id);
+
+      for (const nextCon of nextConns) {
+        let found = traverse(nextCon.inNode, id);
+        if (found) return true;
+        if (nextCon.inNode.id == id) return true;
+      }
+
+      return false;
+    };
+
+    return traverse(rightNode, leftNode.id);
+  }
+
   //todo: integrity check
-  addConnection(con: ConnectionGraphicsItem) {
-    this.conns.push(con);
+  addConnection(con: ConnectionGraphicsItem): boolean {
+    if (this.isCausingCycle(con)) {
+      console.log("You are trying to make cyclic connection, abort.");
+      return false;
+    } else {
+      this.conns.push(con);
 
-    // link the sockets
-    con.socketA.addConnection(con);
-    con.socketB.addConnection(con);
+      // link the sockets
+      con.socketA.addConnection(con);
+      con.socketB.addConnection(con);
 
-    // callback
-    if (this.onconnectioncreated) this.onconnectioncreated(con);
+      // callback
+      if (this.onconnectioncreated) this.onconnectioncreated(con);
+      return true;
+    }
   }
 
   createConnection(leftId: string, rightId: string, rightIndex: number = 0) {

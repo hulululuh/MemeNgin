@@ -268,9 +268,11 @@ export class SocketGraphicsItem extends GraphicsItem {
         //con.socketA.con = con;
         //con.socketB.con = con;
 
-        this.scene.addConnection(con);
-        movedCons.push(con);
-        actions.push(ConnectionSwitchAction.Add);
+        let success = this.scene.addConnection(con);
+        if (success) {
+          movedCons.push(con);
+          actions.push(ConnectionSwitchAction.Add);
+        }
 
         // let action = new AddConnectionAction(this.scene, con);
         // UndoStack.current.push(action);
