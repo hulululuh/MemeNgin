@@ -1015,6 +1015,15 @@ export class ImageDesignerNode extends DesignerNode {
       vec3 RGBtoSRGB(vec3 rgb) {
           return pow(rgb, vec3(0.46226525728));
       }
+      
+      bool UVtoCheck(vec2 uv) {
+        int cU = int(uv.x+10000.0);
+        int cV = int(uv.y+10000.0);
+        int shift = 0;
+        if (cU<0) shift++;
+        if (cV<0) shift++;
+        return (cU+cV)%2 == 0;
+    }
 
       vec3 WhiteBalance(vec3 In, float Temperature, float Tint)
       {

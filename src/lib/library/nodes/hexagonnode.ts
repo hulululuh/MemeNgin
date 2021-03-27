@@ -1,15 +1,18 @@
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 export class HexagonNode extends ImageDesignerNode {
-  init() {
+  public init() {
     this.title = "Hexagon";
+
+    this.addInput("image");
 
     this.addIntProperty("scaleX", "X Scale", 2, 1, 32, 1);
     this.addIntProperty("scaleY", "Y Scale", 2, 1, 32, 1);
-    this.addFloatProperty("margin", "Margin", 0.9, 0.0, 1.0, 0.01);
-    this.addFloatProperty("gradient", "Gradient", 0, 0, 1.0, 0.01);
+    this.addFloatProperty("margin", "Margin", 1.0, 0.0, 1.0, 0.01);
+    this.addFloatProperty("gradient", "Gradient", 0.1, 0, 1.0, 0.01);
+    this.addFloatProperty("zoom", "Zoom", 1.0, 0.25, 2.0, 0.01);
 
-    let source = `
+    const source = `
         // https://www.shadertoy.com/view/Xljczw
         
         //todo: cleanup
@@ -36,20 +39,29 @@ export class HexagonNode extends ImageDesignerNode {
         //const float ratio = 1.15470053838;// 2/sqrt(3)
 
         // https://www.redblobgames.com/grids/hexagons/
-        const float ratio =3.0 * (1.0/sqrt(3.0)); 
+        //const float ratio =3.0 * (1.0/sqrt(3.0));
+        const float ratio = 1.0;
         vec4 process(vec2 uv)
         {
-            // make it more tileable
-            //uv += vec2(0.0, -0.5);
-            //uv.y *= 2.0/s.y;
-
             // it
             vec4 h = getHex(uv*vec2(float(prop_scaleX), float(prop_scaleY) * ratio));
             float dist = hex(h.xy) * 2.0;// result range from hex function is 0.0-0.5
             float finalDist = 1.0 - linearstep(prop_margin - prop_margin*prop_gradient, prop_margin, dist);
             
-            //todo: apply random color using h.zw as color id
-            return vec4(vec3(finalDist),1.0);
+            vec2 hexUV = (h.xy) / prop_zoom + vec2(0.5);
+            if (image_connected) {
+                vec4 colImg = texture(image, hexUV);
+                colImg.a *= finalDist;
+                return colImg;
+            } else {
+                vec2 cCoord = (hexUV * 2.0);
+                bool checker = UVtoCheck(cCoord);
+                const float w = 0.25;
+                
+                vec3 color = vec3(hexUV, 0.0)*(1.0-w) + (checker ? vec3(1.0) : vec3(0.0, 0.0, 1.0))*w;
+                // draw uv coord instead
+                return vec4(color, finalDist);
+            }
         }
         `;
 

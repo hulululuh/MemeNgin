@@ -5,9 +5,9 @@ export class PolygonNode extends ImageDesignerNode {
   init() {
     this.title = "Polygon";
 
-    this.addFloatProperty("radius", "Radius", 0.7, 0, 3, 0.01);
+    this.addFloatProperty("radius", "Radius", 0.5, 0, 3, 0.01);
     this.addFloatProperty("angle", "Angle", 0, 0.0, 360.0, 1);
-    this.addIntProperty("sides", "Sides", 5, 0, 20, 1);
+    this.addIntProperty("sides", "Sides", 5, 3, 36, 1);
     this.addFloatProperty("gradient", "Gradient", 0, 0, 1.0, 0.01);
 
     let source = `

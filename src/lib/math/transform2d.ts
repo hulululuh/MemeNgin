@@ -1,5 +1,4 @@
 import { Vector2, Matrix3 } from "@math.gl/core";
-import { Transform } from "node:stream";
 
 export class Transform2D {
   position: Vector2;

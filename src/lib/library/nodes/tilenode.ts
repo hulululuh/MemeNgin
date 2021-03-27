@@ -12,8 +12,8 @@ export class TileNode extends ImageDesignerNode {
     this.addFloatProperty("brickWidth", "Tile Width", 1.0, 0, 1, 0.01);
     this.addFloatProperty("brickHeight", "Tile Height", 1.0, 0, 1, 0.01);
 
-    this.addIntProperty("rows", "Rows", 6, 1, 20, 1);
-    this.addIntProperty("columns", "Columns", 6, 1, 20, 1);
+    this.addIntProperty("rows", "Rows", 3, 1, 20, 1);
+    this.addIntProperty("columns", "Columns", 3, 1, 20, 1);
 
     let source = `
         // offset for alternating rows
@@ -57,12 +57,26 @@ export class TileNode extends ImageDesignerNode {
 
             // this brings it to the range of 0 - 1
             // perfect for sampling texture
+            vec2 cCoord = pos;
             pos = fract(pos);
             
             vec2 isBrick =is_brick(pos);
-            vec4 col = texture(image, pos);
+
+            if (image_connected) {
+                vec4 col = texture(image, pos);
+                return vec4(col.rgb, isBrick.x * isBrick.y * col.a);
+            } else {
+                cCoord = (pos - vec2(0.5)) * 4.0;
+                bool checker = UVtoCheck(cCoord);
+                
+                float w = 0.125;
+                
+                vec3 color = vec3(clamp(pos, 0.0, 1.0), 0.0)*(1.0-w) + (checker ? vec3(1.0) : vec3(0.0, 0.0, 1.0))*(w);
+
+                // draw uv coord instead
+                return vec4(color, 1.0);
+            }
             
-            return vec4(col.rgb, isBrick.x * isBrick.y * col.a);
         }
         `;
 

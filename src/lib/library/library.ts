@@ -1,6 +1,5 @@
 import { NodeCategory } from "../designer/designernode";
 import { DesignerLibrary } from "../designer/library";
-import { AdvanceSplatterNode } from "./nodes/advancesplatternode";
 import { BlendNode } from "./nodes/blendnode";
 import { BlurNode } from "./nodes/blurnode";
 import { BoolPropertyNode } from "./nodes/boolpropertynode";
@@ -42,7 +41,6 @@ import { TextNode } from "./nodes/textnode";
 import { TextureNode } from "./nodes/texturenode";
 import { ThresholdNode } from "./nodes/thresholdnode";
 import { TileNode } from "./nodes/tilenode";
-import { TileSamplerNode } from "./nodes/tilesamplernode";
 import { Transform2DNode } from "./nodes/transform2dnode";
 import { WarpNode } from "./nodes/warpnode";
 import { WaveNode } from "./nodes/wavenode";
@@ -90,7 +88,7 @@ export function createLibrary() {
   lib.addNode("maprange", "Map Range", MapRangeNode, NodeCategory.Color);
   lib.addNode("splat", "Splat", SplatNode, NodeCategory.Composite);
   lib.addNode("perlin3d", "Perlin 3D", Perlin3DNode, NodeCategory.Create);
-  lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Create);
+  lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Shape);
   lib.addNode(
     "fractalnoise",
     "Fractal Noise",
@@ -125,12 +123,6 @@ export function createLibrary() {
     NodeCategory.Shape
   );
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
-  lib.addNode(
-    "tilesampler",
-    "Tile Sampler",
-    TileSamplerNode,
-    NodeCategory.Shape
-  );
   lib.addNode("normalmap", "Normal Map", NormalMapNode, NodeCategory.Shape);
   lib.addNode(
     "brightnesscontrast",
@@ -146,7 +138,7 @@ export function createLibrary() {
     NodeCategory.Color
   );
   lib.addNode("wave", "Wave", WaveNode, NodeCategory.Create);
-  lib.addNode("copy", "Copy", CopyNode, NodeCategory.Think);
+  lib.addNode("copy", "Copy", CopyNode, NodeCategory.Logic);
   lib.addNode("gradient", "Gradient", GradientNode, NodeCategory.Create);
   lib.addNode("texture", "Texture", TextureNode, NodeCategory.Create);
   lib.addNode(
@@ -155,46 +147,40 @@ export function createLibrary() {
     TriGradientNode,
     NodeCategory.Create
   );
-  lib.addNode("output", "Output", OutputNode, NodeCategory.Think);
-  lib.addNode("blurnodes", "Blur", BlurNode, NodeCategory.Shape);
+  lib.addNode("output", "Output", OutputNode, NodeCategory.Logic);
+  lib.addNode("blur", "Blur", BlurNode, NodeCategory.Shape);
   lib.addNode("slopeblur", "Slope Blur", SlopeBlurNode, NodeCategory.Shape);
-  lib.addNode(
-    "advancesplatter",
-    "Advance Splatter",
-    AdvanceSplatterNode,
-    NodeCategory.Composite
-  );
-  lib.addNode("detect", "Detect", DetectNode, NodeCategory.Think);
-  lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Think);
+  lib.addNode("detect", "Detect", DetectNode, NodeCategory.Logic);
+  lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Logic);
   lib.addNode(
     "boolProperty",
     "BoolProperty",
     BoolPropertyNode,
-    NodeCategory.Think
+    NodeCategory.Logic
   );
   lib.addNode(
     "floatproperty",
     "FloatProperty",
     FloatPropertyNode,
-    NodeCategory.Think
+    NodeCategory.Logic
   );
   lib.addNode(
     "intproperty",
     "IntProperty",
     IntPropertyNode,
-    NodeCategory.Think
+    NodeCategory.Logic
   );
   lib.addNode(
     "stringproperty",
     "StringProperty",
     StringPropertyNode,
-    NodeCategory.Think
+    NodeCategory.Logic
   );
   lib.addNode(
     "colorproperty",
     "ColorProperty",
     ColorPropertyNode,
-    NodeCategory.Think
+    NodeCategory.Logic
   );
 
   return lib;
