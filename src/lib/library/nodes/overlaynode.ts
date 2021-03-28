@@ -130,7 +130,6 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
 
     this.addInput("colorA"); // foreground
     this.addInput("colorB"); // background
-    this.addInput("opacityMap");
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
 
@@ -157,8 +156,6 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
         vec4 process(vec2 uv)
         {
             float finalOpacity = prop_opacity;
-            if (opacityMap_connected)
-                finalOpacity *= texture(opacityMap, uv).r;
 
             vec2 p = vec2(256.0, 256.0);
             vec2 s = vec2(2.0, 1.0);
