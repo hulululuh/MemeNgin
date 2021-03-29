@@ -749,9 +749,13 @@ export class NodeScene {
     // todo: draw grid
     this.view.clear(this.context, settings.colorGridBackground);
     this.view.setViewMatrix(this.context);
-    this.view.drawGrid(this.context, 25, settings.colorGridSecondary, 1);
-    this.view.drawGrid(this.context, 100, settings.colorGridPrimary, 3);
 
+    if (this.view.zoomFactor > 0.01) {
+      this.view.drawGrid(this.context, 100, settings.colorGridPrimary, 3);
+    }
+    if (this.view.zoomFactor > 0.2) {
+      this.view.drawGrid(this.context, 25, settings.colorGridSecondary, 1);
+    }
     this.view.drawCheckerBoard(
       this.gl,
       settings.colorGridPrimary,
