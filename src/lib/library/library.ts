@@ -29,6 +29,7 @@ import { MirrorNode } from "./nodes/mirrornode";
 import { NormalMapNode } from "./nodes/normalmapnode";
 import { OutputNode } from "./nodes/outputnode";
 import { OverlayNode } from "./nodes/overlaynode";
+import { OpacityOverrideNode } from "./nodes/opacityoverridenode";
 import { Perlin3DNode } from "./nodes/perlin3dnode";
 import { CircleNode, PolygonNode } from "./nodes/shapesnodes";
 import { SimplexNoiseNode } from "./nodes/simplexnoisenode";
@@ -62,6 +63,12 @@ export function createLibrary() {
     NodeCategory.Shape
   );
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
+  lib.addNode(
+    "opacityOverrideNode",
+    "Opacity Override",
+    OpacityOverrideNode,
+    NodeCategory.Shape
+  );
   lib.addNode("tile", "Tile", TileNode, NodeCategory.Shape);
   lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Shape);
   lib.addNode("warp", "Warp", WarpNode, NodeCategory.Shape);

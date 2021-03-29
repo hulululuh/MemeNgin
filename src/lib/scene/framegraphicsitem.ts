@@ -1,4 +1,3 @@
-import { SocketGraphicsItem } from "./socketgraphicsitem";
 import {
   GraphicsItem,
   MouseDownEvent,
