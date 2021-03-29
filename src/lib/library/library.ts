@@ -64,7 +64,7 @@ export function createLibrary() {
   );
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
   lib.addNode(
-    "opacityOverrideNode",
+    "opacityOverride",
     "Opacity Override",
     OpacityOverrideNode,
     NodeCategory.Shape
