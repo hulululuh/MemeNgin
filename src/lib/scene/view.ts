@@ -252,6 +252,16 @@ export class SceneView {
     );
   }
 
+  drawCheckerBoard(
+    ctx: WebGL2RenderingContext,
+    colorA: string,
+    colorB: string,
+    size: number
+  ) {
+    // TODO: implement it if needed
+    // canvas drawing took too much resources when scene is zoomed out. need to implement shader based approach
+  }
+
   drawGrid(
     ctx: CanvasRenderingContext2D,
     GRID_SIZE: number,

@@ -17,6 +17,7 @@ export class ApplicationSettings {
   colorGridBackground: string;
   colorGridPrimary: string;
   colorGridSecondary: string;
+  colorFocused: string = "#0095ff";
 
   lineWidthNormal: number = 2;
   lineWidthThick: number = 3;
@@ -47,6 +48,7 @@ export class ApplicationSettings {
     this.colorGridBackground = readProperty("colorGridBackground");
     this.colorGridPrimary = readProperty("colorGridPrimary");
     this.colorGridSecondary = readProperty("colorGridSecondary");
+    this.colorFocused = readProperty("colorFocused");
     this.widgetThickness = readPropertyAsNumber("widgetThickness");
     this.widgetShadowThickness = readPropertyAsNumber("widgetShadowThickness");
     this.colorTitle = readPropertyAsColor("colorTitle");

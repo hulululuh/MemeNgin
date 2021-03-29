@@ -67,6 +67,7 @@ class Selection {
 export class NodeScene {
   canvas: HTMLCanvasElement;
   context!: CanvasRenderingContext2D;
+  gl!: WebGL2RenderingContext;
   contextExtra: any;
   hasFocus: boolean;
 
@@ -148,6 +149,7 @@ export class NodeScene {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = this.canvas.getContext("2d");
+    this.gl = this.canvas.getContext("webgl2");
     this.view = new SceneView(canvas);
     this.hasFocus = false;
     this.contextExtra = this.context;
@@ -745,11 +747,17 @@ export class NodeScene {
     //this.context.fillRect(0,0,this.canvas.width, this.canvas.height);
 
     // todo: draw grid
-
     this.view.clear(this.context, settings.colorGridBackground);
     this.view.setViewMatrix(this.context);
-    this.view.drawGrid(this.context, 33.33333, settings.colorGridSecondary, 1);
+    this.view.drawGrid(this.context, 25, settings.colorGridSecondary, 1);
     this.view.drawGrid(this.context, 100, settings.colorGridPrimary, 3);
+
+    this.view.drawCheckerBoard(
+      this.gl,
+      settings.colorGridPrimary,
+      settings.colorGridSecondary,
+      32
+    );
   }
 
   draw() {
