@@ -400,6 +400,11 @@ export class Editor {
       // }
     };
 
+    this.nodeScene.onoutputnodecreationattempt = function() {
+      self.nodeScene.selectedItems = [self.nodeScene.outputNode];
+      self.nodeScene.zoomSelected(self.nodeScene.selectedItems);
+    };
+
     this.nodeScene.onitemsdeleting = function(
       frames: FrameGraphicsItem[],
       comments: CommentGraphicsItem[],
@@ -442,10 +447,17 @@ export class Editor {
       //   self.onpreviewnode(null, null);
       // }
       // clear selected items
-      self.nodeScene.selectedItems.splice(
-        0,
-        self.nodeScene.selectedItems.length
-      );
+
+      for (let node of nodes) {
+        let idx = self.nodeScene.selectedItems.indexOf(node);
+        if (idx != -1) {
+          self.nodeScene.selectedItems.splice(idx, 1);
+        }
+      }
+      // self.nodeScene.selectedItems.splice(
+      //   0,
+      //   self.nodeScene.selectedItems.length
+      // );
     };
 
     this.nodeScene.oncopy = function(evt: ClipboardEvent) {

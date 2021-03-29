@@ -190,6 +190,12 @@
     }
 
     addItem(type: LibraryItemType, nodeName: string) {
+      if (nodeName == "output") {
+        // only one output node is exists
+        this.editor.nodeScene.onoutputnodecreationattempt();
+        return;
+      }
+
       let action: AddItemsAction = null;
 
       if (type == LibraryItemType.Node) {

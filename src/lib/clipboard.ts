@@ -45,7 +45,9 @@ export class ItemClipboard {
     let nodeList: NodeGraphicsItem[] = [];
     items.forEach((i) => {
       // check if this works with obfuscated code
-      if (i instanceof NodeGraphicsItem) nodeList.push(<NodeGraphicsItem>i);
+      if (i instanceof NodeGraphicsItem) {
+        if (!i.isOutput) nodeList.push(<NodeGraphicsItem>i);
+      }
     });
 
     data.nodes = this.getNodes(designer, nodeList);

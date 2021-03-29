@@ -31,6 +31,7 @@ import { Rect } from "@/lib/math/rect";
 import { Editor } from "@/lib/editor";
 
 import { ApplicationSettings } from "@/settings";
+import { OutputNode } from "./library/nodes/outputnode";
 const settings = ApplicationSettings.getInstance();
 
 enum DragMode {
@@ -50,19 +51,6 @@ class Selection {
     this.nodes = [];
   }
 }
-// class Rect {
-//   x: number;
-//   y: number;
-//   width: number;
-//   height: number;
-
-//   Rect(x: number = 0, y: number = 0, width: number = 1, height: number = 1) {
-//     this.x = x;
-//     this.y = y;
-//     this.width = width;
-//     this.height = height;
-//   }
-// }
 
 export class NodeScene {
   canvas: HTMLCanvasElement;
@@ -100,6 +88,7 @@ export class NodeScene {
   onframeselected?: (item: FrameGraphicsItem) => void;
   onnavigationselected?: (item: NavigationGraphicsItem) => void;
   onwidget2dselected?: (item: Transform2dWidget) => void;
+  onoutputnodecreationattempt?: () => void;
 
   onnodedeleted?: (item: NodeGraphicsItem) => void;
 
@@ -165,27 +154,8 @@ export class NodeScene {
     this.navigations = new Array();
     this.dragMode = null;
     this.selectionRect = new Rect();
-    //this.selectedItem = null;
     this.selectedItems = [];
     this.hitItem = null;
-
-    // add sample frames
-    // let frame = new FrameGraphicsItem(this.view);
-    // frame.setSize(500, 300);
-    // frame.scene = this;
-    // this.frames.push(frame);
-
-    // let comment = new CommentGraphicsItem(this.view);
-    // comment.scene = this;
-    // //comment.setText("Hello World");
-    // comment.setText("This\nis\na\nmultiline\nmessage");
-    // comment.setCenter(200, 500);
-    // this.comments.push(comment);
-
-    // let nav = new NavigationGraphicsItem();
-    // nav.scene = this;
-    // nav.setLabel("Test Navigation");
-    // this.navigations.push(nav);
 
     // bind event listeners
     let self = this;
@@ -359,6 +329,11 @@ export class NodeScene {
     // golden layout conveniently hides it
   }
 
+  get outputNode(): NodeGraphicsItem {
+    let output = this.nodes.find((item) => item.dNode instanceof OutputNode);
+    return output;
+  }
+
   dispose() {
     //alert("disposed!");
     this.canvas.removeEventListener("mousemove", this._mouseMove);
@@ -525,7 +500,7 @@ export class NodeScene {
         navs.push(<NavigationGraphicsItem>item);
       }
       if (item instanceof NodeGraphicsItem) {
-        nodes.push(<NodeGraphicsItem>item);
+        if (!item.isOutput) nodes.push(<NodeGraphicsItem>item);
       }
     }
 
@@ -951,42 +926,7 @@ export class NodeScene {
         this.hitItem = hitItem;
 
         Editor.getInstance().onnodeselected(null);
-        //console.log(hitItem);
       }
-
-      // check for a hit socket first
-      // let hitSock: SocketGraphicsItem = this.getHitSocket(mouseX, mouseY);
-
-      // if (hitSock) {
-      // 	// if socket is an in socket with a connection, make hitsocket the connected out socket
-      // 	if (
-      // 		hitSock.socketType == SocketType.In &&
-      // 		hitSock.hasConnections()
-      // 	) {
-      // 		this.hitSocket = hitSock.getConnection(0).socketA; // insockets should only have one connection
-      // 		// store connection for removal as well
-      // 		this.hitConnection = hitSock.getConnection(0);
-      // 	} else this.hitSocket = hitSock;
-      // } else {
-      // 	// if there isnt a hit socket then check for a hit node
-      // 	let hitNode: NodeGraphicsItem = this.getHitNode(mouseX, mouseY);
-
-      // 	if (hitNode) {
-      // 		//move node to stop of stack
-      // 		this.moveNodeToTop(hitNode);
-
-      // 		// todo: do this properly on mouse release
-      // 		this.selectedNode = hitNode;
-      // 	} else {
-      // 		this.selectedNode = null;
-      // 	}
-
-      // 	this.draggedNode = hitNode;
-      // 	if (this.onnodeselected) {
-      // 		if (hitNode) this.onnodeselected(hitNode);
-      // 		else this.onnodeselected(hitNode);
-      // 	}
-      // }
     }
   }
 
@@ -1036,76 +976,6 @@ export class NodeScene {
         }
       }
     }
-
-    // if (evt.button == 0) {
-    // 	if (this.hitSocket) {
-    // 		// remove previous connection
-    // 		// this block creates a new connection regardless of the outcome
-    // 		if (this.hitConnection) {
-    // 			this.removeConnection(this.hitConnection);
-    // 			this.hitConnection = null;
-    // 		}
-
-    // 		let closeSock: SocketGraphicsItem = this.getHitSocket(
-    // 			mouseX,
-    // 			mouseY
-    // 		);
-
-    // 		if (
-    // 			closeSock &&
-    // 			closeSock != this.hitSocket &&
-    // 			closeSock.socketType != this.hitSocket.socketType &&
-    // 			closeSock.node != this.hitSocket.node
-    // 		) {
-    // 			// close socket
-    // 			let con: ConnectionGraphicsItem = new ConnectionGraphicsItem();
-    // 			// out socket should be on the left, socketA
-    // 			if (this.hitSocket.socketType == SocketType.Out) {
-    // 				// out socket
-    // 				con.socketA = this.hitSocket;
-    // 				con.socketB = closeSock;
-
-    // 				// close sock is an inSocket which means it should only have one connection
-    // 				// remove current connection from inSocket
-    // 				if (closeSock.hasConnections())
-    // 					this.removeConnection(closeSock.getConnection(0));
-    // 			} else {
-    // 				// in socket
-    // 				con.socketA = closeSock;
-    // 				con.socketB = this.hitSocket;
-    // 			}
-
-    // 			// link connection
-    // 			//con.socketA.con = con;
-    // 			//con.socketB.con = con;
-
-    // 			this.addConnection(con);
-    // 		} else if (!closeSock) {
-    // 			// delete connection if hit node is an insock
-    // 			// if we're here it means one of 2 things:
-    // 			// 1: a new connection failed to form
-    // 			// 2: we're breaking a previously formed connection, which can only be done
-    // 			// by dragging from an insock that already has a connection
-
-    // 			if (this.hitSocket.socketType == SocketType.Out) {
-    // 				/*
-    //                 if (this.hitSocket.hasConnections()) {
-    //                     // remove connection
-    //                     //let con = this.hitSocket.con;
-    //                     this.removeConnection(this.hitSocket.getConnectionFrom(this.hitSocket));
-    //                 }
-    //                 */
-
-    // 				if (this.hitConnection)
-    // 					this.removeConnection(this.hitConnection);
-    // 			}
-    // 		}
-    // 	}
-
-    // 	this.draggedNode = null;
-    // 	this.hitSocket = null;
-    // 	this.hitConnection = null;
-    // }
   }
 
   onMouseMove(evt: MouseEvent) {

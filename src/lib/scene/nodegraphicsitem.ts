@@ -65,6 +65,12 @@ export class NodeGraphicsItem extends GraphicsItem {
     // this.relScale = 100 / scale;
   }
 
+  get isOutput(): boolean {
+    if (!this.dNode) return false;
+    else if (this.dNode instanceof OutputNode) return true;
+    else return false;
+  }
+
   setupSize() {
     if (this.isLogic) {
       this.setSize(75, 36);
