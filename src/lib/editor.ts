@@ -632,6 +632,8 @@ export class Editor {
         let node = this.nodeScene.getNodeById(e.textureChannels[channelName]);
       }
     }
+
+    this.nodeScene.view.reset();
   }
 
   save(): any {
