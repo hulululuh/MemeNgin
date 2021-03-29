@@ -1,5 +1,8 @@
 import { SocketGraphicsItem, SocketInOut } from "./socketgraphicsitem";
 import { GraphicsItem } from "./graphicsitem";
+import { ApplicationSettings } from "@/settings";
+
+const settings = ApplicationSettings.getInstance();
 
 export class ConnectionGraphicsItem extends GraphicsItem {
   id!: string;
@@ -20,7 +23,7 @@ export class ConnectionGraphicsItem extends GraphicsItem {
 
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
     ctx.beginPath();
-    ctx.strokeStyle = "rgb(200, 200, 200)";
+    ctx.strokeStyle = settings.colorConnectionLine;
     ctx.lineWidth = 4;
     ctx.moveTo(this.socketA.centerX(), this.socketA.centerY());
     ctx.bezierCurveTo(

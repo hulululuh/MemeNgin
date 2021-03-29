@@ -31,6 +31,8 @@ export class ApplicationSettings {
   colorWidgetShadow: string = "#1e1e1e";
   colorSelectedItem: string = "#bbe1fa";
   colorSelectedItemBackground: string = "#3282b84c";
+  colorSocketTitle: string = "#222222ff";
+  colorConnectionLine: string = "#1e1e1eff";
   colorTitle: Color = Color.fromHex("#3c3c3c");
 
   widgetThickness: number = 3.0;
@@ -49,6 +51,8 @@ export class ApplicationSettings {
     this.colorGridPrimary = readProperty("colorGridPrimary");
     this.colorGridSecondary = readProperty("colorGridSecondary");
     this.colorFocused = readProperty("colorFocused");
+    this.colorSocketTitle = readProperty("colorSocketTitle");
+    this.colorConnectionLine = readProperty("colorConnectionLine");
     this.widgetThickness = readPropertyAsNumber("widgetThickness");
     this.widgetShadowThickness = readPropertyAsNumber("widgetShadowThickness");
     this.colorTitle = readPropertyAsColor("colorTitle");

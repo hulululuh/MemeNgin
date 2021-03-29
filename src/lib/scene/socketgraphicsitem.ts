@@ -16,6 +16,9 @@ import {
 } from "../actions/switchconnectionaction";
 
 import { PropertyType } from "@/lib/designer/properties";
+import { ApplicationSettings } from "@/settings";
+
+const settings = ApplicationSettings.getInstance();
 
 export enum SocketInOut {
   In,
@@ -129,7 +132,7 @@ export class SocketGraphicsItem extends GraphicsItem {
 
     // draw text
     if (renderState.hovered) {
-      ctx.fillStyle = "rgb(150,150,150)";
+      ctx.fillStyle = settings.colorSocketTitle;
       ctx.font = "9px 'Open Sans'";
       if (this.socketInOut == SocketInOut.Out) {
         let w = ctx.measureText(this.title).width;
