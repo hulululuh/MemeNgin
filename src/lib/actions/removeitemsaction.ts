@@ -48,12 +48,6 @@ export class RemoveItemsAction extends Action {
     this.dnodes = dnodes;
 
     this.textureChannels = new Map<string, string>();
-
-    for (let node of nodes) {
-      if (node.textureChannel != null) {
-        this.textureChannels.set(node.id, node.textureChannel);
-      }
-    }
   }
 
   undo() {
@@ -75,11 +69,6 @@ export class RemoveItemsAction extends Action {
 
     for (let dnode of this.dnodes) {
       this.designer.addNode(dnode, false);
-    }
-
-    // assign texture channels
-    for (let [nodeId, channel] of this.textureChannels) {
-      this.editor.assignNodeToTextureChannel(nodeId, channel);
     }
 
     // relying on callbacks to add the connection

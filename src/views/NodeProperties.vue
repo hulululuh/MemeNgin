@@ -6,14 +6,6 @@
     v-if="node != null"
   >
     <v-expansion-panels v-model="panel" multiple accordion>
-      <!-- <v-expansion-panel>
-        <v-expansion-panel-header class="propertyList"
-          >Base Properties</v-expansion-panel-header
-        >
-        <v-expansion-panel-content>
-          <texture-channel :node="getNode" :editor="editor" />
-        </v-expansion-panel-content>
-      </v-expansion-panel> -->
       <v-expansion-panel>
         <v-expansion-panel-header class="propertyList"
           >Properties</v-expansion-panel-header
@@ -50,7 +42,6 @@
   import EnumPropertyView from "@/components/properties/EnumProp.vue";
   import AssetPropertyView from "@/components/properties/AssetProp.vue";
   import ColorPropertyView from "@/components/properties/ColorProp.vue";
-  import TextureChannelPropertyView from "@/components/properties/TextureChannelProp.vue";
   import Accordion from "@/components/Accordion.vue";
   import GradientPropertyView from "@/components/properties/GradientProp.vue";
   import StringPropertyView from "@/components/properties/StringProp.vue";
@@ -81,7 +72,6 @@
       transform2d: Transform2DPropertyView,
       asset: AssetPropertyView,
 
-      textureChannel: TextureChannelPropertyView,
       Accordion,
     },
   })

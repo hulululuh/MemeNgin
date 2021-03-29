@@ -19,6 +19,7 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
 import { PropertyType } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
+import { OutputNode } from "@/lib/library/nodes/outputnode";
 
 export class NodeGraphicsItemRenderState {
   hovered: boolean = false;
@@ -37,13 +38,12 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   hit: boolean;
 
-  // albedo, normal, height, etc...
-  textureChannel: string;
-
   dragStartPos: Vector2;
 
   // TODO: it seems NodeGraphicsItem and DesignerNode better be de-coupled
   dNode: DesignerNode;
+
+  doubleSized: boolean;
 
   constructor(node: DesignerNode) {
     super();
@@ -56,6 +56,7 @@ export class NodeGraphicsItem extends GraphicsItem {
     this.value = "";
     this.id = node.id;
     this.dNode = node;
+    this.doubleSized = false;
 
     this.setupSize();
     this.setupSockets();
@@ -65,12 +66,12 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   setupSize() {
-    if (!this.isLogic) {
-      let node = this.dNode as ImageDesignerNode;
-      this.setVirtualSize(node.getWidth(), node.getHeight());
-    } else {
-      //let logicdNode = dNode as LogicDesignerNode;
+    if (this.isLogic) {
       this.setSize(75, 36);
+    } else {
+      let node = this.dNode as ImageDesignerNode;
+      this.doubleSized = this.dNode instanceof OutputNode;
+      this.setVirtualSize(node.getWidth(), node.getHeight());
     }
   }
 
@@ -101,15 +102,16 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   // resize graphics node by given image size
   setVirtualSize(width: number, height: number) {
-    let wScaled = 100;
-    let hScaled = 100;
+    const scaleFactor = this.doubleSized ? 1.5 : 1.0;
+    let wScaled = 100 * scaleFactor;
+    let hScaled = 100 * scaleFactor;
 
     const scale = Math.min(width, height);
     this.relScale = 100 / scale;
 
     if (width !== height) {
-      wScaled = width * this.relScale;
-      hScaled = height * this.relScale;
+      wScaled = width * this.relScale * scaleFactor;
+      hScaled = height * this.relScale * scaleFactor;
     }
 
     // create node from designer
@@ -124,14 +126,6 @@ export class NodeGraphicsItem extends GraphicsItem {
     this.scene = scene;
 
     for (let sock of this.sockets) sock.setScene(scene);
-  }
-
-  setTextureChannel(name: string) {
-    this.textureChannel = name;
-  }
-
-  clearTextureChannel() {
-    this.textureChannel = null;
   }
 
   setThumbnail(thumbnail: HTMLImageElement) {
@@ -294,18 +288,6 @@ export class NodeGraphicsItem extends GraphicsItem {
 
     for (let sock of this.sockets) {
       sock.draw(ctx, renderState);
-    }
-
-    // texture channel
-    if (this.textureChannel) {
-      ctx.beginPath();
-      //ctx.font = "14px monospace";
-      ctx.font = "12px 'Open Sans'";
-      ctx.fillStyle = "rgb(200, 255, 200)";
-      let size = ctx.measureText(this.textureChannel.toUpperCase());
-      let textX = this.centerX() - size.width / 2;
-      let textY = this.y + this.height + 14;
-      ctx.fillText(this.textureChannel.toUpperCase(), textX, textY);
     }
   }
 

@@ -119,7 +119,7 @@ export class ImageDesignerNode extends DesignerNode {
   isTextureReady: boolean;
 
   isInput: boolean;
-  isResult: boolean;
+  isOutput: boolean;
   inheritParentSize: boolean;
 
   width: number;
@@ -138,7 +138,7 @@ export class ImageDesignerNode extends DesignerNode {
 
     this.isTextureReady = false;
     this.isInput = false;
-    this.isResult = false;
+    this.isOutput = false;
     this.width = 1024;
     this.height = 1024;
     this.parentIndex = "image";
@@ -278,11 +278,12 @@ export class ImageDesignerNode extends DesignerNode {
       (x) => x.id === this.id
     );
     if (gNodes) {
+      // make output node double sized
       gNodes.setVirtualSize(width, height);
     }
 
     // if the result node size has changed, we should resize 2d canvas also
-    if (this.isResult) {
+    if (this.isOutput) {
       let event = new CustomEvent("resizeImage", {
         detail: {
           width: this.getWidth(),
@@ -1262,7 +1263,7 @@ export class ImageDesignerNode extends DesignerNode {
     this.isInput = true;
   }
 
-  setAsResult() {
-    this.isResult = true;
+  setAsOutput() {
+    this.isOutput = true;
   }
 }

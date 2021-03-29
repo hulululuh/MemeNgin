@@ -43,39 +43,6 @@ function rgbToHex(r, g, b) {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-// stores the IDs for the display nodes
-export class DisplayNodes {
-  albedoNode: string;
-  normalNode: string;
-  roughnessNode: string;
-  heightNode: string;
-  metallicNode: string;
-  /*
-    albedoCanvas : ImageCanvas = new ImageCanvas();
-    normalCanvas : ImageCanvas = new ImageCanvas();
-    roughnessCanvas : ImageCanvas = new ImageCanvas();
-    heightCanvas : ImageCanvas = new ImageCanvas();
-    metallicCanvas : ImageCanvas = new ImageCanvas();
-
-    resize(width:number, height:number)
-    {
-        this.albedoCanvas.resize(width, height);
-        this.normalCanvas.resize(width, height);
-        this.roughnessCanvas.resize(width, height);
-        this.heightCanvas.resize(width, height);
-        this.metallicCanvas.resize(width, height);
-    }
-    */
-}
-
-export enum DisplayChannel {
-  Albedo,
-  Metallic,
-  Roughness,
-  Normal,
-  Height,
-}
-
 export enum FileType {
   Texture,
   LUT,
@@ -100,7 +67,6 @@ export class Editor {
 
   //   propGen: PropertyGenerator;
   //   varGen: VariableGenerator;
-  displayNodes: DisplayNodes;
 
   onnodeselected?: (item: DesignerNode) => void;
   oncommentselected?: (item: CommentGraphicsItem) => void;
@@ -110,24 +76,9 @@ export class Editor {
   onpreviewnode?: (item: DesignerNode, image: HTMLCanvasElement) => void;
   onlibrarymenu?: () => void;
 
-  textureChannels = {};
-  ontexturechannelcleared?: (
-    imageCanvas: ImageCanvas,
-    channelName: string
-  ) => void;
-  ontexturechannelassigned?: (
-    imageCanvas: ImageCanvas,
-    channelName: string
-  ) => void;
-  ontexturechannelupdated?: (
-    imageCanvas: ImageCanvas,
-    channelName: string
-  ) => void;
-
   constructor() {
     Editor.instance = this;
     DetectNode.loadModelAsync();
-    this.displayNodes = new DisplayNodes();
     this.selectedDesignerNode = null;
     this.undoStack = new UndoStack();
   }
@@ -157,118 +108,6 @@ export class Editor {
     return this.designer.height;
   }
 
-  assignNodeToTextureChannel(nodeId: string, channelName: string) {
-    // only one node can be assigned to a channel
-    if (
-      this.textureChannels.hasOwnProperty(channelName) &&
-      this.textureChannels[channelName]
-    ) {
-      // remove label from node view
-      let oldNode = this.textureChannels[channelName] as DesignerNode;
-      let nodeView = this.nodeScene.getNodeById(oldNode.id);
-      nodeView.clearTextureChannel();
-      //this.textureChannels[channelName] = null;
-      delete this.textureChannels[channelName];
-
-      if (this.ontexturechannelcleared) {
-        this.ontexturechannelcleared(null, channelName);
-      }
-    }
-
-    let nodeView = this.nodeScene.getNodeById(nodeId);
-    nodeView.setTextureChannel(channelName);
-
-    let newNode = this.designer.getNodeById(nodeId);
-    this.textureChannels[channelName] = newNode;
-
-    // // notify 3d view
-    // if (this.ontexturechannelcleared) {
-    //   this.ontexturechannelassigned(nodeView.imageCanvas, channelName);
-    // }
-  }
-
-  clearTextureChannel(nodeId: string) {
-    // eval which channel has this node assigned
-    for (let channelName in this.textureChannels) {
-      let node = this.textureChannels[channelName];
-
-      if (node.id == nodeId) {
-        let oldNode = this.textureChannels[channelName] as DesignerNode;
-        let nodeView = this.nodeScene.getNodeById(oldNode.id);
-
-        // if this function is called when a node is deleted
-        // nodeView will be null
-        if (nodeView) nodeView.clearTextureChannel();
-
-        delete this.textureChannels[channelName];
-
-        if (this.ontexturechannelcleared) {
-          this.ontexturechannelcleared(null, channelName);
-        }
-      }
-    }
-
-    // only one node can be assigned to a channel
-    // if (this.textureChannels.hasOwnProperty(channelName)) {
-    //   // remove label from node view
-    //   let oldNode = this.textureChannels[channelName] as DesignerNode;
-    //   let nodeView = this.graph.getNodeById(oldNode.id);
-    //   nodeView.clearTextureChannel();
-    //   this.textureChannels[channelName] = null;
-
-    //   if (this.ontexturechannelcleared) {
-    //     this.ontexturechannelcleared(oldNode, channelName);
-    //   }
-    // }
-  }
-
-  hasTextureChannel(channelName: string) {
-    return this.textureChannels.hasOwnProperty(channelName);
-  }
-
-  clearTextureChannels() {
-    for (let channelName in this.textureChannels) {
-      let node = this.textureChannels[channelName];
-
-      this.clearTextureChannel(node.id);
-    }
-  }
-
-  getChannelCanvasImage(channelName: string) {
-    if (this.hasTextureChannel(channelName)) {
-      //console.log(this.textureChannels[channelName]);
-      let dnodeId = this.textureChannels[channelName].id;
-      let nodeView = this.nodeScene.getNodeById(dnodeId);
-      //console.log(nodeView)
-      //console.log(this.graph)
-      return nodeView.imageCanvas;
-    }
-
-    return null;
-  }
-
-  /*
-    constructor(canvas:HTMLCanvasElement, preview2D:HTMLCanvasElement, propHolder : HTMLElement, varHolder : HTMLElement, scene3D:any)
-    {
-        this.canvas = canvas;
-
-        this.displayNodes = new DisplayNodes();
-
-        this.preview2D = preview2D;
-        this.preview2DCtx = preview2D.getContext("2d");
-
-        this.scene3D = scene3D;
-        this.selectedDesignerNode = null;
-
-        this.propGen = new PropertyGenerator(this, propHolder);
-        this.varGen = new VariableGenerator(this, varHolder);
-        
-
-        //this.setDesigner(new Designer());
-        //this.setScene(new NodeScene(canvas));
-    }
-    */
-
   undo() {
     this.undoStack.undo();
   }
@@ -279,8 +118,6 @@ export class Editor {
 
   // create empty scene
   createEmptyScene() {
-    this.clearTextureChannels();
-
     this.library = createLibrary();
     this.setDesigner(new Designer());
     this.setScene(new NodeScene(this.canvas));
@@ -294,16 +131,15 @@ export class Editor {
     let inputNode = this.library.create("color");
     //inputNode.setAsInput();
     let inputNodeView = this.addNode(inputNode, 0, 0);
-    inputNodeView.setCenter(centerX, centerY);
+    inputNodeView.setCenter(centerX - 150, centerY);
 
     // output
     let node = this.library.create("output");
     //node.setAsResult();
     let nodeView = this.addNode(node, 0, 0);
     nodeView.setCenter(centerX + 150, centerY);
-    (node as ImageDesignerNode).setAsResult();
+    (node as ImageDesignerNode).setAsOutput();
 
-    this.assignNodeToTextureChannel(nodeView.id, "albedo");
     this.nodeScene.view.reset();
 
     // connection
@@ -323,8 +159,6 @@ export class Editor {
   // creates new texture
   // requires canvas to be already set
   createNewTexture() {
-    this.clearTextureChannels();
-
     this.library = createLibrary();
     this.setDesigner(new Designer());
     this.setScene(new NodeScene(this.canvas));
@@ -352,54 +186,7 @@ export class Editor {
 
       // something worng with fbo setup around here.
       self.designer.copyNodeTextureToImageCanvas(dnode, graphNode.imageCanvas);
-
-      // if (self.onpreviewnode) {
-      //   if (dnode == self.selectedDesignerNode)
-      //     self.onpreviewnode(dnode, graphNode.imageCanvas.canvas);
-      // }
-
-      if (self.ontexturechannelupdated && graphNode.textureChannel) {
-        self.ontexturechannelupdated(
-          graphNode.imageCanvas,
-          graphNode.textureChannel
-        );
-      }
-      // if(node == self.selectedDesignerNode) {
-      //     requestAnimationFrame(function(){
-      //         self.preview2DCtx.clearRect(0,0,self.preview2D.width, self.preview2D.height);
-      //         self.preview2DCtx.drawImage(graphNode.imageCanvas.canvas,
-      //             0,0,
-      //         self.preview2D.width, self.preview2D.height);
-      //     });
-      // }
-
-      //self.updateDisplayNode(graphNode);
     };
-
-    /*
-        designer.onthumbnailgenerated = function(node, thumb) {
-            console.log(self.selectedDesignerNode);
-            console.log("onthumbnailgenerated generated for: "+node.title);
-            // refresh right node image
-            let graphNode = self.graph.getNodeById(node.id);
-            graphNode.setThumbnail(thumb);
-            self.updateDisplayNode(graphNode);
-
-            if(node == self.selectedDesignerNode) {
-                requestAnimationFrame(function(){
-                    self.preview2DCtx.clearRect(0,0,self.preview2D.width, self.preview2D.height);
-                    self.preview2DCtx.drawImage(thumb,
-                        0,0,
-                    self.preview2D.width, self.preview2D.height);
-                });
-
-                
-            }
-        }
-        */
-
-    //if (this.varGen) this.varGen.setDesigner(designer);
-    //this.propGen.setDesigner(designer);
   }
 
   setScene(scene: NodeScene) {
@@ -424,10 +211,6 @@ export class Editor {
       // make connection
       // switch from `title` to `name`
       self.designer.addConnection(leftDNode, rightDNode, con.socketB.title);
-
-      // refresh right node image
-      //let thumb = self.designer.generateImageFromNode(rightDNode);
-      //rightNode.setThumbnail(thumb);
     };
 
     this.nodeScene.onconnectiondestroyed = function(
@@ -547,9 +330,6 @@ export class Editor {
 
           offset = [offset[0] + 15, offset[1] + 15];
         }
-
-        // import texture then make a node
-        //self.assignNodeToTextureChannel(nodeView.id, "albedo");
       }
 
       if (nodes.length === viewNodes.length && nodes.length > 0) {
@@ -588,17 +368,6 @@ export class Editor {
           );
         }
 
-        // // todo: move to double click
-        // if (self.onpreviewnode) {
-        //   self.onpreviewnode(dnode, node.imageCanvas.canvas);
-        // }
-
-        // //console.log(this.scene3D);
-        // if (self.scene3D) {
-        //   //console.log("setting height texture");
-        //   //self.scene3D.setHeightTexture(node.thumbnail);
-        //   self.updateDisplayNode(node);
-        // }
         if (self.onnodeselected) self.onnodeselected(dnode);
       }
     };
@@ -624,8 +393,6 @@ export class Editor {
     this.nodeScene.onnodedeleted = function(node: NodeGraphicsItem) {
       // remove node from channels
       //console.log(self);
-      self.clearTextureChannel(node.id);
-
       self.designer.removeNode(node.id);
 
       // if (self.onpreviewnode) {
@@ -699,31 +466,6 @@ export class Editor {
         self.onlibrarymenu();
       }
     };
-
-    // property changes
-    /*
-        this.propGen.onnodepropertychanged = function(dnode:DesignerNode, prop:Property) {
-            //let node = self.graph.getNodeById(node.id);
-            //self.graph.refreshNode()
-            
-            // todo: do this properly
-            let thumb = self.designer.generateImageFromNode(dnode);
-            let node = self.graph.getNodeById(dnode.id);
-            node.thumbnail = thumb;
-
-            //console.log(node.thumbnail);
-            requestAnimationFrame(function(){
-                self.preview2DCtx.clearRect(0,0,self.preview2D.width, self.preview2D.height);
-                self.preview2DCtx.drawImage(thumb,
-                    0,0,
-                self.preview2D.width, self.preview2D.height);
-            });
-            
-            // just a stest
-            //self.scene3D.setHeightTexture(node.thumbnail);
-            self.updateDisplayNode(node);
-        }
-        */
   }
 
   executeCopy(evt: ClipboardEvent) {
@@ -803,68 +545,6 @@ export class Editor {
     return nav;
   }
 
-  // DISPLAY NODE FUNCTIONS
-
-  // // updates appropriate image if set
-  // updateDisplayNode(node: NodeGraphicsItem) {
-  //   if (!this.scene3D) return;
-
-  //   //console.log(node.id);
-  //   //console.log(this.displayNodes.normalNode);
-
-  //   // TODO: create custom CanvasImage that resizes with
-  //   // the texture size. NodeGraphicsItem's CanvasImage is fixed
-  //   // to 1024x1024. Another option is to give each DesignerNode a
-  //   // CanvasImage that updates when its texture updates then pass
-  //   // it to NodeGraphicsitem. That way it gets used one place and
-  //   // gets updated everywhere else all at once.
-  //   if (node.id == this.displayNodes.albedoNode) {
-  //     //this.scene3D.setAlbedoTexture(node.thumbnail);
-  //     this.scene3D.setAlbedoCanvasTexture(node.imageCanvas.canvas);
-  //   }
-
-  //   if (node.id == this.displayNodes.metallicNode) {
-  //     //this.scene3D.setMetallicTexture(node.thumbnail);
-  //     this.scene3D.setMetallicCanvasTexture(node.imageCanvas.canvas);
-  //   }
-
-  //   if (node.id == this.displayNodes.normalNode) {
-  //     //this.scene3D.setNormalTexture(node.thumbnail);
-  //     this.scene3D.setNormalCanvasTexture(node.imageCanvas.canvas);
-  //   }
-
-  //   if (node.id == this.displayNodes.roughnessNode) {
-  //     //this.scene3D.setRoughnessTexture(node.thumbnail);
-  //     this.scene3D.setRoughnessCanvasTexture(node.imageCanvas.canvas);
-  //   }
-
-  //   if (node.id == this.displayNodes.heightNode) {
-  //     //this.scene3D.setHeightTexture(node.thumbnail);
-  //     this.scene3D.setHeightCanvasTexture(node.imageCanvas.canvas);
-  //   }
-  // }
-
-  setDisplayChannelNode(channel: DisplayChannel, nodeId: string) {
-    let node = this.nodeScene.getNodeById(nodeId);
-    if (channel == DisplayChannel.Albedo) {
-      this.displayNodes.albedoNode = nodeId;
-    }
-    if (channel == DisplayChannel.Metallic) {
-      this.displayNodes.metallicNode = nodeId;
-    }
-    if (channel == DisplayChannel.Normal) {
-      this.displayNodes.normalNode = nodeId;
-    }
-    if (channel == DisplayChannel.Roughness) {
-      this.displayNodes.roughnessNode = nodeId;
-    }
-    if (channel == DisplayChannel.Height) {
-      this.displayNodes.heightNode = nodeId;
-    }
-
-    //this.updateDisplayNode(node);
-  }
-
   exposeVariable(node: DesignerNode, prop: Property, varDisplayName: string) {
     // create new variable
     let varName = Guid.newGuid();
@@ -881,11 +561,6 @@ export class Editor {
 
     // add it to scene and bind prop
     this.designer.mapNodePropertyToVariable(varName, node, prop.name);
-
-    // copy property props
-
-    // refresh let ui
-    // this.varGen.refreshUi();
   }
 
   evalDesignerVariableType(prop: Property): DesignerVariableType {
@@ -918,8 +593,6 @@ export class Editor {
 
   load(data: any) {
     // clear texture channels
-    this.clearTextureChannels();
-
     let library;
     if (!data["libraryVersion"]) {
       library = createLibrary();
@@ -952,41 +625,18 @@ export class Editor {
     if (data["editor"] != null) {
       let e = data["editor"];
       // console.log("loading editor data");
-      // console.log(e.displayNodes);
-
-      // this.displayNodes.albedoNode = e.displayNodes.albedoNode;
-      // this.displayNodes.metallicNode = e.displayNodes.metallicNode;
-      // this.displayNodes.normalNode = e.displayNodes.normalNode;
-      // this.displayNodes.roughnessNode = e.displayNodes.roughnessNode;
-      // this.displayNodes.heightNode = e.displayNodes.heightNode;
 
       for (let channelName in e.textureChannels) {
         if (!e.textureChannels.hasOwnProperty(channelName)) continue;
         console.log(e);
         let node = this.nodeScene.getNodeById(e.textureChannels[channelName]);
-        if (node) this.assignNodeToTextureChannel(node.id, channelName);
       }
-
-      //this.textureChannels = e.textureChannels || {};
-      //console.log(this.textureChannels)
     }
   }
 
   save(): any {
     let data = this.designer.save();
     data["scene"] = this.nodeScene.save();
-
-    let textureChannels = {};
-    for (let channelName in this.textureChannels) {
-      textureChannels[channelName] = this.textureChannels[channelName].id;
-    }
-
-    data["editor"] = {
-      //displayNodes: this.displayNodes,
-      textureChannels: textureChannels,
-    };
-
-    //data["libraryVersion"] = this.library.getVersionName();
     data["libraryVersion"] = getCurrentLibraryVersion();
 
     return data;

@@ -129,13 +129,11 @@ export class OpacityOverrideNode extends ImageDesignerNode
       }
     };
 
-    this.addInput("colorA"); // foreground
+    this.addInput("colorA"); // alpha
     this.addInput("colorB"); // background
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
     this.addEnumProperty("border", "Border", ["Repeat", "Stretch", "Clamp"]);
-    this.addBoolProperty("clamp", "Clamp", false);
-    this.addBoolProperty("stretch", "Stretch", false);
 
     this.addTransform2DProperty(
       "transform2d",
