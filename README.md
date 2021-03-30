@@ -1,12 +1,12 @@
 <h1 align="center">
-  FxMixer
+  MEME Engine
 </h1>
 
 <p align="center">
-  A node-based image editing tool<br/>
+  Inspire the world with your logic!<br/>
 </p>
 
-![FxMixer]
+![MEME Engine]
 
 ## Building
 
