@@ -114,7 +114,7 @@
         { name: "Color" },
         { name: "Composite" },
         { name: "Create" },
-        { name: "logic" },
+        { name: "Logic" },
       ];
 
       this.panel = [...Array(this.items.length).keys()];
