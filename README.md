@@ -11,7 +11,7 @@
 ## Building
 
 ```
-git clone git@github.com:hulululuh/fxmixer.git
+git clone git@github.com:hulululuh/MEME-Engine.git
 
 cd fxmixer
 
