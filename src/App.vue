@@ -467,11 +467,11 @@
           .showSaveDialog({
             filters: [
               {
-                name: "MemeEngineer Project",
-                extensions: ["texture"],
+                name: "MemeNgin Project",
+                extensions: ["mmng"],
               },
             ],
-            defaultPath: "material.texture",
+            defaultPath: "material.mmng",
           })
           .then((result) => {
             let path = result.filePath;
@@ -508,8 +508,8 @@
         .showOpenDialog({
           filters: [
             {
-              name: "MemeEngineer Project",
-              extensions: ["texture"],
+              name: "MemeNgin Project",
+              extensions: ["mmng"],
             },
           ],
           defaultPath: "material",
@@ -555,7 +555,7 @@
       let libraries = ["v0", "v1"];
       if (libraries.indexOf(libName) == -1) {
         alert(
-          `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeEngineer`
+          `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeNgin`
         );
         return;
       }

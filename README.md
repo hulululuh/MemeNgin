@@ -1,19 +1,19 @@
 <h1 align="center">
-  MEME Engine
+  MemeNgin
 </h1>
 
 <p align="center">
   Inspire the world with your logic!<br/>
 </p>
 
-![MEME Engine]
+![MemeNgin]
 
 ## Building
 
 ```
-git clone git@github.com:hulululuh/MEME-Engine.git
+git clone git@github.com:hulululuh/MemeNgin.git
 
-cd fxmixer
+cd MemeNgin
 
 # if you want to pull down assets (textures and node icons)
 git submodule update --init
