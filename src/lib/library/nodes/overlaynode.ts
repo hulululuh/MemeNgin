@@ -148,6 +148,7 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
       1.0,
       0.001
     );
+    this.addEnumProperty("border", "Border", ["Clamp", "Stretch", "Repeat"]);
 
     let source = `
         uniform mat3 srcTransform;
@@ -155,32 +156,32 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
         
         vec4 process(vec2 uv)
         {
-            float finalOpacity = prop_opacity;
+          float finalOpacity = prop_opacity;
 
-            vec2 p = vec2(256.0, 256.0);
-            vec2 s = vec2(2.0, 1.0);
+          // foreground uv
+          vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
 
-            // foreground uv
-            vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
-            // apply flip
-            fuv.x = prop_flipX ? 1.0 - fuv.x : fuv.x;
-            fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
-            vec4 colA = vec4(0.0);
-            if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
-              colA = texture(colorA, fuv);
-            vec4 colB = texture(colorB,uv);
-            vec4 col = vec4(1.0);
+          // apply flip
+          fuv.x = prop_flipX ? 1.0 - fuv.x : fuv.x;
+          fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
+          
+          vec4 colA = vec4(0.0);
+          if (colorA_connected) {
+            colA = overlayColor(colorA, fuv, prop_border);
+          }
+          vec4 colB = texture(colorB,uv);
+          vec4 col = vec4(1.0);
 
-            colA.a *= finalOpacity;
+          colA.a *= finalOpacity;
 
-            float final_alpha = colA.a + colB.a * (1.0 - colA.a);
-            
-            if (colA.a <= prop_alphaThreshold)
-                col = colB;
-            else
-                col = vec4(mix(colB, colA, colA.a).rgb, final_alpha);
-            
-            return col;
+          float final_alpha = colA.a + colB.a * (1.0 - colA.a);
+          
+          if (colA.a <= prop_alphaThreshold)
+              col = colB;
+          else
+              col = vec4(mix(colB, colA, colA.a).rgb, final_alpha);
+          
+          return col;
         }
         `;
 

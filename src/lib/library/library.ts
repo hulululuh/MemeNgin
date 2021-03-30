@@ -63,12 +63,6 @@ export function createLibrary() {
     NodeCategory.Shape
   );
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
-  lib.addNode(
-    "opacityOverride",
-    "Opacity Override",
-    OpacityOverrideNode,
-    NodeCategory.Shape
-  );
   lib.addNode("tile", "Tile", TileNode, NodeCategory.Shape);
   lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Shape);
   lib.addNode("warp", "Warp", WarpNode, NodeCategory.Shape);
@@ -117,6 +111,12 @@ export function createLibrary() {
   lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
   lib.addNode("splat", "Splat", SplatNode, NodeCategory.Composite);
   lib.addNode("mask", "Mask", MaskNode, NodeCategory.Composite);
+  lib.addNode(
+    "opacityOverride",
+    "Opacity Override",
+    OpacityOverrideNode,
+    NodeCategory.Composite
+  );
 
   lib.addNode("texture", "Texture", TextureNode, NodeCategory.Create);
   lib.addNode("text", "Text", TextNode, NodeCategory.Create);

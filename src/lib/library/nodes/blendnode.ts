@@ -1,12 +1,12 @@
-import { DesignerNode, NodeInput } from "../../designer/designernode";
+import { DesignerNode, NodeInput } from "@/lib/designer/designernode";
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+import { Property } from "@/lib/designer/properties";
+import { ITransformable } from "@/lib/designer/transformable";
 import { Editor } from "@/lib/editor";
 import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
-import { Property } from "@/lib/designer/properties";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
-import { ITransformable } from "@/lib/designer/transformable";
 
 export class BlendNode extends ImageDesignerNode implements ITransformable {
   inputASize: Vector2;
@@ -144,6 +144,7 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
       "Overlay",
       "Screen",
     ]);
+    this.addEnumProperty("border", "Border", ["Clamp", "Stretch", "Repeat"]);
 
     this.addTransform2DProperty(
       "transform2d",
@@ -172,8 +173,6 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
         vec4 process(vec2 uv)
         {
             float finalOpacity = prop_opacity;
-            vec2 p = vec2(256.0, 256.0);
-            vec2 s = vec2(2.0, 1.0);
 
             // foreground uv
             vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
@@ -181,11 +180,18 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
             // apply flip
             fuv.x = prop_flipX ? 1.0 - fuv.x : fuv.x;
             fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
+            
             vec4 colA = vec4(0.0);
-            if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
-              colA = texture(colorA, fuv);
+            if (colorA_connected) {
+              colA = overlayColor(colorA, fuv, prop_border);
+            }
             vec4 colB = texture(colorB,uv);
             vec4 col = vec4(1.0);
+
+            // clipped - skip blending
+            if(colA.a < margin) {
+              return colB;
+            }
 
             colA.a *= finalOpacity;
 

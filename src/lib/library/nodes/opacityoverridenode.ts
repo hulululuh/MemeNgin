@@ -133,7 +133,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
     this.addInput("colorB"); // background
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
-    this.addEnumProperty("border", "Border", ["Repeat", "Stretch", "Clamp"]);
+    this.addEnumProperty("border", "Border", ["Clamp", "Stretch", "Repeat"]);
 
     this.addTransform2DProperty(
       "transform2d",
@@ -143,43 +143,22 @@ export class OpacityOverrideNode extends ImageDesignerNode
 
     let source = `
         uniform mat3 srcTransform;
-        const float margin = 1.0/2048.0;
         
         vec4 process(vec2 uv)
         {
-          vec2 p = vec2(256.0, 256.0);
-          vec2 s = vec2(2.0, 1.0);
-
           // foreground uv
           vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
           // apply flip
           fuv.x = prop_flipX ? 1.0 - fuv.x : fuv.x;
           fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
 
-          bool isBorder = false;
-          if (prop_border == 1 || prop_border == 2) {
-            fuv = clamp(fuv, 0.0, 1.0);
-
-            if (fuv.x > (1.0 - margin) || fuv.x < margin || fuv.y > (1.0 - margin) || fuv.y < margin) {
-              isBorder = true;
-            }
+          vec4 col = vec4(0.0);
+          if (colorB_connected) {
+            col = texture(colorB, fuv);
           }
-
-          float alpha = texture(colorA, fuv).a;
-          if (alpha > 1.0 - margin) {
-            // if image seems not have a alpha check r channel
-            alpha = texture(colorA, fuv).r;
-          }
-          if (isBorder && prop_border == 2) { // Clamp
-            alpha = 0.0f;
-          }
-          vec4 colB = texture(colorB,uv);
-          vec4 col = vec4(1.0);
-          
-          col = colB;
-
+         
           if (colorA_connected) {
-            col.a = alpha;
+            col.a = overlayOpacity(colorA, fuv, prop_border);
           }
           
           return col;

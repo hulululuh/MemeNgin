@@ -1188,6 +1188,50 @@ export class ImageDesignerNode extends DesignerNode {
         return clamp(res, 0.0, 1.0);
       }
 
+      // policy: (0)Repeat, (1)Stretch, (2)Clamp
+      const float margin = 1.0/2048.0;
+      float overlayOpacity(sampler2D tex, vec2 uv, int policy) {
+        bool isBorder = false;
+        if (policy == 1 || policy == 0) {
+          uv = clamp(uv, 0.0, 1.0);
+
+          if (uv.x > (1.0 - margin) || uv.x < margin || uv.y > (1.0 - margin) || uv.y < margin) {
+            isBorder = true;
+          }
+        }
+
+        float weight = texture(tex, uv).a;
+        if (weight > 1.0 - margin) {
+          // if image seems not have a alpha check r channel
+          weight = texture(tex, uv).r;
+        }
+        if (isBorder && policy == 0) { // Clamp
+          weight = 0.0f;
+        }
+
+        return weight;
+      }
+
+      vec4 overlayColor(sampler2D tex, vec2 uv, int policy) {
+        bool isBorder = false;
+        if (policy == 1 || policy == 0) {
+          uv = clamp(uv, 0.0, 1.0);
+
+          if (uv.x > (1.0 - margin) || uv.x < margin || uv.y > (1.0 - margin) || uv.y < margin) {
+            isBorder = true;
+          }
+        }
+
+        vec4 texCol = texture(tex, uv);
+        float weight = texCol.a;
+        if (isBorder && policy == 0) { // Clamp
+          weight = 0.0f;
+        }
+        texCol.a = weight;
+
+        return texCol;
+      }
+
     `;
     return code;
   }
