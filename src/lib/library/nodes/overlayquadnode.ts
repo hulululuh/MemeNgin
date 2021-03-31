@@ -9,19 +9,25 @@ import { MathUtils } from "three";
 import { ITransformable } from "@/lib/designer/transformable";
 import { WidgetType } from "@/lib/scene/widget";
 
-export class OpacityOverrideNode extends ImageDesignerNode
+export class OverlayQuadNode extends ImageDesignerNode
   implements ITransformable {
   inputASize: Vector2;
   inputBSize: Vector2;
   relPos: Vector2;
   baseScale: Vector2;
+
+  pTL: Vector2;
+  pTR: Vector2;
+  pBL: Vector2;
+  pBR: Vector2;
+
   dragStartRelScale: Vector2;
   item: GraphicsItem;
 
   constructor() {
     super();
 
-    this.widgetType = WidgetType.Transform2D;
+    this.widgetType = WidgetType.TransformQuad;
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "transform2d") {
@@ -52,10 +58,15 @@ export class OpacityOverrideNode extends ImageDesignerNode
 
       this.requestUpdateWidget();
     };
+
+    this.pTL = new Vector2(-0.5, 0.5);
+    this.pTR = new Vector2(0.5, 0.5);
+    this.pBL = new Vector2(-0.5, -0.5);
+    this.pBR = new Vector2(0.5, -0.5);
   }
 
   init() {
-    this.title = "Opacity Override";
+    this.title = "Overlay Quad";
     this.parentIndex = "colorB";
     this.isEditing = true;
     this.inputASize = new Vector2(100, 100);
@@ -132,11 +143,10 @@ export class OpacityOverrideNode extends ImageDesignerNode
       }
     };
 
-    this.addInput("colorA"); // alpha
+    this.addInput("colorA"); // foreground
     this.addInput("colorB"); // background
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
-    this.addEnumProperty("border", "Border", ["Clamp", "Stretch", "Repeat"]);
 
     this.addTransform2DProperty(
       "transform2d",
@@ -144,25 +154,47 @@ export class OpacityOverrideNode extends ImageDesignerNode
       Transform2D.IDENTITY
     );
 
+    this.addFloatProperty("opacity", "Opacity", 1.0, 0.0, 1.0, 0.01);
+    this.addFloatProperty(
+      "alphaThreshold",
+      "Alpha Threshold",
+      0.01,
+      0.0,
+      1.0,
+      0.001
+    );
+    this.addEnumProperty("border", "Border", ["Clamp", "Stretch", "Repeat"]);
+
     let source = `
         uniform mat3 srcTransform;
+        //uniform mat3 prop_transform2d;
         
         vec4 process(vec2 uv)
         {
+          float finalOpacity = prop_opacity;
+
           // foreground uv
           vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
+
           // apply flip
           fuv.x = prop_flipX ? 1.0 - fuv.x : fuv.x;
           fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
-
-          vec4 col = vec4(0.0);
-          if (colorB_connected) {
-            col = texture(colorB, fuv);
-          }
-         
+          
+          vec4 colA = vec4(0.0);
           if (colorA_connected) {
-            col.a = overlayOpacity(colorA, fuv, prop_border);
+            colA = overlayColor(colorA, fuv, prop_border);
           }
+          vec4 colB = texture(colorB,uv);
+          vec4 col = vec4(1.0);
+
+          colA.a *= finalOpacity;
+
+          float final_alpha = colA.a + colB.a * (1.0 - colA.a);
+          
+          if (colA.a <= prop_alphaThreshold)
+              col = colB;
+          else
+              col = vec4(mix(colB, colA, colA.a).rgb, final_alpha);
           
           return col;
         }
@@ -201,7 +233,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
           dragStartRelScale: this.dragStartRelScale,
           relScale: this.getTransform().scale,
           enable: true,
-          widget: this.widgetType,
+          widget: WidgetType.TransformQuad,
         },
       });
 

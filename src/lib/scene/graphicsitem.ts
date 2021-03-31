@@ -2,6 +2,7 @@ import { NodeScene } from "@/lib/scene";
 import { Rect } from "@/lib/math/rect";
 import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2 } from "@math.gl/core";
+import { WidgetType } from "./widget";
 
 export class MouseEvent {
   // scene space
@@ -54,13 +55,14 @@ export class WidgetEvent extends CustomEvent<any> {
   dragStartRelScale: Vector2;
   relScale: Vector2;
   enable: boolean = true;
+  widgetType!: WidgetType;
 }
 
 export class GraphicsItem {
   scene!: NodeScene;
-  protected visible: boolean = false;
-  protected enable: boolean = false;
-  protected _drawSelHighlight: boolean = true;
+  visible: boolean = false;
+  enable: boolean = false;
+  _drawSelHighlight: boolean = true;
 
   protected x: number = 0;
   protected y: number = 0;
@@ -139,10 +141,6 @@ export class GraphicsItem {
 
   get bottom() {
     return this.y + this.height;
-  }
-
-  get enabled() {
-    return this.enable;
   }
 
   intersectsRect(other: Rect) {

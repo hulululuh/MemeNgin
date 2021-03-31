@@ -21,6 +21,7 @@ import { Gradient } from "@/lib/designer/gradient";
 import { WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2 } from "@math.gl/core";
+import { WidgetType } from "@/lib/scene/widget";
 
 const POTs: number[] = [
   1,
@@ -80,6 +81,9 @@ export class DesignerNode implements IPropertyHolder {
   inputs: string[] = new Array();
   properties: Property[] = new Array();
   needsUpdate: boolean = true;
+
+  // we assume that designer node does not need a widget by default
+  widgetType: WidgetType = WidgetType.None;
 
   onPropertyLoaded?: () => void;
   onResized?: () => void;

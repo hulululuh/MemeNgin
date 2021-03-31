@@ -7,6 +7,7 @@ import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
+import { WidgetType } from "@/lib/scene/widget";
 
 export class BlendNode extends ImageDesignerNode implements ITransformable {
   inputASize: Vector2;
@@ -18,6 +19,8 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
 
   constructor() {
     super();
+
+    this.widgetType = WidgetType.Transform2D;
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "transform2d") {
@@ -269,6 +272,7 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
           dragStartRelScale: this.dragStartRelScale,
           relScale: this.getTransform().scale,
           enable: true,
+          widget: this.widgetType,
         },
       });
 
@@ -276,7 +280,7 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
     } else {
       const event = new WidgetEvent("widgetUpdate", {
         detail: {
-          enable: false,
+          widget: WidgetType.None,
         },
       });
 

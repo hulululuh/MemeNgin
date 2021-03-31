@@ -29,6 +29,7 @@ import { MirrorNode } from "./nodes/mirrornode";
 import { NormalMapNode } from "./nodes/normalmapnode";
 import { OutputNode } from "./nodes/outputnode";
 import { OverlayNode } from "./nodes/overlaynode";
+import { OverlayQuadNode } from "./nodes/overlayquadnode";
 import { OpacityOverrideNode } from "./nodes/opacityoverridenode";
 import { Perlin3DNode } from "./nodes/perlin3dnode";
 import { CircleNode, PolygonNode } from "./nodes/shapesnodes";
@@ -109,6 +110,12 @@ export function createLibrary() {
 
   lib.addNode("overlay", "Overlay", OverlayNode, NodeCategory.Composite);
   lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
+  lib.addNode(
+    "overlayquad",
+    "Overlay Quad",
+    OverlayQuadNode,
+    NodeCategory.Composite
+  );
   lib.addNode("splat", "Splat", SplatNode, NodeCategory.Composite);
   lib.addNode("mask", "Mask", MaskNode, NodeCategory.Composite);
   lib.addNode(

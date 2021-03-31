@@ -15,7 +15,6 @@ export enum DrawMode {
 }
 
 class Rect {
-  private visible: boolean;
   private x: number;
   private y: number;
   private width: number;
@@ -24,7 +23,6 @@ class Rect {
   color: string;
 
   constructor() {
-    this.visible = true;
     this.x = 0;
     this.y = 0;
     this.width = 1;

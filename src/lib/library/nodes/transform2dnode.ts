@@ -10,6 +10,7 @@ import { ITransformable } from "@/lib/designer/transformable";
 import { Color } from "@/lib/designer/color";
 import { UndoStack } from "@/lib/undostack";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
+import { WidgetType } from "@/lib/scene/widget";
 
 export class Transform2DNode extends ImageDesignerNode
   implements ITransformable {
@@ -28,6 +29,7 @@ export class Transform2DNode extends ImageDesignerNode
   constructor() {
     super();
 
+    this.widgetType = WidgetType.Transform2D;
     this.desiredWidth = 1024;
     this.desiredHeight = 1024;
 
@@ -282,6 +284,7 @@ export class Transform2DNode extends ImageDesignerNode
           dragStartRelScale: this.dragStartRelScale,
           relScale: this.getTransform().scale,
           enable: true,
+          widget: this.widgetType,
         },
       });
 
@@ -289,7 +292,7 @@ export class Transform2DNode extends ImageDesignerNode
     } else {
       const event = new WidgetEvent("widgetUpdate", {
         detail: {
-          enable: false,
+          widget: WidgetType.None,
         },
       });
 

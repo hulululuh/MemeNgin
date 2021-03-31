@@ -44,7 +44,7 @@ enum HighlightMode {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-export class Transform2dWidget extends GraphicsItem implements iWidget {
+export class TransformQuadWidget extends GraphicsItem implements iWidget {
   // iWidget
   member: string;
 
@@ -136,7 +136,7 @@ export class Transform2dWidget extends GraphicsItem implements iWidget {
     this.resizeHandleSize = 10;
     this.minSize = 2;
 
-    this.setSize(100, 100);
+    this.setSize(500, 300);
 
     this.transform2d.setRotation(0);
   }
@@ -155,7 +155,7 @@ export class Transform2dWidget extends GraphicsItem implements iWidget {
     }
 
     const drawWidget = function(
-      item: Transform2dWidget,
+      item: TransformQuadWidget,
       drawHighlight: boolean = false
     ) {
       if (drawHighlight && item.highlightMode === HighlightMode.None) return;

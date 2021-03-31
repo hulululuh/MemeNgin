@@ -32,6 +32,8 @@ import { Editor } from "@/lib/editor";
 
 import { ApplicationSettings } from "@/settings";
 import { OutputNode } from "./library/nodes/outputnode";
+import { iWidget, WidgetType, implementsWidget } from "./scene/widget";
+import { TransformQuadWidget } from "./scene/transformquadwidget";
 const settings = ApplicationSettings.getInstance();
 
 enum DragMode {
@@ -59,8 +61,8 @@ export class NodeScene {
   contextExtra: any;
   hasFocus: boolean;
 
-  // singleton widgets
-  widget2d: Transform2dWidget;
+  // singleton widgets for scene
+  widgets: Map<WidgetType, iWidget>;
 
   // elements that consisting a scene
   frames: FrameGraphicsItem[];
@@ -87,7 +89,7 @@ export class NodeScene {
   oncommentselected?: (item: CommentGraphicsItem) => void;
   onframeselected?: (item: FrameGraphicsItem) => void;
   onnavigationselected?: (item: NavigationGraphicsItem) => void;
-  onwidget2dselected?: (item: Transform2dWidget) => void;
+  onwidgetselected?: (item: iWidget) => void;
   onoutputnodecreationattempt?: () => void;
 
   onnodedeleted?: (item: NodeGraphicsItem) => void;
@@ -143,9 +145,11 @@ export class NodeScene {
     this.hasFocus = false;
     this.contextExtra = this.context;
 
-    // widget
-    this.widget2d = new Transform2dWidget(this.view);
-    this.widget2d.setSize(100, 100);
+    // widgets
+    this.widgets = new Map<WidgetType, iWidget>([
+      [WidgetType.Transform2D, new Transform2dWidget(this.view)],
+      [WidgetType.TransformQuad, new TransformQuadWidget(this.view)],
+    ]);
 
     this.frames = new Array();
     this.comments = new Array();
@@ -283,7 +287,22 @@ export class NodeScene {
     document.addEventListener("paste", this._pasteEvent);
 
     self._widgetUpdate = function(evt: WidgetEvent) {
-      self.widget2d.onWidgetUpdated(evt);
+      for (const key of self.widgets.keys()) {
+        const widget = self.widgets.get(key);
+        if (!widget) continue;
+        if (key == evt.detail.widget) {
+          widget.onWidgetUpdated(evt);
+        } else {
+          // disable widgets other than target
+          const disableEvent = new WidgetEvent("widgetUpdate", {
+            detail: {
+              enable: false,
+              widget: key,
+            },
+          });
+          widget.onWidgetUpdated(disableEvent);
+        }
+      }
     };
     document.addEventListener("widgetUpdate", this._widgetUpdate);
 
@@ -458,10 +477,13 @@ export class NodeScene {
     //   }
     // }
 
-    if (item.enabled) {
+    if (item.enable) {
+      let widgetType = item.dNode ? item.dNode.widgetType : WidgetType.None;
+
       const event = new WidgetEvent("widgetUpdate", {
         detail: {
           enable: false,
+          widget: widgetType,
         },
       });
       document.dispatchEvent(event);
@@ -789,8 +811,10 @@ export class NodeScene {
 
     if (this.selection) this.selection.draw(this.context);
 
-    // 2d widget
-    if (this.widget2d) this.widget2d.draw(this.context);
+    // widgets
+    for (const widget of this.widgets.values()) {
+      widget.draw(this.context, null);
+    }
   }
 
   // TODO: setup color palette
@@ -891,14 +915,23 @@ export class NodeScene {
             }
           }
 
-          if (hitItem instanceof Transform2dWidget) {
-            let hit = <Transform2dWidget>hitItem;
+          if (implementsWidget(hitItem)) {
+            let hit = (<unknown>hitItem) as iWidget;
 
-            if (this.onwidget2dselected) {
-              if (hit) this.onwidget2dselected(hit);
-              else this.onwidget2dselected(hit);
+            if (this.onwidgetselected) {
+              if (hit) this.onwidgetselected(hit);
+              else this.onwidgetselected(hit);
             }
           }
+
+          // if (hitItem instanceof Transform2dWidget) {
+          //   let hit = <Transform2dWidget>hitItem;
+
+          //   if (this.onwidgetselected) {
+          //     if (hit) this.onwidgetselected(hit);
+          //     else this.onwidgetselected(hit);
+          //   }
+          // }
 
           if (hitItem instanceof NavigationGraphicsItem) {
             let hit = <NavigationGraphicsItem>hitItem;
@@ -960,20 +993,34 @@ export class NodeScene {
 
         hitItem.mouseUp(mouseEvent);
 
-        this.hitItem = null;
-
         const isClearingSelection = hitItem instanceof SelectionGraphicsItem;
         if (isClearingSelection) {
-          if (document) {
-            const event = new WidgetEvent("widgetUpdate", {
+          // for (const widget of this.widgets.values()) {
+          //   widget.setEnable(false);
+          // }
+
+          for (const key of this.widgets.keys()) {
+            const disableEvent = new WidgetEvent("widgetUpdate", {
               detail: {
                 enable: false,
+                widget: key,
               },
             });
-
-            document.dispatchEvent(event);
+            document.dispatchEvent(disableEvent);
           }
+          // if (document) {
+          //   const event = new WidgetEvent("widgetUpdate", {
+          //     detail: {
+          //       enable: false,
+          //       widget: WidgetType.None,
+          //     },
+          //   });
+
+          //   document.dispatchEvent(event);
+          // }
         }
+
+        this.hitItem = null;
       }
     }
   }
@@ -1077,9 +1124,11 @@ export class NodeScene {
 
   _getHitItem(x: number, y: number): GraphicsItem {
     // 0) widget
-    if (this.widget2d) {
-      if (this.widget2d.isPointInside(x, y) && this.widget2d.enabled)
-        return this.widget2d;
+    for (const widget of this.widgets.values()) {
+      if (widget.isPointInside(x, y) && widget.isEnabled()) {
+        // TODO: check it safe.
+        return (<unknown>widget) as GraphicsItem;
+      }
     }
 
     // 1) navigation pins
