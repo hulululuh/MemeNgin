@@ -297,6 +297,9 @@ export class FontAsset extends Asset {
 }
 
 export class LutAsset extends Asset {
+  async build(): Promise<any> {
+    // skip this until it is implemented
+  }
   async buildIcon(): Promise<any> {
     Promise.resolve(false);
   }
