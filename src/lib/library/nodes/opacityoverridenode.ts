@@ -157,7 +157,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
 
           vec4 col = vec4(0.0);
           if (colorB_connected) {
-            col = texture(colorB, fuv);
+            col = texture(colorB, uv);
           }
          
           if (colorA_connected) {
