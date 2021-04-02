@@ -6,6 +6,15 @@ export class GradientPoint {
 
   // color of point
   color: Color;
+
+  get colorForPicker() {
+    return new Color(
+      this.color.r * 255,
+      this.color.g * 255,
+      this.color.b * 255,
+      this.color.a
+    );
+  }
 }
 
 export class Gradient {

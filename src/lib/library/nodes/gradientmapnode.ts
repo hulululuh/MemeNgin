@@ -18,10 +18,11 @@ export class GradientMapNode extends ImageDesignerNode {
         vec4 process(vec2 uv)
         {
             // grayscale input color
-            float t = grayscale(texture(image, uv).rgb);
+            vec4 colA = texture(image, uv);
+            float t = grayscale(colA.rgb);
             vec3 col = sampleGradient(prop_gradient, t);
             
-            return vec4(col, 1.0);
+            return vec4(col, colA.a);
         }
           `;
 
