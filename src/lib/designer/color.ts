@@ -54,10 +54,10 @@ export class Color {
     // forcing return value to '8' hex number, otherwise alpha value handling become quite messed up.
     let hex =
       "#" +
-      ("00" + (this.r * 255.0).toString(16)).slice(-2) +
-      ("00" + (this.g * 255.0).toString(16)).slice(-2) +
-      ("00" + (this.b * 255.0).toString(16)).slice(-2) +
-      ("00" + (this.a * 255.0).toString(16)).slice(-2);
+      ("00" + Math.round(this.r * 255.0).toString(16)).slice(-2) +
+      ("00" + Math.round(this.g * 255.0).toString(16)).slice(-2) +
+      ("00" + Math.round(this.b * 255.0).toString(16)).slice(-2) +
+      ("00" + Math.round(this.a * 255.0).toString(16)).slice(-2);
 
     return hex;
   }
