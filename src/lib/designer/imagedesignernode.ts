@@ -444,7 +444,7 @@ export class ImageDesignerNode extends DesignerNode {
       if (prop instanceof EnumProperty) {
         gl.uniform1i(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          (prop as EnumProperty).index
+          (prop as EnumProperty).values.indexOf(prop.value)
         );
       }
       if (prop instanceof ColorProperty) {
