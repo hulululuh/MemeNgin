@@ -9,6 +9,7 @@ import {
   ColorProperty,
   GradientProperty,
   Transform2DProperty,
+  Vector2Property,
 } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
 import { Matrix4 } from "@math.gl/core";
@@ -499,6 +500,14 @@ export class ImageDesignerNode extends DesignerNode {
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
           false,
           mat2d
+        );
+      }
+
+      if (prop instanceof Vector2Property) {
+        let vec2 = (prop as Vector2Property).getValue();
+        gl.uniform2fv(
+          gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
+          vec2
         );
       }
     }
@@ -1295,6 +1304,9 @@ export class ImageDesignerNode extends DesignerNode {
       }
       if (prop instanceof Transform2DProperty) {
         code += "uniform mat3 prop_" + prop.name + ";\n";
+      }
+      if (prop instanceof Vector2Property) {
+        code += "uniform vec2 prop_" + prop.name + ";\n";
       }
     }
 

@@ -16,10 +16,10 @@ export class OverlayQuadNode extends ImageDesignerNode
   relPos: Vector2;
   baseScale: Vector2;
 
-  pTL: Vector2;
-  pTR: Vector2;
-  pBL: Vector2;
-  pBR: Vector2;
+  propTL: Property;
+  propTR: Property;
+  propBR: Property;
+  propBL: Property;
 
   dragStartRelScale: Vector2;
   item: GraphicsItem;
@@ -58,11 +58,6 @@ export class OverlayQuadNode extends ImageDesignerNode
 
       this.requestUpdateWidget();
     };
-
-    this.pTL = new Vector2(-0.5, 0.5);
-    this.pTR = new Vector2(0.5, 0.5);
-    this.pBL = new Vector2(-0.5, -0.5);
-    this.pBR = new Vector2(0.5, -0.5);
   }
 
   init() {
@@ -91,8 +86,30 @@ export class OverlayQuadNode extends ImageDesignerNode
       );
 
       this.properties.filter((p) => p.name === "transform2d")[0].setValue(xf);
-
       this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
+
+      const pts = evt.detail.points;
+      if (pts) {
+        this.setProperty(this.propTL.name, {
+          value: pts[0],
+          exposed: this.propTL.getExposed(),
+        });
+
+        this.setProperty(this.propTR.name, {
+          value: pts[1],
+          exposed: this.propTR.getExposed(),
+        });
+
+        this.setProperty(this.propBR.name, {
+          value: pts[2],
+          exposed: this.propBR.getExposed(),
+        });
+
+        this.setProperty(this.propBL.name, {
+          value: pts[3],
+          exposed: this.propBL.getExposed(),
+        });
+      }
 
       this.createTexture();
       this.requestUpdate();
@@ -154,6 +171,27 @@ export class OverlayQuadNode extends ImageDesignerNode
       Transform2D.IDENTITY
     );
 
+    this.propTL = this.addVector2Property(
+      "pTL",
+      "Point TL",
+      new Vector2(-0.5, -0.5)
+    );
+    this.propTR = this.addVector2Property(
+      "pTR",
+      "Point TR",
+      new Vector2(0.5, -0.5)
+    );
+    this.propBR = this.addVector2Property(
+      "pBR",
+      "Point BR",
+      new Vector2(0.5, 0.5)
+    );
+    this.propBL = this.addVector2Property(
+      "pBL",
+      "Point BL",
+      new Vector2(-0.5, 0.5)
+    );
+
     this.addFloatProperty("opacity", "Opacity", 1.0, 0.0, 1.0, 0.01);
     this.addFloatProperty(
       "alphaThreshold",
@@ -168,13 +206,49 @@ export class OverlayQuadNode extends ImageDesignerNode
     let source = `
         uniform mat3 srcTransform;
         //uniform mat3 prop_transform2d;
+
+        // https://www.shadertoy.com/view/lsBSDm
+        float cross2d( in vec2 a, in vec2 b ) { return a.x*b.y - a.y*b.x; }
+
+        // given a point p and a quad defined by four points {a,b,c,d}, return the bilinear
+        // coordinates of p in the quad. Returns (-1,-1) if the point is outside of the quad.
+        vec2 invBilinear( in vec2 p, in vec2 a, in vec2 b, in vec2 c, in vec2 d )
+        {
+            vec2 e = b-a;
+            vec2 f = d-a;
+            vec2 g = a-b+c-d;
+            vec2 h = p-a;
+                
+            float k2 = cross2d( g, f );
+            float k1 = cross2d( e, f ) + cross2d( h, g );
+            float k0 = cross2d( h, e );
+            
+            float w = k1*k1 - 4.0*k0*k2;
+            if( w<0.0 ) return vec2(-1.0);
+            w = sqrt( w );
+
+            // will fail for k0=0, which is only on the ba edge 
+            float v = 2.0*k0/(-k1 - w); 
+            if( v<0.0 || v>1.0 ) v = 2.0*k0/(-k1 + w);
+
+            float u = (h.x - f.x*v)/(e.x + g.x*v);
+            vec2 uv = vec2( u, 1.0-v );
+            if( uv.x<0.0 || uv.x>1.0 || uv.y<0.0 || uv.y>1.0 ) return vec2(-1.0);
+            return uv;
+        }
+
+        vec2 coordinate(in vec2 uv) {
+          // foreground uv
+          vec2 uvScaled = (inverse(srcTransform) * vec3(uv* vec2(1.0, -1.0) + vec2(0.5), 1.0)).xy;
+          return uvScaled;
+        }
         
         vec4 process(vec2 uv)
         {
           float finalOpacity = prop_opacity;
 
           // foreground uv
-          vec2 fuv = (srcTransform * vec3(uv, 1.0)).xy;
+          vec2 fuv = invBilinear(uv, coordinate(prop_pTL), coordinate(prop_pTR), coordinate(prop_pBR), coordinate(prop_pBL));
 
           // apply flip
           fuv.x = prop_flipX ? 1.0 - fuv.x : fuv.x;
@@ -234,6 +308,12 @@ export class OverlayQuadNode extends ImageDesignerNode
           relScale: this.getTransform().scale,
           enable: true,
           widget: WidgetType.TransformQuad,
+          points: [
+            this.propTL.getValue(),
+            this.propTR.getValue(),
+            this.propBR.getValue(),
+            this.propBL.getValue(),
+          ],
         },
       });
 

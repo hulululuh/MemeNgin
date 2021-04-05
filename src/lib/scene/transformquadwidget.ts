@@ -17,31 +17,83 @@ import {
   LineCollider,
 } from "@/lib/math/collision2d";
 import { Transform2D } from "@/lib/math/transform2d";
+import { MathUtils } from "three";
 
 const settings = ApplicationSettings.getInstance();
 
-enum ScaleMode {
-  None,
-  XDir,
-  YDir,
-  Both,
-}
-
 enum DragMode {
   None,
-  Move,
-  Scale,
+  MoveAll,
+  MoveTL,
+  MoveTR,
+  MoveBL,
+  MoveBR,
+  MoveT,
+  MoveB,
+  MoveL,
+  MoveR,
   Rotate,
 }
 
+// mapping table
+const DRAG_MODE = new Map<string, DragMode>([
+  ["cornerTL", DragMode.MoveTL],
+  ["cornerTR", DragMode.MoveTR],
+  ["cornerBL", DragMode.MoveBL],
+  ["cornerBR", DragMode.MoveBR],
+  ["edgeT", DragMode.MoveT],
+  ["edgeB", DragMode.MoveB],
+  ["edgeL", DragMode.MoveL],
+  ["edgeR", DragMode.MoveR],
+]);
+
+const DRAG_INDICES = new Map<DragMode, Array<number>>([
+  [DragMode.MoveAll, [0, 1, 2, 3]],
+  [DragMode.MoveTL, [0]],
+  [DragMode.MoveTR, [1]],
+  [DragMode.MoveBR, [2]],
+  [DragMode.MoveBL, [3]],
+  [DragMode.MoveT, [0, 1]],
+  [DragMode.MoveR, [1, 2]],
+  [DragMode.MoveB, [2, 3]],
+  [DragMode.MoveL, [3, 0]],
+  [DragMode.Rotate, [0, 1, 2, 3]],
+]);
+
 enum HighlightMode {
-  None,
-  ScaleX,
-  ScaleY,
-  ScaleCircle,
-  Rotation,
-  Move,
+  None = "None",
+  CornerTL = "cornerTL",
+  CornerTR = "cornerTR",
+  CornerBL = "cornerBL",
+  CornerBR = "cornerBR",
+  EdgeT = "edgeT",
+  EdgeB = "edgeB",
+  EdgeL = "edgeL",
+  EdgeR = "edgeR",
+  Rotation = "rotation",
+  MoveAll = "moveAll",
 }
+
+// mapping table
+const HIGHLIGHT_MODE = new Map<string, HighlightMode>([
+  ["cornerTL", HighlightMode.CornerTL],
+  ["cornerTR", HighlightMode.CornerTR],
+  ["cornerBL", HighlightMode.CornerBL],
+  ["cornerBR", HighlightMode.CornerBR],
+  ["edgeT", HighlightMode.EdgeT],
+  ["edgeB", HighlightMode.EdgeB],
+  ["edgeL", HighlightMode.EdgeL],
+  ["edgeR", HighlightMode.EdgeR],
+]);
+
+const HIGHLIGHT_EDGE_INDICES = new Map<HighlightMode, Array<number>>([
+  [HighlightMode.MoveAll, [0, 1, 2, 3]],
+  [HighlightMode.EdgeT, [0]],
+  [HighlightMode.EdgeR, [1]],
+  [HighlightMode.EdgeB, [2]],
+  [HighlightMode.EdgeL, [3]],
+  [HighlightMode.None, []],
+]);
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 export class TransformQuadWidget extends GraphicsItem implements iWidget {
@@ -60,14 +112,20 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
   dragStartRect: Rect;
   dragStartRotation: number;
 
-  scaleMode: ScaleMode;
   dragMode: DragMode;
   highlightMode: HighlightMode;
 
   protected colliders: Array<iCollider>;
   protected points: Array<Vector2>;
+  protected ptCenter: Vector2;
   protected posRotHandle: Vector2;
   protected scaleCursorIdx: Array<string>;
+
+  protected ptsDragStarted: Array<Vector2>;
+  protected offsetOnDragging: Array<Vector2>;
+
+  protected rotDragStart: number;
+  protected rotOffset: number;
 
   distDragStart: number;
   sizeOnDragStart: Vector2;
@@ -89,7 +147,6 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
 
     this.relScale = new Vector2(1, 1);
     this.dragged = true;
-    this.scaleMode = ScaleMode.None;
     this.dragMode = DragMode.None;
     this.highlightMode = HighlightMode.None;
 
@@ -132,12 +189,13 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     this.points[3] = new Vector2(-0.5, 0.5);
     this.posRotHandle = new Vector2(0, -0.75);
 
+    this.ptCenter = new Vector2(0, 0);
+
     this.handleSize = 30;
     this.resizeHandleSize = 10;
     this.minSize = 2;
 
     this.setSize(500, 300);
-
     this.transform2d.setRotation(0);
   }
 
@@ -160,36 +218,44 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     ) {
       if (drawHighlight && item.highlightMode === HighlightMode.None) return;
 
-      let drawScaleX = true;
-      let drawScaleY = true;
-      let drawScaleCircle = true;
+      let drawCornerCircle = true;
+      let drawCircleIndices = [0, 1, 2, 3];
       let drawRotation = true;
       if (drawHighlight) {
-        drawScaleX = item.highlightMode == HighlightMode.ScaleX;
-        drawScaleY = item.highlightMode == HighlightMode.ScaleY;
-        drawScaleCircle = item.highlightMode == HighlightMode.ScaleCircle;
+        const m = item.highlightMode;
+        drawCornerCircle =
+          m == HighlightMode.CornerBL ||
+          m == HighlightMode.CornerBR ||
+          m == HighlightMode.CornerTL ||
+          m == HighlightMode.CornerTR;
+
+        if (drawCornerCircle) {
+          drawCircleIndices = [];
+          if (m == HighlightMode.CornerTL) drawCircleIndices = [0];
+          if (m == HighlightMode.CornerTR) drawCircleIndices = [1];
+          if (m == HighlightMode.CornerBR) drawCircleIndices = [2];
+          if (m == HighlightMode.CornerBL) drawCircleIndices = [3];
+        }
         drawRotation = item.highlightMode == HighlightMode.Rotation;
       }
 
       let ptsXf = item.ptsTransformed;
-      // body
+
+      // body - edges
       if (drawHighlight) {
-        for (let i = 0; i < item.points.length; i++) {
-          const axisX = i % 2 === 1;
-          const shouldDraw =
-            item.highlightMode == HighlightMode.Move ||
-            (axisX && drawScaleX) ||
-            (!axisX && drawScaleY);
+        const indices = HIGHLIGHT_EDGE_INDICES.get(item.highlightMode);
+        if (indices) {
+          for (const idx of indices) {
+            const idxStart = idx;
+            const idxEnd = (idx + 1) % item.points.length;
 
-          if (!shouldDraw) continue;
-
-          ctx.beginPath();
-          const ptBegin = ptsXf[i];
-          ctx.moveTo(ptBegin[0], ptBegin[1]);
-          let next = (i + 1) % item.points.length;
-          const ptNext = ptsXf[next];
-          ctx.lineTo(ptNext[0], ptNext[1]);
-          ctx.stroke();
+            ctx.beginPath();
+            const ptBegin = ptsXf[idxStart];
+            ctx.moveTo(ptBegin[0], ptBegin[1]);
+            const ptNext = ptsXf[idxEnd];
+            ctx.lineTo(ptNext[0], ptNext[1]);
+            ctx.stroke();
+          }
         }
       } else {
         ctx.beginPath();
@@ -230,11 +296,12 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
         ctx.stroke();
       }
 
-      if (drawScaleCircle) {
-        // scaleHandles
-        //for (const pt of ptsXf) {
-        for (let i = 0; i < ptsXf.length - 1; i++) {
-          const pt = ptsXf[i];
+      // scaleHandles
+      //for (const pt of ptsXf) {
+
+      if (drawCornerCircle) {
+        for (let idx of drawCircleIndices) {
+          const pt = ptsXf[idx];
           ctx.beginPath();
           ctx.ellipse(
             pt[0],
@@ -247,6 +314,20 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
           );
           ctx.stroke();
         }
+        // for (let i = 0; i < ptsXf.length - 1; i++) {
+        //   const pt = ptsXf[i];
+        //   ctx.beginPath();
+        //   ctx.ellipse(
+        //     pt[0],
+        //     pt[1],
+        //     settings.widgetRadius / item.view.zoomFactor,
+        //     settings.widgetRadius / item.view.zoomFactor,
+        //     0,
+        //     0,
+        //     360
+        //   );
+        //   ctx.stroke();
+        // }
       }
     };
 
@@ -273,7 +354,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     mouseEvent.globalX = px;
     mouseEvent.globalY = py;
     const hoverResult = this.hover(mouseEvent);
-    const hovered = hoverResult[2] != HighlightMode.None;
+    const hovered = hoverResult[1] != HighlightMode.None;
     if (hovered) return true;
     else this.highlightMode = HighlightMode.None;
 
@@ -292,9 +373,8 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     return false;
   }
 
-  hover(evt: MouseOverEvent): [DragMode, ScaleMode, HighlightMode] {
+  hover(evt: MouseOverEvent): [DragMode, HighlightMode] {
     let dragMode: DragMode = DragMode.None;
-    let scaleMode: ScaleMode = ScaleMode.None;
     let highlightMode: HighlightMode = HighlightMode.None;
 
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
@@ -305,22 +385,14 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
       if (collider.isIntersectWith(ptCursor, this.view.zoomFactor)) {
         collided = collider;
         dragMode =
-          collider.label === "rotHandle" ? DragMode.Rotate : DragMode.Scale;
+          collider.label === "rotHandle" ? DragMode.Rotate : DragMode.MoveAll;
 
         if (collider.label === "rotHandle") {
           highlightMode = HighlightMode.Rotation;
-        }
-
-        if (dragMode === DragMode.Scale) {
-          if (collider.label === "edgeL" || collider.label === "edgeR") {
-            scaleMode = ScaleMode.XDir;
-            highlightMode = HighlightMode.ScaleX;
-          } else if (collider.label === "edgeB" || collider.label === "edgeT") {
-            scaleMode = ScaleMode.YDir;
-            highlightMode = HighlightMode.ScaleY;
-          } else {
-            scaleMode = ScaleMode.Both;
-            highlightMode = HighlightMode.ScaleCircle;
+        } else {
+          let highlight = HIGHLIGHT_MODE.get(collider.label);
+          if (highlight) {
+            highlightMode = highlight;
           }
         }
 
@@ -330,11 +402,11 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
 
     if (!collided) {
       if (this.isPointInsideRect(ptCursor)) {
-        highlightMode = HighlightMode.Move;
+        highlightMode = HighlightMode.MoveAll;
       }
     }
 
-    return [dragMode, scaleMode, highlightMode];
+    return [dragMode, highlightMode];
   }
 
   // MOUSE EVENTS
@@ -347,10 +419,19 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     this.dragged = false;
 
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
+    this.dragStartCursor = new Vector2(ptCursor);
+
     let collided;
     const ptsXf = this.ptsTransformed;
     for (let collider of this.colliders) {
       collider.setPts(ptsXf);
+
+      this.ptsDragStarted = [];
+      this.offsetOnDragging = [];
+      for (const pt of this.points) {
+        this.ptsDragStarted.push(new Vector2(pt[0], pt[1]));
+        this.offsetOnDragging.push(new Vector2(0, 0));
+      }
       if (collider.isIntersectWith(ptCursor, this.view.zoomFactor)) {
         collided = collider;
         this.dragStartPos = new Vector2(this.transform2d.position);
@@ -361,23 +442,20 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
         this.dragStartRelScale = new Vector2(this.relScale);
         this.dragStartRotation = this.transform2d.rotation;
         this.dragMode =
-          collider.label === "rotHandle" ? DragMode.Rotate : DragMode.Scale;
+          collider.label === "rotHandle" ? DragMode.Rotate : DragMode.MoveAll;
 
         if (collider.label === "rotHandle") {
           this.highlightMode = HighlightMode.Rotation;
-        }
 
-        if (this.dragMode === DragMode.Scale) {
-          if (collider.label === "edgeL" || collider.label === "edgeR") {
-            this.scaleMode = ScaleMode.XDir;
-            this.highlightMode = HighlightMode.ScaleX;
-          } else if (collider.label === "edgeB" || collider.label === "edgeT") {
-            this.scaleMode = ScaleMode.YDir;
-            this.highlightMode = HighlightMode.ScaleY;
-          } else {
-            this.scaleMode = ScaleMode.Both;
-            this.highlightMode = HighlightMode.ScaleCircle;
-          }
+          // rotation
+          //const xf = this.transform.invert();
+          const xf = this.transform;
+          const v = new Vector2(ptCursor).sub(xf.transform(this.ptCenter));
+
+          this.rotDragStart = Math.atan2(v[1], v[0]);
+        } else {
+          const dragMode = DRAG_MODE.get(collider.label);
+          if (dragMode) this.dragMode = dragMode;
         }
 
         break;
@@ -387,11 +465,11 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     // drag to move around
     if (!collided) {
       if (this.isPointInsideRect(ptCursor)) {
-        this.dragMode = DragMode.Move;
-        this.highlightMode = HighlightMode.Move;
+        this.dragMode = DragMode.MoveAll;
+        this.highlightMode = HighlightMode.MoveAll;
 
         this.dragStartPos = new Vector2(this.transform2d.position);
-        this.dragStartCursor = new Vector2(ptCursor);
+        //this.dragStartCursor = new Vector2(ptCursor);
 
         // set cursor
         this.view.canvas.style.cursor = "grabbing";
@@ -416,7 +494,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     if (this.dragMode == DragMode.None) {
       // hovering - update highlight mode
       const hoverResult = this.hover(evt);
-      this.highlightMode = hoverResult[2];
+      this.highlightMode = hoverResult[1];
     }
 
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
@@ -443,54 +521,99 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
       return;
     }
 
+    let isMoving = false;
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
 
     if (this.hit) {
+      let targets = DRAG_INDICES.get(this.dragMode);
+
+      // something have hovered
+      const offsetPos = new Vector2(ptCursor)
+        .sub(this.dragStartCursor)
+        .add(new Vector2(this.x, this.y));
+
       // movement
-      if (this.dragMode == DragMode.Move) {
-        const offsetPos = new Vector2(ptCursor).sub(this.dragStartCursor);
-        this.transform2d.position = new Vector2(this.dragStartPos).add(
-          offsetPos
-        );
-        this.x = this.transform2d.position[0];
-        this.y = this.transform2d.position[1];
+      if (this.dragMode === DragMode.None) {
+        // do nothing
       } else if (this.dragMode === DragMode.Rotate) {
-        const rotNow = new Vector2(ptCursor)
-          .sub(this.transform2d.position)
-          .normalize();
-        this.transform2d.rotation =
-          Math.atan2(rotNow[1], rotNow[0]) + Math.PI / 2;
-      } else if (this.dragMode == DragMode.Scale) {
-        const distNow = new Vector2(ptCursor)
-          .sub(this.dragStartPos)
-          .magnitude();
-        const relScale = distNow / this.distDragStart;
+        // rotation
+        //const xf = this.transform.invert();
+        const xf = this.transform;
+        const v = new Vector2(ptCursor).sub(xf.transform(this.ptCenter));
 
-        let w = this.sizeOnDragStart[0]; // * relScale;
-        let h = this.sizeOnDragStart[1]; // * relScale;
+        let rotDelta = Math.atan2(v[1], v[0]) - this.rotDragStart;
 
-        if (this.scaleMode === ScaleMode.XDir) {
-          // do not change y scale
-          // h = this.sizeOnDragStart[1];
-          w *= relScale;
-          this.relScale[0] = this.dragStartRelScale[0] * relScale;
-        } else if (this.scaleMode === ScaleMode.YDir) {
-          // do not change x scale
-          // w = this.sizeOnDragStart[0];
-          h *= relScale;
-          this.relScale[1] = this.dragStartRelScale[1] * relScale;
-          //this.dragStartScale[1] *= relScale;
-        } else {
-          // Both
-          w *= relScale;
-          h *= relScale;
-          this.relScale[0] = this.dragStartRelScale[0] * relScale;
-          this.relScale[1] = this.dragStartRelScale[1] * relScale;
-          // this.dragStartScale[0] *= relScale;
-          // this.dragStartScale[1] *= relScale;
+        let rotXf = new Transform2D(
+          new Vector2(0, 0),
+          new Vector2(1, 1),
+          rotDelta
+        ).toMatrix();
+
+        if (targets && targets.length > 0) {
+          for (const [i, v] of this.ptsDragStarted.entries()) {
+            const found = targets.find((item) => item == i);
+            if (found != undefined) {
+              this.points[i] = new Vector2(
+                rotXf.transform(new Vector2(v).sub(this.ptCenter))
+              ).add(this.ptCenter);
+            }
+          }
         }
 
-        this.setSize(w, h);
+        // const rotNow = new Vector2(ptCursor)
+        //   .sub(this.transform2d.position)
+        //   .normalize();
+        // this.transform2d.rotation =
+        //   Math.atan2(rotNow[1], rotNow[0]) + Math.PI / 2;
+      } else if (this.dragMode == DragMode.MoveAll) {
+        isMoving = true;
+        // something have hovered
+        for (const [i, v] of this.ptsDragStarted.entries()) {
+          //const offsetPos = new Vector2(ptCursor).sub(v);
+          const found = targets.find((item) => item == i);
+          if (found != undefined) {
+            this.offsetOnDragging[i] = new Vector2(offsetPos);
+          }
+        }
+      } else {
+        if (targets && targets.length > 0) {
+          isMoving = true;
+          for (const [i, v] of this.ptsDragStarted.entries()) {
+            //const offsetPos = new Vector2(ptCursor).sub(v);
+            const found = targets.find((item) => item == i);
+            if (found != undefined) {
+              this.offsetOnDragging[i] = new Vector2(offsetPos);
+            }
+          }
+        }
+      }
+
+      if (isMoving) {
+        if (targets && targets.length > 0) {
+          // something have hovered
+          for (const [i, v] of this.ptsDragStarted.entries()) {
+            const found = targets.find((item) => item == i);
+            if (found != undefined) {
+              //const xf = this.transform.invert();
+              const xf = this.transform.invert();
+              let ptOffset = xf.transform(
+                new Vector2(this.offsetOnDragging[i])
+              );
+              let ptXf = new Vector2(ptOffset).add(this.ptsDragStarted[i]);
+              this.points[i] = new Vector2(ptXf[0], ptXf[1]);
+            }
+          }
+        }
+      }
+
+      let cB = new Vector2(this.points[2]).add(this.points[3]).divideScalar(2);
+      let cT = new Vector2(this.points[0]).add(this.points[1]).divideScalar(2);
+      this.posRotHandle = new Vector2(cT).add(
+        new Vector2(cT).sub(cB).multiplyByScalar(0.25)
+      );
+
+      if (isMoving) {
+        this.ptCenter = new Vector2(cB).add(cT).divideScalar(2);
       }
 
       // send a event to apply result to target
@@ -505,6 +628,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
 
             dragStartRelScale: this.dragStartRelScale,
             relScale: this.relScale,
+            points: this.points,
           },
         });
 
@@ -556,20 +680,31 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
   }
 
   isPointInsideRect(ptTransformed: Vector2): boolean {
+    // ray-casting algorithm based on
+    // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
+
     let matInverse = new Matrix3(this.transform).invert();
+
     const ptOrigin = matInverse.transform(
       new Vector2(ptTransformed[0], ptTransformed[1])
     );
+    let x = ptOrigin[0];
+    let y = ptOrigin[1];
 
-    if (
-      ptOrigin[0] >= this.points[0][0] &&
-      ptOrigin[0] <= this.points[2][0] &&
-      ptOrigin[1] >= this.points[0][1] &&
-      ptOrigin[1] <= this.points[2][1]
-    ) {
-      return true;
+    const pts = this.points;
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      let xi = pts[i][0],
+        yi = pts[i][1];
+      let xj = pts[j][0],
+        yj = pts[j][1];
+
+      let intersect =
+        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      if (intersect) inside = !inside;
     }
-    return false;
+
+    return inside;
   }
 
   mouseUp(evt: MouseUpEvent) {
@@ -611,7 +746,6 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
 
     this.dragged = false;
     this.hit = false;
-    this.scaleMode = ScaleMode.None;
     this.dragMode = DragMode.None;
 
     // reset cursor
@@ -644,5 +778,17 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     this.y = this.transform2d.position[1];
     this.width = this.transform2d.scale[0];
     this.height = this.transform2d.scale[1];
+
+    for (let i = 0; i < evt.detail.points.length; i++) {
+      this.points[i] = new Vector2(evt.detail.points[i]);
+    }
+
+    let cB = new Vector2(this.points[2]).add(this.points[3]).divideScalar(2);
+    let cT = new Vector2(this.points[0]).add(this.points[1]).divideScalar(2);
+    this.posRotHandle = new Vector2(cT).add(
+      new Vector2(cT).sub(cB).multiplyByScalar(0.25)
+    );
+
+    this.ptCenter = new Vector2(cB).add(cT).divideScalar(2);
   }
 }

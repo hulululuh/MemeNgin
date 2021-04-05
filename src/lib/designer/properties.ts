@@ -1,8 +1,8 @@
 import { Transform2D } from "../math/transform2d";
+import { Vector2 } from "math.gl";
 import { Color } from "./color";
 import { Gradient } from "./gradient";
-import { Vector2 } from "math.gl";
-import { Asset, AssetType } from "@/assets/assetmanager";
+import { AssetType } from "@/assets/assetmanager";
 
 // for use in code after build
 export enum PropertyType {
@@ -15,6 +15,7 @@ export enum PropertyType {
   Gradient = "gradient",
   File = "file",
   Transform2D = "transform2d",
+  Vector2 = "vector2",
   Asset = "asset",
 
   // use it on the socket
@@ -492,5 +493,40 @@ export class Transform2DProperty extends Property {
   copyValuesFrom(prop: Transform2DProperty) {
     console.log("copy value from transform2d");
     this.setValue(prop.value.clone());
+  }
+}
+
+export class Vector2Property extends Property {
+  value: Vector2;
+  constructor(name: string, displayName: string, value: Vector2) {
+    super();
+    this.name = name;
+    this.displayName = displayName;
+    this.value = value;
+    this.parentValue = value;
+    this.type = PropertyType.Vector2;
+  }
+
+  getValue(): any {
+    return this.value;
+  }
+
+  setValue(val: any) {
+    // todo: validate
+    this.value = val;
+  }
+
+  clone(): Property {
+    let prop = new Vector2Property(
+      this.name,
+      this.displayName,
+      this.value.clone()
+    );
+
+    return prop;
+  }
+
+  copyValuesFrom(prop: Vector2Property) {
+    this.value = prop.value.clone();
   }
 }

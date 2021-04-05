@@ -47,6 +47,7 @@
   import StringPropertyView from "@/components/properties/StringProp.vue";
   import FilePropertyView from "@/components/properties/FileProp.vue";
   import Transform2DPropertyView from "@/components/properties/Transform2DProp.vue";
+  import Vector2PropertyView from "@/components/properties/Vector2Prop.vue";
   import {
     IProperyUi,
     PropertyChangeComplete,
@@ -70,6 +71,7 @@
       string: StringPropertyView,
       file: FilePropertyView,
       transform2d: Transform2DPropertyView,
+      vector2: Vector2PropertyView,
       asset: AssetPropertyView,
 
       Accordion,

@@ -482,7 +482,7 @@
             this.project.data["appVersion"] = this.version;
 
             //console.log(path);
-            if (!path.endsWith(".texture")) path += ".texture";
+            if (!path.endsWith(".mmng")) path += ".mmng";
 
             this.project.name = path.replace(/^.*[\\\/]/, "");
             this.project.path = path;

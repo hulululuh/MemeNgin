@@ -14,6 +14,7 @@ import {
   IPropertyHolder,
   Transform2DProperty,
   AssetProperty,
+  Vector2Property,
 } from "@/lib/designer/properties";
 import { Asset, AssetType } from "@/assets/assetmanager";
 import { Color } from "@/lib/designer/color";
@@ -343,6 +344,17 @@ export class DesignerNode implements IPropertyHolder {
     defaultVal: Transform2D
   ): Transform2DProperty {
     let prop = new Transform2DProperty(id, displayName, defaultVal);
+
+    this.properties.push(prop);
+    return prop;
+  }
+
+  addVector2Property(
+    id: string,
+    displayName: string,
+    defaultVal: Vector2
+  ): Vector2Property {
+    let prop = new Vector2Property(id, displayName, defaultVal);
 
     this.properties.push(prop);
     return prop;
