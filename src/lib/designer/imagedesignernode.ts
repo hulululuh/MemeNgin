@@ -444,7 +444,7 @@ export class ImageDesignerNode extends DesignerNode {
       if (prop instanceof EnumProperty) {
         gl.uniform1i(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          (prop as EnumProperty).values.indexOf(prop.value)
+          value
         );
       }
       if (prop instanceof ColorProperty) {
@@ -457,7 +457,8 @@ export class ImageDesignerNode extends DesignerNode {
         );
       }
       if (prop instanceof GradientProperty) {
-        let gradient = (prop as GradientProperty).value;
+        let gradient = value;
+        this.getProperty(prop.name);
 
         gl.uniform1i(
           gl.getUniformLocation(
@@ -492,9 +493,7 @@ export class ImageDesignerNode extends DesignerNode {
       }
 
       if (prop instanceof Transform2DProperty) {
-        let mat2d = this.getProperty(prop.name)
-          .toMatrix()
-          .toFloat32Array();
+        let mat2d = value.toMatrix().toFloat32Array();
 
         gl.uniformMatrix3fv(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
@@ -506,7 +505,7 @@ export class ImageDesignerNode extends DesignerNode {
       if (prop instanceof Vector2Property) {
         gl.uniform2fv(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          this.getProperty(prop.name)
+          value
         );
       }
     }
