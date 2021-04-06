@@ -502,8 +502,8 @@ export class Vector2Property extends Property {
     super();
     this.name = name;
     this.displayName = displayName;
-    this.value = value;
-    this.parentValue = value;
+    this.value = new Vector2(value);
+    this.parentValue = new Vector2(value);
     this.type = PropertyType.Vector2;
   }
 

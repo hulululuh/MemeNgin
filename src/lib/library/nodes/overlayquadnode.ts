@@ -32,6 +32,14 @@ export class OverlayQuadNode extends ImageDesignerNode
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "transform2d") {
         this.requestUpdateWidget();
+      } else if (
+        prop.name === "pTL" ||
+        prop.name === "pTR" ||
+        prop.name === "pBR" ||
+        prop.name === "pBL"
+      ) {
+        this.requestUpdateWidget();
+        this.requestUpdate();
       }
     };
 
@@ -309,10 +317,10 @@ export class OverlayQuadNode extends ImageDesignerNode
           enable: true,
           widget: WidgetType.TransformQuad,
           points: [
-            this.propTL.getValue(),
-            this.propTR.getValue(),
-            this.propBR.getValue(),
-            this.propBL.getValue(),
+            this.getProperty(this.propTL.name),
+            this.getProperty(this.propTR.name),
+            this.getProperty(this.propBR.name),
+            this.getProperty(this.propBL.name),
           ],
         },
       });

@@ -492,7 +492,7 @@ export class ImageDesignerNode extends DesignerNode {
       }
 
       if (prop instanceof Transform2DProperty) {
-        let mat2d = (prop as Transform2DProperty).value
+        let mat2d = this.getProperty(prop.name)
           .toMatrix()
           .toFloat32Array();
 
@@ -504,10 +504,9 @@ export class ImageDesignerNode extends DesignerNode {
       }
 
       if (prop instanceof Vector2Property) {
-        let vec2 = (prop as Vector2Property).getValue();
         gl.uniform2fv(
           gl.getUniformLocation(this.shaderProgram, "prop_" + prop.name),
-          vec2
+          this.getProperty(prop.name)
         );
       }
     }

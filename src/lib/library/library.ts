@@ -15,6 +15,7 @@ import { CopyNode } from "./nodes/copynode";
 import { DetectNode } from "./nodes/detectnode";
 import { DirectionalWarpNode } from "./nodes/directionalwarpnode";
 import { FloatPropertyNode } from "./nodes/floatpropertynode";
+import { Vector2PropertyNode } from "./nodes/vector2propertynode";
 import { FractalNoiseNode } from "./nodes/fractalnoisenode";
 import { GradientMapNode } from "./nodes/gradientmapnode";
 import { GradientNode, TriGradientNode } from "./nodes/gradientnode";
@@ -167,6 +168,12 @@ export function createLibrary() {
   );
 
   lib.addNode(
+    "colorproperty",
+    "ColorProperty",
+    ColorPropertyNode,
+    NodeCategory.Logic
+  );
+  lib.addNode(
     "boolProperty",
     "BoolProperty",
     BoolPropertyNode,
@@ -191,9 +198,9 @@ export function createLibrary() {
     NodeCategory.Logic
   );
   lib.addNode(
-    "colorproperty",
-    "ColorProperty",
-    ColorPropertyNode,
+    "vector2property",
+    "Vector2Property",
+    Vector2PropertyNode,
     NodeCategory.Logic
   );
   lib.addNode("copy", "Copy", CopyNode, NodeCategory.Logic);
