@@ -364,15 +364,16 @@ export class FrameGraphicsItem extends GraphicsItem {
     // add undo/redo action
     if (this.dragged) {
       if (this.dragMode == DragMode.HandleTop) {
+        const dragStartPos = new Vector2(this.dragStartPos);
         let newPos = new Vector2(this.x, this.y);
         let items: GraphicsItem[] = [this];
-        let oldPosList: Vector2[] = [this.dragStartPos.clone()];
+        let oldPosList: Vector2[] = [dragStartPos];
         let newPosList: Vector2[] = [newPos];
 
         // reverse diff: new pos to old pos
         let diff = new Vector2(
-          this.dragStartPos.x - newPos.x,
-          this.dragStartPos.y - newPos.y
+          dragStartPos.x - newPos.x,
+          dragStartPos.y - newPos.y
         );
 
         // add all captured nodes
