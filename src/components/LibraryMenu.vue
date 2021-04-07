@@ -81,20 +81,20 @@
         return item;
       });
 
-      items.push(
-        new LibraryItem(
-          LibraryItemType.Comment,
-          LibraryItemCategory.Undefined,
-          "comment",
-          "Comment"
-        )
-      );
+      // items.push(
+      //   new LibraryItem(
+      //     LibraryItemType.Comment,
+      //     LibraryItemCategory.Undefined,
+      //     "comment",
+      //     "Comment"
+      //   )
+      // );
       items.push(
         new LibraryItem(
           LibraryItemType.Frame,
-          LibraryItemCategory.Undefined,
-          "frame",
-          "Frame"
+          LibraryItemCategory.Logic,
+          "inputs",
+          "Inputs"
         )
       );
       // items.push(
@@ -231,6 +231,10 @@
     }
 
     addItem(type: LibraryItemType, nodeName: string) {
+      if (nodeName == "inputs") {
+        this.editor.nodeScene.oninputnodecreationattempt();
+        return;
+      }
       if (nodeName == "output") {
         // only one output node is exists
         this.editor.nodeScene.onoutputnodecreationattempt();

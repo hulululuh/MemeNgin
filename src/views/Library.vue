@@ -139,29 +139,20 @@
         return item;
       });
 
-      items.push(
-        new LibraryItem(
-          LibraryItemType.Comment,
-          LibraryItemCategory.Undefined,
-          "comment",
-          "Comment"
-        )
-      );
-      items.push(
-        new LibraryItem(
-          LibraryItemType.Frame,
-          LibraryItemCategory.Undefined,
-          "frame",
-          "Frame"
-        )
-      );
-      // items.push(
-      // 	new LibraryItem(
-      // 		LibraryItemType.Navigation,
-      // 		"navigation",
-      // 		"Navigation"
-      // 	)
-      // );
+      // input
+      let idx = items.findIndex((item) => item.name.toLowerCase() === "output");
+      if (idx > -1) {
+        items.splice(
+          idx,
+          0,
+          new LibraryItem(
+            LibraryItemType.Frame,
+            LibraryItemCategory.Logic,
+            "inputs",
+            "Inputs"
+          )
+        );
+      }
 
       return items;
     }
@@ -190,6 +181,10 @@
     }
 
     addItem(type: LibraryItemType, nodeName: string) {
+      if (nodeName == "inputs") {
+        this.editor.nodeScene.oninputnodecreationattempt();
+        return;
+      }
       if (nodeName == "output") {
         // only one output node is exists
         this.editor.nodeScene.onoutputnodecreationattempt();

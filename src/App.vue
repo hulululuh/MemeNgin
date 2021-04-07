@@ -324,7 +324,7 @@
         console.log("comment selected");
       };
       this.editor.onframeselected = (frame) => {
-        this.propHolder = frame;
+        //this.propHolder = frame;
       };
       // this.editor.onnavigationselected = nav => {
       //   this.propHolder = nav;
@@ -451,7 +451,7 @@
 
       this.library = this.editor.library;
 
-      this.project.name = "New Texture";
+      this.project.name = "New MemeNgin Project";
       this.project.path = null;
 
       this.resolution = 1024;

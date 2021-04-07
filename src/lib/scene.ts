@@ -90,6 +90,7 @@ export class NodeScene {
   onframeselected?: (item: FrameGraphicsItem) => void;
   onnavigationselected?: (item: NavigationGraphicsItem) => void;
   onwidgetselected?: (item: iWidget) => void;
+  oninputnodecreationattempt?: () => void;
   onoutputnodecreationattempt?: () => void;
 
   onnodedeleted?: (item: NodeGraphicsItem) => void;
@@ -348,6 +349,11 @@ export class NodeScene {
     // golden layout conveniently hides it
   }
 
+  get inputNode(): GraphicsItem {
+    let input = this.frames[0];
+    return input;
+  }
+
   get outputNode(): NodeGraphicsItem {
     let output = this.nodes.find((item) => item.dNode instanceof OutputNode);
     return output;
@@ -513,7 +519,8 @@ export class NodeScene {
 
     for (let item of items) {
       if (item instanceof FrameGraphicsItem) {
-        frames.push(<FrameGraphicsItem>item);
+        // input graphic item is not deleteable
+        // frames.push(<FrameGraphicsItem>item);
       }
       if (item instanceof CommentGraphicsItem) {
         comments.push(<CommentGraphicsItem>item);
@@ -1209,10 +1216,7 @@ export class NodeScene {
       n["width"] = frame.getWidth();
       n["height"] = frame.getHeight();
 
-      n["title"] = frame.title;
-      n["showTitle"] = frame.showTitle;
-      n["description"] = frame.description;
-      n["color"] = frame.color.toHex();
+      n["color"] = frame.fillColor.toHex();
 
       frames.push(n);
     }
@@ -1287,10 +1291,7 @@ export class NodeScene {
         frame.setPos(d.x, d.y);
         frame.setSize(d.width, d.height);
 
-        frame.setTitle(d.title);
-        frame.setShowTitle(d.showTitle);
-        frame.setDescription(d.description);
-        frame.color = Color.parse(d.color);
+        frame.fillColor = Color.parse(d.color);
 
         s.addFrame(frame);
       }

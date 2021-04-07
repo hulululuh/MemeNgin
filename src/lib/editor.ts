@@ -10,13 +10,11 @@ import { DesignerLibrary } from "./designer/library";
 import { NodeScene } from "./scene";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
-import { ImageCanvas } from "./designer/imagecanvas";
 
 import { createLibrary, getCurrentLibraryVersion } from "@/lib/library/library";
 import { Color } from "./designer/color";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
 import { FrameGraphicsItem } from "./scene/framegraphicsitem";
-import { Transform2dWidget } from "./scene/Transform2dWidget";
 import { iWidget } from "@/lib/scene/widget";
 import { NavigationGraphicsItem } from "./scene/navigationgraphicsitem";
 import { ItemClipboard } from "./clipboard";
@@ -24,7 +22,6 @@ import { UndoStack } from "./undostack";
 import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detectnode";
-import { LogicDesignerNode } from "./designer/logicdesignernode";
 import { ImageDesignerNode } from "./designer/imagedesignernode";
 const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
@@ -127,6 +124,10 @@ export class Editor {
     this.designer.invalidateAllNodes();
     const centerX = 0;
     const centerY = 0;
+
+    // input bundle
+    let inputBundle = this.createFrame();
+    inputBundle.setCenter(centerX - 350, centerY);
 
     // input
     let inputNode = this.library.create("color");
@@ -399,6 +400,11 @@ export class Editor {
       // if (self.onpreviewnode) {
       //   self.onpreviewnode(null, null);
       // }
+    };
+
+    this.nodeScene.oninputnodecreationattempt = function() {
+      self.nodeScene.selectedItems = [self.nodeScene.inputNode];
+      self.nodeScene.zoomSelected(self.nodeScene.selectedItems);
     };
 
     this.nodeScene.onoutputnodecreationattempt = function() {

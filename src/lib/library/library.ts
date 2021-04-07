@@ -45,6 +45,7 @@ import { TextureNode } from "./nodes/texturenode";
 import { ThresholdNode } from "./nodes/thresholdnode";
 import { TileNode } from "./nodes/tilenode";
 import { Transform2DNode } from "./nodes/transform2dnode";
+import { ResizeNode } from "./nodes/resizenode";
 import { WarpNode } from "./nodes/warpnode";
 import { WaveNode } from "./nodes/wavenode";
 
@@ -64,6 +65,7 @@ export function createLibrary() {
     Transform2DNode,
     NodeCategory.Shape
   );
+  lib.addNode("resize", "Resize", ResizeNode, NodeCategory.Shape);
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
   lib.addNode("tile", "Tile", TileNode, NodeCategory.Shape);
   lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Shape);
@@ -174,7 +176,7 @@ export function createLibrary() {
     NodeCategory.Logic
   );
   lib.addNode(
-    "boolProperty",
+    "boolproperty",
     "BoolProperty",
     BoolPropertyNode,
     NodeCategory.Logic

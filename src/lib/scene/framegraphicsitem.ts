@@ -10,12 +10,6 @@ import { Rect } from "@/lib/math/rect";
 import { Vector2 } from "@math.gl/core";
 import { Color } from "../designer/color";
 import { NodeGraphicsItem } from "./nodegraphicsitem";
-import {
-  IPropertyHolder,
-  Property,
-  StringProperty,
-  BoolProperty,
-} from "../designer/properties";
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 import { ResizeFrameAction } from "../actions/resizeframeaction";
@@ -47,12 +41,10 @@ export class FrameRegion {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
-  title: string;
-  description: string;
-  showTitle: boolean;
+export class FrameGraphicsItem extends GraphicsItem {
   view: SceneView;
-  color: Color;
+  strokeColor: Color;
+  fillColor: Color;
   hit: boolean;
   dragged: boolean;
   dragStartPos: Vector2;
@@ -70,17 +62,11 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
 
   nodes: NodeGraphicsItem[];
 
-  titleProp: StringProperty;
-  showTitleProp: BoolProperty;
-  descrProp: StringProperty;
-
   constructor(view: SceneView) {
     super();
-    this.title = "Frame";
-    this.description = "";
-    this.showTitle = true;
     this.view = view;
-    this.color = new Color(0.1, 0, 0.2);
+    this.strokeColor = new Color(0.2, 0.2, 0.2);
+    this.fillColor = new Color(1.0, 1.0, 1.0);
     this.hit = false;
     this.dragged = true;
 
@@ -91,46 +77,14 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     this.handleSize = 30;
     this.resizeHandleSize = 20;
 
-    this.setSize(500, 300);
+    this.setSize(180, 450);
 
     this.nodes = [];
-
-    this.titleProp = new StringProperty("title", "Title", "Frame");
-    this.showTitleProp = new BoolProperty("showtitle", "Show Title", true);
-    this.descrProp = new StringProperty("description", "Description", "", true);
-    this.properties.push(this.titleProp);
-    this.properties.push(this.showTitleProp);
-    this.properties.push(this.descrProp);
-  }
-  properties: Property[] = new Array();
-  setProperty(name: string, value: any) {
-    if (name == "title") {
-      this.setTitle(value);
-    } else if (name == "showtitle") {
-      this.setShowTitle(value);
-    } else if (name == "description") {
-      this.setDescription(value);
-    }
   }
 
   setSize(w: number, h: number) {
     this.width = w;
     this.height = h;
-  }
-
-  setTitle(text: string) {
-    this.title = text;
-    this.titleProp.setValue(text);
-  }
-
-  setShowTitle(shouldShow: boolean) {
-    this.showTitle = shouldShow;
-    this.showTitleProp.setValue(shouldShow);
-  }
-
-  setDescription(text: string) {
-    this.description = text;
-    this.descrProp.setValue(text);
   }
 
   private buildColor(color: Color, alpha: number) {
@@ -171,7 +125,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     ctx.beginPath();
     ctx.lineWidth = 1;
     //ctx.strokeStyle = "rgb(100, 0, 0)";
-    ctx.strokeStyle = this.buildColor(this.color, 1);
+    ctx.strokeStyle = this.buildColor(this.strokeColor, 1);
     this.roundRect(ctx, this.x, this.y, this.width, this.height, 1);
     ctx.stroke();
 
@@ -180,14 +134,14 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     ctx.beginPath();
     ctx.lineWidth = 1;
     //ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-    ctx.fillStyle = this.buildColor(this.color, 0.5);
+    ctx.fillStyle = this.buildColor(this.fillColor, 0.5);
     this.roundRect(ctx, this.x, this.y, this.width, handleSize, 1);
     ctx.fill();
 
     ctx.beginPath();
     ctx.lineWidth = 1;
     //ctx.strokeStyle = "rgb(100, 0, 0, 0.8)";
-    ctx.strokeStyle = this.buildColor(this.color, 0.8);
+    ctx.strokeStyle = this.buildColor(this.strokeColor, 0.8);
     this.roundRect(ctx, this.x, this.y, this.width, handleSize, 1);
     ctx.stroke();
 
@@ -195,7 +149,7 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     ctx.beginPath();
     ctx.lineWidth = 2;
     //ctx.fillStyle = "rgba(100, 0, 0, 0.2)";
-    ctx.fillStyle = this.buildColor(this.color, 0.2);
+    ctx.fillStyle = this.buildColor(this.fillColor, 0.2);
     this.roundRect(
       ctx,
       this.x,
@@ -207,30 +161,27 @@ export class FrameGraphicsItem extends GraphicsItem implements IPropertyHolder {
     ctx.fill();
 
     // title
-    if (this.showTitle == true) {
-      ctx.beginPath();
+    ctx.beginPath();
 
-      let fontSize = 18; // * this.view.zoomFactor;
+    const fontSize = 18 * this.view.zoomFactor;
 
-      ctx.save();
-      //ctx.scale(1.0 / this.view.zoomFactor, 1.0 / this.view.zoomFactor);
-      ctx.setTransform(1, 0, 0, 1, this.view.offset.x, this.view.offset.y);
+    ctx.save();
+    ctx.scale(1.0 / this.view.zoomFactor, 1.0 / this.view.zoomFactor);
+    ctx.setTransform(1, 0, 0, 1, this.view.offset.x, this.view.offset.y);
 
-      //ctx.font = fontSize + "px 'Open Sans'";
-      ctx.font = "30px 'Open Sans'";
-      ctx.fillStyle = "rgb(240, 240, 240)";
-      //let size = ctx.measureText(this.textureChannel.toUpperCase());
-      let textX = this.x;
-      let textY = this.y;
-      //ctx.fillText("Hello World", textX, textY - 5);
-      ctx.fillText(
-        this.title,
-        textX * this.view.zoomFactor,
-        (textY - 5) * this.view.zoomFactor
-      );
+    ctx.font = `${fontSize}px 'Open Sans'`;
+    ctx.fillStyle = "rgb(0, 0, 0)";
+    //let size = ctx.measureText(this.textureChannel.toUpperCase());
+    let textX = this.x;
+    let textY = this.y;
 
-      ctx.restore();
-    }
+    ctx.fillText(
+      "Inputs",
+      (textX + 5) * this.view.zoomFactor,
+      (textY + 20) * this.view.zoomFactor
+    );
+
+    ctx.restore();
 
     // // debug draw frames
     // if (false) {

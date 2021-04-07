@@ -53,26 +53,25 @@ export class ItemClipboard {
     data.nodes = this.getNodes(designer, nodeList);
     data.connections = this.getConnections(data.nodes, designer, nodeList);
 
-    // FRAMES
-    let frames = [];
-    for (let item of items) {
-      if (!(item instanceof FrameGraphicsItem)) continue;
-      let frame = <FrameGraphicsItem>item;
+    if (false) {
+      // FRAMES
+      let frames = [];
+      for (let item of items) {
+        if (!(item instanceof FrameGraphicsItem)) continue;
+        let frame = <FrameGraphicsItem>item;
 
-      let n: any = {};
-      n["x"] = frame.left;
-      n["y"] = frame.top;
-      n["width"] = frame.getWidth();
-      n["height"] = frame.getHeight();
+        let n: any = {};
+        n["x"] = frame.left;
+        n["y"] = frame.top;
+        n["width"] = frame.getWidth();
+        n["height"] = frame.getHeight();
 
-      n["title"] = frame.title;
-      n["showTitle"] = frame.showTitle;
-      n["description"] = frame.description;
-      n["color"] = frame.color.toHex();
+        n["color"] = frame.fillColor.toHex();
 
-      frames.push(n);
+        frames.push(n);
+      }
+      data.frames = frames;
     }
-    data.frames = frames;
 
     // COMMENTS
     let comments = [];
@@ -144,10 +143,7 @@ export class ItemClipboard {
         frame.setPos(d.x, d.y);
         frame.setSize(d.width, d.height);
 
-        frame.setTitle(d.title);
-        frame.setShowTitle(d.showTitle);
-        frame.setDescription(d.description);
-        frame.color = Color.parse(d.color);
+        frame.fillColor = Color.parse(d.color);
 
         scene.addFrame(frame);
         frames.push(frame);
