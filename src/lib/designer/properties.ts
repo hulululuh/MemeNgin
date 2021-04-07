@@ -250,7 +250,7 @@ export class AssetProperty extends Property {
 
 export class EnumProperty extends Property {
   values: string[];
-  index: number;
+  index: number = -1;
   value: string;
   constructor(
     name: string,
@@ -273,6 +273,9 @@ export class EnumProperty extends Property {
   }
 
   getValue(): any {
+    if (this.index == -1) {
+      this.index = this.values.indexOf(this.value);
+    }
     return this.index;
   }
 
@@ -285,7 +288,7 @@ export class EnumProperty extends Property {
       this.name,
       this.displayName,
       this.values.slice(0),
-      0
+      this.index
     );
     prop.index = this.index;
 
@@ -295,6 +298,7 @@ export class EnumProperty extends Property {
   copyValuesFrom(prop: EnumProperty) {
     this.values = prop.values;
     this.index = prop.index;
+    this.value = prop.value;
   }
 }
 

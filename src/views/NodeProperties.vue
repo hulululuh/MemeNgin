@@ -52,6 +52,7 @@
     IProperyUi,
     PropertyChangeComplete,
   } from "../components/properties/ipropertyui";
+  import { OutputNode } from "@/lib/library/nodes/outputnode";
 
   /* eslint-disable */
 
@@ -139,6 +140,27 @@
 
     // calculated
     get properties(): PropHolder[] {
+      // if (this.node instanceof OutputNode) {
+      //   let inputprops = Editor.getInstance().getInputItem().inputProperties;
+      //   let props: PropHolder[] = [];
+
+      //   for (let prop of inputprops) {
+      //     props.push({ prop: prop, componentName: prop.type });
+      //   }
+      //   return props;
+      // } else {
+      //   let props: PropHolder[] = this.node.properties.map((prop) => {
+      //     //let name: string = "";
+      //     return {
+      //       prop: prop,
+      //       componentName: prop.type,
+      //     };
+      //   });
+
+      //   //console.log(props);
+      //   return props;
+      // }
+
       let props: PropHolder[] = this.node.properties.map((prop) => {
         //let name: string = "";
         return {

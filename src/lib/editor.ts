@@ -98,6 +98,11 @@ export class Editor {
     return editor.nodeScene;
   }
 
+  getInputItem() {
+    const item = this.nodeScene.frames[0];
+    return item;
+  }
+
   getImageWidth() {
     return this.designer.width;
   }
@@ -127,7 +132,7 @@ export class Editor {
 
     // input bundle
     let inputBundle = this.createFrame();
-    inputBundle.setCenter(centerX - 350, centerY);
+    inputBundle.setCenter(centerX - 400, centerY);
 
     // input
     let inputNode = this.library.create("color");

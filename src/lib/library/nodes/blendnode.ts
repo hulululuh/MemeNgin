@@ -91,6 +91,7 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
         .filter((p) => p.name === "transform2d")[0]
         .setValue(this.getTransform());
       this.requestUpdateWidget();
+      this.requestUpdate();
     };
 
     this.onItemSelected = () => {

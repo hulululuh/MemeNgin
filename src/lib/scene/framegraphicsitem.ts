@@ -13,6 +13,8 @@ import { NodeGraphicsItem } from "./nodegraphicsitem";
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 import { ResizeFrameAction } from "../actions/resizeframeaction";
+import { LogicDesignerNode } from "../designer/logicdesignernode";
+import { TextureNode } from "@/lib/library/nodes/texturenode";
 
 enum XResizeDir {
   None,
@@ -77,9 +79,27 @@ export class FrameGraphicsItem extends GraphicsItem {
     this.handleSize = 30;
     this.resizeHandleSize = 20;
 
-    this.setSize(180, 450);
+    this.setSize(200, 600);
 
     this.nodes = [];
+  }
+
+  get inputProperties() {
+    this.nodes = this.getHoveredNodes();
+    let props = [];
+    for (let item of this.nodes) {
+      if (item.dNode instanceof TextureNode) {
+        let fileProp = item.dNode.properties.find(
+          (item) => item.name == "file"
+        );
+        if (fileProp) props.push(fileProp);
+      } else if (item.dNode instanceof LogicDesignerNode) {
+        for (let prop of item.dNode.properties) {
+          props.push(prop);
+        }
+      }
+    }
+    return props;
   }
 
   setSize(w: number, h: number) {
