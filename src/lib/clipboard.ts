@@ -10,8 +10,6 @@ import { DesignerNode } from "./designer/designernode";
 import { ImageDesignerNode } from "./designer/imagedesignernode";
 import { LogicDesignerNode } from "./designer/logicdesignernode";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
-import { DesignerNodeConn } from "./designer/designerconnection";
-import { SocketInOut } from "./scene/socketgraphicsitem";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { Guid } from "./utils";
 import { AddItemsAction } from "./actions/additemsaction";
@@ -192,6 +190,9 @@ export class ItemClipboard {
       // assign properties
       for (let propName in n.properties) {
         dNode.setProperty(propName, n.properties[propName]);
+      }
+      if (dNode.onPropertyLoaded) {
+        dNode.onPropertyLoaded();
       }
 
       // create scene version
