@@ -81,14 +81,14 @@
         return item;
       });
 
-      // items.push(
-      //   new LibraryItem(
-      //     LibraryItemType.Comment,
-      //     LibraryItemCategory.Undefined,
-      //     "comment",
-      //     "Comment"
-      //   )
-      // );
+      items.push(
+        new LibraryItem(
+          LibraryItemType.Comment,
+          LibraryItemCategory.Logic,
+          "comment",
+          "Comment"
+        )
+      );
       items.push(
         new LibraryItem(
           LibraryItemType.Frame,

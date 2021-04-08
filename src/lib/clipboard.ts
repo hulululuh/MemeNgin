@@ -64,7 +64,7 @@ export class ItemClipboard {
         n["width"] = frame.getWidth();
         n["height"] = frame.getHeight();
 
-        n["color"] = frame.fillColor.toHex();
+        //n["color"] = frame.fillColor.toHex();
 
         frames.push(n);
       }
@@ -141,7 +141,7 @@ export class ItemClipboard {
         frame.setPos(d.x, d.y);
         frame.setSize(d.width, d.height);
 
-        frame.fillColor = Color.parse(d.color);
+        //frame.fillColor = Color.parse(d.color);
 
         scene.addFrame(frame);
         frames.push(frame);

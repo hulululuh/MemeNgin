@@ -18,6 +18,9 @@ export class ApplicationSettings {
   colorGridPrimary: string;
   colorGridSecondary: string;
   colorFocused: string = "#0095ff";
+  colorEditorText: string = "#000000ff";
+  colorInputsStroke: string = "#333333ff";
+  colorInputsFill: string = "#ffffffff";
 
   lineWidthNormal: number = 2;
   lineWidthThick: number = 3;
@@ -51,6 +54,10 @@ export class ApplicationSettings {
     this.colorGridPrimary = readProperty("colorGridPrimary");
     this.colorGridSecondary = readProperty("colorGridSecondary");
     this.colorFocused = readProperty("colorFocused");
+    this.colorEditorText = readProperty("colorEditorText");
+    this.colorInputsStroke = readProperty("colorInputsStroke");
+    this.colorInputsFill = readProperty("colorInputsFill");
+
     this.colorSocketTitle = readProperty("colorSocketTitle");
     this.colorConnectionLine = readProperty("colorConnectionLine");
     this.widgetThickness = readPropertyAsNumber("widgetThickness");

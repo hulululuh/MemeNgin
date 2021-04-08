@@ -154,6 +154,15 @@
         );
       }
 
+      items.push(
+        new LibraryItem(
+          LibraryItemType.Comment,
+          LibraryItemCategory.Logic,
+          "comment",
+          "Comment"
+        )
+      );
+
       return items;
     }
 

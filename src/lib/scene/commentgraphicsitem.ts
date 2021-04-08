@@ -15,6 +15,8 @@ import {
 } from "../designer/properties";
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
+import { ApplicationSettings } from "@/settings";
+const settings = ApplicationSettings.getInstance();
 
 // https://stackoverflow.com/questions/5026961/html5-canvas-ctx-filltext-wont-do-line-breaks
 export class CommentGraphicsItem extends GraphicsItem
@@ -23,6 +25,8 @@ export class CommentGraphicsItem extends GraphicsItem
   textProp: StringProperty;
   view: SceneView;
   color: Color;
+  strokeColor: Color;
+  textColor: Color;
 
   padding: number;
   fontHeight: number;
@@ -35,7 +39,9 @@ export class CommentGraphicsItem extends GraphicsItem
     super();
     this.text = "";
     this.view = view;
-    this.color = new Color(0.9, 0.9, 0.9);
+    this.color = Color.parse(settings.colorInputsFill);
+    this.strokeColor = Color.parse(settings.colorInputsStroke);
+    this.textColor = Color.parse(settings.colorEditorText);
 
     this.hit = false;
     this.dragged = false;
@@ -60,7 +66,7 @@ export class CommentGraphicsItem extends GraphicsItem
     // }
 
     if (name == "comment") {
-      this.setText(value);
+      this.setText(value.value);
     }
   }
 
@@ -132,8 +138,8 @@ export class CommentGraphicsItem extends GraphicsItem
 
     // stroke bounding rect
     ctx.beginPath();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = this.buildColor(this.color, 0.5);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = this.buildColor(this.strokeColor, 0.7);
     this.roundRect(ctx, this.x, this.y, width, height, 1);
     ctx.stroke();
 
@@ -145,7 +151,7 @@ export class CommentGraphicsItem extends GraphicsItem
     ctx.fill();
 
     // multiline text
-    ctx.fillStyle = "rgb(240, 240, 240)";
+    ctx.fillStyle = this.buildColor(this.textColor, 1.0);
     let textX = this.x + this.padding;
     let textY = this.y + fontHeight;
 

@@ -15,6 +15,9 @@ import { UndoStack } from "../undostack";
 import { ResizeFrameAction } from "../actions/resizeframeaction";
 import { LogicDesignerNode } from "../designer/logicdesignernode";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
+import { ApplicationSettings } from "@/settings";
+
+const settings = ApplicationSettings.getInstance();
 
 enum XResizeDir {
   None,
@@ -47,6 +50,7 @@ export class FrameGraphicsItem extends GraphicsItem {
   view: SceneView;
   strokeColor: Color;
   fillColor: Color;
+  textColor: Color;
   hit: boolean;
   dragged: boolean;
   dragStartPos: Vector2;
@@ -67,8 +71,10 @@ export class FrameGraphicsItem extends GraphicsItem {
   constructor(view: SceneView) {
     super();
     this.view = view;
-    this.strokeColor = new Color(0.2, 0.2, 0.2);
-    this.fillColor = new Color(1.0, 1.0, 1.0);
+    this.strokeColor = Color.parse(settings.colorInputsStroke);
+    this.fillColor = Color.parse(settings.colorInputsFill);
+    this.textColor = Color.parse(settings.colorEditorText);
+
     this.hit = false;
     this.dragged = true;
 
@@ -190,7 +196,7 @@ export class FrameGraphicsItem extends GraphicsItem {
     ctx.setTransform(1, 0, 0, 1, this.view.offset.x, this.view.offset.y);
 
     ctx.font = `${fontSize}px 'Open Sans'`;
-    ctx.fillStyle = "rgb(0, 0, 0)";
+    ctx.fillStyle = this.buildColor(this.textColor, 1.0);
     //let size = ctx.measureText(this.textureChannel.toUpperCase());
     let textX = this.x;
     let textY = this.y;

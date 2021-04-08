@@ -416,6 +416,10 @@ export class NodeScene {
     //todo: remove from selection
     let i = this.comments.indexOf(item);
     if (i !== -1) this.comments.splice(i, 1);
+
+    // emit deselection
+    if (this.onnodeselected) this.onnodeselected(null);
+    this.selectedItems = [];
   }
 
   addFrame(item: FrameGraphicsItem) {
