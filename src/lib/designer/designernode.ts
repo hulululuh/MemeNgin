@@ -184,9 +184,18 @@ export class DesignerNode implements IPropertyHolder {
     let prop = this.properties.find((x) => {
       return x.name == name;
     });
-
     if (prop) {
-      prop.setValue(value["value"]);
+      if (prop instanceof EnumProperty) {
+        let index = prop.values.indexOf(value["value"]);
+
+        if (index == -1) {
+          index = value["value"];
+        }
+        prop.setValue(index);
+      } else {
+        prop.setValue(value["value"]);
+      }
+
       prop.setExposed(value["exposed"]);
       this.requestUpdate();
     }

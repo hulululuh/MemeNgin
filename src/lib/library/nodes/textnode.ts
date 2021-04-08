@@ -109,6 +109,10 @@ export class TextNode extends ImageDesignerNode {
     this.onPropertyLoaded = () => {
       this.selectedFontId = this.fontProp.values[this.fontProp.index];
       this.textGeom.setupFont(this.selectedFontId);
+      this.textGeom.updateAlign(<TextAlign>this.getProperty("align"));
+      this.textGeom.updateAlignVertical(
+        <TextAlignVertical>this.getProperty("alignVertical")
+      );
       this.textGeom.updateText(this.getProperty("text"));
       this.textGeom.updateSize(this.getProperty("size"));
       this.textGeom.updateLetterSpacing(this.getProperty("letterSpacing"));
@@ -280,15 +284,12 @@ export class TextNode extends ImageDesignerNode {
     this.addEnumProperty("align", "Align", ["Left", "Center", "Right"]);
 
     // align vertical
-    let vAlign = this.addEnumProperty(
+    this.addEnumProperty(
       "alignVertical",
       "AlignVertical",
       ["Top", "Center", "Bottom"],
       1
     );
-    // // default value should be set to 'center'
-    // vAlign.index = 1;
-    // vAlign.value = "Center";
 
     // size
     this.addBoolProperty("fitToFrame", "Fit to frame", false);

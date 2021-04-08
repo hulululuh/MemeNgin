@@ -141,8 +141,6 @@ export class ItemClipboard {
         frame.setPos(d.x, d.y);
         frame.setSize(d.width, d.height);
 
-        //frame.fillColor = Color.parse(d.color);
-
         scene.addFrame(frame);
         frames.push(frame);
         focusItems.push(frame);

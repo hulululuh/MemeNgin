@@ -279,8 +279,10 @@ export class EnumProperty extends Property {
     return this.index;
   }
 
-  setValue(val: any) {
-    this.index = this.values.indexOf(val);
+  setValue(index: number) {
+    //this.index = this.values.indexOf(val);
+    this.index = index;
+    this.value = this.values[this.index];
   }
 
   clone(): Property {
