@@ -4,7 +4,7 @@ import {
   UpdateTexture,
 } from "@/lib/designer/imagedesignernode";
 import { buildShaderProgram } from "@/lib/designer/gl";
-import { Property } from "@/lib/designer/properties";
+import { Property, AssetProperty } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
 import {
   TextGeometry,
@@ -26,6 +26,7 @@ export class TextNode extends ImageDesignerNode {
   selectedFontId: string;
   fonts: Array<any>;
   color: Color;
+  fontProp: AssetProperty;
 
   constructor() {
     super();
@@ -106,6 +107,8 @@ export class TextNode extends ImageDesignerNode {
     };
 
     this.onPropertyLoaded = () => {
+      this.selectedFontId = this.fontProp.values[this.fontProp.index];
+      this.textGeom.setupFont(this.selectedFontId);
       this.textGeom.updateText(this.getProperty("text"));
       this.textGeom.updateSize(this.getProperty("size"));
       this.textGeom.updateLetterSpacing(this.getProperty("letterSpacing"));
@@ -260,7 +263,12 @@ export class TextNode extends ImageDesignerNode {
     let fontAssetList = AssetManager.getInstance().getAssetLists(
       AssetType.Font
     );
-    this.addAssetProperty("font", "Font", fontAssetList, AssetType.Font);
+    this.fontProp = this.addAssetProperty(
+      "font",
+      "Font",
+      fontAssetList,
+      AssetType.Font
+    );
 
     // color
     this.addColorProperty("color", "Color", this.color);
