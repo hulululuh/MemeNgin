@@ -1202,8 +1202,10 @@ export class NodeScene {
     for (let node of this.nodes) {
       let n: any = {};
       n["id"] = node.id;
-      n["x"] = node.centerX();
-      n["y"] = node.centerY();
+      // n["x"] = node.centerX();
+      // n["y"] = node.centerY();
+      n["x"] = node.left;
+      n["y"] = node.top;
       n["w"] = node.getWidth();
       n["h"] = node.getHeight();
 
@@ -1268,7 +1270,10 @@ export class NodeScene {
       s.addNode(node);
 
       const nodeData = data["nodes"][node.id];
-      node.setCenter(nodeData.x, nodeData.y);
+      node.setCenter(
+        nodeData.x + node.getWidth() / 2,
+        nodeData.y + node.getHeight() / 2
+      );
     }
 
     // add connection one by one
