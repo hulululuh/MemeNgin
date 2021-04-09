@@ -10,6 +10,7 @@ import { CheckerBoardNode } from "./nodes/checkerboardnode";
 import { ColorAdjustNode } from "./nodes/coloradjustnode";
 import { ColorGradeNode } from "./nodes/colorgradenode";
 import { ColorizeNode, ColorNode } from "./nodes/colornode";
+import { UvCoordNode } from "./nodes/uvcoordnode";
 import { ColorPropertyNode } from "./nodes/colorpropertynode";
 import { CopyNode } from "./nodes/copynode";
 import { DetectNode } from "./nodes/detectnode";
@@ -48,6 +49,7 @@ import { Transform2DNode } from "./nodes/transform2dnode";
 import { ResizeNode } from "./nodes/resizenode";
 import { WarpNode } from "./nodes/warpnode";
 import { WaveNode } from "./nodes/wavenode";
+import { UvSwapNode } from "./nodes/uvswapnode";
 
 export const libraryMajorVersion = 0;
 export const libraryMinorVersion = 1;
@@ -82,6 +84,8 @@ export function createLibrary() {
 
   lib.addNode("color", "Color", ColorNode, NodeCategory.Color);
   lib.addNode("colorize", "Colorize", ColorizeNode, NodeCategory.Color);
+  // TODO: need to support 16bit texture in order to convey texCoord details
+  //lib.addNode("uvcoord", "UV Coord", UvCoordNode, NodeCategory.Color);
   lib.addNode(
     "coloradjust",
     "Color Adjust",
@@ -127,6 +131,9 @@ export function createLibrary() {
     OpacityOverrideNode,
     NodeCategory.Composite
   );
+
+  // TODO: 16 bit texture, for same reason above
+  //lib.addNode("uvSwap", "Uv Swap", UvSwapNode, NodeCategory.Composite);
 
   lib.addNode("texture", "Texture", TextureNode, NodeCategory.Create);
   lib.addNode("text", "Text", TextNode, NodeCategory.Create);

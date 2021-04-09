@@ -4,6 +4,15 @@
 
     <v-app-bar app clipped-left clipped-right dense>
       <v-toolbar-title>
+        <v-btn color="gray" @click="newProject">
+          <v-img src="assets/icons/add_black_24dp.svg"> </v-img>
+        </v-btn>
+        <v-btn color="gray" @click="saveProject">
+          <v-img src="assets/icons/save_black_24dp.svg"> </v-img>
+        </v-btn>
+        <v-btn color="gray" @click="openProject">
+          <v-img src="assets/icons/folder_open_black_24dp.svg"> </v-img>
+        </v-btn>
         <v-btn color="gray" @click="undoAction">
           <v-icon dark>
             mdi-undo
@@ -13,6 +22,9 @@
           <v-icon dark>
             mdi-redo
           </v-icon>
+        </v-btn>
+        <v-btn color="gray" @click="zoomSelection">
+          <v-img src="assets/icons/center_focus_weak_black_24dp.svg"> </v-img>
         </v-btn>
       </v-toolbar-title>
     </v-app-bar>
@@ -65,30 +77,32 @@
       clipped
       style="padding-top:52px !important; display:flex;"
     >
-      <v-container
-        fluid
-        app
-        bottom
-        clipped
-        id="editor-view"
-        class="pa-0 ma-0"
-        v-resize="onResize"
-      >
-        <canvas
+      <router-view>
+        <v-container
+          fluid
           app
           bottom
           clipped
-          id="editor"
+          id="editor-view"
           class="pa-0 ma-0"
-          ondragover="event.preventDefault()"
-        />
-        <library-menu
-          :editor="this.editor"
-          :library="this.library"
-          v-if="this.library != null"
-          ref="libraryMenu"
-        />
-      </v-container>
+          v-resize="onResize"
+        >
+          <canvas
+            app
+            bottom
+            clipped
+            id="editor"
+            class="pa-0 ma-0"
+            ondragover="event.preventDefault()"
+          />
+          <library-menu
+            :editor="this.editor"
+            :library="this.library"
+            v-if="this.library != null"
+            ref="libraryMenu"
+          />
+        </v-container>
+      </router-view>
     </v-main>
   </v-app>
 </template>
@@ -530,6 +544,10 @@
         .catch((...args) => {
           console.warn("failed/rejected with", args);
         });
+    }
+
+    zoomSelection() {
+      this.editor.nodeScene.zoomSelected(this.editor.nodeScene.selectedItems);
     }
 
     loadSample(name: string) {}

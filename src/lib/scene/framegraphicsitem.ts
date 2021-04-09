@@ -16,7 +16,6 @@ import { ResizeFrameAction } from "../actions/resizeframeaction";
 import { LogicDesignerNode } from "../designer/logicdesignernode";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
 import { ApplicationSettings } from "@/settings";
-
 const settings = ApplicationSettings.getInstance();
 
 enum XResizeDir {
