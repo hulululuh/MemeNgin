@@ -72,7 +72,6 @@
             ((1.0 - margin) * this.$refs.canvas.height) / node.getHeight();
 
           const zoomFactor = Math.min(1.0, Math.min(ratioW, ratioH));
-
           self.dragZoom.centerImage(zoomFactor);
         }
       };
@@ -143,9 +142,9 @@
         });
     }
     centerTexture() {
-      if (this.$refs.canvas && this.image) {
-        const w = this.$refs.canvas.width / this.image.width;
-        const h = this.$refs.canvas.height / this.image.height;
+      if (this.$refs.canvas && this.node) {
+        const w = this.$refs.canvas.width / this.node.getWidth();
+        const h = this.$refs.canvas.height / this.node.getHeight();
         let zoomFactor = w > h ? h : w;
 
         // todo: center texture in canvas

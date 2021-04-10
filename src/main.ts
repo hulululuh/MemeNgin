@@ -16,7 +16,6 @@ import App from "./App.vue";
 import store from "./store";
 
 import Vuetify from "vuetify/lib";
-import vuetify from "./plugins/vuetify";
 
 Vue.config.productionTip = false;
 Vue.use(Vuetify);
@@ -36,6 +35,6 @@ new Titlebar({
 
 new Vue({
   store,
-  vuetify,
+  vuetify: new Vuetify(),
   render: (h) => h(App),
 }).$mount("#app");

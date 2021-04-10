@@ -77,32 +77,30 @@
       clipped
       style="padding-top:52px !important; display:flex;"
     >
-      <router-view>
-        <v-container
-          fluid
+      <v-container
+        fluid
+        app
+        bottom
+        clipped
+        id="editor-view"
+        class="pa-0 ma-0"
+        v-resize="onResize"
+      >
+        <canvas
           app
           bottom
           clipped
-          id="editor-view"
+          id="editor"
           class="pa-0 ma-0"
-          v-resize="onResize"
-        >
-          <canvas
-            app
-            bottom
-            clipped
-            id="editor"
-            class="pa-0 ma-0"
-            ondragover="event.preventDefault()"
-          />
-          <library-menu
-            :editor="this.editor"
-            :library="this.library"
-            v-if="this.library != null"
-            ref="libraryMenu"
-          />
-        </v-container>
-      </router-view>
+          ondragover="event.preventDefault()"
+        />
+        <library-menu
+          :editor="this.editor"
+          :library="this.library"
+          v-if="this.library != null"
+          ref="libraryMenu"
+        />
+      </v-container>
     </v-main>
   </v-app>
 </template>
