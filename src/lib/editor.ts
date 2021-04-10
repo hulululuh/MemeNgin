@@ -658,6 +658,13 @@ export class Editor {
     }
 
     this.nodeScene.view.reset();
+
+    // todo: move to double click
+    if (this.onpreviewnode) {
+      const item = this.nodeScene.outputNode;
+      const node = this.nodeScene.outputNode.dNode;
+      this.onpreviewnode(node, item.imageCanvas.canvas);
+    }
   }
 
   save(): any {

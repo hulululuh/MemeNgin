@@ -134,7 +134,7 @@
           const url = canvas.toDataURL("image/png", 1);
           const nativeImage = electron.nativeImage.createFromDataURL(url);
           const buffer = nativeImage.toPNG();
-
+          const fs = require("fs");
           fs.writeFile(path, buffer, function(err) {
             //console.log(err);
             if (err) alert("Error saving image: " + err);
