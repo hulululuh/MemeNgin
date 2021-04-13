@@ -575,6 +575,8 @@ export class NodeScene {
   }
 
   zoomSelected(selectedItems: GraphicsItem[]) {
+    if (selectedItems.length == 0) return;
+
     // TODO: move it to utility library
     let getSelectedBounds = (selectedItems: GraphicsItem[]): BoundingBox => {
       let box = BoundingBox.fromRect(selectedItems[0].getRect());
