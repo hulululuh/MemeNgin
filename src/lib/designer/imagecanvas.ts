@@ -73,6 +73,7 @@ export class ImageCanvas {
       gl.UNSIGNED_BYTE,
       this.canvas
     );
+    gl.bindTexture(gl.TEXTURE_2D, null);
 
     return texture;
   }

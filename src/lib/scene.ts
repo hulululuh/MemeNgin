@@ -46,14 +46,6 @@ enum DragMode {
   Comment,
 }
 
-class Selection {
-  nodes: NodeGraphicsItem[];
-
-  clear() {
-    this.nodes = [];
-  }
-}
-
 export class NodeScene {
   canvas: HTMLCanvasElement;
   context!: CanvasRenderingContext2D;
@@ -1204,12 +1196,15 @@ export class NodeScene {
     for (let node of this.nodes) {
       let n: any = {};
       n["id"] = node.id;
-      // n["x"] = node.centerX();
-      // n["y"] = node.centerY();
       n["x"] = node.left;
       n["y"] = node.top;
       n["w"] = node.getWidth();
       n["h"] = node.getHeight();
+
+      // if (node.dNode instanceof TextureNode) {
+      //   let imgDataURL = canvasToURL(node.imageCanvas.canvas);
+      //   n["imgDataURL"] = imgDataURL;
+      // }
 
       nodes[node.id] = n;
     }
@@ -1269,9 +1264,9 @@ export class NodeScene {
     for (let dNode of designer.nodes) {
       // create node from designer
       let node = new NodeGraphicsItem(dNode);
+      const nodeData = data["nodes"][node.id];
       s.addNode(node);
 
-      const nodeData = data["nodes"][node.id];
       node.setCenter(
         nodeData.x + node.getWidth() / 2,
         nodeData.y + node.getHeight() / 2

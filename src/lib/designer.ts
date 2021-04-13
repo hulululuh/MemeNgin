@@ -25,11 +25,23 @@ import { StringPropertyNode } from "./library/nodes/stringpropertynode";
 import { TextNode } from "./library/nodes/textnode";
 import { Guid } from "./utils";
 import { AssetType } from "@/assets/assetmanager";
+import { TextureNode } from "@/lib/library/nodes/texturenode";
 
 const HALF = 0.5;
 
+function canvasToURL(img: HTMLCanvasElement) {
+  let canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  let ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+
+  const url = canvas.toDataURL("image/webp", 0.2);
+  return url;
+}
+
 export class Designer {
-  static dummyTex: WebGLTexture;
+  dummyTex: WebGLTexture;
 
   canvas: HTMLCanvasElement;
   gl: WebGL2RenderingContext;
@@ -570,6 +582,8 @@ export class Designer {
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
     // cleanup
     gl.disableVertexAttribArray(posLoc);
     //gl.disableVertexAttribArray(texCoordLoc);
@@ -618,6 +632,7 @@ export class Designer {
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+    gl.bindTexture(gl.TEXTURE_2D, null);
     // cleanup
     gl.disableVertexAttribArray(posLoc);
     //gl.disableVertexAttribArray(texCoordLoc);
@@ -660,10 +675,11 @@ export class Designer {
   }
 
   createDummyTexture() {
-    let gl = this.canvas.getContext("webgl2");
-    if (!Designer.dummyTex) {
-      Designer.dummyTex = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, Designer.dummyTex);
+    //let gl = this.canvas.getContext("webgl2");
+    let gl = this.gl;
+    if (!this.dummyTex) {
+      this.dummyTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, this.dummyTex);
       // bind a dummy texture to suppress WebGL warning.
       gl.texImage2D(
         gl.TEXTURE_2D,
@@ -676,6 +692,8 @@ export class Designer {
         gl.UNSIGNED_BYTE,
         new Uint8Array([0, 0, 0, 255])
       ); // red
+
+      gl.bindTexture(gl.TEXTURE_2D, null);
     }
   }
 
@@ -801,6 +819,13 @@ export class Designer {
       n["exportName"] = node.exportName;
       n["nodeType"] = node.nodeType;
 
+      if (node instanceof TextureNode) {
+        n["texPath"] = node.texPath;
+        const imgCanvas = Editor.getScene().getNodeById(node.id).imageCanvas
+          .canvas;
+        n["imgDataURL"] = canvasToURL(imgCanvas);
+      }
+
       if (node.nodeType === NodeType.Texture) {
         n["texPath"] = node.texPath;
       } else if (node.nodeType === NodeType.Text) {
@@ -868,9 +893,12 @@ export class Designer {
       n.id = node["id"];
       n.nodeType = node["nodeType"];
 
-      if (n.nodeType === NodeType.Texture) {
+      if (n instanceof TextureNode) {
         n.texPath = node["texPath"];
+        n.setImageData(node["imgDataURL"], true);
       }
+      // if (n.nodeType === NodeType.Texture) {
+      // }
 
       // add node to it's properties will be initialized
       // todo: separate setting properties and inputs from setting shader in node

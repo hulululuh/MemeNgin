@@ -4,6 +4,7 @@ import {
   UpdateTexture,
 } from "@/lib/designer/imagedesignernode";
 import { Property, FileProperty } from "@/lib/designer/properties";
+import { Editor } from "@/lib/editor";
 import path from "path";
 
 const isDataUri = require("is-data-uri");
@@ -23,11 +24,25 @@ async function loadLocalWebp(path: string) {
   }
 }
 
-async function loadImage(imgPath: string, isUrl: boolean) {
+async function loadImage(imgPath: string, isDataUrl: boolean) {
   let img = null;
 
-  if (isUrl) {
-    img = NativeImage.createFromDataURL(imgPath);
+  if (isDataUrl) {
+    img = new Image();
+    img.src = imgPath;
+    await img.decode();
+
+    let canvas = <HTMLCanvasElement>document.createElement("canvas");
+    let context = canvas.getContext("2d");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    context.drawImage(img, 0, 0);
+    let bitmap = context.getImageData(0, 0, img.width, img.height);
+
+    return NativeImage.createFromBitmap(bitmap.data, {
+      width: img.width,
+      height: img.height,
+    });
   } else {
     const ext = path.extname(imgPath).toLowerCase();
     if (ext === ".webp") {
@@ -45,6 +60,23 @@ export class TextureNode extends ImageDesignerNode {
   protected imgWidth: number = 0;
   protected imgHeight: number = 0;
   isUrl: boolean = false;
+
+  // constructor
+  constructor() {
+    super();
+    this.nodeType = NodeType.Texture;
+    this.nodeCategory = NodeCategory.Create;
+
+    this.onnodepropertychanged = (prop: Property) => {
+      if (prop.name === "file") {
+        this.isUrl = false;
+        this.texPath = (prop as FileProperty).value;
+        if (this.texPath) {
+          this.loadTexture();
+        }
+      }
+    };
+  }
 
   loadTexture() {
     let target = this.isUrl ? this.imgData : this.texPath;
@@ -66,31 +98,14 @@ export class TextureNode extends ImageDesignerNode {
     });
   }
 
-  // constructor
-  constructor() {
-    super();
-    this.nodeType = NodeType.Texture;
-    this.nodeCategory = NodeCategory.Create;
-
-    this.onnodepropertychanged = (prop: Property) => {
-      if (prop.name === "file") {
-        if (prop) {
-          // update local file path
-          if (!this.isUrl) {
-            this.texPath = (prop as FileProperty).value;
-            if (this.texPath) {
-              this.loadTexture();
-            }
-          }
-        }
-      }
-    };
+  setImageData(imgDataURL: string, isUrl: boolean) {
+    this.imgData = imgDataURL;
+    this.isUrl = isUrl;
   }
 
   createTexture() {
     if (!this.bmp) return;
-
-    let gl = this.gl;
+    const gl = this.gl;
     this.isTextureReady = false;
 
     if (this.tex) {
@@ -132,7 +147,7 @@ export class TextureNode extends ImageDesignerNode {
       Uint8Array.from(this.bmp),
       NodeType.Texture,
       this.gl,
-      true,
+      !this.isUrl,
       true
     );
     this.isTextureReady = true;
@@ -149,17 +164,17 @@ export class TextureNode extends ImageDesignerNode {
     }
 
     let source = `
-        vec4 process(vec2 uv)
-        {
-          vec4 col = vec4(0,1,0,1);
-          if (baseTexture_ready) {
-            col = texture(baseTexture, uv);
-          } else {
-            col = vec4(uv.x, uv.y, 0.0, 1.0);
-          }
-          return col;
+      vec4 process(vec2 uv)
+      {
+        vec4 col = vec4(0,1,0,1);
+        if (baseTexture_ready) {
+          col = texture(baseTexture, uv);
+        } else {
+          col = vec4(uv.x, uv.y, 0.0, 1.0);
         }
-        `;
+        return col;
+      }
+      `;
 
     this.buildShader(source);
 

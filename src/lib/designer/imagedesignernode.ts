@@ -168,7 +168,7 @@ export class ImageDesignerNode extends DesignerNode {
   }
 
   getBaseTexture(): WebGLTexture {
-    return this.tex ? this.tex : Designer.dummyTex;
+    return this.tex ? this.tex : Editor.getDesigner().dummyTex;
   }
 
   getBaseTextureType(): number {
@@ -333,6 +333,8 @@ export class ImageDesignerNode extends DesignerNode {
 
       let node = input.node as ImageDesignerNode;
       const tex = node.getBaseTexture();
+
+      if (!tex) continue;
       const texW = node.tex ? node.getWidth() : 100;
       const texH = node.tex ? node.getHeight() : 100;
 
@@ -358,23 +360,27 @@ export class ImageDesignerNode extends DesignerNode {
 
     // pass baseTexture if it is texture node
     if (this.hasBaseTexture()) {
-      const tex = this.isTextureReady ? this.baseTex : Designer.dummyTex;
-      const textureType = this.isTextureReady
-        ? this.getBaseTextureType()
-        : gl.TEXTURE_2D;
-      gl.activeTexture(gl.TEXTURE0 + texIndex);
-      gl.bindTexture(textureType, tex);
-      gl.uniform1i(
-        gl.getUniformLocation(this.shaderProgram, "baseTexture"),
-        texIndex
-      );
-      gl.uniform1i(
-        gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
-        1
-      );
+      const tex = this.isTextureReady
+        ? this.baseTex
+        : Editor.getDesigner().dummyTex;
+      if (tex) {
+        const textureType = this.isTextureReady
+          ? this.getBaseTextureType()
+          : gl.TEXTURE_2D;
+        gl.activeTexture(gl.TEXTURE0 + texIndex);
+        gl.bindTexture(textureType, tex);
+        gl.uniform1i(
+          gl.getUniformLocation(this.shaderProgram, "baseTexture"),
+          texIndex
+        );
+        gl.uniform1i(
+          gl.getUniformLocation(this.shaderProgram, "baseTexture_ready"),
+          1
+        );
 
-      console.log("bound texture " + texIndex);
-      texIndex++;
+        console.log("bound texture " + texIndex);
+        texIndex++;
+      }
     }
 
     const texW = this.getWidth();
@@ -528,6 +534,17 @@ export class ImageDesignerNode extends DesignerNode {
     gl.disableVertexAttribArray(posLoc);
     gl.disableVertexAttribArray(texCoordLoc);
 
+    texIndex = 0;
+    for (let i = 0; i < inputs.length; i++) {
+      gl.activeTexture(gl.TEXTURE0 + texIndex);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+      texIndex++;
+    }
+
+    if (this.hasBaseTexture()) {
+      gl.activeTexture(gl.TEXTURE0 + texIndex);
+      gl.bindTexture(this.getBaseTextureType(), null);
+    }
     // render
   }
 
