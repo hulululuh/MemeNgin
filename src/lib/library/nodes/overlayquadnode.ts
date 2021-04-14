@@ -47,7 +47,7 @@ export class OverlayQuadNode extends ImageDesignerNode
       // background has changed
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
-        "colorA"
+        "image"
       ) as ImageDesignerNode;
       if (!srcNode) return;
       let lw = srcNode.getWidth();
@@ -70,7 +70,7 @@ export class OverlayQuadNode extends ImageDesignerNode
 
   init() {
     this.title = "Overlay Quad";
-    this.parentIndex = "colorB";
+    this.parentIndex = "background";
     this.isEditing = true;
     this.inputASize = new Vector2(100, 100);
     this.inputBSize = new Vector2(100, 100);
@@ -141,7 +141,7 @@ export class OverlayQuadNode extends ImageDesignerNode
       const leftImageNode = leftNode as ImageDesignerNode;
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
-        "colorA"
+        "image"
       ) as ImageDesignerNode;
 
       // background has changed
@@ -168,8 +168,8 @@ export class OverlayQuadNode extends ImageDesignerNode
       }
     };
 
-    this.addInput("colorA"); // foreground
-    this.addInput("colorB"); // background
+    this.addInput("image"); // foreground
+    this.addInput("background"); // background
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
 
@@ -263,10 +263,10 @@ export class OverlayQuadNode extends ImageDesignerNode
           fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
           
           vec4 colA = vec4(0.0);
-          if (colorA_connected) {
-            colA = overlayColor(colorA, fuv, prop_border);
+          if (image_connected) {
+            colA = overlayColor(image, fuv, prop_border);
           }
-          vec4 colB = texture(colorB,uv);
+          vec4 colB = texture(background,uv);
           vec4 col = vec4(1.0);
 
           colA.a *= finalOpacity;
@@ -287,7 +287,7 @@ export class OverlayQuadNode extends ImageDesignerNode
 
   render(inputs: NodeInput[]) {
     const designer = Editor.getDesigner();
-    designer.findLeftNode(this.id, "colorA");
+    designer.findLeftNode(this.id, "image");
 
     const option = () => {
       if (this.isEditing) {
@@ -338,8 +338,8 @@ export class OverlayQuadNode extends ImageDesignerNode
   }
 
   isWidgetAvailable(): boolean {
-    const colA = Editor.getDesigner().findLeftNode(this.id, "colorA");
-    const colB = Editor.getDesigner().findLeftNode(this.id, "colorB");
+    const colA = Editor.getDesigner().findLeftNode(this.id, "image");
+    const colB = Editor.getDesigner().findLeftNode(this.id, "background");
 
     if (colA && colB) {
       return true;

@@ -5,7 +5,6 @@ export class CopyNode extends ImageDesignerNode {
     this.title = "Copy";
 
     this.addInput("image");
-    this.addStringProperty("name", "Name");
 
     let source = `
         vec4 process(vec2 uv)

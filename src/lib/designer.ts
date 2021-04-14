@@ -499,7 +499,7 @@ export class Designer {
 
       if (inputs.length > 0) {
         let parent = node.getParentNode();
-        if (parent && node.inheritParentSize) {
+        if (parent && !node.customSize) {
           node.resize(parent.getWidth(), parent.getHeight());
         }
 

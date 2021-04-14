@@ -33,7 +33,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
       // background has changed
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
-        "colorA"
+        "opacityMap"
       ) as ImageDesignerNode;
       if (!srcNode) return;
       let lw = srcNode.getWidth();
@@ -56,7 +56,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
 
   init() {
     this.title = "Opacity Override";
-    this.parentIndex = "colorB";
+    this.parentIndex = "image";
     this.isEditing = true;
     this.inputASize = new Vector2(100, 100);
     this.inputBSize = new Vector2(100, 100);
@@ -105,7 +105,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
       const leftImageNode = leftNode as ImageDesignerNode;
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
-        "colorA"
+        "opacityMap"
       ) as ImageDesignerNode;
 
       // background has changed
@@ -132,8 +132,8 @@ export class OpacityOverrideNode extends ImageDesignerNode
       }
     };
 
-    this.addInput("colorA"); // alpha
-    this.addInput("colorB"); // background
+    this.addInput("image"); // background
+    this.addInput("opacityMap"); // alpha
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
     this.addEnumProperty("border", "Border", ["Clamp", "Stretch", "Repeat"]);
@@ -156,12 +156,12 @@ export class OpacityOverrideNode extends ImageDesignerNode
           fuv.y = prop_flipY ? 1.0 - fuv.y : fuv.y;
 
           vec4 col = vec4(0.0);
-          if (colorB_connected) {
-            col = texture(colorB, uv);
+          if (image_connected) {
+            col = texture(image, uv);
           }
          
-          if (colorA_connected) {
-            col.a = overlayOpacity(colorA, fuv, prop_border);
+          if (opacityMap_connected) {
+            col.a = overlayOpacity(opacityMap, fuv, prop_border);
           }
           
           return col;
@@ -173,7 +173,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
 
   render(inputs: NodeInput[]) {
     const designer = Editor.getDesigner();
-    designer.findLeftNode(this.id, "colorA");
+    designer.findLeftNode(this.id, "opacityMap");
 
     const option = () => {
       if (this.isEditing) {
@@ -218,8 +218,8 @@ export class OpacityOverrideNode extends ImageDesignerNode
   }
 
   isWidgetAvailable(): boolean {
-    const colA = Editor.getDesigner().findLeftNode(this.id, "colorA");
-    const colB = Editor.getDesigner().findLeftNode(this.id, "colorB");
+    const colA = Editor.getDesigner().findLeftNode(this.id, "opacityMap");
+    const colB = Editor.getDesigner().findLeftNode(this.id, "image");
 
     if (colA && colB) {
       return true;

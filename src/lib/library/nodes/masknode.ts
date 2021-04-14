@@ -3,11 +3,11 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 export class MaskNode extends ImageDesignerNode {
   init() {
     this.title = "Mask";
-    this.parentIndex = "textureB";
+    this.parentIndex = "imageB";
 
-    this.addInput("textureA");
-    this.addInput("textureB");
-    this.addInput("mask");
+    this.addInput("imageA");
+    this.addInput("imageB");
+    this.addInput("maskMap");
 
     let source = `
         float lum(vec4 col)
@@ -17,10 +17,10 @@ export class MaskNode extends ImageDesignerNode {
 
         vec4 process(vec2 uv)
         {
-            vec2 foreground_uv = clamp(uv * (textureB_size / textureA_size), 0.0, 1.0);
-            vec4 a =  texture(textureA, foreground_uv);
-            vec4 b =  texture(textureB, uv);
-            vec4 m =  texture(mask, uv);
+            vec2 foreground_uv = clamp(uv * (imageB_size / imageA_size), 0.0, 1.0);
+            vec4 a =  texture(imageA, foreground_uv);
+            vec4 b =  texture(imageB, uv);
+            vec4 m =  texture(maskMap, uv);
             float t = lum(m);
 
             // lerp

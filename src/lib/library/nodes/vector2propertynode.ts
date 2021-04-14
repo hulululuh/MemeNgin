@@ -6,6 +6,6 @@ export class Vector2PropertyNode extends LogicDesignerNode {
     this.title = "Vector2Property";
     this.logicType = LogicType.Property;
 
-    this.addVector2Property("value", "Vector2Property", new Vector2(0, 0));
+    this.addVector2Property("value", "Value", new Vector2(0, 0));
   }
 }

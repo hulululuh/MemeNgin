@@ -5,6 +5,6 @@ export class BoolPropertyNode extends LogicDesignerNode {
     this.title = "BoolProperty";
     this.logicType = LogicType.Property;
 
-    this.addBoolProperty("value", "BoolProperty", false);
+    this.addBoolProperty("value", "Value", false);
   }
 }

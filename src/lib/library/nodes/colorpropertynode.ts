@@ -6,10 +6,6 @@ export class ColorPropertyNode extends LogicDesignerNode {
     this.title = "ColorProperty";
     this.logicType = LogicType.Property;
 
-    this.addColorProperty(
-      "value",
-      "ColorProperty",
-      new Color(1.0, 1.0, 1.0, 1.0)
-    );
+    this.addColorProperty("value", "Value", new Color(1.0, 1.0, 1.0, 1.0));
   }
 }

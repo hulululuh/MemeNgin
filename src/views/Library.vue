@@ -1,7 +1,7 @@
 <template>
   <div class="library-container">
-    <div class style="padding-bottom:1em; display:flex; margin:0.5em;">
-      <v-text-field label="Filter..." v-model="filter" />
+    <div class style="padding-bottom:0em; display:flex; margin:0.5em;">
+      <v-text-field hide-details label="Filter..." v-model="filter" />
     </div>
     <div id="app" class="node-list">
       <v-expansion-panels v-model="panel" multiple accordion>
@@ -46,7 +46,7 @@
 </style>
 
 <script lang="ts">
-  import { Component, Prop, Model, Vue } from "vue-property-decorator";
+  import { Component, Prop, Vue } from "vue-property-decorator";
   import { Editor } from "@/lib/editor";
   import { DesignerLibrary } from "@/lib/designer/library";
   import { NodeCategory } from "@/lib/designer/designernode";
@@ -165,14 +165,6 @@
 
       return items;
     }
-
-    // get filteredList() {
-    //   let kw = this.filter;
-    //   let list = Object.values(this.libItems).filter(function(item) {
-    //     return item.name.toLowerCase().includes(kw.toLowerCase());
-    //   });
-    //   return list;
-    // }
 
     getFilteredListByName(name: string) {
       return this.getFilteredList(name.toLowerCase() as LibraryItemCategory);

@@ -5,10 +5,10 @@ export class DirectionalWarpNode extends ImageDesignerNode {
     this.title = "Directional Warp";
 
     this.addInput("image");
-    this.addInput("height");
+    this.addInput("heightMap");
 
     this.addFloatProperty("intensity", "Intensity", 0.1, -0.5, 0.5, 0.01);
-    this.addFloatProperty("angle", "Angle", 0.85, 0.0, 3.142, 0.01);
+    this.addFloatProperty("angle", "Angle", 0.85, -3.142, 3.142, 0.01);
 
     // calculates normal, then warps uv by it
     let source = `
@@ -19,7 +19,7 @@ export class DirectionalWarpNode extends ImageDesignerNode {
             vec2 dir = normalize(vec2(cos(prop_angle), sin(prop_angle)));
 
             // center point
-            float dist = abs(texture(height, uv).r) - 0.5;
+            float dist = abs(texture(heightMap, uv).r) - 0.5;
             
             vec4 color = texture(image, uv + dir * prop_intensity * dist);
 

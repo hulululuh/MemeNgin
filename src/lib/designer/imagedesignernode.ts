@@ -121,7 +121,7 @@ export class ImageDesignerNode extends DesignerNode {
 
   isInput: boolean;
   isOutput: boolean;
-  inheritParentSize: boolean;
+  customSize: boolean;
 
   width: number;
   height: number;
@@ -143,7 +143,7 @@ export class ImageDesignerNode extends DesignerNode {
     this.width = 1024;
     this.height = 1024;
     this.parentIndex = "image";
-    this.inheritParentSize = true;
+    this.customSize = false;
   }
 
   _init() {
@@ -228,7 +228,7 @@ export class ImageDesignerNode extends DesignerNode {
   }
 
   connected(leftNode: DesignerNode, rightIndex: string) {
-    if (this.isParentIndex(rightIndex) && this.inheritParentSize) {
+    if (this.isParentIndex(rightIndex) && !this.customSize) {
       // fit the size to parent node - try resize
       if (leftNode instanceof ImageDesignerNode) {
         this.resizeByNode(leftNode);

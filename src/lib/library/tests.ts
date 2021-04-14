@@ -39,14 +39,14 @@ export class TestMultiplyNode extends ImageDesignerNode {
   init() {
     this.title = "Multiply";
 
-    this.addInput("colorA");
-    this.addInput("colorB");
+    this.addInput("image");
+    this.addInput("background");
 
     let source = `
         vec4 process(vec2 uv)
         {
-            vec4 colA = texture(colorA,uv);
-            vec4 colB = texture(colorB,uv);
+            vec4 colA = texture(image,uv);
+            vec4 colB = texture(background,uv);
             return colA * colB;
         }
         `;

@@ -39,7 +39,7 @@ export class ResizeNode extends ImageDesignerNode {
       // background has changed
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
-        "colorA"
+        "image"
       ) as ImageDesignerNode;
 
       if (!srcNode) return;
@@ -69,7 +69,7 @@ export class ResizeNode extends ImageDesignerNode {
 
   init() {
     this.title = "Resize";
-    this.parentIndex = "colorA";
+    this.parentIndex = "image";
     this.isEditing = true;
     this.inputASize = new Vector2(100, 100);
     this.inputBSize = new Vector2(100, 100);
@@ -108,7 +108,7 @@ export class ResizeNode extends ImageDesignerNode {
       "Stretch",
     ]);
 
-    this.addInput("colorA"); // foreground
+    this.addInput("image"); // foreground
 
     this.addIntProperty("width", "Width", 1024, 256, 2048);
     this.addIntProperty("height", "Height", 1024, 256, 2048);
@@ -129,7 +129,7 @@ export class ResizeNode extends ImageDesignerNode {
 
           vec4 colA = vec4(0.0);
           if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
-            colA = texture(colorA, fuv);
+            colA = texture(image, fuv);
           vec4 colB = prop_background;
           vec4 col = vec4(1.0);
 
@@ -158,7 +158,7 @@ export class ResizeNode extends ImageDesignerNode {
 
   render(inputs: NodeInput[]) {
     const designer = Editor.getDesigner();
-    designer.findLeftNode(this.id, "colorA");
+    designer.findLeftNode(this.id, "image");
 
     const option = () => {
       if (this.isEditing) {

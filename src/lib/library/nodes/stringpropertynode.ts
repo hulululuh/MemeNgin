@@ -5,6 +5,6 @@ export class StringPropertyNode extends LogicDesignerNode {
     this.title = "StringProperty";
     this.logicType = LogicType.Property;
 
-    this.addStringProperty("value", "StringProperty", "");
+    this.addStringProperty("value", "Value", "");
   }
 }

@@ -5,6 +5,6 @@ export class IntPropertyNode extends LogicDesignerNode {
     this.title = "IntProperty";
     this.logicType = LogicType.Property;
 
-    this.addIntProperty("value", "IntProperty");
+    this.addIntProperty("value", "Value");
   }
 }

@@ -42,8 +42,8 @@ export class Transform2DNode extends ImageDesignerNode
       } else if (prop.name === "height") {
         this.desiredHeight = parseInt(prop.getValue());
         this.checkAndApplyResize();
-      } else if (prop.name === "inherit") {
-        this.inheritParentSize = prop.getValue();
+      } else if (prop.name === "customSize") {
+        this.customSize = prop.getValue();
         this.checkAndApplyResize();
       }
     };
@@ -52,7 +52,7 @@ export class Transform2DNode extends ImageDesignerNode
       // background has changed
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
-        "colorA"
+        "image"
       ) as ImageDesignerNode;
 
       if (!srcNode) return;
@@ -79,7 +79,7 @@ export class Transform2DNode extends ImageDesignerNode
         .setValue(this.getTransform());
       this.desiredWidth = parseInt(this.getProperty("width"));
       this.desiredHeight = parseInt(this.getProperty("height"));
-      this.inheritParentSize = this.getProperty("inherit");
+      this.customSize = this.getProperty("customSize");
 
       this.resize(this.getWidth(), this.getHeight());
       this.requestUpdate();
@@ -89,7 +89,7 @@ export class Transform2DNode extends ImageDesignerNode
 
   init() {
     this.title = "Transform2D";
-    this.parentIndex = "colorA";
+    this.parentIndex = "image";
     this.isEditing = true;
     this.inputASize = new Vector2(100, 100);
     this.inputBSize = new Vector2(100, 100);
@@ -183,9 +183,9 @@ export class Transform2DNode extends ImageDesignerNode
       }
     };
 
-    this.addInput("colorA"); // foreground
+    this.addInput("image"); // foreground
 
-    this.addBoolProperty("inherit", "Inherit", true);
+    this.addBoolProperty("customSize", "Custom Size", false);
     this.addIntProperty("width", "Width", 1024, 256, 2048);
     this.addIntProperty("height", "Height", 1024, 256, 2048);
     this.addColorProperty("background", "Background", new Color(0, 0, 0, 0));
@@ -211,7 +211,7 @@ export class Transform2DNode extends ImageDesignerNode
 
             vec4 colA = vec4(0.0);
             if (fuv.x > 0.0 && fuv.x < 1.0 && fuv.y > 0.0 && fuv.y < 1.0)
-              colA = texture(colorA, fuv);
+              colA = texture(image, fuv);
             vec4 colB = prop_background;
             vec4 col = vec4(1.0);
 
@@ -241,7 +241,7 @@ export class Transform2DNode extends ImageDesignerNode
 
   render(inputs: NodeInput[]) {
     const designer = Editor.getDesigner();
-    designer.findLeftNode(this.id, "colorA");
+    designer.findLeftNode(this.id, "image");
 
     const option = () => {
       if (this.isEditing) {
@@ -301,7 +301,7 @@ export class Transform2DNode extends ImageDesignerNode
   }
 
   isWidgetAvailable(): boolean {
-    const colA = Editor.getDesigner().findLeftNode(this.id, "colorA");
+    const colA = Editor.getDesigner().findLeftNode(this.id, "image");
 
     if (colA) {
       return true;
@@ -310,18 +310,18 @@ export class Transform2DNode extends ImageDesignerNode
   }
 
   getWidth(): number {
-    if (this.inheritParentSize) {
-      return super.getWidth();
-    } else {
+    if (this.customSize) {
       return this.desiredWidth;
+    } else {
+      return super.getWidth();
     }
   }
 
   getHeight(): number {
-    if (this.inheritParentSize) {
-      return super.getHeight();
-    } else {
+    if (this.customSize) {
       return this.desiredHeight;
+    } else {
+      return super.getHeight();
     }
   }
 
