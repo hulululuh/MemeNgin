@@ -26,6 +26,7 @@ import { TextNode } from "./library/nodes/textnode";
 import { Guid } from "./utils";
 import { AssetType } from "@/assets/assetmanager";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
+import { OutputNode } from "./library/nodes/outputnode";
 
 const HALF = 0.5;
 
@@ -33,6 +34,17 @@ function canvasToURL(img: HTMLCanvasElement) {
   let canvas = document.createElement("canvas");
   canvas.width = img.width;
   canvas.height = img.height;
+  let ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+
+  const url = canvas.toDataURL("image/webp", 0.2);
+  return url;
+}
+
+function canvasToThumbnailURL(img: HTMLCanvasElement) {
+  let canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
   let ctx = canvas.getContext("2d");
   ctx.drawImage(img, 0, 0);
 
@@ -811,6 +823,8 @@ export class Designer {
   }
 
   save(): any {
+    let outputNode: OutputNode = null;
+    let outputCanvas = null;
     let nodes = new Array();
     for (let node of this.nodes) {
       let n = {};
@@ -821,17 +835,10 @@ export class Designer {
 
       if (node instanceof TextureNode) {
         n["texPath"] = node.texPath;
-        const imgCanvas = Editor.getScene().getNodeById(node.id).imageCanvas
+        outputCanvas = Editor.getScene().getNodeById(node.id).imageCanvas
           .canvas;
-        n["imgDataURL"] = canvasToURL(imgCanvas);
+        n["imgDataURL"] = canvasToURL(outputCanvas);
       }
-
-      if (node.nodeType === NodeType.Texture) {
-        n["texPath"] = node.texPath;
-      } else if (node.nodeType === NodeType.Text) {
-        //n["fontPath"]
-      }
-      //n["inputs"] = node.inputs;// not needed imo
 
       let props = {};
       for (let prop of node.properties) {
@@ -842,6 +849,8 @@ export class Designer {
       n["properties"] = props;
 
       nodes.push(n);
+
+      if (node instanceof OutputNode) outputNode = node;
     }
 
     let connections = new Array();
@@ -876,6 +885,8 @@ export class Designer {
     }
 
     let data = {};
+    data["description"] = outputNode.getProperty("description");
+    data["thumbnail"] = canvasToThumbnailURL(outputCanvas);
     data["nodes"] = nodes;
     data["connections"] = connections;
     data["variables"] = variables;
@@ -897,8 +908,6 @@ export class Designer {
         n.texPath = node["texPath"];
         n.setImageData(node["imgDataURL"], true);
       }
-      // if (n.nodeType === NodeType.Texture) {
-      // }
 
       // add node to it's properties will be initialized
       // todo: separate setting properties and inputs from setting shader in node

@@ -733,21 +733,6 @@ export class NodeScene {
   }
 
   clearAndDrawGrid() {
-    //this.context.scale(2,2);
-    // this.context.fillStyle = "rgb(120, 120, 120)";
-    // let topCorner = this.view.canvasToSceneXY(0, 0);
-    // let bottomCorner = this.view.canvasToSceneXY(
-    //   this.canvas.clientWidth,
-    //   this.canvas.clientHeight
-    // );
-    // this.context.fillRect(
-    //   topCorner.x,
-    //   topCorner.y,
-    //   bottomCorner.x - topCorner.x,
-    //   bottomCorner.y - topCorner.y
-    // );
-    //this.context.fillRect(0,0,this.canvas.width, this.canvas.height);
-
     // todo: draw grid
     this.view.clear(this.context, settings.colorGridBackground);
     this.view.setViewMatrix(this.context);
@@ -928,15 +913,6 @@ export class NodeScene {
               else this.onwidgetselected(hit);
             }
           }
-
-          // if (hitItem instanceof Transform2dWidget) {
-          //   let hit = <Transform2dWidget>hitItem;
-
-          //   if (this.onwidgetselected) {
-          //     if (hit) this.onwidgetselected(hit);
-          //     else this.onwidgetselected(hit);
-          //   }
-          // }
 
           if (hitItem instanceof NavigationGraphicsItem) {
             let hit = <NavigationGraphicsItem>hitItem;

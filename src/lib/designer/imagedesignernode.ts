@@ -283,18 +283,6 @@ export class ImageDesignerNode extends DesignerNode {
       gNodes.setVirtualSize(width, height);
     }
 
-    // if the result node size has changed, we should resize 2d canvas also
-    if (this.isOutput) {
-      let event = new CustomEvent("resizeImage", {
-        detail: {
-          width: this.getWidth(),
-          height: this.getHeight(),
-        },
-      });
-
-      if (document) document.dispatchEvent(event);
-    }
-
     return true;
   }
 
