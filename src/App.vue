@@ -1,32 +1,51 @@
 <template>
-  <v-app id="inspire">
-    <v-system-bar app height="26" />
+  <v-app class="fill-height" id="inspire">
+    <v-system-bar app window clipped class="pl-0 pr-0 app-system-bar">
+      <v-btn><v-icon>mdi-menu</v-icon></v-btn>
+      <v-spacer />
+      <v-btn class="system-bar-button" @click="minimizeWindow">
+        <v-icon>mdi-minus</v-icon>
+      </v-btn>
+      <v-btn class="system-bar-button" @click="maximizeWindow">
+        <v-icon v-if="isMaximized"> mdi-window-restore </v-icon>
+        <v-icon v-if="!isMaximized"> mdi-window-maximize </v-icon>
+      </v-btn>
+      <v-btn class="system-bar-button" @click="closeWindow"
+        ><v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-system-bar>
 
-    <v-app-bar app clipped-left clipped-right dense>
-      <v-toolbar-title>
-        <v-btn color="gray" @click="newProject">
-          <v-img src="assets/icons/add_black_24dp.svg"> </v-img>
-        </v-btn>
-        <v-btn color="gray" @click="saveProject">
-          <v-img src="assets/icons/save_black_24dp.svg"> </v-img>
-        </v-btn>
-        <v-btn color="gray" @click="openProject">
-          <v-img src="assets/icons/folder_open_black_24dp.svg"> </v-img>
-        </v-btn>
-        <v-btn color="gray" @click="undoAction">
-          <v-icon dark>
-            mdi-undo
-          </v-icon>
-        </v-btn>
-        <v-btn color="gray" @click="redoAction">
-          <v-icon dark>
-            mdi-redo
-          </v-icon>
-        </v-btn>
-        <v-btn color="gray" @click="zoomSelection">
-          <v-img src="assets/icons/center_focus_weak_black_24dp.svg"> </v-img>
-        </v-btn>
-      </v-toolbar-title>
+    <v-app-bar app dense clipped-left clipped-right>
+      <v-btn color="gray" @click="newProject">
+        <v-icon>mdi-note-plus-outline</v-icon>
+      </v-btn>
+      <v-btn color="gray" @click="saveProject">
+        <v-icon>mdi-content-save-outline</v-icon>
+      </v-btn>
+      <v-btn color="gray" @click="openProject">
+        <v-icon>mdi-folder-open-outline</v-icon>
+      </v-btn>
+      <v-btn color="gray" @click="undoAction">
+        <v-icon dark>
+          mdi-undo
+        </v-icon>
+      </v-btn>
+      <v-btn color="gray" @click="redoAction">
+        <v-icon dark>
+          mdi-redo
+        </v-icon>
+      </v-btn>
+      <v-btn color="gray" @click="zoomSelection">
+        <v-icon>mdi-image-filter-center-focus-strong</v-icon>
+      </v-btn>
+
+      <v-spacer />
+      <v-btn @click="saveTexture">
+        <v-icon> mdi-download </v-icon>
+      </v-btn>
+      <v-btn @click="centerTexture">
+        <v-icon> mdi-fit-to-page-outline </v-icon>
+      </v-btn>
     </v-app-bar>
 
     <v-navigation-drawer app clipped width="300">
@@ -39,9 +58,12 @@
 
     <v-navigation-drawer
       app
+      flex
+      fluid
       clipped
       right
-      style="overflow: hidden; width: 360px;"
+      width="360"
+      style="overflow: hidden;"
     >
       <v-card
         app
@@ -54,7 +76,8 @@
           align="center"
           justify="center"
           ref="preview2d"
-          style="width:360px; max-height:400px; min-height:360px;"
+          style="width:360px !important; height:360px !important;"
+          class="pa-2"
         />
       </v-card>
       <v-card no-gutters style="max-height:60%; overflow: auto;">
@@ -69,29 +92,21 @@
         />
       </v-card>
     </v-navigation-drawer>
-
-    <v-main
-      fluid
-      app
-      bottom
-      clipped
-      style="padding-top:52px !important; display:flex;"
-    >
+    <v-main>
       <v-container
         fluid
-        app
-        bottom
+        flex
         clipped
         id="editor-view"
         class="pa-0 ma-0"
         v-resize="onResize"
       >
         <canvas
-          app
-          bottom
+          fluid
+          flex
           clipped
-          id="editor"
           class="pa-0 ma-0"
+          id="editor"
           ondragover="event.preventDefault()"
         />
         <library-menu
@@ -159,6 +174,7 @@
     project: Project;
 
     isMenuSetup: boolean = false;
+    isMaximized: boolean = false;
 
     resolution: number = 1024;
     randomSeed: number = 32;
@@ -175,6 +191,16 @@
       this.library = null;
 
       this.project = new Project();
+
+      const remote = window.require ? window.require("electron").remote : null;
+      const WIN = remote.getCurrentWindow();
+      this.isMaximized = WIN.isMaximized();
+    }
+
+    data() {
+      return {
+        startup: false,
+      };
     }
 
     created() {
@@ -219,12 +245,21 @@
       });
     }
 
+    destroyed() {
+      window.removeEventListener("resize", this.windowResize);
+    }
+
+    windowResize() {
+      const remote = window.require ? window.require("electron").remote : null;
+      const WIN = remote.getCurrentWindow();
+      this.isMaximized = WIN.isMaximized();
+    }
+
     onResize() {
       const canvas = document.getElementById("editor") as HTMLCanvasElement;
       const view = document.getElementById("editor-view");
       canvas.width = view.clientWidth;
       canvas.height = view.clientHeight;
-
       let scene = this.editor.nodeScene;
       if (scene) {
         scene.view.onResized();
@@ -234,6 +269,8 @@
 
     mounted() {
       this.setupMenu();
+
+      window.addEventListener("resize", this.windowResize);
 
       document.addEventListener("mousemove", (evt) => {
         this.mouseX = evt.pageX;
@@ -597,6 +634,39 @@
       let seed = evt.target.value;
       this.randomSeed = seed;
       this.editor.designer.setRandomSeed(seed);
+    }
+
+    maximizeWindow() {
+      const remote = window.require ? window.require("electron").remote : null;
+      const WIN = remote.getCurrentWindow();
+
+      if (!WIN.isMaximized()) {
+        WIN.maximize();
+        this.isMaximized = true;
+      } else {
+        WIN.unmaximize();
+        this.isMaximized = false;
+      }
+    }
+
+    closeWindow() {
+      const remote = window.require ? window.require("electron").remote : null;
+      const WIN = remote.getCurrentWindow();
+      WIN.close();
+    }
+
+    minimizeWindow() {
+      const remote = window.require ? window.require("electron").remote : null;
+      const WIN = remote.getCurrentWindow();
+      WIN.minimize();
+    }
+
+    saveTexture() {
+      (this.$refs.preview2d as Preview2D).saveTexture();
+    }
+
+    centerTexture() {
+      (this.$refs.preview2d as Preview2D).centerTexture();
     }
   }
 </script>

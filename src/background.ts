@@ -32,14 +32,14 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 function createWindow() {
-  setupMenu();
+  //setupMenu();
 
   // Create the browser window.
   win = new BrowserWindow({
     width: 1280,
-    height: 720,
+    height: 900,
     frame: false,
-    titleBarStyle: "hidden",
+    //titleBarStyle: "hidden",
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
@@ -48,7 +48,6 @@ function createWindow() {
     },
   });
   win.maximize();
-  win.show();
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -62,6 +61,10 @@ function createWindow() {
 
   win.on("closed", () => {
     win = null;
+  });
+
+  win.once("ready-to-show", () => {
+    win.show();
   });
 }
 

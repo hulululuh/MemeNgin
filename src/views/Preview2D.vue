@@ -1,13 +1,13 @@
 <template>
   <v-container>
-    <v-flex>
+    <!-- <v-flex>
       <v-btn @click="saveTexture">
-        <v-img src="assets/icons/save_alt_black_24dp.svg"> </v-img>
+        <v-icon> mdi-download </v-icon>
       </v-btn>
       <v-btn @click="centerTexture">
-        <v-img src="assets/icons/fit_screen-24px.svg"> </v-img>
+        <v-icon> mdi-fit-to-page-outline </v-icon>
       </v-btn>
-    </v-flex>
+    </v-flex> -->
     <v-flex fill-height justify-center v-resize="resize" ref="flex">
       <canvas id="_2dpreview" ref="canvas"></canvas>
     </v-flex>
@@ -168,7 +168,7 @@
     // Make it visually fill the positioned parent
     canvas.style.width = "100%";
     // 1em is the size of the top bar
-    canvas.style.height = "calc(100% - 2em)";
+    canvas.style.height = "100%";
     // ...then set the internal size to match
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;

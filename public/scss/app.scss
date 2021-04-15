@@ -96,3 +96,11 @@
   padding: 0.5em;
   font-family: "Open Sans";
 }
+
+.app-system-bar {
+  -webkit-app-region: drag !important;
+}
+
+.system-bar-button {
+  -webkit-app-region: no-drag;
+}

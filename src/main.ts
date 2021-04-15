@@ -29,9 +29,9 @@ AssetManager.getInstance();
 
 settings.load();
 
-new Titlebar({
-  backgroundColor: settings.colorTitle,
-});
+// new Titlebar({
+//   backgroundColor: settings.colorTitle,
+// });
 
 new Vue({
   store,
