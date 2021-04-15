@@ -1,7 +1,7 @@
 <template>
   <v-app class="fill-height" id="inspire">
     <v-system-bar app window clipped class="pl-0 pr-0 app-system-bar">
-      <v-btn><v-icon>mdi-menu</v-icon></v-btn>
+      <v-btn class="system-bar-button"><v-icon>mdi-menu</v-icon></v-btn>
       <v-spacer />
       <v-btn class="system-bar-button" @click="minimizeWindow">
         <v-icon>mdi-minus</v-icon>
@@ -92,7 +92,7 @@
         />
       </v-card>
     </v-navigation-drawer>
-    <v-main>
+    <v-main fluid flex>
       <v-container
         fluid
         flex

@@ -9,10 +9,12 @@ import {
 } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { MenuCommands, setupMenu } from "@/menu";
+import path from "path";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const undoShortcut = "CmdOrCtrl+Z";
 const redoShortcut = "CmdOrCtrl+Shift+Z";
+declare let __static: any;
 
 let vueDevToolsPath = null;
 if (process.platform === "win32") {
@@ -39,7 +41,7 @@ function createWindow() {
     width: 1280,
     height: 900,
     frame: false,
-    //titleBarStyle: "hidden",
+    icon: path.join(__static, "assets/icons/mmng_icon.png"),
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
