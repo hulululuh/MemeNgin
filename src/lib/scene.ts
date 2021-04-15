@@ -128,7 +128,6 @@ export class NodeScene {
   _widgetDragged: (evt: WidgetEvent) => void;
   _widgetDragStarted: (evt: WidgetEvent) => void;
   _widgetDragEnded: (evt: WidgetEvent) => void;
-  copyElement: HTMLInputElement;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -172,11 +171,6 @@ export class NodeScene {
 
       if (evt.target == canvas) {
         self.hasFocus = true;
-
-        // focus copy element
-        self.copyElement.focus();
-        self.copyElement.select();
-        console.log("focus");
       } else {
         self.hasFocus = false;
       }
@@ -243,7 +237,7 @@ export class NodeScene {
     canvas.addEventListener("contextmenu", self._contextMenu);
 
     this._copyEvent = (evt) => {
-      if (self.hasFocus && evt.target == self.copyElement) {
+      if (self.hasFocus) {
         // alert("copying selection");
         console.log(evt.target);
         evt.preventDefault();
@@ -254,7 +248,7 @@ export class NodeScene {
     document.addEventListener("copy", this._copyEvent);
 
     this._cutEvent = (evt) => {
-      if (self.hasFocus && evt.target == self.copyElement) {
+      if (self.hasFocus) {
         // alert("cutting selection");
         console.log(evt.target);
         evt.preventDefault();
@@ -266,12 +260,11 @@ export class NodeScene {
     document.addEventListener("cut", this._cutEvent);
 
     this._pasteEvent = (evt) => {
-      if (self.hasFocus && evt.target == self.copyElement) {
+      if (self.hasFocus) {
         // alert("pasting selection");
         // console.log(evt.target);
         // console.log(evt.clipboardData);
         evt.preventDefault();
-        self.copyElement.value = " ";
 
         self.onPaste(evt);
         console.log(self);
@@ -328,17 +321,6 @@ export class NodeScene {
       }
     };
     document.addEventListener("widgetDragEnded", this._widgetDragEnded);
-
-    this.copyElement = document.createElement("input");
-    self.copyElement.value = " ";
-    //self.copyElement.style.display = "none";
-    self.copyElement.style.opacity = "0";
-    self.copyElement.style.width = "1px";
-    self.copyElement.style.height = "1px";
-    document.body.appendChild(this.copyElement);
-    //this.copyElement.addEventListener("copy", this._copyEvent);
-    // note: console.log(this.copyElement) to see in DOM
-    // golden layout conveniently hides it
   }
 
   get inputNode(): GraphicsItem {
@@ -352,7 +334,6 @@ export class NodeScene {
   }
 
   dispose() {
-    //alert("disposed!");
     this.canvas.removeEventListener("mousemove", this._mouseMove);
     this.canvas.removeEventListener("mouedown", this._mouseDown);
     this.canvas.removeEventListener("mouseup", this._mouseUp);
@@ -365,8 +346,6 @@ export class NodeScene {
     document.removeEventListener("widgetDragged", this._widgetDragged);
     document.removeEventListener("widgetDragStarted", this._widgetDragStarted);
     document.removeEventListener("widgetDragEnded", this._widgetDragEnded);
-    // this.copyElement.removeEventListener("copy", this._copyEvent);
-    // this.copyElement.removeEventListener("paste", this._copyEvent);
   }
 
   setSelectedItems(items: GraphicsItem[], createSelection: boolean = false) {
