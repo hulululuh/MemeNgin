@@ -1,5 +1,5 @@
 <template>
-  <v-app class="fill-height" id="inspire">
+  <v-app>
     <v-system-bar app window clipped class="pl-0 pr-0 app-system-bar">
       <v-btn class="system-bar-button"><v-icon>mdi-menu</v-icon></v-btn>
       <v-spacer />
@@ -38,7 +38,6 @@
       <v-btn color="gray" @click="zoomSelection">
         <v-icon>mdi-image-filter-center-focus-strong</v-icon>
       </v-btn>
-
       <v-spacer />
       <v-btn @click="saveTexture">
         <v-icon> mdi-download </v-icon>
@@ -92,7 +91,7 @@
         />
       </v-card>
     </v-navigation-drawer>
-    <v-main fluid flex>
+    <v-main>
       <v-container
         fluid
         flex
@@ -102,9 +101,6 @@
         v-resize="onResize"
       >
         <canvas
-          fluid
-          flex
-          clipped
           class="pa-0 ma-0"
           id="editor"
           ondragover="event.preventDefault()"
@@ -134,9 +130,9 @@
   import EditorView from "@/views/Editor.vue";
   import LibraryView from "@/views/Library.vue";
   import LibraryMenu from "@/components/LibraryMenu.vue";
-  import { Editor } from "@/lib/editor";
   import NodePropertiesView from "./views/NodeProperties.vue";
   import Preview2D from "./views/Preview2D.vue";
+  import { Editor } from "@/lib/editor";
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
@@ -148,7 +144,6 @@
 
   const electron = require("electron");
   const remote = electron.remote;
-  //const { dialog, app, BrowserWindow, Menu } = remote;
   const { dialog } = require("electron").remote;
 
   declare let __static: any;
@@ -168,8 +163,6 @@
     library!: DesignerLibrary;
 
     propHolder: IPropertyHolder = null;
-
-    //designer!: Designer;
 
     project: Project;
 
@@ -195,12 +188,6 @@
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       this.isMaximized = WIN.isMaximized();
-    }
-
-    data() {
-      return {
-        startup: false,
-      };
     }
 
     created() {
