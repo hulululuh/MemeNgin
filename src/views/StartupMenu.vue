@@ -22,7 +22,7 @@
         <v-tab>Workshop</v-tab>
         <v-tab-item justify="center" v-for="n in 3" :key="n">
           <v-container fluid style="overflow-y: scroll !important;">
-            <v-row>
+            <v-row class="grid">
               <v-col v-for="i in 30" :key="i" cols="auto" md="auto">
                 <project-item />
               </v-col>

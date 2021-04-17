@@ -104,3 +104,16 @@
 .system-bar-button {
   -webkit-app-region: no-drag;
 }
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; 
+  padding: auto;
+  margin: auto;
+  
+  &:after {
+    content: "";
+    flex: auto;
+  }
+}
