@@ -1,7 +1,8 @@
 <template>
   <v-app>
     <v-system-bar app window clipped class="pl-0 pr-0 app-system-bar">
-      <v-btn class="system-bar-button"><v-icon>mdi-menu</v-icon></v-btn>
+      <startup-menu />
+
       <v-spacer />
       <v-btn class="system-bar-button" @click="minimizeWindow">
         <v-icon>mdi-minus</v-icon>
@@ -15,7 +16,7 @@
       </v-btn>
     </v-system-bar>
 
-    <v-app-bar app dense clipped-left clipped-right>
+    <v-app-bar class="pa-0" app dense clipped-left clipped-right>
       <v-btn color="gray" @click="newProject">
         <v-icon>mdi-note-plus-outline</v-icon>
       </v-btn>
@@ -91,6 +92,7 @@
         />
       </v-card>
     </v-navigation-drawer>
+
     <v-main>
       <v-container
         fluid
@@ -128,11 +130,12 @@
   /* eslint-disable */
   import { Component, Vue } from "vue-property-decorator";
   import EditorView from "@/views/Editor.vue";
+  import { Editor } from "@/lib/editor";
   import LibraryView from "@/views/Library.vue";
   import LibraryMenu from "@/components/LibraryMenu.vue";
-  import NodePropertiesView from "./views/NodeProperties.vue";
-  import Preview2D from "./views/Preview2D.vue";
-  import { Editor } from "@/lib/editor";
+  import NodePropertiesView from "@/views/NodeProperties.vue";
+  import Preview2D from "@/views/Preview2D.vue";
+  import StartupMenu from "@/views/StartupMenu.vue";
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
@@ -154,6 +157,7 @@
       LibraryView,
       NodePropertiesView,
       LibraryMenu,
+      startupMenu: StartupMenu,
       preview2d: Preview2D,
     },
   })
@@ -176,6 +180,13 @@
     mouseY: number = 0;
 
     version: string = "0.1.0";
+
+    /// v-dialog
+    dialog: boolean = false;
+    notifications: boolean = false;
+    sound: boolean = true;
+    widgets: boolean = false;
+    // v-dialog
 
     constructor() {
       super();
