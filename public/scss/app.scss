@@ -106,14 +106,8 @@
 }
 
 .grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between; 
-  padding: auto;
-  margin: auto;
-  
-  &:after {
-    content: "";
-    flex: auto;
-  }
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 256px);
+  justify-content: space-between;
 }

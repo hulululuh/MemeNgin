@@ -1,8 +1,8 @@
 <template>
-  <v-card max-width="256px">
+  <v-card width="256px">
     <v-img
       class="white--text align-center"
-      max-height="256px"
+      height="256px"
       src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
     >
       <v-card-title class="justify-center"> Dogefornia </v-card-title>
