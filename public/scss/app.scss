@@ -108,6 +108,7 @@
 .grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 256px);
+  padding-top: 12px;
+  grid-template-columns: repeat(auto-fill, 192px);
   justify-content: space-between;
 }

@@ -40,6 +40,8 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 900,
+    minWidth: 800,
+    minHeight: 600,
     frame: false,
     icon: path.join(__static, "assets/icons/mmng_icon.png"),
     webPreferences: {

@@ -20,14 +20,8 @@
         <v-tab>Home</v-tab>
         <v-tab>Explore</v-tab>
         <v-tab>Workshop</v-tab>
-        <v-tab-item justify="center" v-for="n in 3" :key="n">
-          <v-container fluid style="overflow-y: scroll !important;">
-            <v-row class="grid">
-              <v-col v-for="i in 30" :key="i" cols="auto" md="auto">
-                <project-item />
-              </v-col>
-            </v-row>
-          </v-container>
+        <v-tab-item justify="center">
+          <home-tab />
         </v-tab-item>
       </v-tabs>
     </v-card>
@@ -40,11 +34,11 @@
 
 <script lang="ts">
   import { Vue, Component } from "vue-property-decorator";
-  import ProjectItem from "@/views/ProjectItem.vue";
+  import HomeTab from "@/views/HomeTab.vue";
 
   @Component({
     components: {
-      projectItem: ProjectItem,
+      homeTab: HomeTab,
     },
   })
   export default class StartupMenu extends Vue {

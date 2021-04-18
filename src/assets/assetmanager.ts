@@ -15,7 +15,34 @@ const electron = require("electron");
 
 declare let __static: any;
 
-function getAllFiles(dirPath, arrayOfFiles, filter) {
+function isFilteredResultOf(fileName, filter) {
+  const filePath = path.parse(fileName);
+  const name = filePath.name;
+  const ext = filePath.ext;
+
+  const filterPath = path.parse(filter);
+  const fName = filterPath.name;
+  const fExt = filterPath.ext;
+
+  // exact
+  let namePass = false;
+  let extPass = false;
+  if (fName === "*") {
+    namePass = true;
+  } else if (fName === name) {
+    namePass = true;
+  }
+
+  if (fExt !== ".*") {
+    extPass = true;
+  } else if (fExt === ext) {
+    extPass = true;
+  }
+
+  return namePass && extPass;
+}
+
+export function getAllFiles(dirPath, arrayOfFiles, filter) {
   let files = fs.readdirSync(dirPath);
 
   arrayOfFiles = arrayOfFiles || [];
@@ -23,7 +50,7 @@ function getAllFiles(dirPath, arrayOfFiles, filter) {
   files.forEach(function(file) {
     if (fs.statSync(dirPath + "/" + file).isDirectory()) {
       arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles, filter);
-    } else if (file === filter) {
+    } else if (isFilteredResultOf(file, filter)) {
       arrayOfFiles.push(path.join(dirPath, file));
     }
   });
