@@ -4,6 +4,8 @@
       <startup-menu />
 
       <v-spacer />
+      <div>{{ title }}</div>
+      <v-spacer />
       <v-btn class="system-bar-button" @click="minimizeWindow">
         <v-icon>mdi-minus</v-icon>
       </v-btn>
@@ -181,12 +183,7 @@
 
     version: string = "0.1.0";
 
-    /// v-dialog
-    dialog: boolean = false;
-    notifications: boolean = false;
-    sound: boolean = true;
-    widgets: boolean = false;
-    // v-dialog
+    title: string = "";
 
     constructor() {
       super();
@@ -504,6 +501,8 @@
       this.resolution = 1024;
       this.randomSeed = 32;
 
+      this.title = "new project";
+
       // todo: set title
     }
 
@@ -536,6 +535,7 @@
 
             ProjectManager.save(path, this.project);
             remote.getCurrentWindow().setTitle(this.project.name);
+            this.title = this.project.name;
           })
           .catch((...args) => {
             console.warn("failed/rejected with", args);
@@ -567,6 +567,7 @@
           console.log(project);
 
           remote.getCurrentWindow().setTitle(project.name);
+          this.title = project.name;
           this.editor.load(project.data);
           this.resolution = 1024;
           this.randomSeed = 32;
@@ -612,6 +613,7 @@
       }
 
       remote.getCurrentWindow().setTitle(project.name);
+      this.title = project.name;
       this.editor.load(project.data);
       this.resolution = 1024;
       this.randomSeed = 32;
