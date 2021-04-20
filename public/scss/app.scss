@@ -112,3 +112,12 @@
   grid-template-columns: repeat(auto-fill, 192px);
   justify-content: space-between;
 }
+
+.v-card--reveal {
+  align-items: center;
+  bottom: 0;
+  justify-content: center;
+  opacity: 1.0;
+  position: absolute;
+  width: 100%;
+}

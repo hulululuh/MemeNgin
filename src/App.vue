@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-system-bar app window clipped class="pl-0 pr-0 app-system-bar">
-      <startup-menu />
+      <startup-menu ref="startupMenu" />
 
       <v-spacer />
       <div>{{ title }}</div>
@@ -562,22 +562,29 @@
           defaultPath: "material",
         })
         .then((result) => {
-          let path = result.filePaths[0];
-          let project = ProjectManager.load(path);
-          console.log(project);
-
-          remote.getCurrentWindow().setTitle(project.name);
-          this.title = project.name;
-          this.editor.load(project.data);
-          this.resolution = 1024;
-          this.randomSeed = 32;
-
-          this.project = project;
-          this.library = this.editor.library;
+          this.openProjectWithPath(result.filePaths[0]);
         })
         .catch((...args) => {
           console.warn("failed/rejected with", args);
         });
+    }
+
+    openProjectWithPath(path: string) {
+      (this.$refs.startupMenu as StartupMenu).tryClose();
+
+      let project = ProjectManager.load(path);
+      if (!project) return;
+
+      console.log(project);
+
+      remote.getCurrentWindow().setTitle(project.name);
+      this.title = project.name;
+      this.editor.load(project.data);
+      this.resolution = 1024;
+      this.randomSeed = 32;
+
+      this.project = project;
+      this.library = this.editor.library;
     }
 
     zoomSelection() {

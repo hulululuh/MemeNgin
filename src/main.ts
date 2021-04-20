@@ -20,18 +20,12 @@ import Vuetify from "vuetify/lib";
 Vue.config.productionTip = false;
 Vue.use(Vuetify);
 
-import { Titlebar } from "custom-electron-titlebar";
 import { ApplicationSettings } from "@/settings";
 import { AssetManager } from "@/assets/assetmanager";
 
-const settings = ApplicationSettings.getInstance();
 AssetManager.getInstance();
-
+const settings = ApplicationSettings.getInstance();
 settings.load();
-
-// new Titlebar({
-//   backgroundColor: settings.colorTitle,
-// });
 
 new Vue({
   store,

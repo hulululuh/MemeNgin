@@ -27,6 +27,7 @@ import { Guid } from "./utils";
 import { AssetType } from "@/assets/assetmanager";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
 import { OutputNode } from "./library/nodes/outputnode";
+import { WidgetEvent } from "./scene/graphicsitem";
 
 const HALF = 0.5;
 
@@ -37,18 +38,41 @@ function canvasToURL(img: HTMLCanvasElement) {
   let ctx = canvas.getContext("2d");
   ctx.drawImage(img, 0, 0);
 
-  const url = canvas.toDataURL("image/webp", 0.2);
+  const url = canvas.toDataURL("image/webp", 1.0);
   return url;
 }
+
+enum FitMode {
+  Width,
+  Height,
+  Long,
+}
+const fitMode: FitMode = FitMode.Height;
 
 function canvasToThumbnailURL(img: HTMLCanvasElement) {
   let canvas = document.createElement("canvas");
   canvas.width = 256;
   canvas.height = 256;
   let ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0);
+  let scale = 1;
 
-  const url = canvas.toDataURL("image/webp", 0.2);
+  switch (fitMode) {
+    case FitMode.Height:
+      scale = canvas.height / img.height;
+      break;
+    case FitMode.Width:
+      scale = canvas.width / img.width;
+      break;
+    case FitMode.Long:
+      scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+      break;
+  }
+
+  let x = canvas.width / 2 - (img.width / 2) * scale;
+  let y = canvas.height / 2 - (img.height / 2) * scale;
+  ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+  const url = canvas.toDataURL("image/webp", 1.0);
   return url;
 }
 
@@ -824,7 +848,6 @@ export class Designer {
 
   save(): any {
     let outputNode: OutputNode = null;
-    let outputCanvas = null;
     let nodes = new Array();
     for (let node of this.nodes) {
       let n = {};
@@ -835,9 +858,10 @@ export class Designer {
 
       if (node instanceof TextureNode) {
         n["texPath"] = node.texPath;
-        outputCanvas = Editor.getScene().getNodeById(node.id).imageCanvas
+
+        let imgCanvas = Editor.getScene().getNodeById(node.id).imageCanvas
           .canvas;
-        n["imgDataURL"] = canvasToURL(outputCanvas);
+        n["imgDataURL"] = canvasToURL(imgCanvas);
       }
 
       let props = {};
@@ -883,6 +907,9 @@ export class Designer {
       variables.push(v);
       console.log(v);
     }
+
+    let outputCanvas = Editor.getScene().getNodeById(outputNode.id).imageCanvas
+      .canvas;
 
     let data = {};
     data["description"] = outputNode.getProperty("description");

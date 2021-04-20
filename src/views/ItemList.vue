@@ -3,7 +3,7 @@
     <v-subheader style="font-size: 1rem; font-weight: 400;">{{
       categoryName
     }}</v-subheader>
-    <v-divider />
+    <v-divider class="pb-1" />
     <v-row class="grid pa-1">
       <v-col
         v-for="item in lists"
@@ -12,7 +12,7 @@
         md="auto"
         class="pa-1"
       >
-        <project-item :path="item" />
+        <project-item v-if="exists(item)" :path="item" />
       </v-col>
     </v-row>
   </v-flex>
@@ -25,6 +25,7 @@
 <script lang="ts">
   import { Vue, Prop, Component } from "vue-property-decorator";
   import ProjectItem from "@/views/ProjectItem.vue";
+  import fs from "fs";
 
   @Component({
     components: {
@@ -34,5 +35,9 @@
   export default class ItemList extends Vue {
     @Prop() categoryName: string;
     @Prop() lists: string[];
+
+    exists(path: string) {
+      return fs.existsSync(path);
+    }
   }
 </script>

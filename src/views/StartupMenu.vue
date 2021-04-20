@@ -46,5 +46,9 @@
     notifications: boolean = false;
     sound: boolean = true;
     widgets: boolean = false;
+
+    tryClose() {
+      if (this.dialog) this.dialog = false;
+    }
   }
 </script>

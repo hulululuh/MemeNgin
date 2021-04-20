@@ -10,7 +10,7 @@ export class Project {
 export class ProjectManager {
   static load(path: string): Project {
     let project = new Project();
-
+    if (!fs.existsSync(path)) return null;
     project.path = path;
     project.name = path.replace(/^.*[\\]/, "");
     project.data = JSON.parse(fs.readFileSync(path).toString());
@@ -18,8 +18,6 @@ export class ProjectManager {
   }
 
   static save(path: string, project: Project) {
-    // console.log(project.data);
-    // console.log(JSON.stringify(project.data));
     fs.writeFileSync(path, JSON.stringify(project.data));
   }
 }
