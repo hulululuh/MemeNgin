@@ -13,8 +13,8 @@
   import ItemList from "@/views/ItemList.vue";
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { getAllFiles } from "@/assets/assetmanager";
+  import { UserData } from "@/userdata";
   import path from "path";
-
   declare let __static: any;
 
   @Component({
@@ -24,7 +24,8 @@
   })
   export default class HomeTab extends Vue {
     get recentList() {
-      return [];
+      const list = UserData.getInstance().recentFiles;
+      return list;
     }
 
     get tutorialsList() {

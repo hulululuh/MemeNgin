@@ -142,6 +142,8 @@
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
   import path from "path";
+  import fs from "fs";
+  import { UserData, registerRecent } from "@/userdata";
   import { IPropertyHolder } from "./lib/designer/properties";
   import { AddItemsAction } from "./lib/actions/additemsaction";
   import { UndoStack } from "./lib/undostack";
@@ -149,8 +151,9 @@
 
   const electron = require("electron");
   const remote = electron.remote;
-  const { dialog } = require("electron").remote;
-
+  const { dialog } = remote;
+  const app = remote.app;
+  const userDataPath = path.join(app.getPath("userData"), "userData.json");
   declare let __static: any;
 
   @Component({
@@ -199,6 +202,10 @@
     }
 
     created() {
+      if (fs.existsSync(userDataPath)) {
+        UserData.parse(userDataPath);
+      }
+
       electron.ipcRenderer.on(MenuCommands.FileNew, (evt, arg) => {
         this.newProject();
       });
@@ -575,6 +582,7 @@
       let project = ProjectManager.load(path);
       if (!project) return;
 
+      registerRecent(path, UserData.getInstance());
       console.log(project);
 
       remote.getCurrentWindow().setTitle(project.name);
@@ -657,6 +665,12 @@
     }
 
     closeWindow() {
+      try {
+        fs.writeFileSync(userDataPath, JSON.stringify(UserData.getInstance()));
+      } catch (err) {
+        alert("Error saving user data: " + err);
+      }
+
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       WIN.close();

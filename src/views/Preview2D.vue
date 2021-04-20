@@ -165,6 +165,7 @@
 
   //https://stackoverflow.com/questions/10214873/make-canvas-as-wide-and-as-high-as-parent
   function fitCanvasToContainer(canvas) {
+    if (!canvas) return;
     // Make it visually fill the positioned parent
     canvas.style.width = "100%";
     // 1em is the size of the top bar

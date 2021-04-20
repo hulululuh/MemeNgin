@@ -27,20 +27,6 @@
             {{ description }}
           </div>
         </v-expand-transition>
-
-        <!-- <v-card-title class="justify-center" fluid>
-          {{ filename }}
-        </v-card-title>
-
-        <v-expand-transition>
-          <v-card
-            v-show="hover"
-            height="100px"
-            style="background-color: rgba(255, 255, 255, 0.5); text-shadow: none; height: 100%;"
-          >
-            {{ description }}
-          </v-card>
-        </v-expand-transition> -->
       </v-img>
     </v-card>
   </v-hover>
