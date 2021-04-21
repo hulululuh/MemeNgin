@@ -128,6 +128,7 @@ export class NodeScene {
   _widgetDragged: (evt: WidgetEvent) => void;
   _widgetDragStarted: (evt: WidgetEvent) => void;
   _widgetDragEnded: (evt: WidgetEvent) => void;
+  copyElement: HTMLInputElement;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -171,6 +172,11 @@ export class NodeScene {
 
       if (evt.target == canvas) {
         self.hasFocus = true;
+
+        // focus copy element
+        self.copyElement.focus();
+        self.copyElement.select();
+        console.log("focus");
       } else {
         self.hasFocus = false;
       }
@@ -237,7 +243,7 @@ export class NodeScene {
     canvas.addEventListener("contextmenu", self._contextMenu);
 
     this._copyEvent = (evt) => {
-      if (self.hasFocus) {
+      if (self.hasFocus && evt.target == self.copyElement) {
         // alert("copying selection");
         console.log(evt.target);
         evt.preventDefault();
@@ -248,7 +254,7 @@ export class NodeScene {
     document.addEventListener("copy", this._copyEvent);
 
     this._cutEvent = (evt) => {
-      if (self.hasFocus) {
+      if (self.hasFocus && evt.target == self.copyElement) {
         // alert("cutting selection");
         console.log(evt.target);
         evt.preventDefault();
@@ -260,11 +266,12 @@ export class NodeScene {
     document.addEventListener("cut", this._cutEvent);
 
     this._pasteEvent = (evt) => {
-      if (self.hasFocus) {
+      if (self.hasFocus && evt.target == self.copyElement) {
         // alert("pasting selection");
         // console.log(evt.target);
         // console.log(evt.clipboardData);
         evt.preventDefault();
+        self.copyElement.value = " ";
 
         self.onPaste(evt);
         console.log(self);
@@ -321,6 +328,15 @@ export class NodeScene {
       }
     };
     document.addEventListener("widgetDragEnded", this._widgetDragEnded);
+
+    this.copyElement = document.createElement("input");
+    self.copyElement.value = " ";
+    self.copyElement.style.opacity = "0";
+    self.copyElement.style.width = "0px";
+    self.copyElement.style.height = "0px";
+    self.copyElement.style.margin = "0px";
+    self.copyElement.style.padding = "0px";
+    document.getElementById("editor-view").appendChild(this.copyElement);
   }
 
   get inputNode(): GraphicsItem {
