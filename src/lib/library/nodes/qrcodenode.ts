@@ -3,6 +3,7 @@ import {
   ImageDesignerNode,
   UpdateTexture,
 } from "@/lib/designer/imagedesignernode";
+import { DesignerNode } from "@/lib/designer/designernode";
 import { Property } from "@/lib/designer/properties";
 import QRCode from "qrcode";
 const NativeImage = require("electron").nativeImage;
@@ -10,7 +11,7 @@ const NativeImage = require("electron").nativeImage;
 async function loadImage(input: string) {
   let qrInput = input.length === 0 ? " " : input;
   try {
-    let qrUrl = await QRCode.toDataURL(qrInput, { width: 256, height: 256 });
+    let qrUrl = await QRCode.toDataURL(qrInput);
     return NativeImage.createFromDataURL(qrUrl);
   } catch (err) {
     console.log(err);
@@ -123,6 +124,20 @@ export class QrCodeNode extends ImageDesignerNode {
         return col;
       }
       `;
+
+    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
+      if (rightIndex === "text") {
+        this.text = this.getProperty("text");
+        this.loadTexture();
+      }
+    };
+
+    this.ondisconnected = (leftNode: DesignerNode, rightIndex: string) => {
+      if (rightIndex === "text") {
+        this.text = this.getProperty("text");
+        this.loadTexture();
+      }
+    };
 
     this.buildShader(source);
 
