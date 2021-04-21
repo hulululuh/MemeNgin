@@ -43,6 +43,7 @@ import { StringPropertyNode } from "./nodes/stringpropertynode";
 import { StylizeNode } from "./nodes/stylizenode";
 import { TextNode } from "./nodes/textnode";
 import { TextureNode } from "./nodes/texturenode";
+import { QrCodeNode } from "./nodes/qrcodenode";
 import { ThresholdNode } from "./nodes/thresholdnode";
 import { TileNode } from "./nodes/tilenode";
 import { Transform2DNode } from "./nodes/transform2dnode";
@@ -175,6 +176,8 @@ export function createLibrary() {
     TriGradientNode,
     NodeCategory.Create
   );
+
+  lib.addNode("qrcode", "QrCode", QrCodeNode, NodeCategory.Create);
 
   lib.addNode(
     "colorproperty",
