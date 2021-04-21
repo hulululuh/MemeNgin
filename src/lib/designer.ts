@@ -932,7 +932,6 @@ export class Designer {
       n.nodeType = node["nodeType"];
 
       if (n instanceof TextureNode) {
-        n.texPath = node["texPath"];
         n.setImageData(node["imgDataURL"], true);
       }
 

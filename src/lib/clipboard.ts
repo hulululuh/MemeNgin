@@ -15,6 +15,8 @@ import { Guid } from "./utils";
 import { AddItemsAction } from "./actions/additemsaction";
 import { UndoStack } from "./undostack";
 import { Rect } from "@/lib/math/rect";
+import { TextureNode } from "./library/nodes/texturenode";
+import { Editor } from "@/lib/editor";
 
 export class ItemClipboard {
   static copyItems(
@@ -184,6 +186,11 @@ export class ItemClipboard {
       // add to designer
       designer.addNode(dNode);
       nodeIdMap[n.id] = dNode.id;
+
+      if (dNode instanceof TextureNode) {
+        let srcNode = Editor.getDesigner().getNodeById(n.id) as TextureNode;
+        dNode.setImageData(srcNode.imgData, true);
+      }
 
       // assign properties
       for (let propName in n.properties) {

@@ -99,8 +99,9 @@ export class TextureNode extends ImageDesignerNode {
   }
 
   setImageData(imgDataURL: string, isUrl: boolean) {
-    this.imgData = imgDataURL;
+    this.imgData = imgDataURL.repeat(1);
     this.isUrl = isUrl;
+    this.loadTexture();
   }
 
   createTexture() {
@@ -178,6 +179,8 @@ export class TextureNode extends ImageDesignerNode {
 
     this.buildShader(source);
 
-    this.loadTexture();
+    if (!this.isUrl && this.texPath) {
+      this.loadTexture();
+    }
   }
 }
