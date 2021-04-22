@@ -49,6 +49,7 @@ import { TileNode } from "./nodes/tilenode";
 import { Transform2DNode } from "./nodes/transform2dnode";
 import { ResizeNode } from "./nodes/resizenode";
 import { KaleidoscopeNode } from "./nodes/kaleidoscopenode";
+import { MosaicNode } from "./nodes/mosaicnode";
 import { WarpNode } from "./nodes/warpnode";
 import { WaveNode } from "./nodes/wavenode";
 import { UvSwapNode } from "./nodes/uvswapnode";
@@ -79,6 +80,7 @@ export function createLibrary() {
     KaleidoscopeNode,
     NodeCategory.Shape
   );
+  lib.addNode("mosaic", "Mosaic", MosaicNode, NodeCategory.Shape);
   lib.addNode("warp", "Warp", WarpNode, NodeCategory.Shape);
   lib.addNode(
     "directionalwarp",
