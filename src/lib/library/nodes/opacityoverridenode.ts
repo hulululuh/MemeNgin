@@ -105,7 +105,7 @@ export class OpacityOverrideNode extends ImageDesignerNode
       const leftImageNode = leftNode as ImageDesignerNode;
       const srcNode = Editor.getDesigner().findLeftNode(
         this.id,
-        "opacityMap"
+        "image"
       ) as ImageDesignerNode;
 
       // background has changed
