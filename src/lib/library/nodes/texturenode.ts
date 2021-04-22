@@ -4,25 +4,8 @@ import {
   UpdateTexture,
 } from "@/lib/designer/imagedesignernode";
 import { Property, FileProperty } from "@/lib/designer/properties";
-import { Editor } from "@/lib/editor";
 import path from "path";
-
-const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
-
-async function loadLocalWebp(path: string) {
-  let blob = await fetch(path).then((r) => r.blob());
-  let reader = new FileReader();
-  await reader.readAsDataURL(blob);
-  let dataUrl = reader.result.toString();
-
-  if (isDataUri(dataUrl)) {
-    let img = NativeImage.createFromDataURL(dataUrl);
-    return img;
-  } else {
-    console.warn("something went wrong loading local webp file");
-  }
-}
 
 async function loadImage(imgPath: string, isDataUrl: boolean) {
   let img = null;

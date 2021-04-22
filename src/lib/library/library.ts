@@ -48,6 +48,7 @@ import { ThresholdNode } from "./nodes/thresholdnode";
 import { TileNode } from "./nodes/tilenode";
 import { Transform2DNode } from "./nodes/transform2dnode";
 import { ResizeNode } from "./nodes/resizenode";
+import { KaleidoscopeNode } from "./nodes/kaleidoscopenode";
 import { WarpNode } from "./nodes/warpnode";
 import { WaveNode } from "./nodes/wavenode";
 import { UvSwapNode } from "./nodes/uvswapnode";
@@ -72,6 +73,12 @@ export function createLibrary() {
   lib.addNode("mirror", "Mirror", MirrorNode, NodeCategory.Shape);
   lib.addNode("tile", "Tile", TileNode, NodeCategory.Shape);
   lib.addNode("hexagon", "Hexagon", HexagonNode, NodeCategory.Shape);
+  lib.addNode(
+    "kaleidoscope",
+    "Kaleidoscope",
+    KaleidoscopeNode,
+    NodeCategory.Shape
+  );
   lib.addNode("warp", "Warp", WarpNode, NodeCategory.Shape);
   lib.addNode(
     "directionalwarp",
