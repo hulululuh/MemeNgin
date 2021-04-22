@@ -42,7 +42,7 @@ export class TextureNode extends ImageDesignerNode {
   protected bmp: Uint8Array = null;
   protected imgWidth: number = 0;
   protected imgHeight: number = 0;
-  isUrl: boolean = false;
+  isDataUrl: boolean = false;
 
   // constructor
   constructor() {
@@ -52,7 +52,7 @@ export class TextureNode extends ImageDesignerNode {
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "file") {
-        this.isUrl = false;
+        this.isDataUrl = false;
         this.texPath = (prop as FileProperty).value;
         if (this.texPath) {
           this.loadTexture();
@@ -62,10 +62,10 @@ export class TextureNode extends ImageDesignerNode {
   }
 
   loadTexture() {
-    let target = this.isUrl ? this.imgData : this.texPath;
+    let target = this.isDataUrl ? this.imgData : this.texPath;
     if (!target) return;
 
-    loadImage(target, this.isUrl).then((img) => {
+    loadImage(target, this.isDataUrl).then((img) => {
       if (!img) return;
       this.bmp = img.getBitmap();
       const size = img.getSize();
@@ -83,7 +83,7 @@ export class TextureNode extends ImageDesignerNode {
 
   setImageData(imgDataURL: string, isUrl: boolean) {
     this.imgData = imgDataURL.repeat(1);
-    this.isUrl = isUrl;
+    this.isDataUrl = isUrl;
     this.loadTexture();
   }
 
@@ -131,7 +131,7 @@ export class TextureNode extends ImageDesignerNode {
       Uint8Array.from(this.bmp),
       NodeType.Texture,
       this.gl,
-      !this.isUrl,
+      !this.isDataUrl,
       true
     );
     this.isTextureReady = true;
@@ -162,7 +162,7 @@ export class TextureNode extends ImageDesignerNode {
 
     this.buildShader(source);
 
-    if (!this.isUrl && this.texPath) {
+    if ((!this.isDataUrl && this.texPath) || (this.isDataUrl && this.imgData)) {
       this.loadTexture();
     }
   }

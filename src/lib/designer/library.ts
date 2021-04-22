@@ -1,4 +1,5 @@
 import { DesignerNode, NodeCategory } from "./designernode";
+import { TextureNode } from "@/lib/library/nodes/texturenode";
 
 export class DesignerNodeFactory {
   name: string;
@@ -48,8 +49,8 @@ export class DesignerLibrary {
       }
     }
 
-    if (isUrl !== undefined) {
-      node.isUrl = isUrl;
+    if (node instanceof TextureNode && isUrl !== undefined) {
+      (node as TextureNode).isDataUrl = isUrl;
     }
 
     node.typeName = name;

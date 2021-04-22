@@ -65,7 +65,7 @@ export class DesignerNode implements IPropertyHolder {
   id: string = Guid.newGuid();
   texPath: string;
   imgData: string;
-  isUrl: boolean;
+  isDataUrl: boolean;
   title: string;
   typeName: string; // added when node is created from library
   nodeType: NodeType;

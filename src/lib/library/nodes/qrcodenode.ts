@@ -101,7 +101,7 @@ export class QrCodeNode extends ImageDesignerNode {
       Uint8Array.from(this.bmp),
       NodeType.Texture,
       this.gl,
-      !this.isUrl,
+      !this.isDataUrl,
       true
     );
     this.isTextureReady = true;
