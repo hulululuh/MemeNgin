@@ -3,13 +3,21 @@
     <v-subheader class="ma-0 pa-0">
       <label>{{ prop.displayName }}</label>
     </v-subheader>
-
     <v-container>
       <v-row no-gutters>
         <v-col class="ma-0 pa-0 width=10%" md="2">
           Pos
         </v-col>
-        <v-col class="ma-0 pa-0" md="5">
+        <v-checkbox
+          v-model="prop.exposed"
+          @change="updateExposed"
+          class="ma-0 pa-0"
+          type="number"
+          hide-details
+          disabled
+        />
+        <v-subheader> x:</v-subheader>
+        <v-col class="ma-0 pa-0" md="4.5">
           <v-text-field
             class=" ma-0 pa-0"
             step="0.001"
@@ -20,20 +28,10 @@
             @change="blur"
             @focus="focus"
             hide-details
-          >
-            <template v-slot:prepend class="ma-0 pa-0">
-              <v-checkbox
-                v-model="prop.exposed"
-                @change="updateExposed"
-                class="ma-0 pa-0"
-                type="number"
-                hide-details
-              />
-              x:
-            </template>
-          </v-text-field>
+          />
         </v-col>
-        <v-col class="ma-0 pa-0" md="5">
+        <v-subheader> y:</v-subheader>
+        <v-col class="ma-0 pa-0" md="4.5">
           <v-text-field
             class="ma-0 pa-0"
             step="0.001"
@@ -43,25 +41,23 @@
             @blur="blur"
             @change="blur"
             hide-details
-          >
-            <template v-slot:prepend class="ma-0 pa-0">
-              <v-checkbox
-                v-model="prop.exposed"
-                @change="updateExposed"
-                class="ma-0 pa-0"
-                type="number"
-                hide-details
-              />
-              y:
-            </template>
-          </v-text-field>
+          />
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col class="ma-0 pa-0 width=10%" md="2">
           Scale
         </v-col>
-        <v-col class="ma-0 pa-0" md="5">
+        <v-checkbox
+          v-model="prop.exposed"
+          @change="updateExposed"
+          class="ma-0 pa-0"
+          type="number"
+          hide-details
+          disabled
+        />
+        <v-subheader> x:</v-subheader>
+        <v-col class="ma-0 pa-0" md="4.5">
           <v-text-field
             class="text-aligned-right ma-0 pa-0"
             step="0.001"
@@ -71,20 +67,10 @@
             @blur="blur"
             @change="blur"
             hide-details
-          >
-            <template v-slot:prepend class="ma-0 pa-0">
-              <v-checkbox
-                v-model="prop.exposed"
-                @change="updateExposed"
-                class="ma-0 pa-0"
-                type="number"
-                hide-details
-              />
-              x:
-            </template>
-          </v-text-field>
+          />
         </v-col>
-        <v-col class="ma-0 pa-0" md="5">
+        <v-subheader> y:</v-subheader>
+        <v-col class="ma-0 pa-0" md="4.5">
           <v-text-field
             class="text-aligned-right ma-0 pa-0"
             step="0.001"
@@ -94,25 +80,23 @@
             @blur="blur"
             @change="blur"
             hide-details
-          >
-            <template v-slot:prepend class="ma-0 pa-0">
-              <v-checkbox
-                v-model="prop.exposed"
-                @change="updateExposed"
-                class="ma-0 pa-0"
-                type="number"
-                hide-details
-              />
-              y:
-            </template>
-          </v-text-field>
+          />
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col class="ma-0 pa-0 width=10%" md="2">
           Rot
         </v-col>
-        <v-col class="ma-0 pa-0" md="5">
+        <v-checkbox
+          v-model="prop.exposed"
+          @change="updateExposed"
+          class="ma-0 pa-0"
+          type="number"
+          hide-details
+          disabled
+        />
+        <v-subheader>deg:</v-subheader>
+        <v-col class="ma-0 pa-0" md="5.5">
           <v-text-field
             class="text-aligned-right ma-0 pa-0"
             step="0.1"
@@ -122,19 +106,9 @@
             @blur="blur"
             @change="blur"
             hide-details
-          >
-            <template v-slot:prepend class="ma-0 pa-0">
-              <v-checkbox
-                v-model="prop.exposed"
-                @change="updateExposed"
-                class="ma-0 pa-0"
-                type="number"
-                hide-details
-              />
-            </template>
-          </v-text-field>
+          />
         </v-col>
-        <v-col class="ma-0 pa-0 width=10%" md="5"> </v-col>
+        <v-col class="ma-0 pa-0 width=10%" md="3.5"> </v-col>
       </v-row>
     </v-container>
   </v-container>

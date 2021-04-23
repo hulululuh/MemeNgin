@@ -461,11 +461,6 @@ export class GradientProperty extends Property {
 
 export class Transform2DProperty extends Property {
   value: Transform2D;
-  // positionX: number;
-  // positionY: number;
-  // scaleX: number;
-  // scaleY: number;
-  // rotation: number;
 
   constructor(name: string, displayName: string, value: Transform2D) {
     super();

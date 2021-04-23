@@ -1,7 +1,7 @@
 <template>
   <v-container class="field ma-0 pa-0">
     <v-subheader class="ma-0 pa-0">
-      {{ prop.displayName }}
+      <label>{{ prop.displayName }}</label>
     </v-subheader>
     <v-input class="ma-0 pa-0" hide-details>
       <template v-slot:prepend>
