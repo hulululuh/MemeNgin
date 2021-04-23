@@ -12,7 +12,8 @@
         type="number"
         hide-details
       />
-      <v-col class="ma-0 pa-0" md="5">
+      <v-subheader> x:</v-subheader>
+      <v-col class="ma-0 pa-0" md="4.5">
         <v-text-field
           class=" ma-0 pa-0"
           step="0.001"
@@ -23,13 +24,10 @@
           @change="blur"
           @focus="focus"
           hide-details
-        >
-          <template v-slot:prepend class="ma-0 pa-0">
-            x:
-          </template>
-        </v-text-field>
+        />
       </v-col>
-      <v-col class="ma-0 pa-0" md="5">
+      <v-subheader> y:</v-subheader>
+      <v-col class="ma-0 pa-0" md="4.5">
         <v-text-field
           class="ma-0 pa-0"
           step="0.001"
@@ -39,11 +37,7 @@
           @blur="blur"
           @change="blur"
           hide-details
-        >
-          <template v-slot:prepend class="ma-0 pa-0">
-            y:
-          </template>
-        </v-text-field>
+        />
       </v-col>
     </v-input>
   </v-container>
