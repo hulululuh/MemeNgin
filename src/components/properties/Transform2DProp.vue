@@ -9,12 +9,11 @@
           Pos
         </v-col>
         <v-checkbox
-          v-model="prop.exposed"
+          v-model="prop.positionExposed"
           @change="updateExposed"
           class="ma-0 pa-0"
           type="number"
           hide-details
-          disabled
         />
         <v-subheader> x:</v-subheader>
         <v-col class="ma-0 pa-0" md="4.5">
@@ -49,12 +48,11 @@
           Scale
         </v-col>
         <v-checkbox
-          v-model="prop.exposed"
+          v-model="prop.scaleExposed"
           @change="updateExposed"
           class="ma-0 pa-0"
           type="number"
           hide-details
-          disabled
         />
         <v-subheader> x:</v-subheader>
         <v-col class="ma-0 pa-0" md="4.5">
@@ -88,14 +86,12 @@
           Rot
         </v-col>
         <v-checkbox
-          v-model="prop.exposed"
+          v-model="prop.rotationExposed"
           @change="updateExposed"
           class="ma-0 pa-0"
           type="number"
           hide-details
-          disabled
         />
-        <v-subheader>deg:</v-subheader>
         <v-col class="ma-0 pa-0" md="5.5">
           <v-text-field
             class="text-aligned-right ma-0 pa-0"
@@ -121,7 +117,11 @@
 <script lang="ts">
   import { Vue, Prop, Component, Emit } from "vue-property-decorator";
   import { Designer } from "@/lib/designer";
-  import { IPropertyHolder } from "../../lib/designer/properties";
+  import {
+    IPropertyHolder,
+    Transform2DProperty,
+    TransformComponent,
+  } from "@/lib/designer/properties";
   import { PropertyChangeComplete } from "./ipropertyui";
   import { UndoStack } from "@/lib/undostack";
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
@@ -169,7 +169,7 @@
 
     @Prop()
     // FloatProperty
-    prop: any;
+    prop: Transform2DProperty;
 
     @Prop()
     designer: Designer;
@@ -221,7 +221,7 @@
     updateExposed(value) {
       this.propHolder.setProperty(this.prop.name, {
         value: this.prop.getValue(),
-        exposed: value,
+        exposed: this.prop.getExposed(),
       });
       this.propertyExposeChanged();
     }

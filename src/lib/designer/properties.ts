@@ -26,12 +26,8 @@ export class Property {
   name: string;
   displayName: string;
   type: string;
-  exposed: boolean;
+  exposed: any;
   parentValue: any;
-
-  constructor() {
-    this.exposed = false;
-  }
 
   getParentValue(): any {
     return this.parentValue;
@@ -52,7 +48,7 @@ export class Property {
     return this.exposed;
   }
 
-  setExposed(val: boolean) {
+  setExposed(val: any) {
     this.exposed = val;
   }
 }
@@ -82,6 +78,7 @@ export class FloatProperty extends Property {
     this.parentValue = value;
     this.step = step;
     this.type = PropertyType.Float;
+    this.exposed = false;
   }
 
   getValue(): any {
@@ -132,6 +129,7 @@ export class IntProperty extends Property {
     this.parentValue = value;
     this.step = step;
     this.type = PropertyType.Int;
+    this.exposed = false;
   }
 
   getValue(): any {
@@ -173,6 +171,7 @@ export class BoolProperty extends Property {
     this.value = value;
     this.parentValue = value;
     this.type = PropertyType.Bool;
+    this.exposed = false;
   }
 
   getValue(): any {
@@ -216,6 +215,7 @@ export class AssetProperty extends Property {
     this.parentValue = this.index;
     this.type = PropertyType.Asset;
     this.assetType = assetType;
+    this.exposed = false;
   }
 
   getValues(): string[] {
@@ -266,6 +266,7 @@ export class EnumProperty extends Property {
     this.value = this.values[this.index];
     this.parentValue = this.index;
     this.type = PropertyType.Enum;
+    this.exposed = false;
   }
 
   getValues(): string[] {
@@ -313,6 +314,7 @@ export class ColorProperty extends Property {
     this.value = value;
     this.parentValue = value;
     this.type = PropertyType.Color;
+    this.exposed = false;
   }
 
   getValue(): any {
@@ -363,6 +365,7 @@ export class StringProperty extends Property {
     this.parentValue = value;
     this.type = PropertyType.String;
     this.isMultiline = isMultiline;
+    this.exposed = false;
   }
 
   getValue(): any {
@@ -401,6 +404,7 @@ export class FileProperty extends Property {
     this.parentValue = value;
     this.extensions = extensions;
     this.type = PropertyType.File;
+    this.exposed = false;
   }
 
   getValue(): any {
@@ -432,6 +436,7 @@ export class GradientProperty extends Property {
     this.value = value;
     this.parentValue = value;
     this.type = PropertyType.Gradient;
+    this.exposed = false;
   }
 
   getValue(): any {
@@ -459,8 +464,22 @@ export class GradientProperty extends Property {
   }
 }
 
+export enum TransformComponent {
+  None = 0,
+  Position = 1,
+  Scale = 1 << 1,
+  Rotation = 1 << 2,
+  ALL = Position | Scale | Rotation,
+}
 export class Transform2DProperty extends Property {
   value: Transform2D;
+  pExposed: boolean;
+  sExposed: boolean;
+  rExposed: boolean;
+
+  // pos: Vector2Property;
+  // scale: Vector2Property;
+  // rotation: FloatProperty;
 
   constructor(name: string, displayName: string, value: Transform2D) {
     super();
@@ -469,6 +488,50 @@ export class Transform2DProperty extends Property {
     this.value = value;
     this.parentValue = value;
     this.type = PropertyType.Transform2D;
+    this.exposed = TransformComponent.None;
+  }
+
+  get positionExposed() {
+    return this.pExposed;
+  }
+
+  get scaleExposed() {
+    return this.sExposed;
+  }
+
+  get rotationExposed() {
+    return this.rExposed;
+  }
+
+  set positionExposed(value) {
+    this.pExposed = value;
+  }
+
+  set scaleExposed(value) {
+    this.sExposed = value;
+  }
+
+  set rotationExposed(value) {
+    this.rExposed = value;
+  }
+
+  getExposed() {
+    this.updateExposed();
+    return this.exposed;
+  }
+
+  setExposed(val: any) {
+    this.exposed = val;
+    this.pExposed = (this.exposed & TransformComponent.Position) != 0;
+    this.sExposed = (this.exposed & TransformComponent.Scale) != 0;
+    this.rExposed = (this.exposed & TransformComponent.Rotation) != 0;
+  }
+
+  private updateExposed() {
+    this.exposed =
+      (this.pExposed ? TransformComponent.Position : 0) |
+      (this.sExposed ? TransformComponent.Scale : 0) |
+      (this.rExposed ? TransformComponent.Rotation : 0);
   }
 
   getValue(): any {
@@ -506,6 +569,7 @@ export class Vector2Property extends Property {
     this.value = new Vector2(value);
     this.parentValue = new Vector2(value);
     this.type = PropertyType.Vector2;
+    this.exposed = false;
   }
 
   getValue(): any {
