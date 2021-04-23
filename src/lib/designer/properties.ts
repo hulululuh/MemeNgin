@@ -477,10 +477,6 @@ export class Transform2DProperty extends Property {
   sExposed: boolean;
   rExposed: boolean;
 
-  // pos: Vector2Property;
-  // scale: Vector2Property;
-  // rotation: FloatProperty;
-
   constructor(name: string, displayName: string, value: Transform2D) {
     super();
     this.name = name;

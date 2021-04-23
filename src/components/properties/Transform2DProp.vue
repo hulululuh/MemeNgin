@@ -14,6 +14,7 @@
           class="ma-0 pa-0"
           type="number"
           hide-details
+          disabled
         />
         <v-subheader> x:</v-subheader>
         <v-col class="ma-0 pa-0" md="4.5">
@@ -53,6 +54,7 @@
           class="ma-0 pa-0"
           type="number"
           hide-details
+          disabled
         />
         <v-subheader> x:</v-subheader>
         <v-col class="ma-0 pa-0" md="4.5">
@@ -91,6 +93,7 @@
           class="ma-0 pa-0"
           type="number"
           hide-details
+          disabled
         />
         <v-col class="ma-0 pa-0" md="5.5">
           <v-text-field
