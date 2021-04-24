@@ -16,7 +16,7 @@ import {
   AssetProperty,
   Vector2Property,
 } from "@/lib/designer/properties";
-import { Asset, AssetType } from "@/assets/assetmanager";
+import { AssetType } from "@/assets/assetmanager";
 import { Color } from "@/lib/designer/color";
 import { Gradient } from "@/lib/designer/gradient";
 import { WidgetEvent } from "@/lib/scene/graphicsitem";
@@ -167,7 +167,21 @@ export class DesignerNode implements IPropertyHolder {
   }
 
   getExposedProperties(): Array<Property> {
-    return this.properties.filter((x) => x.getExposed());
+    let exposed = [];
+    for (let prop of this.properties) {
+      // have child properties - check inside
+      if (prop.hasChildren) {
+        // assume that property can only have second depth
+        for (let child of prop.children) {
+          if (child instanceof Property && child.exposed) {
+            exposed.push(child);
+          }
+        }
+      } else {
+        if (prop.exposed) exposed.push(prop);
+      }
+    }
+    return exposed;
   }
 
   getProperty(name: string): any {
@@ -184,6 +198,22 @@ export class DesignerNode implements IPropertyHolder {
     let prop = this.properties.find((x) => {
       return x.name == name;
     });
+
+    // search for child prop
+    if (!prop) {
+      let parents = [];
+      for (let p of this.properties) {
+        if (p.children.length > 0) parents.push(p);
+      }
+
+      for (let parent of parents) {
+        prop = parent.children.find((item) => item.name == name);
+
+        if (prop) break;
+      }
+    }
+
+    // set prop
     if (prop) {
       if (prop instanceof EnumProperty) {
         let index = prop.values.indexOf(value["value"]);
@@ -198,6 +228,8 @@ export class DesignerNode implements IPropertyHolder {
 
       prop.setExposed(value["exposed"]);
       this.requestUpdate();
+    } else {
+      console.error("can not find property");
     }
   }
 
@@ -350,9 +382,11 @@ export class DesignerNode implements IPropertyHolder {
   addTransform2DProperty(
     id: string,
     displayName: string,
-    defaultVal: Transform2D
+    defaultVal: Transform2D,
+    ownerId: string
   ): Transform2DProperty {
     let prop = new Transform2DProperty(id, displayName, defaultVal);
+    prop.ownerId = ownerId;
 
     this.properties.push(prop);
     return prop;

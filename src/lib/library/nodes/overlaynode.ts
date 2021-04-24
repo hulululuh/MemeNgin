@@ -139,7 +139,8 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
     this.addTransform2DProperty(
       "transform2d",
       "Transform",
-      Transform2D.IDENTITY
+      Transform2D.IDENTITY,
+      this.id
     );
 
     this.addFloatProperty("opacity", "Opacity", 1.0, 0.0, 1.0, 0.01);

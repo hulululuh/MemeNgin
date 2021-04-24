@@ -176,7 +176,8 @@ export class OverlayQuadNode extends ImageDesignerNode
     this.addTransform2DProperty(
       "transform2d",
       "Transform",
-      Transform2D.IDENTITY
+      Transform2D.IDENTITY,
+      this.id
     );
 
     this.propTL = this.addVector2Property(

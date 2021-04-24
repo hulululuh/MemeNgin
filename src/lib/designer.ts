@@ -866,9 +866,17 @@ export class Designer {
 
       let props = {};
       for (let prop of node.properties) {
-        props[prop.name] = {};
-        props[prop.name]["value"] = prop.getValue();
-        props[prop.name]["exposed"] = prop.getExposed();
+        if (prop.hasChildren) {
+          for (let childProp of prop.children) {
+            props[childProp.name] = {};
+            props[childProp.name]["value"] = childProp.getValue();
+            props[childProp.name]["exposed"] = childProp.getExposed();
+          }
+        } else {
+          props[prop.name] = {};
+          props[prop.name]["value"] = prop.getValue();
+          props[prop.name]["exposed"] = prop.getExposed();
+        }
       }
       n["properties"] = props;
 

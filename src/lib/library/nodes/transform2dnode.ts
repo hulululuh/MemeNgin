@@ -195,7 +195,8 @@ export class Transform2DNode extends ImageDesignerNode
     this.addTransform2DProperty(
       "transform2d",
       "Transform",
-      Transform2D.IDENTITY
+      Transform2D.IDENTITY,
+      this.id
     );
 
     let source = `

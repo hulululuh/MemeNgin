@@ -10,11 +10,10 @@
         </v-col>
         <v-checkbox
           v-model="prop.positionExposed"
-          @change="updateExposed"
+          @change="updateExposedPos"
           class="ma-0 pa-0"
           type="number"
           hide-details
-          disabled
         />
         <v-subheader> x:</v-subheader>
         <v-col class="ma-0 pa-0" md="4.5">
@@ -50,11 +49,10 @@
         </v-col>
         <v-checkbox
           v-model="prop.scaleExposed"
-          @change="updateExposed"
+          @change="updateExposedScale"
           class="ma-0 pa-0"
           type="number"
           hide-details
-          disabled
         />
         <v-subheader> x:</v-subheader>
         <v-col class="ma-0 pa-0" md="4.5">
@@ -89,11 +87,10 @@
         </v-col>
         <v-checkbox
           v-model="prop.rotationExposed"
-          @change="updateExposed"
+          @change="updateExposedRot"
           class="ma-0 pa-0"
           type="number"
           hide-details
-          disabled
         />
         <v-col class="ma-0 pa-0" md="5.5">
           <v-text-field
@@ -123,7 +120,6 @@
   import {
     IPropertyHolder,
     Transform2DProperty,
-    TransformComponent,
   } from "@/lib/designer/properties";
   import { PropertyChangeComplete } from "./ipropertyui";
   import { UndoStack } from "@/lib/undostack";
@@ -138,27 +134,6 @@
     ScaleY,
     Rotation,
     None,
-  }
-
-  function getUpdatedTransform(
-    xf: Transform2D,
-    val: number,
-    comp: Transform2DComponent
-  ) {
-    let res = xf.clone();
-    if (comp === Transform2DComponent.PositionX) {
-      res.position = new Vector2(val, xf.position[1]);
-    } else if (comp === Transform2DComponent.PositionY) {
-      res.position = new Vector2(xf.position[0], val);
-    } else if (comp === Transform2DComponent.ScaleX) {
-      res.scale = new Vector2(val, xf.scale[1]);
-    } else if (comp === Transform2DComponent.ScaleY) {
-      res.scale = new Vector2(xf.scale[0], val);
-    } else if (comp === Transform2DComponent.Rotation) {
-      res.rotation = val;
-    }
-
-    return res;
   }
 
   @Component
@@ -221,12 +196,31 @@
       return this.prop.name;
     }
 
-    updateExposed(value) {
-      this.propHolder.setProperty(this.prop.name, {
-        value: this.prop.getValue(),
-        exposed: this.prop.getExposed(),
+    updateExposedPos(value) {
+      let prop = this.prop.pProp;
+      this.propHolder.setProperty(prop.name, {
+        value: prop.getValue(),
+        exposed: value,
       });
-      this.propertyExposeChanged();
+      this.$emit("propertyExposeChanged", prop);
+    }
+
+    updateExposedScale(value) {
+      let prop = this.prop.sProp;
+      this.propHolder.setProperty(prop.name, {
+        value: prop.getValue(),
+        exposed: value,
+      });
+      this.$emit("propertyExposeChanged", prop);
+    }
+
+    updateExposedRot(value) {
+      let prop = this.prop.rProp;
+      this.propHolder.setProperty(prop.name, {
+        value: prop.getValue(),
+        exposed: value,
+      });
+      this.$emit("propertyExposeChanged", prop);
     }
 
     onInputPosX(value) {
