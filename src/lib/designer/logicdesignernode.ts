@@ -8,8 +8,11 @@ export enum LogicType {
 
 export class LogicDesignerNode extends DesignerNode {
   logicType: LogicType;
+  isCalculated: boolean;
+
   constructor() {
     super();
+    this.isCalculated = false;
 
     this.onnodepropertychanged = function(prop: Property) {
       if (prop.name === "value") {
@@ -22,11 +25,16 @@ export class LogicDesignerNode extends DesignerNode {
     this.init();
   }
 
+  calculated() {
+    return 0;
+  }
+
   getPropertyValue(): any {
     let inputNode = this.designer.findLeftNode(
       this.id,
       this.properties[0].name
     );
+
     if (inputNode && inputNode instanceof LogicDesignerNode) {
       return this.properties[0].getParentValue();
     } else {

@@ -28,6 +28,7 @@ import { AssetType } from "@/assets/assetmanager";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
 import { OutputNode } from "./library/nodes/outputnode";
 import { WidgetEvent } from "./scene/graphicsitem";
+import { MapFloatNode } from "./library/nodes/mapfloatnode";
 
 const HALF = 0.5;
 
@@ -435,9 +436,11 @@ export class Designer {
     let graphNode = Editor.getScene().getNodeById(dNode.id);
     if (!graphNode) return; // node could have been deleted
 
+    let propValue;
     let node = dNode as LogicDesignerNode;
     let prop = node.properties[0];
     let inputNode = this.findLeftNode(node.id, "value");
+
     // update parentNode if exists
     if (inputNode && inputNode.needsUpdate) {
       this.generateDataFromNode(inputNode);
@@ -445,16 +448,17 @@ export class Designer {
       this.updateList.splice(this.updateList.indexOf(inputNode), 1);
     }
 
-    let propValue;
     if (prop.exposed && inputNode instanceof LogicDesignerNode) {
       prop.parentValue = (inputNode as LogicDesignerNode).getPropertyValue();
+      // for calculated logic nodes
+      if (node.isCalculated) prop.parentValue = node.calculated();
       propValue = prop.getParentValue();
     } else {
       propValue = prop.getValue();
     }
 
     // format property value for display
-    if (dNode instanceof FloatPropertyNode) {
+    if (dNode instanceof FloatPropertyNode || dNode instanceof MapFloatNode) {
       if (typeof propValue === "string") {
         propValue = parseFloat(propValue);
       }
@@ -866,16 +870,18 @@ export class Designer {
 
       let props = {};
       for (let prop of node.properties) {
+        // itself
+        props[prop.name] = {};
+        props[prop.name]["value"] = prop.getValue();
+        props[prop.name]["exposed"] = prop.getExposed();
+
+        // load child property
         if (prop.hasChildren) {
           for (let childProp of prop.children) {
             props[childProp.name] = {};
             props[childProp.name]["value"] = childProp.getValue();
             props[childProp.name]["exposed"] = childProp.getExposed();
           }
-        } else {
-          props[prop.name] = {};
-          props[prop.name]["value"] = prop.getValue();
-          props[prop.name]["exposed"] = prop.getExposed();
         }
       }
       n["properties"] = props;

@@ -53,6 +53,7 @@ import { MosaicNode } from "./nodes/mosaicnode";
 import { WarpNode } from "./nodes/warpnode";
 import { WaveNode } from "./nodes/wavenode";
 import { UvSwapNode } from "./nodes/uvswapnode";
+import { MapFloatNode } from "./nodes/mapfloatnode";
 
 export const libraryMajorVersion = 0;
 export const libraryMinorVersion = 1;
@@ -228,6 +229,7 @@ export function createLibrary() {
   lib.addNode("output", "Output", OutputNode, NodeCategory.Logic);
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Logic);
   lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Logic);
+  lib.addNode("mapfloat", "MapFloat", MapFloatNode, NodeCategory.Logic);
 
   return lib;
 }
