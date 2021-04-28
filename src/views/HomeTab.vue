@@ -2,6 +2,7 @@
   <v-container fluid class="pa-0 ma-0" style="overflow-y: scroll !important;">
     <item-list categoryName="Recent" :lists="this.recentList" />
     <item-list categoryName="Tutorials" :lists="this.tutorialsList" />
+    <item-list categoryName="Applications" :lists="this.applicationsList" />
   </v-container>
 </template>
 
@@ -30,6 +31,16 @@
 
     get tutorialsList() {
       const assetRoot = "assets/mmngs/tutorials/";
+      const assetPath = path.join(__static, assetRoot);
+
+      let assetFiles = [];
+      getAllFiles(assetPath, assetFiles, "*.mmng");
+
+      return assetFiles;
+    }
+
+    get applicationsList() {
+      const assetRoot = "assets/mmngs/applications/";
       const assetPath = path.join(__static, assetRoot);
 
       let assetFiles = [];
