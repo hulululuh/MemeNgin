@@ -57,7 +57,8 @@
     "vue-property-decorator": "6.0.0",
     "vue-router": "^3.0.3",
     "vuetify": "^2.4.0",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",

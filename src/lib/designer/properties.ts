@@ -1,9 +1,9 @@
-import { Transform2D } from "../math/transform2d";
+import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2 } from "math.gl";
-import { Color } from "./color";
-import { Gradient } from "./gradient";
+import { Color } from "@/lib/designer/color";
+import { Gradient } from "@/lib/designer/gradient";
 import { AssetType } from "@/assets/assetmanager";
-import { Editor } from "../editor";
+import { Editor } from "@/lib/editor";
 
 // for use in code after build
 export enum PropertyType {

@@ -25,9 +25,9 @@ import { StringPropertyNode } from "./library/nodes/stringpropertynode";
 import { TextNode } from "./library/nodes/textnode";
 import { Guid } from "./utils";
 import { AssetType } from "@/assets/assetmanager";
+import { TextManager } from "@/assets/textmanager";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
 import { OutputNode } from "./library/nodes/outputnode";
-import { WidgetEvent } from "./scene/graphicsitem";
 import { MapFloatNode } from "./library/nodes/mapfloatnode";
 
 const HALF = 0.5;
@@ -462,8 +462,9 @@ export class Designer {
       if (typeof propValue === "string") {
         propValue = parseFloat(propValue);
       }
-      propValue = propValue.toFixed(2);
+      propValue = propValue.toFixed(3);
     } else if (dNode instanceof StringPropertyNode) {
+      propValue = TextManager.translate(propValue);
       // in case prop is empty string
       if (typeof propValue === "string" && propValue.length === 0) {
         propValue = "${string}";

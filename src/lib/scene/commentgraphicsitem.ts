@@ -1,4 +1,3 @@
-import { SocketGraphicsItem } from "./socketgraphicsitem";
 import {
   GraphicsItem,
   MouseDownEvent,
@@ -16,12 +15,14 @@ import {
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 import { ApplicationSettings } from "@/settings";
+import { TextManager } from "@/assets/textmanager";
 const settings = ApplicationSettings.getInstance();
 
 // https://stackoverflow.com/questions/5026961/html5-canvas-ctx-filltext-wont-do-line-breaks
 export class CommentGraphicsItem extends GraphicsItem
   implements IPropertyHolder {
   text: string;
+  formatted: string;
   textProp: StringProperty;
   view: SceneView;
   color: Color;
@@ -47,7 +48,7 @@ export class CommentGraphicsItem extends GraphicsItem
     this.dragged = false;
 
     this.padding = 5;
-    this.fontHeight = 20;
+    this.fontHeight = 15;
 
     this.textProp = new StringProperty("comment", "Comment", "Comment.", true);
     this.properties.push(this.textProp);
@@ -72,6 +73,9 @@ export class CommentGraphicsItem extends GraphicsItem
 
   setText(text: string) {
     this.text = text;
+    let translated = TextManager.translate(this.text);
+    this.formatted = translated.replace(/(.{60})/g, "$1\n");
+
     this.textProp.setValue(text);
     let fontHeight = this.fontHeight;
 
@@ -79,10 +83,9 @@ export class CommentGraphicsItem extends GraphicsItem
 
     ctx.lineWidth = 1;
     ctx.font = fontHeight + "px 'Open Sans'";
-    let size = ctx.measureText(this.text);
 
     let maxWidth = 0;
-    let lines = this.text.split("\n");
+    let lines = this.formatted.split("\n");
     // console.log(lines);
     // console.log(ctx);
     // console.log(ctx.font);
@@ -122,7 +125,7 @@ export class CommentGraphicsItem extends GraphicsItem
     // recalc rect
     let maxWidth = 0;
     //console.log(this.text);
-    let lines = this.text.split("\n");
+    let lines = this.formatted.split("\n");
     for (let i = 0; i < lines.length; ++i) {
       let size = ctx.measureText(lines[i]);
       maxWidth = Math.max(maxWidth, size.width);

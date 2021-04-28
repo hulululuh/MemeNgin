@@ -25,9 +25,7 @@ export class LogicDesignerNode extends DesignerNode {
     this.init();
   }
 
-  calculated() {
-    return 0;
-  }
+  calculated(): any {}
 
   getPropertyValue(): any {
     let inputNode = this.designer.findLeftNode(
