@@ -143,7 +143,7 @@ export class TextManager {
   }
 
   constructor() {
-    this.setLanguage("kor");
+    this.setLanguage("en");
   }
 
   setLanguage(languageId: string) {
