@@ -28,5 +28,20 @@ export class UserData {
 
   static parse(path: string) {
     UserData._instance = JSON.parse(fs.readFileSync(path).toString());
+
+    // validate data and remove invalid path
+    let invalids = [];
+    let recentFiles = UserData._instance.recentFiles;
+    recentFiles.forEach((v, i) => {
+      if (!fs.existsSync(v)) invalids.push(i);
+    });
+
+    for (let i of invalids.reverse()) {
+      recentFiles.splice(i, 1);
+    }
+
+    console.log(
+      `found ${invalids.length} invalid path, removed from recentFiles`
+    );
   }
 }
