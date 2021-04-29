@@ -64,7 +64,7 @@
 
         self.dragZoom.setImage(image);
 
-        if (node instanceof ImageDesignerNode) {
+        if (node instanceof ImageDesignerNode && this.$refs.canvas) {
           const margin = 0.1;
           const ratioW =
             ((1.0 - margin) * this.$refs.canvas.width) / node.getWidth();
@@ -86,6 +86,7 @@
       this.dragZoom.onResize(width, height);
     }
     resizeImage(width, height) {
+      if (!this.$refs.canvas) return;
       fitCanvasToContainer(this.$refs.canvas);
 
       const margin = 0.1;

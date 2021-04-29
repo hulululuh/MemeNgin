@@ -2,9 +2,8 @@
   <v-app>
     <v-system-bar app window clipped class="pl-0 pr-0 app-system-bar">
       <startup-menu ref="startupMenu" />
-
       <v-spacer />
-      <div>{{ title }}</div>
+      {{ this.title }}
       <v-spacer />
       <v-btn class="system-bar-button" @click="minimizeWindow">
         <v-icon>mdi-minus</v-icon>
@@ -22,8 +21,11 @@
       <v-btn color="gray" @click="newProject">
         <v-icon>mdi-note-plus-outline</v-icon>
       </v-btn>
-      <v-btn color="gray" @click="saveProject">
+      <v-btn color="gray" @click="saveProject" :disabled="!saveable">
         <v-icon>mdi-content-save-outline</v-icon>
+      </v-btn>
+      <v-btn color="gray" @click="saveProjectAs">
+        <v-icon>mdi-content-save-edit-outline</v-icon>
       </v-btn>
       <v-btn color="gray" @click="openProject">
         <v-icon>mdi-folder-open-outline</v-icon>
@@ -96,6 +98,26 @@
     </v-navigation-drawer>
 
     <v-main>
+      <v-dialog v-model="dialog" persistent max-width="290">
+        <v-card>
+          <v-card-title class="headline">
+            MemeNgin
+          </v-card-title>
+          <v-card-text>Do you want to save changes?</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="saveAndClose">
+              Save
+            </v-btn>
+            <v-btn text @click="closeAnyway">
+              Don't Save
+            </v-btn>
+            <v-btn text @click="dialog = false">
+              Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-container
         fluid
         flex
@@ -186,19 +208,29 @@
 
     version: string = "0.1.0";
 
-    title: string = "";
+    titleName: string = "";
+    edited: boolean = false;
+    dialog: boolean = false;
 
     constructor() {
       super();
 
       this.editor = new Editor();
       this.library = null;
-
       this.project = new Project();
 
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       this.isMaximized = WIN.isMaximized();
+    }
+
+    get title() {
+      return this.edited ? `${this.titleName} *` : this.titleName;
+    }
+
+    get isEdited() {
+      if (UndoStack.current) return UndoStack.current.pointer > -1;
+      else return false;
     }
 
     created() {
@@ -216,7 +248,7 @@
         this.saveProject();
       });
       electron.ipcRenderer.on(MenuCommands.FileSaveAs, (evt, arg) => {
-        this.saveProject(true);
+        this.saveProjectAs();
       });
 
       electron.ipcRenderer.on(MenuCommands.EditUndo, async (evt, arg) => {
@@ -249,6 +281,22 @@
 
     destroyed() {
       window.removeEventListener("resize", this.windowResize);
+      document.removeEventListener("editStarted", this.onEditStarted);
+      document.removeEventListener("editEnded", this.onEditEnded);
+    }
+
+    onEditStarted() {
+      this.edited = true;
+      this.refreshTitle();
+    }
+
+    onEditEnded() {
+      this.edited = false;
+      this.refreshTitle();
+    }
+
+    refreshTitle() {
+      if (remote) remote.getCurrentWindow().setTitle(this.title);
     }
 
     windowResize() {
@@ -273,6 +321,8 @@
       this.setupMenu();
 
       window.addEventListener("resize", this.windowResize);
+      document.addEventListener("editStarted", this.onEditStarted);
+      document.addEventListener("editEnded", this.onEditEnded);
 
       document.addEventListener("mousemove", (evt) => {
         this.mouseX = evt.pageX;
@@ -448,7 +498,7 @@
 
     itemCreated(item: any) {
       // editor
-      if (item.config.title == "Editor") {
+      if (item.config.titleName == "Editor") {
         let container = item.container;
         item.container.on("resize", function() {
           const canvas = document.getElementById("editor") as HTMLCanvasElement;
@@ -458,7 +508,7 @@
       }
 
       // 2d view
-      if (item.config.title == "2D View") {
+      if (item.config.titleName == "2D View") {
         let container = item.container;
         item.container.on("resize", () => {
           // const canvas = <HTMLCanvasElement>document.getElementById("_2dview");
@@ -473,7 +523,7 @@
       }
 
       // // 3d view
-      // if (item.config.title == "3D View") {
+      // if (item.config.titleName == "3D View") {
       //   let container = item.container;
       //   item.container.on("resize", () => {
       //     // const canvas = <HTMLCanvasElement>document.getElementById("_3dview");
@@ -508,51 +558,99 @@
       this.resolution = 1024;
       this.randomSeed = 32;
 
-      this.title = "new project";
+      this.titleName = "new project";
 
-      // todo: set title
+      // todo: set titleName
     }
 
-    saveProject(saveAs: boolean = false) {
-      // if project has no name then it hasnt been saved yet
-      if (this.project.path == null || saveAs) {
-        dialog
-          .showSaveDialog({
-            filters: [
-              {
-                name: "MemeNgin Project",
-                extensions: ["mmng"],
-              },
-            ],
-            defaultPath: "material.mmng",
-          })
-          .then((result) => {
-            let path = result.filePath;
-            if (!path) return;
-            let data = this.editor.save();
-            console.log(data);
-            this.project.data = data;
-            this.project.data["appVersion"] = this.version;
+    get saveable() {
+      return this.edited || this.project.path == null;
+    }
 
-            //console.log(path);
-            if (!path.endsWith(".mmng")) path += ".mmng";
+    saveAndClose() {
+      this.dialog = false;
+      if (!this.saveable) return;
 
-            this.project.name = path.replace(/^.*[\\\/]/, "");
-            this.project.path = path;
+      const remote = window.require ? window.require("electron").remote : null;
+      const WIN = remote.getCurrentWindow();
 
-            ProjectManager.save(path, this.project);
-            remote.getCurrentWindow().setTitle(this.project.name);
-            this.title = this.project.name;
-          })
-          .catch((...args) => {
-            console.warn("failed/rejected with", args);
-          });
+      // trying to save new project
+      if (!this.project.path) {
+        this.saveProjectAs().then(() => {
+          WIN.close();
+        });
       } else {
         let data = this.editor.save();
         console.log(data);
         this.project.data = data;
         this.project.data["appVersion"] = this.version;
         ProjectManager.save(this.project.path, this.project);
+        UndoStack.current.reset();
+        this.edited = false;
+        WIN.close();
+      }
+    }
+
+    closeAnyway() {
+      this.dialog = false;
+      const remote = window.require ? window.require("electron").remote : null;
+      const WIN = remote.getCurrentWindow();
+      WIN.close();
+    }
+
+    saveProject() {
+      if (!this.saveable) return;
+
+      // trying to save new project
+      if (!this.project.path) {
+        this.saveProjectAs();
+      } else {
+        let data = this.editor.save();
+        console.log(data);
+        this.project.data = data;
+        this.project.data["appVersion"] = this.version;
+        ProjectManager.save(this.project.path, this.project);
+        UndoStack.current.reset();
+        this.edited = false;
+      }
+    }
+
+    async saveProjectAs() {
+      // if project has no name then it hasnt been saved yet
+
+      try {
+        let result = await dialog.showSaveDialog({
+          filters: [
+            {
+              name: "MemeNgin Project",
+              extensions: ["mmng"],
+            },
+          ],
+          defaultPath: "material.mmng",
+        });
+
+        let path = result.filePath;
+        if (!path) return;
+        let data = this.editor.save();
+        console.log(data);
+        this.project.data = data;
+        this.project.data["appVersion"] = this.version;
+
+        //console.log(path);
+        if (!path.endsWith(".mmng")) path += ".mmng";
+
+        this.project.name = path.replace(/^.*[\\\/]/, "");
+        this.project.path = path;
+
+        ProjectManager.save(path, this.project);
+        this.titleName = this.project.name;
+        remote.getCurrentWindow().setTitle(this.title);
+        UndoStack.current.reset();
+        this.edited = false;
+        return true;
+      } catch (err) {
+        console.warn("failed/rejected with", err);
+        return false;
       }
     }
 
@@ -585,14 +683,17 @@
       registerRecent(path, UserData.getInstance());
       console.log(project);
 
-      remote.getCurrentWindow().setTitle(project.name);
-      this.title = project.name;
+      this.titleName = project.name;
+      remote.getCurrentWindow().setTitle(this.title);
       this.editor.load(project.data);
       this.resolution = 1024;
       this.randomSeed = 32;
 
       this.project = project;
       this.library = this.editor.library;
+
+      UndoStack.current.reset();
+      this.edited = false;
     }
 
     zoomSelection() {
@@ -627,8 +728,8 @@
         return;
       }
 
+      this.titleName = project.name;
       remote.getCurrentWindow().setTitle(project.name);
-      this.title = project.name;
       this.editor.load(project.data);
       this.resolution = 1024;
       this.randomSeed = 32;
@@ -673,7 +774,12 @@
 
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
-      WIN.close();
+
+      if (!this.edited) {
+        WIN.close();
+      } else {
+        this.dialog = true;
+      }
     }
 
     minimizeWindow() {

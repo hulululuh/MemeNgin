@@ -34,7 +34,7 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 function createWindow() {
-  //setupMenu();
+  setupMenu();
 
   // Create the browser window.
   win = new BrowserWindow({

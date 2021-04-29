@@ -1,6 +1,7 @@
+export class UndoStackEvent extends CustomEvent<any> {}
+
 export class Action {
   redo() {}
-
   undo() {}
 }
 
@@ -23,6 +24,12 @@ export class UndoStack {
 
     this.stack.push(action);
     console.log(action);
+
+    // editing started
+    if (document && this.pointer == 0) {
+      const event = new UndoStackEvent("editStarted");
+      document.dispatchEvent(event);
+    }
   }
 
   undo() {
@@ -32,6 +39,12 @@ export class UndoStack {
     action.undo();
 
     this.pointer -= 1;
+
+    // editing ended
+    if (document && this.pointer < 0) {
+      const event = new UndoStackEvent("editEnded");
+      document.dispatchEvent(event);
+    }
   }
 
   redo() {
@@ -41,5 +54,10 @@ export class UndoStack {
 
     let action = this.stack[this.pointer];
     action.redo();
+  }
+
+  reset() {
+    this.pointer = -1;
+    this.stack = [];
   }
 }
