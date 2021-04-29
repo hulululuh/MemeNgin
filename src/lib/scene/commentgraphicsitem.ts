@@ -73,8 +73,7 @@ export class CommentGraphicsItem extends GraphicsItem
 
   setText(text: string) {
     this.text = text;
-    let translated = TextManager.translate(this.text);
-    this.formatted = translated.replace(/(.{60})/g, "$1\n");
+    this.formatted = TextManager.translate(this.text);
 
     this.textProp.setValue(text);
     let fontHeight = this.fontHeight;
@@ -95,11 +94,24 @@ export class CommentGraphicsItem extends GraphicsItem
       maxWidth = Math.max(maxWidth, size.width);
     }
 
+    let textX = this.x + this.padding;
+    let textY = this.y + fontHeight;
+
     // somewhat inaccurate here for some reason
     // maybe some bug in html5 canvas
     // recalculate in draw function
-    this.width = maxWidth + this.padding * 2;
-    this.height = lines.length * fontHeight + this.padding * 2;
+
+    this.width = Math.min(maxWidth + this.padding * 2, 800);
+    this.height =
+      this.measureHeight(
+        ctx,
+        this.formatted,
+        textX,
+        textY,
+        this.width,
+        this.fontHeight
+      ) +
+      this.padding * 2;
   }
 
   private buildColor(color: Color, alpha: number) {
@@ -117,6 +129,45 @@ export class CommentGraphicsItem extends GraphicsItem
     return col;
   }
 
+  measureHeight(ctx, text, x, y, maxWidth, lineHeight) {
+    let words = text.split(" ");
+    let line = "";
+    let numLines = 1;
+
+    for (let n = 0; n < words.length; n++) {
+      let testLine = line + words[n] + " ";
+      let metrics = ctx.measureText(testLine);
+      let testWidth = metrics.width;
+      if (testWidth > maxWidth && n > 0) {
+        line = words[n] + " ";
+        y += lineHeight;
+        numLines++;
+      } else {
+        line = testLine;
+      }
+    }
+    return lineHeight * numLines;
+  }
+
+  wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    let words = text.split(" ");
+    let line = "";
+
+    for (let n = 0; n < words.length; n++) {
+      let testLine = line + words[n] + " ";
+      let metrics = ctx.measureText(testLine);
+      let testWidth = metrics.width;
+      if (testWidth > maxWidth && n > 0) {
+        ctx.fillText(line, x, y);
+        line = words[n] + " ";
+        y += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line, x, y);
+  }
+
   draw(ctx: CanvasRenderingContext2D, renderData: any = null) {
     let fontHeight = this.fontHeight;
     ctx.font = fontHeight + "px 'Open Sans'";
@@ -131,13 +182,9 @@ export class CommentGraphicsItem extends GraphicsItem
       maxWidth = Math.max(maxWidth, size.width);
     }
 
-    this.width = maxWidth + this.padding * 2;
-    this.height = lines.length * fontHeight + this.padding * 2;
-
     // --------------------------------------------------------
-
-    let width = this.width;
-    let height = this.height;
+    const width = this.width;
+    const height = this.height;
 
     // stroke bounding rect
     ctx.beginPath();
@@ -164,13 +211,14 @@ export class CommentGraphicsItem extends GraphicsItem
     ctx.textAlign = "left";
     ctx.lineWidth = 1;
 
-    //console.log(ctx.font);
-    for (let i = 0; i < lines.length; ++i) {
-      ctx.fillText(lines[i], textX, textY);
-      textY += lineHeight;
-      let size = ctx.measureText(lines[i]);
-      //console.log("RENDER WITH: " + size.width);
-    }
+    this.wrapText(
+      ctx,
+      this.formatted,
+      textX,
+      textY,
+      this.width,
+      this.fontHeight
+    );
   }
 
   // MOUSE EVENTS
