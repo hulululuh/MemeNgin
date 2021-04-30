@@ -98,26 +98,11 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-dialog v-model="dialog" persistent max-width="290">
-        <v-card>
-          <v-card-title class="headline">
-            MemeNgin
-          </v-card-title>
-          <v-card-text>Do you want to save changes?</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="saveAndClose">
-              Save
-            </v-btn>
-            <v-btn text @click="closeAnyway">
-              Don't Save
-            </v-btn>
-            <v-btn text @click="dialog = false">
-              Cancel
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <close-dialog
+        ref="closeDialog"
+        @onSave="saveAndClose"
+        @onClose="closeAnyway"
+      />
       <v-container
         fluid
         flex
@@ -160,6 +145,7 @@
   import NodePropertiesView from "@/views/NodeProperties.vue";
   import Preview2D from "@/views/Preview2D.vue";
   import StartupMenu from "@/views/StartupMenu.vue";
+  import CloseDialog from "@/views/CloseDialog.vue";
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
@@ -186,6 +172,7 @@
       LibraryMenu,
       startupMenu: StartupMenu,
       preview2d: Preview2D,
+      closeDialog: CloseDialog,
     },
   })
   export default class App extends Vue {
@@ -567,8 +554,7 @@
       return this.edited || this.project.path == null;
     }
 
-    saveAndClose() {
-      this.dialog = false;
+    async saveAndClose() {
       if (!this.saveable) return;
 
       const remote = window.require ? window.require("electron").remote : null;
@@ -576,9 +562,8 @@
 
       // trying to save new project
       if (!this.project.path) {
-        this.saveProjectAs().then(() => {
-          WIN.close();
-        });
+        let sucess = await this.saveProjectAs();
+        if (sucess) WIN.close();
       } else {
         let data = this.editor.save();
         console.log(data);
@@ -592,7 +577,6 @@
     }
 
     closeAnyway() {
-      this.dialog = false;
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       WIN.close();
@@ -630,7 +614,7 @@
         });
 
         let path = result.filePath;
-        if (!path) return;
+        if (!path) return false;
         let data = this.editor.save();
         console.log(data);
         this.project.data = data;
@@ -778,7 +762,7 @@
       if (!this.edited) {
         WIN.close();
       } else {
-        this.dialog = true;
+        (this.$refs.closeDialog as CloseDialog).dialog = true;
       }
     }
 
