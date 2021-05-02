@@ -9,6 +9,7 @@ import { MathUtils } from "three";
 import { ITransformable } from "@/lib/designer/transformable";
 import { WidgetType } from "@/lib/scene/widget";
 import { UndoStack } from "@/lib/undostack";
+import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
 
 export class OverlayNode extends ImageDesignerNode implements ITransformable {
   inputASize: Vector2;
@@ -17,6 +18,8 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
   baseScale: Vector2;
   dragStartRelScale: Vector2;
   item: GraphicsItem;
+
+  private _xfStarted: Transform2D;
 
   constructor() {
     super();
@@ -85,6 +88,33 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
 
       this.createTexture();
       this.requestUpdate();
+    };
+
+    this.onWidgetDragStarted = (evt: WidgetEvent) => {
+      const prop = this.properties.find((item) => item.name === "transform2d");
+      this._xfStarted = (prop as Transform2DProperty).getValue().clone();
+    };
+
+    this.onWidgetDragEnded = (evt: WidgetEvent) => {
+      const prop = this.properties.find((item) => item.name === "transform2d");
+
+      // todo: make it happen!
+      let action = new PropertyChangeAction(
+        null,
+        prop.name,
+        this,
+        { value: this._xfStarted, exposed: false },
+        {
+          value: (prop as Transform2DProperty).getValue().clone(),
+          exposed: false,
+        }
+      );
+      UndoStack.current.push(action);
+
+      this.properties
+        .filter((p) => p.name === "transform2d")[0]
+        .setValue(this.getTransform());
+      this.requestUpdateWidget();
     };
 
     this.onPropertyLoaded = () => {
