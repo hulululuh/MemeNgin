@@ -3,11 +3,12 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { Editor } from "@/lib/editor";
 import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
-import { Property } from "@/lib/designer/properties";
+import { Property, Transform2DProperty } from "@/lib/designer/properties";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
 import { ITransformable } from "@/lib/designer/transformable";
 import { WidgetType } from "@/lib/scene/widget";
+import { UndoStack } from "@/lib/undostack";
 
 export class OverlayNode extends ImageDesignerNode implements ITransformable {
   inputASize: Vector2;
@@ -126,7 +127,7 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
       this.dragStartRelScale = new Vector2(1, 1);
 
       if (this.isWidgetAvailable()) {
-        Editor.getInstance().selectedDesignerNode = this;
+        Editor.getInstance().selectedNodeId = this.id;
         this.requestUpdateWidget();
       }
     };
@@ -214,7 +215,7 @@ export class OverlayNode extends ImageDesignerNode implements ITransformable {
     if (!document) return;
     if (this.isWidgetAvailable()) {
       // select this in order to activate transform2d widget
-      Editor.getInstance().selectedDesignerNode = this;
+      Editor.getInstance().selectedNodeId = this.id;
 
       const event = new WidgetEvent("widgetUpdate", {
         detail: {

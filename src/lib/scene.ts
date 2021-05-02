@@ -34,6 +34,7 @@ import { ApplicationSettings } from "@/settings";
 import { OutputNode } from "./library/nodes/outputnode";
 import { iWidget, WidgetType, implementsWidget } from "./scene/widget";
 import { TransformQuadWidget } from "./scene/transformquadwidget";
+import { Guid } from "./utils";
 const settings = ApplicationSettings.getInstance();
 
 enum DragMode {
@@ -72,6 +73,11 @@ export class NodeScene {
   hitConnection?: ConnectionGraphicsItem;
   selectedItems: GraphicsItem[];
   hitItem: GraphicsItem;
+
+  view: SceneView;
+  copyElement: HTMLInputElement;
+
+  id: string = Guid.newGuid();
 
   // callbacks
   onconnectioncreated?: (item: ConnectionGraphicsItem) => void;
@@ -112,8 +118,6 @@ export class NodeScene {
 
   onlibrarymenu?: () => void;
 
-  view: SceneView;
-
   // listeners for cleanup
   _mouseMove: (evt: MouseEvent) => void;
   _mouseDown: (evt: MouseEvent) => void;
@@ -128,7 +132,6 @@ export class NodeScene {
   _widgetDragged: (evt: WidgetEvent) => void;
   _widgetDragStarted: (evt: WidgetEvent) => void;
   _widgetDragEnded: (evt: WidgetEvent) => void;
-  copyElement: HTMLInputElement;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -149,25 +152,24 @@ export class NodeScene {
     this.nodes = new Array();
     this.conns = new Array();
     this.navigations = new Array();
-    this.dragMode = null;
     this.selectionRect = new Rect();
     this.selectedItems = [];
     this.hitItem = null;
+    this.dragMode = null;
 
-    // bind event listeners
     let self = this;
 
-    self._mouseMove = function(evt: MouseEvent) {
+    this._mouseMove = function(evt: MouseEvent) {
       self.onMouseMove(evt);
     };
     canvas.addEventListener("mousemove", this._mouseMove);
 
-    self._mouseDown = function(evt: MouseEvent) {
+    this._mouseDown = function(evt: MouseEvent) {
       self.onMouseDown(evt);
     };
-    canvas.addEventListener("mousedown", self._mouseDown);
+    canvas.addEventListener("mousedown", this._mouseDown);
 
-    self._mouseUp = function(evt: MouseEvent) {
+    this._mouseUp = function(evt: MouseEvent) {
       self.onMouseUp(evt);
 
       if (evt.target == canvas) {
@@ -181,18 +183,18 @@ export class NodeScene {
         self.hasFocus = false;
       }
     };
-    canvas.addEventListener("mouseup", self._mouseUp);
+    canvas.addEventListener("mouseup", this._mouseUp);
 
-    // self._mouseClick = function(evt: MouseEvent) {
-    // 	if (evt.target == canvas) {
-    // 		self.hasFocus = true;
-    // 	} else {
-    // 		self.hasFocus = false;
-    // 	}
-    // };
-    // window.addEventListener("click", self._mouseClick);
+    this._mouseClick = function(evt: MouseEvent) {
+      if (evt.target == canvas) {
+        self.hasFocus = true;
+      } else {
+        self.hasFocus = false;
+      }
+    };
+    window.addEventListener("click", this._mouseClick);
 
-    self._keyDown = function(evt: KeyboardEvent) {
+    this._keyDown = function(evt: KeyboardEvent) {
       if (self.hasFocus) {
         // Delete selected nodes
         if (
@@ -233,14 +235,14 @@ export class NodeScene {
 
       console.log(evt.key.length);
     };
-    window.addEventListener("keydown", self._keyDown, true);
+    window.addEventListener("keydown", this._keyDown, true);
     // canvas.addEventListener("mousewheel", function(evt: WheelEvent) {
     //   self.onMouseScroll(evt);
     // });
-    self._contextMenu = function(evt: MouseEvent) {
+    this._contextMenu = function(evt: MouseEvent) {
       evt.preventDefault();
     };
-    canvas.addEventListener("contextmenu", self._contextMenu);
+    canvas.addEventListener("contextmenu", this._contextMenu);
 
     this._copyEvent = (evt) => {
       if (self.hasFocus && evt.target == self.copyElement) {
@@ -279,7 +281,7 @@ export class NodeScene {
     };
     document.addEventListener("paste", this._pasteEvent);
 
-    self._widgetUpdate = function(evt: WidgetEvent) {
+    this._widgetUpdate = function(evt: WidgetEvent) {
       for (const key of self.widgets.keys()) {
         const widget = self.widgets.get(key);
         if (!widget) continue;
@@ -299,8 +301,8 @@ export class NodeScene {
     };
     document.addEventListener("widgetUpdate", this._widgetUpdate);
 
-    self._widgetDragged = function(evt: WidgetEvent) {
-      const node = Editor.getInstance().selectedDesignerNode;
+    this._widgetDragged = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedNode;
 
       // TODO: Complete this condition
       if (node && node.onWidgetDragged) {
@@ -309,8 +311,8 @@ export class NodeScene {
     };
     document.addEventListener("widgetDragged", this._widgetDragged);
 
-    self._widgetDragStarted = function(evt: WidgetEvent) {
-      const node = Editor.getInstance().selectedDesignerNode;
+    this._widgetDragStarted = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedNode;
 
       // TODO: Complete this condition
       if (node && node.onWidgetDragStarted) {
@@ -319,8 +321,8 @@ export class NodeScene {
     };
     document.addEventListener("widgetDragStarted", this._widgetDragStarted);
 
-    self._widgetDragEnded = function(evt: WidgetEvent) {
-      const node = Editor.getInstance().selectedDesignerNode;
+    this._widgetDragEnded = function(evt: WidgetEvent) {
+      const node = Editor.getInstance().selectedNode;
 
       // TODO: Complete this condition
       if (node && node.onWidgetDragEnded) {
@@ -330,12 +332,12 @@ export class NodeScene {
     document.addEventListener("widgetDragEnded", this._widgetDragEnded);
 
     this.copyElement = document.createElement("input");
-    self.copyElement.value = " ";
-    self.copyElement.style.opacity = "0";
-    self.copyElement.style.width = "0px";
-    self.copyElement.style.height = "0px";
-    self.copyElement.style.margin = "0px";
-    self.copyElement.style.padding = "0px";
+    this.copyElement.value = " ";
+    this.copyElement.style.opacity = "0";
+    this.copyElement.style.width = "0px";
+    this.copyElement.style.height = "0px";
+    this.copyElement.style.margin = "0px";
+    this.copyElement.style.padding = "0px";
     document.getElementById("editor-view").appendChild(this.copyElement);
   }
 
@@ -353,15 +355,24 @@ export class NodeScene {
     this.canvas.removeEventListener("mousemove", this._mouseMove);
     this.canvas.removeEventListener("mouedown", this._mouseDown);
     this.canvas.removeEventListener("mouseup", this._mouseUp);
+    this.canvas.removeEventListener("contextmenu", this._contextMenu);
     window.removeEventListener("click", this._mouseClick);
     window.removeEventListener("keydown", this._keyDown);
-    this.canvas.removeEventListener("contextmenu", this._contextMenu);
     document.removeEventListener("copy", this._copyEvent);
+    document.removeEventListener("cut", this._cutEvent);
     document.removeEventListener("paste", this._pasteEvent);
     document.removeEventListener("widgetUpdate", this._widgetUpdate);
     document.removeEventListener("widgetDragged", this._widgetDragged);
     document.removeEventListener("widgetDragStarted", this._widgetDragStarted);
     document.removeEventListener("widgetDragEnded", this._widgetDragEnded);
+
+    this.frames = [];
+    this.comments = [];
+    this.nodes = [];
+    this.conns = [];
+    this.navigations = [];
+    this.selectedItems = [];
+    this.hitItem = null;
   }
 
   setSelectedItems(items: GraphicsItem[], createSelection: boolean = false) {

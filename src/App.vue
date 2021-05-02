@@ -202,7 +202,7 @@
     constructor() {
       super();
 
-      this.editor = new Editor();
+      this.editor = Editor.getInstance();
       this.library = null;
       this.project = new Project();
 
@@ -546,6 +546,7 @@
       this.randomSeed = 32;
 
       this.titleName = "new project";
+      this.edited = false;
 
       // todo: set titleName
     }

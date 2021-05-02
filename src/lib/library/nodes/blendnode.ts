@@ -127,7 +127,7 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
       this.dragStartRelScale = new Vector2(1, 1);
 
       if (this.isWidgetAvailable()) {
-        Editor.getInstance().selectedDesignerNode = this;
+        Editor.getInstance().selectedNodeId = this.id;
         this.requestUpdateWidget();
       }
     };
@@ -266,7 +266,7 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
     if (!document) return;
     if (this.isWidgetAvailable()) {
       // select this in order to activate transform2d widget
-      Editor.getInstance().selectedDesignerNode = this;
+      Editor.getInstance().selectedNodeId = this.id;
 
       const event = new WidgetEvent("widgetUpdate", {
         detail: {

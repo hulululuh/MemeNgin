@@ -54,7 +54,7 @@ export class Editor {
   library: DesignerLibrary;
   nodeScene: NodeScene;
   designer: Designer;
-  selectedDesignerNode: DesignerNode;
+  selectedNodeId: string;
 
   undoStack: UndoStack;
 
@@ -77,7 +77,7 @@ export class Editor {
   constructor() {
     Editor.instance = this;
     DetectNode.loadModelAsync();
-    this.selectedDesignerNode = null;
+    this.selectedNodeId = "";
     this.undoStack = new UndoStack();
   }
 
@@ -96,6 +96,15 @@ export class Editor {
   static getScene() {
     const editor = this.getInstance();
     return editor.nodeScene;
+  }
+
+  get selectedNode(): DesignerNode {
+    if (this.selectedNodeId != "") {
+      return this.designer.getNodeById(this.selectedNodeId);
+    } else {
+      console.warn("tried to find node with empty id");
+      return null;
+    }
   }
 
   getInputItem() {
@@ -163,16 +172,6 @@ export class Editor {
     }
   }
 
-  // creates new texture
-  // requires canvas to be already set
-  createNewTexture() {
-    this.library = createLibrary();
-    this.setDesigner(new Designer());
-    this.setScene(new NodeScene(this.canvas));
-
-    this.createEmptyScene();
-  }
-
   set2DPreview(preview2D: HTMLCanvasElement) {
     this.preview2D = preview2D;
     this.preview2DCtx = preview2D.getContext("2d");
@@ -180,7 +179,7 @@ export class Editor {
 
   setSceneCanvas(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.setScene(new NodeScene(canvas));
+    //this.setScene(new NodeScene(canvas));
   }
 
   setDesigner(designer: Designer) {
@@ -199,11 +198,11 @@ export class Editor {
   setScene(scene: NodeScene) {
     // cleanup previous graph
     if (this.nodeScene) this.nodeScene.dispose();
+    this.nodeScene = scene;
 
+    if (this.undoStack) this.undoStack.reset();
     this.undoStack = new UndoStack();
     UndoStack.current = this.undoStack;
-
-    this.nodeScene = scene;
 
     let self = this;
     this.nodeScene.onconnectioncreated = function(con: ConnectionGraphicsItem) {
@@ -360,10 +359,11 @@ export class Editor {
 
     this.nodeScene.onnodeselected = function(node: NodeGraphicsItem) {
       if (node != null) {
-        let dnode = self.designer.getNodeById(node.id);
-        self.selectedDesignerNode = dnode;
+        self.selectedNodeId = node.id;
 
+        let dnode = self.designer.getNodeById(node.id);
         if (dnode) dnode.onItemSelected();
+        else console.error(`No corresponding designer item for ${node.id}`);
 
         if (self.preview2DCtx) {
           self.preview2DCtx.drawImage(
