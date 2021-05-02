@@ -280,6 +280,7 @@
     onEditEnded() {
       this.edited = false;
       this.refreshTitle();
+      this.editor.refreshWidget();
     }
 
     refreshTitle() {
@@ -402,18 +403,14 @@
       };
       this.editor.setSceneCanvas(canvas);
 
-      //this.designer = this.editor.designer;
       this.editor.onnodeselected = (node) => {
-        //this.selectedNode = node;
         this.propHolder = node;
       };
       this.editor.oncommentselected = (comment) => {
         this.propHolder = comment;
         console.log("comment selected");
       };
-      this.editor.onframeselected = (frame) => {
-        //this.propHolder = frame;
-      };
+      this.editor.onframeselected = (frame) => {};
       // this.editor.onnavigationselected = nav => {
       //   this.propHolder = nav;
       // };

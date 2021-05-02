@@ -23,6 +23,7 @@ import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detectnode";
 import { ImageDesignerNode } from "./designer/imagedesignernode";
+import { ITransformable } from "./designer/transformable";
 const isDataUri = require("is-data-uri");
 const NativeImage = require("electron").nativeImage;
 
@@ -105,6 +106,12 @@ export class Editor {
       console.warn("tried to find node with empty id");
       return null;
     }
+  }
+
+  refreshWidget() {
+    const selectedNode = this.designer.getNodeById(this.selectedNodeId);
+    let xf = selectedNode as any;
+    if (xf && xf.requestUpdateWidget) xf.requestUpdateWidget();
   }
 
   getInputItem() {
@@ -665,6 +672,8 @@ export class Editor {
       const node = this.nodeScene.outputNode.dNode;
       this.onpreviewnode(node, item.imageCanvas.canvas);
     }
+
+    this.refreshWidget();
   }
 
   save(): any {

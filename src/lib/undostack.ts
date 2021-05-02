@@ -10,7 +10,7 @@ export class Action {
 export class UndoStack {
   static current: UndoStack;
 
-  stack: Action[];
+  stack: any[];
   pointer: number;
 
   constructor() {
@@ -18,7 +18,7 @@ export class UndoStack {
     this.stack = [];
   }
 
-  push(action: Action) {
+  push(action: any) {
     this.pointer += 1;
     this.stack.splice(this.pointer);
 
@@ -36,7 +36,15 @@ export class UndoStack {
     if (this.pointer < 0) return;
 
     let action = this.stack[this.pointer];
-    action.undo();
+    if (action instanceof Action) {
+      action.undo();
+    } else {
+      for (let a of action) {
+        if (a instanceof Action) {
+          a.undo();
+        }
+      }
+    }
 
     this.pointer -= 1;
 
@@ -53,7 +61,15 @@ export class UndoStack {
     this.pointer += 1;
 
     let action = this.stack[this.pointer];
-    action.redo();
+    if (action instanceof Action) {
+      action.redo();
+    } else {
+      for (let a of action) {
+        if (a instanceof Action) {
+          a.redo();
+        }
+      }
+    }
   }
 
   reset() {

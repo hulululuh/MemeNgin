@@ -3,11 +3,14 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { Editor } from "@/lib/editor";
 import { GraphicsItem, WidgetEvent } from "@/lib/scene/graphicsitem";
 import { Transform2D } from "@/lib/math/transform2d";
-import { Property } from "@/lib/designer/properties";
+import { Property, Transform2DProperty } from "@/lib/designer/properties";
 import { Vector2, Matrix3 } from "@math.gl/core";
 import { MathUtils } from "three";
 import { ITransformable } from "@/lib/designer/transformable";
 import { WidgetType } from "@/lib/scene/widget";
+import { UndoStack } from "@/lib/undostack";
+import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
+import { Transform } from "node:stream";
 
 export class OverlayQuadNode extends ImageDesignerNode
   implements ITransformable {
@@ -24,15 +27,15 @@ export class OverlayQuadNode extends ImageDesignerNode
   dragStartRelScale: Vector2;
   item: GraphicsItem;
 
+  private _ptsStarted: Vector2[];
+
   constructor() {
     super();
 
     this.widgetType = WidgetType.TransformQuad;
 
     this.onnodepropertychanged = (prop: Property) => {
-      if (prop.name === "transform2d") {
-        this.requestUpdateWidget();
-      } else if (
+      if (
         prop.name === "pTL" ||
         prop.name === "pTR" ||
         prop.name === "pBR" ||
@@ -87,13 +90,6 @@ export class OverlayQuadNode extends ImageDesignerNode
         .sub(new Vector2(this.item.centerX(), this.item.centerY()))
         .divide(new Vector2(this.item.getWidth(), this.item.getHeight() * -1));
 
-      const xf = new Transform2D(
-        this.relPos,
-        evt.detail.transform2d.scale,
-        evt.detail.transform2d.rotation * MathUtils.RAD2DEG
-      );
-
-      this.properties.filter((p) => p.name === "transform2d")[0].setValue(xf);
       this.dragStartRelScale = new Vector2(evt.detail.dragStartRelScale);
 
       const pts = evt.detail.points;
@@ -123,17 +119,40 @@ export class OverlayQuadNode extends ImageDesignerNode
       this.requestUpdate();
     };
 
+    this.onWidgetDragStarted = (evt: WidgetEvent) => {
+      this._ptsStarted = [
+        this.propTL.getValue(),
+        this.propTR.getValue(),
+        this.propBR.getValue(),
+        this.propBL.getValue(),
+      ];
+    };
+
+    this.onWidgetDragEnded = (evt: WidgetEvent) => {
+      const props = [this.propTL, this.propTR, this.propBR, this.propBL];
+      const propNames = ["pTL", "pTR", "pBR", "pBL"];
+
+      let actions = [];
+      for (let i = 0; i < props.length; i++) {
+        let action = new PropertyChangeAction(
+          null,
+          propNames[i],
+          this,
+          { value: this._ptsStarted[i], exposed: false },
+          { value: props[i].getValue(), exposed: false }
+        );
+        actions.push(action);
+      }
+
+      UndoStack.current.push(actions);
+      this.requestUpdateWidget();
+    };
+
     this.onPropertyLoaded = () => {
-      this.properties
-        .filter((p) => p.name === "transform2d")[0]
-        .setValue(this.getTransform());
       this.requestUpdateWidget();
     };
 
     this.onItemSelected = () => {
-      this.properties
-        .filter((p) => p.name === "transform2d")[0]
-        .setValue(this.getTransform());
       this.requestUpdateWidget();
     };
 
@@ -172,13 +191,6 @@ export class OverlayQuadNode extends ImageDesignerNode
     this.addInput("background"); // background
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
-
-    this.addTransform2DProperty(
-      "transform2d",
-      "Transform",
-      Transform2D.IDENTITY,
-      this.id
-    );
 
     this.propTL = this.addVector2Property(
       "pTL",
@@ -364,9 +376,7 @@ export class OverlayQuadNode extends ImageDesignerNode
   }
 
   getTransform(): Transform2D {
-    return this.properties
-      .filter((p) => p.name === "transform2d")[0]
-      .getValue();
+    return Transform2D.IDENTITY.clone();
   }
 
   getTransformGL(): Matrix3 {
@@ -374,9 +384,7 @@ export class OverlayQuadNode extends ImageDesignerNode
       this.item = Editor.getScene().getNodeById(this.id);
     }
 
-    const xf = this.properties
-      .filter((p) => p.name === "transform2d")[0]
-      .getValue();
+    const xf = Transform2D.IDENTITY.clone();
 
     this.relPos = new Vector2(xf.position);
 
