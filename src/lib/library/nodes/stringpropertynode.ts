@@ -7,4 +7,8 @@ export class StringPropertyNode extends LogicDesignerNode {
 
     this.addStringProperty("value", "Value", "");
   }
+
+  calculated() {
+    return this.getPropertyValue(0);
+  }
 }

@@ -8,4 +8,8 @@ export class Vector2PropertyNode extends LogicDesignerNode {
 
     this.addVector2Property("value", "Value", new Vector2(0, 0));
   }
+
+  calculated() {
+    return this.getPropertyValue(0);
+  }
 }

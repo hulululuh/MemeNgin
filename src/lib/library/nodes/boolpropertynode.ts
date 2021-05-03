@@ -7,4 +7,8 @@ export class BoolPropertyNode extends LogicDesignerNode {
 
     this.addBoolProperty("value", "Value", false);
   }
+
+  calculated() {
+    return this.getPropertyValue(0);
+  }
 }

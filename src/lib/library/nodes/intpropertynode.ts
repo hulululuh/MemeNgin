@@ -7,4 +7,8 @@ export class IntPropertyNode extends LogicDesignerNode {
 
     this.addIntProperty("value", "Value");
   }
+
+  calculated() {
+    return this.getPropertyValue(0);
+  }
 }

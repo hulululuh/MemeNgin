@@ -8,4 +8,8 @@ export class ColorPropertyNode extends LogicDesignerNode {
 
     this.addColorProperty("value", "Value", new Color(1.0, 1.0, 1.0, 1.0));
   }
+
+  calculated() {
+    return this.getPropertyValue(0);
+  }
 }

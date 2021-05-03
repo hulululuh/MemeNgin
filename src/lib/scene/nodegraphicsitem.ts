@@ -73,7 +73,7 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   setupSize() {
     if (this.isLogic) {
-      this.setSize(75, 36);
+      this.setSize(75, 48);
     } else {
       let node = this.dNode as ImageDesignerNode;
       this.doubleSized = this.dNode instanceof OutputNode;
@@ -168,12 +168,19 @@ export class NodeGraphicsItem extends GraphicsItem {
     }
 
     let fillColor = "rgb(0, 0, 0)";
+
+    // for boolean true / false
+    let flipColor = false;
     // convert to text
     let value = this.value;
     if (this.value instanceof Color) {
       value = this.value.toHex();
       fillColor = this.value.toHex();
+    } else if (typeof this.value == "boolean") {
+      flipColor = this.value;
     }
+
+    if (flipColor) fillColor = "rgb(255, 255, 255)";
 
     // background
     ctx.beginPath();
@@ -181,27 +188,41 @@ export class NodeGraphicsItem extends GraphicsItem {
     ctx.rect(this.x, this.y, this.width, this.height);
     ctx.fill();
 
-    //ctx.globalAlpha = 0.65;
-    // title
-    //if (!renderState.hovered) {
-    // ctx.beginPath();
-    // ctx.fillStyle = "rgb(0,0,0)";
-    // ctx.rect(this.x, this.y, this.width, 20);
-    // ctx.fill();
-
+    let textFillColor = flipColor ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
+    let textStroteColor = flipColor
+      ? "rgb(255, 255, 255, 0.5)"
+      : "rgb(0,0,0, 0.5)";
     ctx.beginPath();
     let fontSize = 12;
     ctx.font = `bold ${fontSize}px 'Open Sans'`;
-    ctx.fillStyle = "rgb(255,255,255)";
-    ctx.strokeStyle = "rgb(0,0,0, 0.5)";
+    ctx.fillStyle = textFillColor;
+    ctx.strokeStyle = textStroteColor;
     ctx.lineWidth = 0.8;
 
     // draw text
     let size = ctx.measureText(value);
     let textX = this.centerX() - size.width / 2;
-    let textY = this.centerY() + fontSize / 4;
+    let textY = this.centerY() + fontSize / 4 + this.getHeight() / 5.0;
     ctx.strokeText(value, textX, textY);
     ctx.fillText(value, textX, textY);
+
+    ctx.globalAlpha = 0.65;
+    // title
+    if (!renderState.hovered) {
+      ctx.beginPath();
+      ctx.fillStyle = "rgb(0,0,0)";
+      ctx.rect(this.x, this.y, this.width, 20);
+      ctx.fill();
+
+      ctx.beginPath();
+      //ctx.font = "14px monospace";
+      ctx.font = "bold 9px 'Open Sans'";
+      ctx.fillStyle = "rgb(255,255,255)";
+      let size = ctx.measureText(this.title);
+      let textX = this.centerX() - size.width / 2;
+      let textY = this.y + 14;
+      ctx.fillText(this.title, textX, textY);
+    }
 
     ctx.globalAlpha = 0.5;
     ctx.beginPath();

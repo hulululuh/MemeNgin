@@ -7,4 +7,8 @@ export class FloatPropertyNode extends LogicDesignerNode {
 
     this.addFloatProperty("value", "Value", 0.0, 0.0, 1.0, 0.001);
   }
+
+  calculated() {
+    return this.getPropertyValue(0);
+  }
 }

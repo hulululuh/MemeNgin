@@ -436,47 +436,48 @@ export class Designer {
     let graphNode = Editor.getScene().getNodeById(dNode.id);
     if (!graphNode) return; // node could have been deleted
 
-    let propValue;
+    let nodeValue;
     let node = dNode as LogicDesignerNode;
-    let prop = node.properties[0];
-    let inputNode = this.findLeftNode(node.id, "value");
 
-    // update parentNode if exists
-    if (inputNode && inputNode.needsUpdate) {
-      this.generateDataFromNode(inputNode);
-      inputNode.needsUpdate = false;
-      this.updateList.splice(this.updateList.indexOf(inputNode), 1);
-    }
+    node.properties.forEach((p, i) => {
+      let inputNode = this.findLeftNode(node.id, p.name);
 
-    if (prop.exposed && inputNode instanceof LogicDesignerNode) {
-      prop.parentValue = (inputNode as LogicDesignerNode).getPropertyValue();
-      // for calculated logic nodes
-      if (node.isCalculated) prop.parentValue = node.calculated();
-      propValue = prop.getParentValue();
-    } else {
-      propValue = prop.getValue();
-    }
+      // update parentNode if exists
+      if (inputNode && inputNode.needsUpdate) {
+        this.generateDataFromNode(inputNode);
+        inputNode.needsUpdate = false;
+        this.updateList.splice(this.updateList.indexOf(inputNode), 1);
+      }
+
+      let prop = node.properties[i];
+      if (prop.exposed && inputNode instanceof LogicDesignerNode) {
+        prop.parentValue = (inputNode as LogicDesignerNode).calculated();
+      }
+    });
+
+    // for calculated logic nodes
+    nodeValue = node.calculated();
 
     // format property value for display
     if (dNode instanceof FloatPropertyNode || dNode instanceof MapFloatNode) {
-      if (typeof propValue === "string") {
-        propValue = parseFloat(propValue);
+      if (typeof nodeValue === "string") {
+        nodeValue = parseFloat(nodeValue);
       }
-      propValue = propValue.toFixed(3);
+      nodeValue = nodeValue.toFixed(3);
     } else if (dNode instanceof StringPropertyNode) {
-      propValue = TextManager.translate(propValue);
+      nodeValue = TextManager.translate(nodeValue);
       // in case prop is empty string
-      if (typeof propValue === "string" && propValue.length === 0) {
-        propValue = "${string}";
+      if (typeof nodeValue === "string" && nodeValue.length === 0) {
+        nodeValue = "${string}";
       }
 
       const prevLength = 9;
-      if (propValue.length > prevLength) {
-        propValue = propValue.substring(0, prevLength - 1) + "...";
+      if (nodeValue.length > prevLength) {
+        nodeValue = nodeValue.substring(0, prevLength - 1) + "...";
       }
     }
 
-    graphNode.value = propValue;
+    graphNode.value = nodeValue;
   }
 
   // this function generates the image of the node given its input nodes
@@ -515,7 +516,7 @@ export class Designer {
       for (let prop of node.getExposedProperties()) {
         let propNode = this.findLeftNode(node.id, prop.name);
         if (propNode instanceof LogicDesignerNode) {
-          let propValFromParent = (propNode as LogicDesignerNode).getPropertyValue();
+          let propValFromParent = (propNode as LogicDesignerNode).calculated();
           if (prop.getParentValue() != propValFromParent) {
             prop.parentValue = propValFromParent;
 

@@ -10,7 +10,6 @@ export class MapFloatNode extends LogicDesignerNode {
   init() {
     this.title = "MapFloat";
     this.logicType = LogicType.Property;
-    this.isCalculated = true;
 
     this.vProp = this.addFloatProperty("value", "Value", 0.0, 0.0, 1.0, 0.01);
     this.vProp.setExposed(true);
@@ -44,7 +43,7 @@ export class MapFloatNode extends LogicDesignerNode {
   calculated() {
     // we assume input value ranged [0...1]
     let calculated =
-      this.minVal + (this.maxVal - this.minVal) * this.getPropertyValue();
+      this.minVal + (this.maxVal - this.minVal) * this.getPropertyValue(0);
     return calculated;
   }
 }
