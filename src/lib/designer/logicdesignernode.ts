@@ -1,5 +1,5 @@
 import { DesignerNode } from "@/lib/designer/designernode";
-import { Property } from "@/lib/designer/properties";
+import { Property, PropertyType } from "@/lib/designer/properties";
 
 export enum LogicType {
   Property,
@@ -8,6 +8,7 @@ export enum LogicType {
 
 export class LogicDesignerNode extends DesignerNode {
   logicType: LogicType;
+  outputType!: PropertyType;
 
   constructor() {
     super();

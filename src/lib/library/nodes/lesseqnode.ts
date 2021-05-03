@@ -1,16 +1,16 @@
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
 import { Property, PropertyType } from "@/lib/designer/properties";
-export class AndGateNode extends LogicDesignerNode {
+export class LessEqNode extends LogicDesignerNode {
   aProp: Property;
   bProp: Property;
-  outputType = PropertyType.Bool;
 
   init() {
-    this.title = "AndGate";
+    this.title = "LessEq";
     this.logicType = LogicType.Property;
+    this.outputType = PropertyType.Bool;
 
-    this.aProp = this.addBoolProperty("valueA", "A", false);
-    this.bProp = this.addBoolProperty("valueB", "B", false);
+    this.aProp = this.addFloatProperty("valueA", "A", 0.0, 0.0, 1.0);
+    this.bProp = this.addFloatProperty("valueB", "B", 1.0, 0.0, 1.0);
     this.aProp.setExposed(true);
     this.bProp.setExposed(true);
   }
@@ -18,6 +18,6 @@ export class AndGateNode extends LogicDesignerNode {
   calculated() {
     let valA = this.getPropertyValue(0);
     let valB = this.getPropertyValue(1);
-    return valA && valB;
+    return valA <= valB ? true : false;
   }
 }

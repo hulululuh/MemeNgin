@@ -1,9 +1,11 @@
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
+import { PropertyType } from "@/lib/designer/properties";
 
 export class FloatPropertyNode extends LogicDesignerNode {
   init() {
     this.title = "FloatProperty";
     this.logicType = LogicType.Property;
+    this.outputType = PropertyType.Float;
 
     this.addFloatProperty("value", "Value", 0.0, 0.0, 1.0, 0.001);
   }

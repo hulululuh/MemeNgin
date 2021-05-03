@@ -1,5 +1,5 @@
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
-import { Property } from "@/lib/designer/properties";
+import { Property, PropertyType } from "@/lib/designer/properties";
 const FLOAT_MAX = 9999;
 const FLOAT_MIN = -FLOAT_MAX;
 export class MapFloatNode extends LogicDesignerNode {
@@ -10,6 +10,7 @@ export class MapFloatNode extends LogicDesignerNode {
   init() {
     this.title = "MapFloat";
     this.logicType = LogicType.Property;
+    this.outputType = PropertyType.Float;
 
     this.vProp = this.addFloatProperty("value", "Value", 0.0, 0.0, 1.0, 0.01);
     this.vProp.setExposed(true);

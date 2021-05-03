@@ -1,16 +1,17 @@
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
 import { PropertyType } from "@/lib/designer/properties";
 
-export class BoolPropertyNode extends LogicDesignerNode {
+export class NotGateNode extends LogicDesignerNode {
   init() {
-    this.title = "BoolProperty";
+    this.title = "NotGate";
     this.logicType = LogicType.Property;
     this.outputType = PropertyType.Bool;
 
-    this.addBoolProperty("value", "Value", false);
+    let prop = this.addBoolProperty("value", "Value", false);
+    prop.setExposed(true);
   }
 
   calculated() {
-    return this.getPropertyValue(0);
+    return !this.getPropertyValue(0);
   }
 }

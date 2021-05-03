@@ -1,0 +1,54 @@
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+import { DesignerNode } from "@/lib/designer/designernode";
+import { Property } from "@/lib/designer/properties";
+import { Editor } from "@/lib/editor";
+
+export class ImgSelectorNode extends ImageDesignerNode {
+  selProp: Property;
+  constructor() {
+    super();
+
+    this.onnodepropertychanged = (prop: Property) => {
+      if (prop.name === "sel") {
+        let sel = this.getProperty(prop.name);
+        let selectedInput = !sel ? "imageA" : "imageB";
+        let selectedNode = Editor.getDesigner().findLeftNode(
+          this.id,
+          selectedInput
+        );
+        if (selectedNode) {
+          this.resizeByNode(selectedNode);
+        }
+      }
+    };
+  }
+
+  init() {
+    this.title = "ImgSelector";
+
+    this.addInput("imageA");
+    this.addInput("imageB");
+
+    this.selProp = this.addBoolProperty("sel", "Sel", false);
+    this.selProp.setExposed(true);
+
+    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
+      this.onnodepropertychanged(this.selProp);
+    };
+
+    let source = `
+        vec4 process(vec2 uv)
+        {
+          vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+            if (prop_sel && imageB_connected) {
+              col = texture(imageB, uv);
+            } else if(!prop_sel && imageA_connected) {
+              col = texture(imageA, uv);
+            }
+            return col;
+        }
+        `;
+
+    this.buildShader(source);
+  }
+}

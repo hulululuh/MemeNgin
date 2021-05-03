@@ -96,7 +96,7 @@ export class NodeGraphicsItem extends GraphicsItem {
 
     // Logic designer node
     if (node instanceof LogicDesignerNode) {
-      let outputType = (node as LogicDesignerNode).properties[0].type;
+      let outputType = (node as LogicDesignerNode).outputType;
       this.addSocket("output", "output", SocketInOut.Out, outputType);
     } else {
       this.addSocket("output", "output", SocketInOut.Out, PropertyType.Image);

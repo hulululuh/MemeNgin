@@ -55,6 +55,15 @@ import { WaveNode } from "./nodes/wavenode";
 import { UvSwapNode } from "./nodes/uvswapnode";
 import { MapFloatNode } from "./nodes/mapfloatnode";
 import { AndGateNode } from "./nodes/andgatenode";
+import { OrGateNode } from "./nodes/orgatenode";
+import { XorGateNode } from "./nodes/xorgatenode";
+import { NotGateNode } from "./nodes/notgatenode";
+import { NumSelectorNode } from "./nodes/numselectornode";
+import { ImgSelectorNode } from "./nodes/imgselectornode";
+import { GreaterNode } from "./nodes/greaternode";
+import { GreaterEqNode } from "./nodes/greatereqnode";
+import { LessNode } from "./nodes/lessnode";
+import { LessEqNode } from "./nodes/lesseqnode";
 
 export const libraryMajorVersion = 0;
 export const libraryMinorVersion = 1;
@@ -232,6 +241,26 @@ export function createLibrary() {
   lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Logic);
   lib.addNode("mapfloat", "MapFloat", MapFloatNode, NodeCategory.Logic);
   lib.addNode("andgate", "AndGate", AndGateNode, NodeCategory.Logic);
+  lib.addNode("orgate", "OrGate", OrGateNode, NodeCategory.Logic);
+  lib.addNode("xorgate", "XorGate", XorGateNode, NodeCategory.Logic);
+  lib.addNode("notgate", "NotGate", NotGateNode, NodeCategory.Logic);
+  lib.addNode(
+    "numselector",
+    "NumSelector",
+    NumSelectorNode,
+    NodeCategory.Logic
+  );
+  lib.addNode(
+    "imgselector",
+    "ImgSelector",
+    ImgSelectorNode,
+    NodeCategory.Logic
+  );
+
+  lib.addNode("greater", "GreaterNode", GreaterNode, NodeCategory.Logic);
+  lib.addNode("greatereq", "GreaterEqNode", GreaterEqNode, NodeCategory.Logic);
+  lib.addNode("less", "LessNode", LessNode, NodeCategory.Logic);
+  lib.addNode("lesseq", "LessEqNode", LessEqNode, NodeCategory.Logic);
 
   return lib;
 }
