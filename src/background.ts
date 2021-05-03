@@ -72,31 +72,6 @@ function createWindow() {
   });
 }
 
-app.on("browser-window-focus", () => {
-  // TODO: better way to do this?
-  // https://github.com/electron/electron/issues/3682
-  if (!globalShortcut.isRegistered(undoShortcut)) {
-    globalShortcut.register(undoShortcut, () =>
-      win.webContents.send(MenuCommands.EditUndo)
-    );
-  }
-
-  if (!globalShortcut.isRegistered(redoShortcut)) {
-    globalShortcut.register(redoShortcut, () =>
-      win.webContents.send(MenuCommands.EditRedo)
-    );
-  }
-});
-
-app.on("browser-window-blur", () => {
-  if (globalShortcut.isRegistered(undoShortcut)) {
-    globalShortcut.unregister(undoShortcut);
-  }
-  if (globalShortcut.isRegistered(redoShortcut)) {
-    globalShortcut.unregister(redoShortcut);
-  }
-});
-
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
