@@ -1,6 +1,6 @@
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
 import { Property, PropertyType } from "@/lib/designer/properties";
-const FLOAT_MAX = 9999;
+const FLOAT_MAX = 10000;
 const FLOAT_MIN = -FLOAT_MAX;
 export class MapFloatNode extends LogicDesignerNode {
   vProp: Property;
