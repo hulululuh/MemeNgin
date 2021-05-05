@@ -22,6 +22,6 @@ export class NumSelectorNode extends LogicDesignerNode {
     let valA = this.getPropertyValue(0);
     let valB = this.getPropertyValue(1);
     let sel = this.getPropertyValue(2);
-    return sel == true ? valA : valB;
+    return sel == false ? valA : valB;
   }
 }

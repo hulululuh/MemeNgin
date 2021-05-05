@@ -253,11 +253,12 @@ export class ImageDesignerNode extends DesignerNode {
 
   resizeByNode(node: DesignerNode): boolean {
     let imgNode = node as ImageDesignerNode;
-
     if (imgNode) {
       const w = imgNode.getWidth();
       const h = imgNode.getHeight();
-      return this.resize(w, h);
+      if (w != this.getWidth() || h != this.getHeight())
+        return this.resize(w, h);
+      else return false;
     } else {
       return false;
     }

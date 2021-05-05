@@ -10,16 +10,12 @@ export class ImgSelectorNode extends ImageDesignerNode {
 
     this.onnodepropertychanged = (prop: Property) => {
       if (prop.name === "sel") {
-        let sel = this.getProperty(prop.name);
-        let selectedInput = !sel ? "imageA" : "imageB";
-        let selectedNode = Editor.getDesigner().findLeftNode(
-          this.id,
-          selectedInput
-        );
-        if (selectedNode) {
-          this.resizeByNode(selectedNode);
-        }
+        this.tryResize();
       }
+    };
+
+    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
+      this.tryResize();
     };
   }
 
@@ -50,5 +46,18 @@ export class ImgSelectorNode extends ImageDesignerNode {
         `;
 
     this.buildShader(source);
+  }
+
+  protected tryResize() {
+    let sel = this.getProperty(this.selProp.name);
+    let selectedInput = !sel ? "imageA" : "imageB";
+    let selectedNode = Editor.getDesigner().findLeftNode(
+      this.id,
+      selectedInput
+    );
+    if (selectedNode) {
+      this.parentIndex = selectedInput;
+      this.resizeByNode(selectedNode);
+    }
   }
 }
