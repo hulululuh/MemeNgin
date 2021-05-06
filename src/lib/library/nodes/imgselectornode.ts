@@ -3,6 +3,8 @@ import { DesignerNode } from "@/lib/designer/designernode";
 import { Property } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
 
+const ABOUT_TEN_FRAMES = 166;
+
 export class ImgSelectorNode extends ImageDesignerNode {
   selProp: Property;
   constructor() {
@@ -15,7 +17,7 @@ export class ImgSelectorNode extends ImageDesignerNode {
     };
 
     this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
-      this.tryResize();
+      if (leftNode instanceof ImageDesignerNode) this.tryResize();
     };
   }
 
@@ -27,10 +29,6 @@ export class ImgSelectorNode extends ImageDesignerNode {
 
     this.selProp = this.addBoolProperty("sel", "Sel", false);
     this.selProp.setExposed(true);
-
-    this.onConnected = (leftNode: DesignerNode, rightIndex: string) => {
-      this.onnodepropertychanged(this.selProp);
-    };
 
     let source = `
         vec4 process(vec2 uv)
@@ -58,6 +56,10 @@ export class ImgSelectorNode extends ImageDesignerNode {
     if (selectedNode) {
       this.parentIndex = selectedInput;
       this.resizeByNode(selectedNode);
+      this.createTexture();
+      this.requestUpdate();
+    } else {
+      setTimeout(() => this.tryResize(), ABOUT_TEN_FRAMES);
     }
   }
 }
