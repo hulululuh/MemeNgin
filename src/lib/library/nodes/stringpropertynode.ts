@@ -15,7 +15,6 @@ export class StringPropertyNode extends LogicDesignerNode {
   }
 
   updateVariableProperty() {
-    //let variables = this.calculated().match(/\${(.*?)}/g);
     let variables = this.getPropertyValue(0).match(/\${(.*?)}/g);
     if (!variables) variables = [];
     this.propNames = [];
@@ -37,7 +36,8 @@ export class StringPropertyNode extends LogicDesignerNode {
     );
 
     for (let name of added) {
-      this.addStringProperty(name, name, "");
+      let sProp = this.addStringProperty(name, name, "");
+      sProp.setExposed(true);
     }
 
     for (let name of toRemoved.reverse()) {
@@ -52,11 +52,14 @@ export class StringPropertyNode extends LogicDesignerNode {
     this.outputType = PropertyType.String;
 
     this.addStringProperty("value", "Value", "");
+    this.updateVariableProperty();
   }
 
   calculated() {
     let value = this.getPropertyValue(0);
-
+    if (typeof value !== "string") {
+      value = value.toString();
+    }
     let calculated = value.replace(/\${(.*?)}/g, (x, g) => {
       let prop = this.properties.find((x) => x.name === g);
       return prop ? this.evaluatePropertyValue(prop) : "";

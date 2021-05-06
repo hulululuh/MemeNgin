@@ -29,13 +29,21 @@ export function ValidateConnection(
   sockA: SocketGraphicsItem,
   sockB: SocketGraphicsItem
 ): boolean {
-  return (
+  let connectable =
     sockB &&
     sockB != sockA &&
     sockB.socketInOut != sockA.socketInOut &&
-    sockB.propertyType == sockA.propertyType &&
-    sockB.node != sockA.node
-  );
+    sockB.node != sockA.node;
+
+  if (!connectable) return false;
+
+  let inSocket = sockA.socketInOut == SocketInOut.In ? sockA : sockB;
+  let compatible =
+    sockB.propertyType == sockA.propertyType ||
+    (sockA.propertyType != PropertyType.Image &&
+      sockB.propertyType != PropertyType.Image &&
+      inSocket.propertyType == PropertyType.String);
+  return compatible;
 }
 
 export class SocketGraphicsItem extends GraphicsItem {

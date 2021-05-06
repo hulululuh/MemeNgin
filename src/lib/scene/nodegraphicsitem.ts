@@ -20,6 +20,7 @@ import { LogicDesignerNode } from "@/lib/designer/logicdesignernode";
 import { PropertyType } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
 import { OutputNode } from "@/lib/library/nodes/outputnode";
+import { StringPropertyNode } from "../library/nodes/stringpropertynode";
 
 export class NodeGraphicsItemRenderState {
   hovered: boolean = false;
@@ -86,6 +87,9 @@ export class NodeGraphicsItem extends GraphicsItem {
     let node = this.dNode;
     this.sockets = [];
 
+    if (this.dNode instanceof StringPropertyNode)
+      this.dNode.updateVariableProperty();
+    
     for (let input of node.getInputs()) {
       this.addSocket(input, input, SocketInOut.In, PropertyType.Image);
     }

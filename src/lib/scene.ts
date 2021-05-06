@@ -627,6 +627,10 @@ export class NodeScene {
   isCausingCycle(con: ConnectionGraphicsItem) {
     const leftNode = con.outNode;
     const rightNode = con.inNode;
+    if (!leftNode || !rightNode) {
+      console.warn("invalid connection item detected");
+      return true;
+    }
 
     let self = this;
     let traverse = function(node: NodeGraphicsItem, id: string) {

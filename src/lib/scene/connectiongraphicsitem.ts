@@ -10,12 +10,16 @@ export class ConnectionGraphicsItem extends GraphicsItem {
   socketB!: SocketGraphicsItem;
 
   get inNode() {
+    if (!this.socketA || !this.socketB) return null;
+
     return this.socketA.socketInOut == SocketInOut.In
       ? this.socketA.node
       : this.socketB.node;
   }
 
   get outNode() {
+    if (!this.socketA || !this.socketB) return null;
+
     return this.socketA.socketInOut == SocketInOut.Out
       ? this.socketA.node
       : this.socketB.node;
