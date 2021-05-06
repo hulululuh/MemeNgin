@@ -11,6 +11,9 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { MenuCommands, setupMenu } from "@/menu";
 import path from "path";
 
+const Config = require("electron-config");
+const config = new Config();
+
 const isDevelopment = process.env.NODE_ENV !== "production";
 const undoShortcut = "CmdOrCtrl+Z";
 const redoShortcut = "CmdOrCtrl+Shift+Z";
@@ -43,6 +46,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     frame: false,
+    show: false,
     icon: path.join(__static, "assets/icons/mmng_icon.png"),
     webPreferences: {
       nodeIntegration: true,
@@ -51,7 +55,12 @@ function createWindow() {
       contextIsolation: false,
     },
   });
-  win.maximize();
+
+  if (config.get("winIsMaximized")) {
+    win.maximize();
+  } else {
+    win.setBounds(config.get("winBounds"));
+  }
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -63,6 +72,12 @@ function createWindow() {
     const indexPath = path.join(__dirname, "index.html");
     win.loadURL(indexPath);
   }
+
+  // save window size and position
+  win.on("close", () => {
+    config.set("winBounds", win.getBounds());
+    config.set("winIsMaximized", win.isMaximized());
+  });
 
   win.on("closed", () => {
     win = null;

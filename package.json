@@ -34,6 +34,7 @@
     "dedent-js": "^1.0.1",
     "dictionary-types": "^1.2.0",
     "earcut": "^2.2.2",
+    "electron-config": "^2.0.0",
     "electron-icon-builder": "^2.0.1",
     "electron-settings": "^4.0.2",
     "element-resize-detector": "^1.1.15",
