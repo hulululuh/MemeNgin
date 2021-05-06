@@ -17,11 +17,10 @@ import {
   LineCollider,
 } from "@/lib/math/collision2d";
 import { Transform2D } from "@/lib/math/transform2d";
-import { MathUtils } from "three";
 
 const settings = ApplicationSettings.getInstance();
 
-enum DragMode {
+enum DragMode_Quad {
   None,
   MoveAll,
   MoveTL,
@@ -36,31 +35,31 @@ enum DragMode {
 }
 
 // mapping table
-const DRAG_MODE = new Map<string, DragMode>([
-  ["cornerTL", DragMode.MoveTL],
-  ["cornerTR", DragMode.MoveTR],
-  ["cornerBL", DragMode.MoveBL],
-  ["cornerBR", DragMode.MoveBR],
-  ["edgeT", DragMode.MoveT],
-  ["edgeB", DragMode.MoveB],
-  ["edgeL", DragMode.MoveL],
-  ["edgeR", DragMode.MoveR],
+const DRAG_MODE = new Map<string, DragMode_Quad>([
+  ["cornerTL", DragMode_Quad.MoveTL],
+  ["cornerTR", DragMode_Quad.MoveTR],
+  ["cornerBL", DragMode_Quad.MoveBL],
+  ["cornerBR", DragMode_Quad.MoveBR],
+  ["edgeT", DragMode_Quad.MoveT],
+  ["edgeB", DragMode_Quad.MoveB],
+  ["edgeL", DragMode_Quad.MoveL],
+  ["edgeR", DragMode_Quad.MoveR],
 ]);
 
-const DRAG_INDICES = new Map<DragMode, Array<number>>([
-  [DragMode.MoveAll, [0, 1, 2, 3]],
-  [DragMode.MoveTL, [0]],
-  [DragMode.MoveTR, [1]],
-  [DragMode.MoveBR, [2]],
-  [DragMode.MoveBL, [3]],
-  [DragMode.MoveT, [0, 1]],
-  [DragMode.MoveR, [1, 2]],
-  [DragMode.MoveB, [2, 3]],
-  [DragMode.MoveL, [3, 0]],
-  [DragMode.Rotate, [0, 1, 2, 3]],
+const DRAG_INDICES = new Map<DragMode_Quad, Array<number>>([
+  [DragMode_Quad.MoveAll, [0, 1, 2, 3]],
+  [DragMode_Quad.MoveTL, [0]],
+  [DragMode_Quad.MoveTR, [1]],
+  [DragMode_Quad.MoveBR, [2]],
+  [DragMode_Quad.MoveBL, [3]],
+  [DragMode_Quad.MoveT, [0, 1]],
+  [DragMode_Quad.MoveR, [1, 2]],
+  [DragMode_Quad.MoveB, [2, 3]],
+  [DragMode_Quad.MoveL, [3, 0]],
+  [DragMode_Quad.Rotate, [0, 1, 2, 3]],
 ]);
 
-enum HighlightMode {
+enum HighlightMode_Quad {
   None = "None",
   CornerTL = "cornerTL",
   CornerTR = "cornerTR",
@@ -75,24 +74,24 @@ enum HighlightMode {
 }
 
 // mapping table
-const HIGHLIGHT_MODE = new Map<string, HighlightMode>([
-  ["cornerTL", HighlightMode.CornerTL],
-  ["cornerTR", HighlightMode.CornerTR],
-  ["cornerBL", HighlightMode.CornerBL],
-  ["cornerBR", HighlightMode.CornerBR],
-  ["edgeT", HighlightMode.EdgeT],
-  ["edgeB", HighlightMode.EdgeB],
-  ["edgeL", HighlightMode.EdgeL],
-  ["edgeR", HighlightMode.EdgeR],
+const HIGHLIGHT_MODE = new Map<string, HighlightMode_Quad>([
+  ["cornerTL", HighlightMode_Quad.CornerTL],
+  ["cornerTR", HighlightMode_Quad.CornerTR],
+  ["cornerBL", HighlightMode_Quad.CornerBL],
+  ["cornerBR", HighlightMode_Quad.CornerBR],
+  ["edgeT", HighlightMode_Quad.EdgeT],
+  ["edgeB", HighlightMode_Quad.EdgeB],
+  ["edgeL", HighlightMode_Quad.EdgeL],
+  ["edgeR", HighlightMode_Quad.EdgeR],
 ]);
 
-const HIGHLIGHT_EDGE_INDICES = new Map<HighlightMode, Array<number>>([
-  [HighlightMode.MoveAll, [0, 1, 2, 3]],
-  [HighlightMode.EdgeT, [0]],
-  [HighlightMode.EdgeR, [1]],
-  [HighlightMode.EdgeB, [2]],
-  [HighlightMode.EdgeL, [3]],
-  [HighlightMode.None, []],
+const HIGHLIGHT_EDGE_INDICES = new Map<HighlightMode_Quad, Array<number>>([
+  [HighlightMode_Quad.MoveAll, [0, 1, 2, 3]],
+  [HighlightMode_Quad.EdgeT, [0]],
+  [HighlightMode_Quad.EdgeR, [1]],
+  [HighlightMode_Quad.EdgeB, [2]],
+  [HighlightMode_Quad.EdgeL, [3]],
+  [HighlightMode_Quad.None, []],
 ]);
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
@@ -112,8 +111,8 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
   dragStartRect: Rect;
   dragStartRotation: number;
 
-  dragMode: DragMode;
-  highlightMode: HighlightMode;
+  dragMode: DragMode_Quad;
+  highlightMode: HighlightMode_Quad;
 
   protected colliders: Array<iCollider>;
   protected points: Array<Vector2>;
@@ -147,8 +146,8 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
 
     this.relScale = new Vector2(1, 1);
     this.dragged = true;
-    this.dragMode = DragMode.None;
-    this.highlightMode = HighlightMode.None;
+    this.dragMode = DragMode_Quad.None;
+    this.highlightMode = HighlightMode_Quad.None;
 
     this.colliders = new Array<iCollider>();
     this.colliders.push(
@@ -216,7 +215,8 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
       item: TransformQuadWidget,
       drawHighlight: boolean = false
     ) {
-      if (drawHighlight && item.highlightMode === HighlightMode.None) return;
+      if (drawHighlight && item.highlightMode === HighlightMode_Quad.None)
+        return;
 
       let drawCornerCircle = true;
       let drawCircleIndices = [0, 1, 2, 3];
@@ -224,19 +224,19 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
       if (drawHighlight) {
         const m = item.highlightMode;
         drawCornerCircle =
-          m == HighlightMode.CornerBL ||
-          m == HighlightMode.CornerBR ||
-          m == HighlightMode.CornerTL ||
-          m == HighlightMode.CornerTR;
+          m == HighlightMode_Quad.CornerBL ||
+          m == HighlightMode_Quad.CornerBR ||
+          m == HighlightMode_Quad.CornerTL ||
+          m == HighlightMode_Quad.CornerTR;
 
         if (drawCornerCircle) {
           drawCircleIndices = [];
-          if (m == HighlightMode.CornerTL) drawCircleIndices = [0];
-          if (m == HighlightMode.CornerTR) drawCircleIndices = [1];
-          if (m == HighlightMode.CornerBR) drawCircleIndices = [2];
-          if (m == HighlightMode.CornerBL) drawCircleIndices = [3];
+          if (m == HighlightMode_Quad.CornerTL) drawCircleIndices = [0];
+          if (m == HighlightMode_Quad.CornerTR) drawCircleIndices = [1];
+          if (m == HighlightMode_Quad.CornerBR) drawCircleIndices = [2];
+          if (m == HighlightMode_Quad.CornerBL) drawCircleIndices = [3];
         }
-        drawRotation = item.highlightMode == HighlightMode.Rotation;
+        drawRotation = item.highlightMode == HighlightMode_Quad.Rotation;
       }
 
       let ptsXf = item.ptsTransformed;
@@ -354,9 +354,9 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     mouseEvent.globalX = px;
     mouseEvent.globalY = py;
     const hoverResult = this.hover(mouseEvent);
-    const hovered = hoverResult[1] != HighlightMode.None;
+    const hovered = hoverResult[1] != HighlightMode_Quad.None;
     if (hovered) return true;
-    else this.highlightMode = HighlightMode.None;
+    else this.highlightMode = HighlightMode_Quad.None;
 
     // const xf = this.transform;
     // let ptsXf = this.ptsTransformed;
@@ -373,9 +373,9 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     return false;
   }
 
-  hover(evt: MouseOverEvent): [DragMode, HighlightMode] {
-    let dragMode: DragMode = DragMode.None;
-    let highlightMode: HighlightMode = HighlightMode.None;
+  hover(evt: MouseOverEvent): [DragMode_Quad, HighlightMode_Quad] {
+    let dragMode: DragMode_Quad = DragMode_Quad.None;
+    let highlightMode: HighlightMode_Quad = HighlightMode_Quad.None;
 
     const ptCursor = new Vector2(evt.globalX, evt.globalY);
     const ptsXf = this.ptsTransformed;
@@ -385,10 +385,12 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
       if (collider.isIntersectWith(ptCursor, this.view.zoomFactor)) {
         collided = collider;
         dragMode =
-          collider.label === "rotHandle" ? DragMode.Rotate : DragMode.MoveAll;
+          collider.label === "rotHandle"
+            ? DragMode_Quad.Rotate
+            : DragMode_Quad.MoveAll;
 
         if (collider.label === "rotHandle") {
-          highlightMode = HighlightMode.Rotation;
+          highlightMode = HighlightMode_Quad.Rotation;
         } else {
           let highlight = HIGHLIGHT_MODE.get(collider.label);
           if (highlight) {
@@ -402,7 +404,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
 
     if (!collided) {
       if (this.isPointInsideRect(ptCursor)) {
-        highlightMode = HighlightMode.MoveAll;
+        highlightMode = HighlightMode_Quad.MoveAll;
       }
     }
 
@@ -442,10 +444,12 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
         this.dragStartRelScale = new Vector2(this.relScale);
         this.dragStartRotation = this.transform2d.rotation;
         this.dragMode =
-          collider.label === "rotHandle" ? DragMode.Rotate : DragMode.MoveAll;
+          collider.label === "rotHandle"
+            ? DragMode_Quad.Rotate
+            : DragMode_Quad.MoveAll;
 
         if (collider.label === "rotHandle") {
-          this.highlightMode = HighlightMode.Rotation;
+          this.highlightMode = HighlightMode_Quad.Rotation;
 
           // rotation
           //const xf = this.transform.invert();
@@ -465,8 +469,8 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     // drag to move around
     if (!collided) {
       if (this.isPointInsideRect(ptCursor)) {
-        this.dragMode = DragMode.MoveAll;
-        this.highlightMode = HighlightMode.MoveAll;
+        this.dragMode = DragMode_Quad.MoveAll;
+        this.highlightMode = HighlightMode_Quad.MoveAll;
 
         this.dragStartPos = new Vector2(this.transform2d.position);
         //this.dragStartCursor = new Vector2(ptCursor);
@@ -477,7 +481,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
     }
 
     // catch the first frame of valid transform
-    if (this.dragMode != DragMode.None) {
+    if (this.dragMode != DragMode_Quad.None) {
       // send a event to focus event to property
       if (document) {
         const event = new WidgetEvent("widgetDragStarted", {});
@@ -491,7 +495,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
       return;
     }
 
-    if (this.dragMode == DragMode.None) {
+    if (this.dragMode == DragMode_Quad.None) {
       // hovering - update highlight mode
       const hoverResult = this.hover(evt);
       this.highlightMode = hoverResult[1];
@@ -533,9 +537,9 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
         .add(new Vector2(this.x, this.y));
 
       // movement
-      if (this.dragMode === DragMode.None) {
+      if (this.dragMode === DragMode_Quad.None) {
         // do nothing
-      } else if (this.dragMode === DragMode.Rotate) {
+      } else if (this.dragMode === DragMode_Quad.Rotate) {
         // rotation
         //const xf = this.transform.invert();
         const xf = this.transform;
@@ -565,7 +569,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
         //   .normalize();
         // this.transform2d.rotation =
         //   Math.atan2(rotNow[1], rotNow[0]) + Math.PI / 2;
-      } else if (this.dragMode == DragMode.MoveAll) {
+      } else if (this.dragMode == DragMode_Quad.MoveAll) {
         isMoving = true;
         // something have hovered
         for (const [i, v] of this.ptsDragStarted.entries()) {
@@ -746,7 +750,7 @@ export class TransformQuadWidget extends GraphicsItem implements iWidget {
 
     this.dragged = false;
     this.hit = false;
-    this.dragMode = DragMode.None;
+    this.dragMode = DragMode_Quad.None;
 
     // reset cursor
     this.view.canvas.style.cursor = "default";

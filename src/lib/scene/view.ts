@@ -56,29 +56,57 @@ export class SceneView {
     this.context = this.canvas.getContext("2d");
 
     let self = this;
-    canvas.addEventListener("mousemove", function(evt: MouseEvent) {
-      self.onMouseMove(evt);
-    });
-    canvas.addEventListener("mousedown", function(evt: MouseEvent) {
-      self.onMouseDown(evt);
-    });
-    canvas.addEventListener("mouseup", function(evt: MouseEvent) {
-      self.onMouseUp(evt);
-    });
-    canvas.addEventListener("mouseout", function(evt: MouseEvent) {
-      self.onMouseOut(evt);
-    });
-    canvas.addEventListener("mousewheel", function(evt: WheelEvent) {
-      self.onMouseScroll(evt);
-    });
-    canvas.addEventListener("contextmenu", function(evt: MouseEvent) {
-      evt.preventDefault();
-    });
+    canvas.addEventListener(
+      "mousemove",
+      function(evt: MouseEvent) {
+        self.onMouseMove(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mousedown",
+      function(evt: MouseEvent) {
+        self.onMouseDown(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mouseup",
+      function(evt: MouseEvent) {
+        self.onMouseUp(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mouseout",
+      function(evt: MouseEvent) {
+        self.onMouseOut(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mousewheel",
+      function(evt: WheelEvent) {
+        self.onMouseScroll(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "contextmenu",
+      function(evt: MouseEvent) {
+        evt.preventDefault();
+      },
+      { capture: true, passive: false }
+    );
 
     // todo: do document mouse move event callback too
-    document.addEventListener("mousemove", function(evt: MouseEvent) {
-      self.onGlobalMouseMove(evt);
-    });
+    document.addEventListener(
+      "mousemove",
+      function(evt: MouseEvent) {
+        self.onGlobalMouseMove(evt);
+      },
+      { capture: true, passive: false }
+    );
 
     this.zoomFactor = 1;
     this.offset = new Vector2(0, 0);

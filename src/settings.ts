@@ -7,17 +7,17 @@ import {
 } from "./utils/scsshelper";
 
 export class ApplicationSettings {
-  colorPrimary: string = "#21252b";
-  colorSecondary: string = "#282c34";
-  colorBorder: string = "#3e4146";
-  colorAccent1: string = "#d52015";
-  colorAccent2: string = "#2196f3";
-  colorAccent3: string = "#4caf50";
-  colorFont: string = "#f8f4f4";
+  colorPrimary: string = "#21252bff";
+  colorSecondary: string = "#282c34ff";
+  colorBorder: string = "#3e4146ff";
+  colorAccent1: string = "#d52015ff";
+  colorAccent2: string = "#2196f3ff";
+  colorAccent3: string = "#4caf50ff";
+  colorFont: string = "#f8f4f4ff";
   colorGridBackground: string;
   colorGridPrimary: string;
   colorGridSecondary: string;
-  colorFocused: string = "#0095ff";
+  colorFocused: string = "#0095ffff";
   colorEditorText: string = "#000000ff";
   colorInputsStroke: string = "#333333ff";
   colorInputsFill: string = "#ffffffff";
@@ -29,14 +29,14 @@ export class ApplicationSettings {
   colThicknessLine: number = 10;
   colThicknessCircle: number = 3;
 
-  colorWidget: string = "#ffffff";
-  colorWidgetHighlight: string = "#3282b8";
-  colorWidgetShadow: string = "#1e1e1e";
-  colorSelectedItem: string = "#bbe1fa";
+  colorWidget: string = "#ffffffff";
+  colorWidgetHighlight: string = "#3282b8ff";
+  colorWidgetShadow: string = "#1e1e1eff";
+  colorSelectedItem: string = "#bbe1faff";
   colorSelectedItemBackground: string = "#3282b84c";
   colorSocketTitle: string = "#222222ff";
   colorConnectionLine: string = "#1e1e1eff";
-  colorTitle: Color = Color.fromHex("#3c3c3c");
+  colorTitle: Color = Color.fromHex("#3c3c3cff");
 
   widgetThickness: number = 3.0;
   widgetShadowThickness: number = 2.0;

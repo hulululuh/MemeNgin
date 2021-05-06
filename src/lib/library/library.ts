@@ -147,7 +147,7 @@ export function createLibrary() {
   lib.addNode("splat", "Splat", SplatNode, NodeCategory.Composite);
   lib.addNode("mask", "Mask", MaskNode, NodeCategory.Composite);
   lib.addNode(
-    "opacityOverride",
+    "opacityoverride",
     "Opacity Override",
     OpacityOverrideNode,
     NodeCategory.Composite

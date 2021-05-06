@@ -15,8 +15,17 @@ import { UndoStack } from "../undostack";
 import { ResizeFrameAction } from "../actions/resizeframeaction";
 import { LogicDesignerNode } from "../designer/logicdesignernode";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
-import { ApplicationSettings } from "@/settings";
-const settings = ApplicationSettings.getInstance();
+
+// TODO: need to fix application settings on production.
+// import { ApplicationSettings } from "@/settings";
+// const settings = ApplicationSettings.getInstance();
+// const strokeColor = Color.parse(settings.colorInputsStroke);
+// const fillColor = Color.parse(settings.colorInputsFill);
+// const textColor = Color.parse(settings.colorEditorText);
+
+const strokeColor = Color.parse("#33333333");
+const fillColor = Color.parse("#ffffffff");
+const textColor = Color.parse("#000000ff");
 
 enum XResizeDir {
   None,
@@ -70,9 +79,9 @@ export class FrameGraphicsItem extends GraphicsItem {
   constructor(view: SceneView) {
     super();
     this.view = view;
-    this.strokeColor = Color.parse(settings.colorInputsStroke);
-    this.fillColor = Color.parse(settings.colorInputsFill);
-    this.textColor = Color.parse(settings.colorEditorText);
+    this.strokeColor = strokeColor;
+    this.fillColor = fillColor;
+    this.textColor = textColor;
 
     this.hit = false;
     this.dragged = true;

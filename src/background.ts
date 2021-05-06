@@ -60,7 +60,8 @@ function createWindow() {
   } else {
     createProtocol("app");
     // Load the index.html when not in development
-    win.loadURL("file://./index.html");
+    const indexPath = path.join(__dirname, "index.html");
+    win.loadURL(indexPath);
   }
 
   win.on("closed", () => {

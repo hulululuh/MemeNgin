@@ -1,4 +1,3 @@
-//import { Vector2 } from "@/lib/scene/view";
 import { Vector2 } from "@math.gl/core";
 
 const IMAGE_RENDER_SIZE = 1000;
@@ -106,27 +105,55 @@ export class DragZoom {
     this.image = null;
 
     let self = this;
-    canvas.addEventListener("mousemove", function(evt: MouseEvent) {
-      self.onMouseMove(evt);
-    });
-    canvas.addEventListener("mousedown", function(evt: MouseEvent) {
-      self.onMouseDown(evt);
-    });
-    canvas.addEventListener("mouseup", function(evt: MouseEvent) {
-      self.onMouseUp(evt);
-    });
-    canvas.addEventListener("mouseout", function(evt: MouseEvent) {
-      self.onMouseOut(evt);
-    });
-    canvas.addEventListener("mousewheel", function(evt: WheelEvent) {
-      self.onMouseScroll(evt);
-    });
-    canvas.addEventListener("contextmenu", function(evt: MouseEvent) {
-      evt.preventDefault();
-    });
-    canvas.addEventListener("resize", function(evt: MouseEvent) {
-      console.log("2d canvas resized");
-    });
+    canvas.addEventListener(
+      "mousemove",
+      function(evt: MouseEvent) {
+        self.onMouseMove(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mousedown",
+      function(evt: MouseEvent) {
+        self.onMouseDown(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mouseup",
+      function(evt: MouseEvent) {
+        self.onMouseUp(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mouseout",
+      function(evt: MouseEvent) {
+        self.onMouseOut(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "mousewheel",
+      function(evt: WheelEvent) {
+        self.onMouseScroll(evt);
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "contextmenu",
+      function(evt: MouseEvent) {
+        evt.preventDefault();
+      },
+      { capture: true, passive: false }
+    );
+    canvas.addEventListener(
+      "resize",
+      function(evt: MouseEvent) {
+        console.log("2d canvas resized");
+      },
+      { capture: true, passive: false }
+    );
 
     this.drawMode = DrawMode.Single;
     this.zoomFactor = 0.4;

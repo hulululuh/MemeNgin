@@ -1,16 +1,20 @@
 {
   "name": "memengin",
+  "description": "MemeNgin is a node-based image engine developed for meme creators.",
   "version": "0.2.0",
   "private": true,
+  "author": "Jaemoon Choi <hulululuh@gmail.com>",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
+    "preelectron:build": "yarn buildicons",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "buildicons": "electron-icon-builder --input=./public/assets/icons/mmng_icon.png --output ./build"
   },
   "main": "background.js",
   "dependencies": {
@@ -30,6 +34,7 @@
     "dedent-js": "^1.0.1",
     "dictionary-types": "^1.2.0",
     "earcut": "^2.2.2",
+    "electron-icon-builder": "^2.0.1",
     "electron-settings": "^4.0.2",
     "element-resize-detector": "^1.1.15",
     "eslint-webpack-plugin": "^2.1.0",

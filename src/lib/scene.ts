@@ -37,7 +37,7 @@ import { TransformQuadWidget } from "./scene/transformquadwidget";
 import { Guid } from "./utils";
 const settings = ApplicationSettings.getInstance();
 
-enum DragMode {
+enum DragMode_Scene {
   None,
   Selection,
   Nodes,
@@ -65,7 +65,7 @@ export class NodeScene {
   conns: ConnectionGraphicsItem[];
   selection: SelectionGraphicsItem;
 
-  dragMode: DragMode;
+  dragMode: DragMode_Scene;
   selectionRect: Rect;
   draggedNode?: NodeGraphicsItem;
   //selectedNode: NodeGraphicsItem;
