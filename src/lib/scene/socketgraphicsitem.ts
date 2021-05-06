@@ -41,7 +41,8 @@ export function ValidateConnection(
   let compatible =
     sockB.propertyType == sockA.propertyType ||
     (sockA.propertyType != PropertyType.Image &&
-      sockB.propertyType != PropertyType.Image &&
+    sockB.propertyType != PropertyType.Image &&
+    inSocket.id != "value" && // allow property to string conversion only on sub-property, it makes logic much simpler
       inSocket.propertyType == PropertyType.String);
   return compatible;
 }

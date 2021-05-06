@@ -19,6 +19,7 @@ export class StringPropertyNode extends LogicDesignerNode {
     if (!variables) variables = [];
     this.propNames = [];
     variables.forEach((element) => {
+      if (typeof element != "string") element = element.toString();
       let name = element.substring(2, element.length - 1);
       if (name.length > 0) this.propNames.push(name);
     });
@@ -38,10 +39,14 @@ export class StringPropertyNode extends LogicDesignerNode {
     for (let name of added) {
       let sProp = this.addStringProperty(name, name, "");
       sProp.setExposed(true);
+      this.onnodeexposechanged(sProp);
     }
 
     for (let name of toRemoved.reverse()) {
       let idx = this.properties.findIndex((item) => item.name == name);
+      const targetProp = this.properties[idx];
+      targetProp.setExposed(false);
+      this.onnodeexposechanged(targetProp);
       if (idx >= 0) this.properties.splice(idx, 1);
     }
   }
