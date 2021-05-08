@@ -1,8 +1,16 @@
 <template>
   <v-container fluid class="pa-0 ma-0" style="overflow-y: scroll !important;">
-    <item-list categoryName="Recent" :lists="this.recentList" />
-    <item-list categoryName="Tutorials" :lists="this.tutorialsList" />
-    <item-list categoryName="Applications" :lists="this.applicationsList" />
+    <item-list categoryName="Recent" :lists="this.recentList" ref="recent" />
+    <item-list
+      categoryName="Tutorials"
+      :lists="this.tutorialsList"
+      ref="tutorials"
+    />
+    <item-list
+      categoryName="Applications"
+      :lists="this.applicationsList"
+      ref="applications"
+    />
   </v-container>
 </template>
 
@@ -24,9 +32,38 @@
     },
   })
   export default class HomeTab extends Vue {
+    private dirtyRecent: boolean = false;
+    private dirtyTutorials: boolean = false;
+    private dirtyApplications: boolean = false;
+
+    refresh() {
+      if (this.dirtyRecent) {
+        (this.$refs
+          .recent as ItemList).lists = UserData.getInstance().recentFiles;
+        this.dirtyRecent = false;
+      }
+      if (this.dirtyTutorials) {
+        (this.$refs.tutorials as ItemList).lists = this.tutorialsList;
+        this.dirtyTutorials = false;
+      }
+      if (this.dirtyApplications) {
+        (this.$refs.applications as ItemList).lists = this.applicationsList;
+        this.dirtyApplications = false;
+      }
+    }
+
+    refreshRecent() {
+      this.dirtyRecent = true;
+    }
+    refreshTutorials() {
+      this.dirtyTutorials = true;
+    }
+    refreshApplications() {
+      this.dirtyApplications = true;
+    }
+
     get recentList() {
-      const list = UserData.getInstance().recentFiles;
-      return list;
+      return UserData.getInstance().recentFiles;
     }
 
     get tutorialsList() {

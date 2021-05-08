@@ -7,6 +7,7 @@
         v-bind="attrs"
         v-on="on"
         class="system-bar-button"
+        @click="opened"
       >
         <v-icon>mdi-menu</v-icon>
       </v-btn>
@@ -21,7 +22,7 @@
         <v-tab>Explore</v-tab>
         <v-tab>Workshop</v-tab>
         <v-tab-item justify="center">
-          <home-tab />
+          <home-tab ref="home" />
         </v-tab-item>
       </v-tabs>
     </v-card>
@@ -35,10 +36,14 @@
 <script lang="ts">
   import { Vue, Component } from "vue-property-decorator";
   import HomeTab from "@/views/HomeTab.vue";
+  // import ExploreTab from "@/views/ExploreTab.vue";
+  // import WorkshopTab from "@/views/WorkshopTab.vue";
 
   @Component({
     components: {
       homeTab: HomeTab,
+      // exploreTab: ExploreTab,
+      // workshopTab: WorkshopTab,
     },
   })
   export default class StartupMenu extends Vue {
@@ -46,6 +51,11 @@
     notifications: boolean = false;
     sound: boolean = true;
     widgets: boolean = false;
+
+    opened() {
+      let homeTab = this.$refs.home as HomeTab;
+      if (homeTab) homeTab.refresh();
+    }
 
     tryClose() {
       if (this.dialog) this.dialog = false;

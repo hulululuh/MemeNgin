@@ -151,11 +151,12 @@
   import { MenuCommands } from "./menu";
   import path from "path";
   import fs from "fs";
-  import { UserData, registerRecent } from "@/userdata";
+  import { UserData } from "@/userdata";
   import { IPropertyHolder } from "./lib/designer/properties";
   import { AddItemsAction } from "./lib/actions/additemsaction";
   import { UndoStack } from "./lib/undostack";
   import { ApplicationSettings } from "./settings";
+  import HomeTab from "./views/HomeTab.vue";
 
   const electron = require("electron");
   const remote = electron.remote;
@@ -526,13 +527,10 @@
     newProject() {
       // reset states of all components
       // load default scene
-      //(this.$refs.preview3d as any).reset();
       (this.$refs.preview2d as any).reset();
 
       // an empty scene
       this.editor.createEmptyScene();
-      // default material scene
-      //this.editor.createNewTexture();
 
       this.library = this.editor.library;
 
@@ -657,12 +655,15 @@
     }
 
     openProjectWithPath(path: string) {
-      (this.$refs.startupMenu as StartupMenu).tryClose();
+      let startupMenu = this.$refs.startupMenu as StartupMenu;
+      startupMenu.tryClose();
 
       let project = ProjectManager.load(path);
       if (!project) return;
 
-      registerRecent(path, UserData.getInstance());
+      UserData.registerRecent(path);
+      //registerRecent(path, UserData.getInstance().recentFiles);
+      (startupMenu.$refs.home as HomeTab).refreshRecent();
       console.log(project);
 
       this.titleName = project.name;
