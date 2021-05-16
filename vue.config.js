@@ -1,5 +1,3 @@
-// vue.config.js
-
 module.exports = {
   configureWebpack: {
     devtool: "source-map",
@@ -7,6 +5,7 @@ module.exports = {
 
   pluginOptions: {
     electronBuilder: {
+      removeElectronJunk: true,
       chainWebpackMainProcess: (config) => {
         config.plugins.delete("uglify");
       },

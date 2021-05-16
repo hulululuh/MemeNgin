@@ -1,17 +1,19 @@
 {
   "name": "memengin",
+  "version": "0.2.0", 
   "description": "MemeNgin is a node-based image engine developed for meme creators.",
-  "version": "0.2.0",
-  "private": true,
   "author": "Jaemoon Choi <hulululuh@gmail.com>",
+  "license": "GPLv3",
+  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "preelectron:build": "yarn buildicons",
-    "electron:build": "vue-cli-service electron:build",
+    "electron:build": "vue-cli-service electron:build && ./post_build.bat",
     "electron:serve": "vue-cli-service electron:serve",
+    "publishOnSteam": "cd steam/steamworks_sdk/tools/ContentBuilder && ./upload.bat",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "buildicons": "electron-icon-builder --input=./public/assets/icons/mmng_icon.png --output ./build"
