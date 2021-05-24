@@ -23,11 +23,9 @@ Vue.use(Vuetify);
 import { ApplicationSettings } from "@/settings";
 import { AssetManager } from "@/assets/assetmanager";
 import { TextManager } from "@/assets/textmanager";
-import { WorkshopManager } from "@/community/workshop";
 
 AssetManager.getInstance();
 TextManager.getInstance();
-WorkshopManager.getInstance();
 
 const settings = ApplicationSettings.getInstance();
 settings.load();
