@@ -96,5 +96,9 @@
     "vue-cli-plugin-vuetify": "^2.1.0",
     "vue-template-compiler": "^2.6.10",
     "vuetify-loader": "^1.7.0"
+  },
+  "resolutions": {
+    "**/@typescript-eslint/eslint-plugin": "^4.1.1",
+    "**/@typescript-eslint/parser": "^4.1.1"
   }
 }
