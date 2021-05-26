@@ -24,7 +24,7 @@ if (process.platform === "win32") {
   vueDevToolsPath =
     "C:/Users/hulul/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.3.4_0";
 }
-
+app.allowRendererProcessReuse = false;
 app.commandLine.appendSwitch("--disable-seccomp-filter-sandbox");
 
 // Keep a global reference of the window object, if you don't, the window will
