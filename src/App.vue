@@ -222,9 +222,7 @@
     }
 
     created() {
-      if (fs.existsSync(userDataPath)) {
-        UserData.parse(userDataPath);
-      }
+      UserData.serialize();
 
       electron.ipcRenderer.on(MenuCommands.FileNew, (evt, arg) => {
         this.newProject();
@@ -412,22 +410,11 @@
         console.log("comment selected");
       };
       this.editor.onframeselected = (frame) => {};
-      // this.editor.onnavigationselected = nav => {
-      //   this.propHolder = nav;
-      // };
       this.editor.onlibrarymenu = this.showLibraryMenu;
 
       // const _2dview = <HTMLCanvasElement>document.getElementById("_2dview");
-      // this.editor.set2DPreview(_2dview);
       (this.$refs.preview2d as any).setEditor(this.editor);
 
-      // const _3dview = <HTMLCanvasElement>document.getElementById("_3dview");
-      // this.view3d = new View3D();
-      // this.view3d.setCanvas(_3dview);
-      //this.editor.set3DScene(scene3D);
-      //(this.$refs.preview3d as any).setEditor(this.editor);
-
-      //this.editor.createNewTexture();
       this.newProject();
 
       // start animation
@@ -463,13 +450,6 @@
 
     setupMenu() {
       if (this.isMenuSetup) return;
-
-      // let titleBar = new Titlebar({
-      //   backgroundColor: Color.fromHex("#333333"),
-      //   icon: "./favicon.svg",
-      //   shadow: true
-      // });
-
       this.isMenuSetup = true;
     }
 
@@ -496,28 +476,12 @@
       if (item.config.titleName == "2D View") {
         let container = item.container;
         item.container.on("resize", () => {
-          // const canvas = <HTMLCanvasElement>document.getElementById("_2dview");
-          // canvas.width = container.width;
-          // canvas.height = container.height;
-
           (this.$refs.preview2d as any).resize(
             container.width,
             container.height
           );
         });
       }
-
-      // // 3d view
-      // if (item.config.titleName == "3D View") {
-      //   let container = item.container;
-      //   item.container.on("resize", () => {
-      //     // const canvas = <HTMLCanvasElement>document.getElementById("_3dview");
-      //     // canvas.width = container.width;
-      //     // canvas.height = container.height;
-      //     //if (this.view3d) this.view3d.resize(container.width, container.height);
-      //     (this.$refs.preview3d as any).resize(container.width, container.height);
-      //   });
-      // }
     }
 
     resizeCanvas() {
@@ -661,9 +625,8 @@
       let project = ProjectManager.load(path);
       if (!project) return;
 
-      UserData.registerRecent(path);
-      //registerRecent(path, UserData.getInstance().recentFiles);
-      (startupMenu.$refs.home as HomeTab).refreshRecent();
+      let userData: UserData = UserData.getInstance();
+      userData.registerRecent(path);
       console.log(project);
 
       this.titleName = project.name;
@@ -749,11 +712,7 @@
     }
 
     closeWindow() {
-      try {
-        fs.writeFileSync(userDataPath, JSON.stringify(UserData.getInstance()));
-      } catch (err) {
-        alert("Error saving user data: " + err);
-      }
+      UserData.deserialize();
 
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();

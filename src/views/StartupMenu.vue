@@ -19,8 +19,8 @@
       </v-btn>
       <v-tabs Left>
         <v-tab>Home</v-tab>
+        <v-tab>Personalized</v-tab>
         <v-tab>Explore</v-tab>
-        <v-tab>Workshop</v-tab>
         <v-tab-item justify="center">
           <home-tab ref="home" />
         </v-tab-item>
@@ -52,10 +52,7 @@
     sound: boolean = true;
     widgets: boolean = false;
 
-    opened() {
-      let homeTab = this.$refs.home as HomeTab;
-      if (homeTab) homeTab.refresh();
-    }
+    opened() {}
 
     tryClose() {
       if (this.dialog) this.dialog = false;
