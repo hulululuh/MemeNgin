@@ -1,3 +1,6 @@
+import { UserData } from "@/userdata";
+import { ProjectItemData } from "./ProjectItemData";
+
 const greenworks = require("greenworks");
 
 const APP_ID = 431960;
@@ -27,6 +30,22 @@ export class WorkshopManager {
           greenworks.UGCQueryType.RankedByPublicationDate,
           (items) => {
             console.log(items);
+
+            let searchedItems: ProjectItemData[] = [];
+            for (let item of items) {
+              let prjItem = new ProjectItemData();
+              prjItem.id = item.file;
+              prjItem.title = item.title;
+              prjItem.description = item.description;
+              prjItem.thumbnailUrl = item.PreviewImageUrl;
+              prjItem.publisherId = item.steamIDOwner;
+              prjItem.numSubscribed = item.NumFollowers;
+              prjItem.numLikes = item.NumFavorites;
+              // prjItem.numDislikes = item.previewUrl;
+
+              searchedItems.push(prjItem);
+            }
+            UserData.getInstance().updateSearchedItems(searchedItems);
           },
           (err) => {
             console.error(err);

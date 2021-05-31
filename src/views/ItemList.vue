@@ -6,13 +6,13 @@
     <v-divider class="pb-1" />
     <v-row class="grid pa-1">
       <v-col
-        v-for="item in lists"
-        :key="item"
+        v-for="(item, i) in lists"
+        :key="i"
         cols="auto"
         md="auto"
         class="pa-1"
       >
-        <project-item v-if="exists(item)" :path="item" />
+        <project-item v-if="exists(item)" :itemData="item" />
       </v-col>
     </v-row>
   </v-flex>
@@ -26,6 +26,7 @@
   import { Vue, Prop, Component } from "vue-property-decorator";
   import ProjectItem from "@/views/ProjectItem.vue";
   import fs from "fs";
+  import { ProjectItemData } from "@/community/ProjectItemData";
 
   @Component({
     components: {
@@ -34,10 +35,10 @@
   })
   export default class ItemList extends Vue {
     @Prop() categoryName: string;
-    @Prop() lists: string[];
+    @Prop() lists: ProjectItemData[];
 
-    exists(path: string) {
-      return fs.existsSync(path);
+    exists(item: ProjectItemData) {
+      return fs.existsSync(item.localPath) || item.thumbnailUrl;
     }
   }
 </script>

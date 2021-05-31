@@ -24,6 +24,9 @@
         <v-tab-item justify="center">
           <home-tab ref="home" />
         </v-tab-item>
+        <v-tab-item justify="center" :key="1">
+          <explore-tab ref="explore" />
+        </v-tab-item>
       </v-tabs>
     </v-card>
   </v-dialog>
@@ -36,13 +39,13 @@
 <script lang="ts">
   import { Vue, Component } from "vue-property-decorator";
   import HomeTab from "@/views/HomeTab.vue";
-  // import ExploreTab from "@/views/ExploreTab.vue";
+  import ExploreTab from "@/views/ExploreTab.vue";
   // import WorkshopTab from "@/views/WorkshopTab.vue";
 
   @Component({
     components: {
       homeTab: HomeTab,
-      // exploreTab: ExploreTab,
+      exploreTab: ExploreTab,
       // workshopTab: WorkshopTab,
     },
   })

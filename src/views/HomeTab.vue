@@ -23,6 +23,7 @@
   import { Vue, Component } from "vue-property-decorator";
   import { getAllFiles } from "@/assets/assetmanager";
   import path from "path";
+  import { ProjectItemData } from "@/community/ProjectItemData";
   declare let __static: any;
 
   @Component({
@@ -32,7 +33,7 @@
   })
   export default class HomeTab extends Vue {
     get recentList() {
-      return this.$store.state.userData.recentFiles;
+      return this.$store.state.userData.recentItems;
     }
 
     get tutorialsList() {
@@ -42,7 +43,15 @@
       let assetFiles = [];
       getAllFiles(assetPath, assetFiles, "*.mmng");
 
-      return assetFiles;
+      let items: ProjectItemData[] = [];
+      let idx = 0;
+      for (let path of assetFiles) {
+        let item = new ProjectItemData();
+        item.localPath = path;
+        items.push(item);
+      }
+
+      return items;
     }
 
     get applicationsList() {
@@ -52,7 +61,15 @@
       let assetFiles = [];
       getAllFiles(assetPath, assetFiles, "*.mmng");
 
-      return assetFiles;
+      let items: ProjectItemData[] = [];
+      let idx = 0;
+      for (let path of assetFiles) {
+        let item = new ProjectItemData();
+        item.localPath = path;
+        items.push(item);
+      }
+
+      return items;
     }
   }
 </script>

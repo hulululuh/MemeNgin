@@ -1,5 +1,7 @@
 import path from "path";
 import fs from "fs";
+import { ProjectItemData } from "@/community/ProjectItemData";
+
 const MAX_RECENT_FILE = 8;
 const app = require("electron").remote.app;
 const userDataPath = path.join(app.getPath("userData"), "userData.json");
@@ -8,6 +10,9 @@ export class UserData {
   recentFiles: string[] = [];
   subscribedProject: string[] = [];
   followedUser: string[] = [];
+
+  recentItems: ProjectItemData[] = [];
+  searchedItems: ProjectItemData[] = [];
 
   static _instance: UserData = null;
   static getInstance(): UserData {
@@ -38,6 +43,12 @@ export class UserData {
         instance.recentFiles.splice(i, 1);
       }
 
+      for (let item of instance.recentFiles) {
+        let projectItem: ProjectItemData = new ProjectItemData();
+        projectItem.localPath = item;
+        instance.recentItems.push(projectItem);
+      }
+
       console.log(
         `found ${invalids.length} invalid path, removed from recentFiles`
       );
@@ -54,14 +65,42 @@ export class UserData {
   }
 
   registerRecent(path: string) {
+    // remove target from list
     let idx = this.recentFiles.findIndex((item) => item === path);
     if (idx > -1) {
       this.recentFiles.splice(idx, 1);
     }
 
+    // move target to front of list
     this.recentFiles = [path, ...this.recentFiles];
+
+    // cut overflowed item
     if (this.recentFiles.length > MAX_RECENT_FILE) {
       this.recentFiles.splice(MAX_RECENT_FILE, 1);
     }
+
+    this.registerRecentItem(path);
+  }
+
+  registerRecentItem(path: string) {
+    let idx = this.recentItems.findIndex((item) => item.localPath == path);
+    if (idx > -1) {
+      this.recentItems.splice(idx, 1);
+    }
+
+    let projectItem: ProjectItemData = new ProjectItemData();
+    projectItem.localPath = path;
+
+    //this
+    this.recentItems = [projectItem, ...this.recentItems];
+
+    // cut overflowed item
+    if (this.recentItems.length > MAX_RECENT_FILE) {
+      this.recentItems.splice(MAX_RECENT_FILE, 1);
+    }
+  }
+
+  updateSearchedItems(items: ProjectItemData[]) {
+    this.searchedItems = items;
   }
 }

@@ -1,4 +1,4 @@
-<template>
+<template v-on:change="onChanged">
   <v-hover v-slot="{ hover }">
     <v-card
       width="192px"
@@ -15,7 +15,7 @@
         @click="open"
       >
         <v-card-title class="justify-center" fluid>
-          {{ filename }}
+          {{ itemData.filename }}
         </v-card-title>
 
         <v-expand-transition>
@@ -24,7 +24,7 @@
             class="d-flex transition-fast-in-fast-out v-card--reveal"
             style="height: 35%; background-color: rgba(255, 255, 255, 0.3);"
           >
-            {{ description }}
+            {{ itemData.desc }}
           </div>
         </v-expand-transition>
       </v-img>
@@ -41,33 +41,34 @@
   import { ProjectManager } from "@/lib/project";
   import path from "path";
   import App from "../App.vue";
+  import { ProjectItemData } from "@/community/ProjectItemData";
 
   @Component
   export default class ProjectItem extends Vue {
-    @Prop() path!: string;
-    thumbnail: any;
+    @Prop() itemData: ProjectItemData;
     data: any;
-
-    created() {
-      let project = ProjectManager.load(this.path);
-      if (project) {
-        this.data = project.data;
-        this.thumbnail = this.data["thumbnail"];
-      }
-    }
 
     open() {
       console.log("tried to open");
-      (this.$root.$children[0] as App).openProjectWithPath(this.path);
+      (this.$root.$children[0] as App).openProjectWithPath(
+        this.itemData.localPath
+      );
     }
 
-    get filename() {
-      return path.parse(this.path).name;
+    get thumbnail() {
+      if (this.itemData.localPath) {
+        let project = ProjectManager.load(this.itemData.localPath);
+        if (project) {
+          this.data = project.data;
+          return project.data["thumbnail"];
+        }
+      } else if (this.itemData.thumbnailUrl) {
+        return this.itemData.thumbnailUrl;
+      }
     }
 
-    get description() {
-      if (this.data) return this.data["description"];
-      else return "";
+    get isWorkshopItem() {
+      return this.itemData.publisherId;
     }
   }
 </script>
