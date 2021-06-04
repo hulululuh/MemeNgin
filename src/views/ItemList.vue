@@ -24,9 +24,9 @@
 
 <script lang="ts">
   import { Vue, Prop, Component } from "vue-property-decorator";
+  import { ProjectItemData } from "@/community/ProjectItemData";
   import ProjectItem from "@/views/ProjectItem.vue";
   import fs from "fs";
-  import { ProjectItemData } from "@/community/ProjectItemData";
 
   @Component({
     components: {

@@ -39,7 +39,6 @@
 <script lang="ts">
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectManager } from "@/lib/project";
-  import path from "path";
   import App from "../App.vue";
   import { ProjectItemData } from "@/community/ProjectItemData";
 

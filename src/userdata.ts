@@ -6,6 +6,42 @@ const MAX_RECENT_FILE = 8;
 const app = require("electron").remote.app;
 const userDataPath = path.join(app.getPath("userData"), "userData.json");
 
+// export enum AgeRating {
+//   Everyone = "everyone",
+//   Unsure = "unsure",
+//   Mature = "mature",
+// }
+export const AGE_RATING: string[] = ["Everyone", "Questionable", "Mature"];
+
+export const TAGS_TEST: string[] = [
+  "Abstract",
+  "Animal",
+  "Anime",
+  "Audio response",
+  "Cartoon",
+  "CGI",
+  "Cyberpunk",
+  "Fantasy",
+  "Game",
+  "Girls",
+  "Guys",
+  "Landscape",
+  "Medieval",
+  "Memes",
+  "MMD",
+  "Music",
+  "Nature",
+  "Pixel art",
+  "Relaxing",
+  "Retro",
+  "Sci-fi",
+  "Sports",
+  "Technology",
+  "Television",
+  "Vehicle",
+  "Unspecified",
+];
+
 export class UserData {
   recentFiles: string[] = [];
   subscribedProject: string[] = [];
@@ -13,6 +49,15 @@ export class UserData {
 
   recentItems: ProjectItemData[] = [];
   searchedItems: ProjectItemData[] = [];
+  numSearchResultInPages: number;
+  pageIndex: number = -1;
+
+  // search tags
+  keyword: string = "";
+  tags: string[] = [];
+  //tags: string[] = ["Abstract", "Fantasy"];
+  //excludedTags: string[] = ["Everyone", "Questionable", "Mature"];
+  excludedTags: string[] = ["Questionable", "Mature"];
 
   static _instance: UserData = null;
   static getInstance(): UserData {

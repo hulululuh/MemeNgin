@@ -150,13 +150,11 @@
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
   import path from "path";
-  import fs from "fs";
   import { UserData } from "@/userdata";
   import { IPropertyHolder } from "./lib/designer/properties";
   import { AddItemsAction } from "./lib/actions/additemsaction";
   import { UndoStack } from "./lib/undostack";
   import { ApplicationSettings } from "./settings";
-  import HomeTab from "./views/HomeTab.vue";
 
   const electron = require("electron");
   const remote = electron.remote;
