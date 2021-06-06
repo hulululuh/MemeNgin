@@ -1,10 +1,5 @@
 <template>
-  <v-container
-    fluid
-    class="pa-0 ma-0"
-    style="overflow-y: scroll !important;"
-    block
-  >
+  <v-container fluid class="pa-0 ma-0">
     <v-subheader style="font-size: 1rem; font-weight: 400;">{{
       "Age rating"
     }}</v-subheader>
@@ -46,7 +41,7 @@
 
 <script lang="ts">
   import { WorkshopManager } from "@/community/workshop";
-  import { UserData, AGE_RATING, TAGS_TEST } from "@/userdata";
+  import { UserData, AGE_RATING, TAGS_TEST, QueryTarget } from "@/userdata";
   import { Component, Vue } from "vue-property-decorator";
   @Component
   export default class WorkshopFilter extends Vue {
@@ -62,7 +57,7 @@
       }
 
       UserData.getInstance().excludedTags = ratingsToExclude;
-      WorkshopManager.getInstance().requestUpdate();
+      WorkshopManager.getInstance().requestUpdate(QueryTarget.Search);
     }
 
     onTagsChanged() {
@@ -72,7 +67,7 @@
       }
 
       UserData.getInstance().tags = TAGS;
-      WorkshopManager.getInstance().requestUpdate();
+      WorkshopManager.getInstance().requestUpdate(QueryTarget.Search);
     }
 
     get ageRating() {

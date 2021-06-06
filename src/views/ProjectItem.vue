@@ -8,23 +8,24 @@
       <v-img
         id="thumbnail"
         class="white--text align-center"
-        style=" text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
+        style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
         height="192px"
         v-bind:src="thumbnail"
         lazy-src="assets/icons/image.svg"
         @click="open"
       >
-        <v-card-title class="justify-center" fluid>
+        <v-card-title class="justify-center" fluid style="font-size:18px">
           {{ itemData.filename }}
         </v-card-title>
 
         <v-expand-transition>
           <div
             v-if="hover"
-            class="d-flex transition-fast-in-fast-out v-card--reveal"
-            style="height: 35%; background-color: rgba(255, 255, 255, 0.3);"
+            class="transition-fast-in-fast-out v-card--reveal"
+            style="height: 35%; background-color: rgba(255, 255, 255, 0.42); font-size:13px; font-weight: bold;
+              text-shadow: none; color:#000; line-height: 1.125;"
           >
-            {{ itemData.desc }}
+            {{ itemData.desc.substring(0, 200) }}
           </div>
         </v-expand-transition>
       </v-img>
@@ -64,10 +65,6 @@
       } else if (this.itemData.thumbnailUrl) {
         return this.itemData.thumbnailUrl;
       }
-    }
-
-    get isWorkshopItem() {
-      return this.itemData.publisherId;
     }
   }
 </script>

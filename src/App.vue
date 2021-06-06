@@ -84,7 +84,7 @@
           class="pa-2"
         />
       </v-card>
-      <v-card no-gutters style="max-height:60%; overflow: auto;">
+      <v-card no-gutters style="max-height:calc(100% - 360px); overflow: auto;">
         <node-properties-view
           fluid
           align="start"

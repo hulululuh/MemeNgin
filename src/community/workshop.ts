@@ -1,4 +1,4 @@
-import { UserData } from "@/userdata";
+import { UserData, QueryTarget } from "@/userdata";
 import { ProjectItemData } from "./ProjectItemData";
 import { readFileSync, writeFileSync } from "fs";
 import path from "path";
@@ -12,8 +12,12 @@ const UPDATE_DELAY = 1000;
 
 export class WorkshopManager {
   private static _instance: WorkshopManager;
-  private _dirty: boolean = false;
+  private _dirty = new Map<QueryTarget, boolean>([
+    [QueryTarget.Best, false],
+    [QueryTarget.Search, false],
+  ]);
   private activeTimerId;
+  initialized: boolean = false;
   static getInstance() {
     if (!WorkshopManager._instance) {
       WorkshopManager._instance = new WorkshopManager();
@@ -31,31 +35,42 @@ export class WorkshopManager {
       }
 
       // trying to init api with appid: 0
-      let initialized = greenworks.init();
-      if (initialized) {
+      this.initialized = greenworks.init();
+      if (this.initialized) {
         console.log("Steam API has been initialized.");
-        this.requestPage(1);
+        this.requestPage(1, QueryTarget.Search);
+        this.requestPage(1, QueryTarget.Best);
       }
     } catch (err) {
-      console.error(err);
+      console.warn(err);
     }
   }
 
-  requestPage(num: number) {
+  requestPage(num: number, target: QueryTarget) {
     const userData = UserData.getInstance();
-    if (userData.pageIndex != num || this._dirty) {
-      userData.pageIndex = num;
+    // target == QueryTarget.Search
+    let rank = greenworks.UGCQueryType.RankedByPublicationDate;
+    let tags = userData.tags;
+    let excludedTags = userData.excludedTags;
 
+    if (target == QueryTarget.Best) {
+      rank = greenworks.UGCQueryType.RankedByVote;
+      tags = [];
+      excludedTags = [];
+    }
+
+    if (userData.pageIndex.get(target) != num || this._dirty.get(target)) {
+      userData.pageIndex.set(target, num);
       greenworks.ugcGetItems(
         {
           "app_id": APP_ID,
-          "page_num": userData.pageIndex,
-          "tags": userData.tags,
-          "excludedTags": userData.excludedTags,
+          "page_num": userData.pageIndex.get(target),
+          "tags": tags,
+          "excludedTags": excludedTags,
           "keyword": userData.keyword,
         },
         greenworks.UGCMatchingType.Items,
-        greenworks.UGCQueryType.RankedByPublicationDate,
+        rank,
         (items, numResults, numTotalResults) => {
           UserData.getInstance().numSearchResultInPages = Math.trunc(
             numTotalResults / 50 + 1
@@ -71,12 +86,12 @@ export class WorkshopManager {
             prjItem.thumbnailUrl = item.PreviewImageUrl;
             prjItem.publisherId = item.steamIDOwner;
             prjItem.numSubscribed = item.NumFollowers;
-            prjItem.numLikes = item.NumFavorites;
-            // prjItem.numDislikes = item.previewUrl;
+            prjItem.numLikes = item.votesUp;
+            prjItem.numDislikes = item.votesDown;
 
             searchedItems.push(prjItem);
           }
-          UserData.getInstance().updateSearchedItems(searchedItems);
+          UserData.getInstance().updateSearchedItems(searchedItems, target);
         },
         (err) => {
           console.error(err);
@@ -85,15 +100,15 @@ export class WorkshopManager {
     }
   }
 
-  requestUpdate() {
+  requestUpdate(target: QueryTarget) {
     if (this._dirty) {
       clearTimeout(this.activeTimerId);
     }
 
-    this._dirty = true;
+    this._dirty.set(target, true);
     this.activeTimerId = setTimeout(() => {
-      this.requestPage(UserData.getInstance().pageIndex);
-      this._dirty = false;
+      this.requestPage(UserData.getInstance().pageIndex.get(target), target);
+      this._dirty.set(target, false);
     }, UPDATE_DELAY);
   }
 

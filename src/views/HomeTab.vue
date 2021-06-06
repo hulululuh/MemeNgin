@@ -44,7 +44,6 @@
       getAllFiles(assetPath, assetFiles, "*.mmng");
 
       let items: ProjectItemData[] = [];
-      let idx = 0;
       for (let path of assetFiles) {
         let item = new ProjectItemData();
         item.localPath = path;

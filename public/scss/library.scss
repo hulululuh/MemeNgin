@@ -4,8 +4,8 @@
   width: $nodeIconSize;
   display: block;
   float: left;
-  padding: 5px;
   cursor: pointer;
+  padding: 5px;
   border-radius: 4px;
 }
 
@@ -19,7 +19,6 @@
   height: $nodeIconSize;
   background: #ccc;
   border-radius: 4px;
-
   margin-left: -4px;
   border: solid rgba(0, 0, 0, 0.7) 4px;
 }

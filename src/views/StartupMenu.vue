@@ -17,17 +17,22 @@
       <v-btn color="primary" dark @click="dialog = false">
         <v-icon>mdi-menu</v-icon>
       </v-btn>
-      <v-tabs Left>
+      <v-tabs Left v-model="tabs">
         <v-tab>Home</v-tab>
-        <v-tab>Personalized</v-tab>
+        <v-tab>Personal</v-tab>
         <v-tab>Explore</v-tab>
-        <v-tab-item justify="center">
+      </v-tabs>
+      <v-tabs-items v-model="tabs">
+        <v-tab-item justify="center" :key="0">
           <home-tab ref="home" />
         </v-tab-item>
         <v-tab-item justify="center" :key="1">
+          <personal-tab ref="personal" />
+        </v-tab-item>
+        <v-tab-item justify="center" :key="2">
           <explore-tab ref="explore" />
         </v-tab-item>
-      </v-tabs>
+      </v-tabs-items>
     </v-card>
   </v-dialog>
 </template>
@@ -40,13 +45,13 @@
   import { Vue, Component } from "vue-property-decorator";
   import HomeTab from "@/views/HomeTab.vue";
   import ExploreTab from "@/views/ExploreTab.vue";
-  // import WorkshopTab from "@/views/WorkshopTab.vue";
+  import PersonalTab from "@/views/PersonalTab.vue";
 
   @Component({
     components: {
       homeTab: HomeTab,
+      personalTab: PersonalTab,
       exploreTab: ExploreTab,
-      // workshopTab: WorkshopTab,
     },
   })
   export default class StartupMenu extends Vue {
@@ -54,6 +59,7 @@
     notifications: boolean = false;
     sound: boolean = true;
     widgets: boolean = false;
+    tabs: number[] = null;
 
     opened() {}
 

@@ -11,6 +11,12 @@ const userDataPath = path.join(app.getPath("userData"), "userData.json");
 //   Unsure = "unsure",
 //   Mature = "mature",
 // }
+
+export enum QueryTarget {
+  Search = "Search",
+  Best = "Best",
+}
+
 export const AGE_RATING: string[] = ["Everyone", "Questionable", "Mature"];
 
 export const TAGS_TEST: string[] = [
@@ -48,9 +54,15 @@ export class UserData {
   followedUser: string[] = [];
 
   recentItems: ProjectItemData[] = [];
+  bestItems: ProjectItemData[] = [];
   searchedItems: ProjectItemData[] = [];
   numSearchResultInPages: number;
-  pageIndex: number = -1;
+  //pageIndex: number = -1;
+
+  pageIndex = new Map<QueryTarget, number>([
+    [QueryTarget.Best, -1],
+    [QueryTarget.Search, -1],
+  ]);
 
   // search tags
   keyword: string = "";
@@ -145,7 +157,14 @@ export class UserData {
     }
   }
 
-  updateSearchedItems(items: ProjectItemData[]) {
-    this.searchedItems = items;
+  updateSearchedItems(items: ProjectItemData[], target: QueryTarget) {
+    switch (target) {
+      case QueryTarget.Search:
+        this.searchedItems = items;
+        break;
+      case QueryTarget.Best:
+        this.bestItems = items;
+        break;
+    }
   }
 }

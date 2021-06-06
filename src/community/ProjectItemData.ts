@@ -30,4 +30,12 @@ export class ProjectItemData {
     if (this.description) return this.description;
     else return "";
   }
+
+  get isLocal() {
+    return this.localPath && !this.id;
+  }
+
+  get isWorkshopItem() {
+    return this.id && this.publisherId;
+  }
 }
