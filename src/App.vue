@@ -18,38 +18,58 @@
     </v-system-bar>
 
     <v-app-bar class="pa-0" app dense clipped-left clipped-right>
-      <v-btn color="gray" @click="newProject">
-        <v-icon>mdi-note-plus-outline</v-icon>
-      </v-btn>
-      <v-btn color="gray" @click="saveProject" :disabled="!saveable">
-        <v-icon>mdi-content-save-outline</v-icon>
-      </v-btn>
-      <v-btn color="gray" @click="saveProjectAs">
-        <v-icon>mdi-content-save-edit-outline</v-icon>
-      </v-btn>
-      <v-btn color="gray" @click="openProject">
-        <v-icon>mdi-folder-open-outline</v-icon>
-      </v-btn>
-      <v-btn color="gray" @click="undoAction">
-        <v-icon dark>
-          mdi-undo
-        </v-icon>
-      </v-btn>
-      <v-btn color="gray" @click="redoAction">
-        <v-icon dark>
-          mdi-redo
-        </v-icon>
-      </v-btn>
-      <v-btn color="gray" @click="zoomSelection">
-        <v-icon>mdi-image-filter-center-focus-strong</v-icon>
-      </v-btn>
+      <tooltip-button
+        icon="mdi-note-plus-outline"
+        tooltip="New project"
+        @click="newProject"
+      />
+      <tooltip-button
+        icon="mdi-content-save-outline"
+        tooltip="Save project"
+        @click="saveProject"
+        :disabled="!saveable"
+      />
+      <tooltip-button
+        icon="mdi-content-save-edit-outline"
+        tooltip="Save project as"
+        @click="saveProjectAs"
+      />
+      <tooltip-button
+        icon="mdi-folder-open-outline"
+        tooltip="Open project"
+        @click="openProject"
+      />
+      <tooltip-button
+        icon="mdi-undo"
+        tooltip="Undo action"
+        @click="undoAction"
+      />
+      <tooltip-button
+        icon="mdi-redo"
+        tooltip="Redo action"
+        @click="redoAction"
+      />
+      <tooltip-button
+        icon="mdi-image-filter-center-focus-strong"
+        tooltip="Zoom selection"
+        @click="zoomSelection"
+      />
       <v-spacer />
-      <v-btn @click="saveTexture">
-        <v-icon> mdi-download </v-icon>
-      </v-btn>
-      <v-btn @click="centerTexture">
-        <v-icon> mdi-fit-to-page-outline </v-icon>
-      </v-btn>
+      <tooltip-button
+        iconPath="assets/icons/Steam_Logo_Lockups_24dp.svg"
+        tooltip="Publish item"
+        @click="publishItem"
+      />
+      <tooltip-button
+        icon="mdi-download"
+        tooltip="Save as Image"
+        @click="saveTexture"
+      />
+      <tooltip-button
+        icon="mdi-fit-to-page-outline"
+        tooltip="Center texture"
+        @click="centerTexture"
+      />
     </v-app-bar>
 
     <v-navigation-drawer app clipped width="300">
@@ -144,6 +164,7 @@
   import LibraryMenu from "@/components/LibraryMenu.vue";
   import NodePropertiesView from "@/views/NodeProperties.vue";
   import Preview2D from "@/views/Preview2D.vue";
+  import TooltipButton from "@/views/TooltipButton.vue";
   import StartupMenu from "@/views/StartupMenu.vue";
   import CloseDialog from "@/views/CloseDialog.vue";
   import { DesignerLibrary } from "./lib/designer/library";
@@ -172,6 +193,7 @@
       startupMenu: StartupMenu,
       preview2d: Preview2D,
       closeDialog: CloseDialog,
+      tooltipButton: TooltipButton,
     },
   })
   export default class App extends Vue {
@@ -727,6 +749,8 @@
       const WIN = remote.getCurrentWindow();
       WIN.minimize();
     }
+
+    publishItem() {}
 
     saveTexture() {
       (this.$refs.preview2d as Preview2D).saveTexture();

@@ -57,7 +57,6 @@ export class UserData {
   bestItems: ProjectItemData[] = [];
   searchedItems: ProjectItemData[] = [];
   numSearchResultInPages: number;
-  //pageIndex: number = -1;
 
   pageIndex = new Map<QueryTarget, number>([
     [QueryTarget.Best, -1],
