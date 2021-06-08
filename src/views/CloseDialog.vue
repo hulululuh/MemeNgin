@@ -13,7 +13,7 @@
         <v-btn text @click="onClose">
           {{ textClose }}
         </v-btn>
-        <v-btn text @click="dialog = false">
+        <v-btn text @click="onCancel">
           {{ textCancel }}
         </v-btn>
       </v-card-actions>
@@ -43,6 +43,12 @@
     onClose() {
       this.dialog = false;
       this.$emit("onClose");
+    }
+
+    @Emit()
+    onCancel() {
+      this.dialog = false;
+      this.$emit("onCancel");
     }
 
     get textMessage() {

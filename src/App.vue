@@ -39,16 +39,8 @@
         tooltip="Open project"
         @click="openProject"
       />
-      <tooltip-button
-        icon="mdi-undo"
-        tooltip="Undo action"
-        @click="undoAction"
-      />
-      <tooltip-button
-        icon="mdi-redo"
-        tooltip="Redo action"
-        @click="redoAction"
-      />
+      <tooltip-button icon="mdi-undo" tooltip="Undo" @click="undoAction" />
+      <tooltip-button icon="mdi-redo" tooltip="Redo" @click="redoAction" />
       <tooltip-button
         icon="mdi-image-filter-center-focus-strong"
         tooltip="Zoom selection"
@@ -62,7 +54,7 @@
       />
       <tooltip-button
         icon="mdi-download"
-        tooltip="Save as Image"
+        tooltip="Save as image"
         @click="saveTexture"
       />
       <tooltip-button
@@ -118,10 +110,12 @@
     </v-navigation-drawer>
 
     <v-main>
+      <publish-dialog @onCancel="onCancelled" ref="publishDialog" />
       <close-dialog
         ref="closeDialog"
         @onSave="saveAndClose"
         @onClose="closeAnyway"
+        @onCancel="onCancelled"
       />
       <v-container
         fluid
@@ -167,6 +161,7 @@
   import TooltipButton from "@/views/TooltipButton.vue";
   import StartupMenu from "@/views/StartupMenu.vue";
   import CloseDialog from "@/views/CloseDialog.vue";
+  import PublishDialog from "@/views/PublishDialog.vue";
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
@@ -194,6 +189,7 @@
       preview2d: Preview2D,
       closeDialog: CloseDialog,
       tooltipButton: TooltipButton,
+      publishDialog: PublishDialog,
     },
   })
   export default class App extends Vue {
@@ -218,7 +214,8 @@
 
     titleName: string = "";
     edited: boolean = false;
-    dialog: boolean = false;
+
+    havePersistentDialog: boolean = false;
 
     constructor() {
       super();
@@ -474,8 +471,10 @@
     }
 
     showLibraryMenu() {
+      // prevent showing library menu, when a program asks you important questions
+      if (this.havePersistentDialog) return;
+
       // ensure mouse is in canvas bounds
-      //if (this.$refs.canvas.offset)
       let lib = this.$refs.libraryMenu as any;
       console.log("show menu");
       if (lib.show == false) lib.showModal(this.mouseX, this.mouseY);
@@ -560,6 +559,10 @@
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       WIN.close();
+    }
+
+    onCancelled() {
+      this.havePersistentDialog = false;
     }
 
     saveProject() {
@@ -719,6 +722,8 @@
     }
 
     maximizeWindow() {
+      if (this.havePersistentDialog) return;
+
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
 
@@ -732,6 +737,8 @@
     }
 
     closeWindow() {
+      if (this.havePersistentDialog) return;
+
       UserData.deserialize();
 
       const remote = window.require ? window.require("electron").remote : null;
@@ -741,22 +748,32 @@
         WIN.close();
       } else {
         (this.$refs.closeDialog as CloseDialog).dialog = true;
+        this.havePersistentDialog = true;
       }
     }
 
     minimizeWindow() {
+      if (this.havePersistentDialog) return;
+
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       WIN.minimize();
     }
 
-    publishItem() {}
+    publishItem() {
+      if (this.havePersistentDialog) return;
+
+      (this.$refs.publishDialog as PublishDialog).dialog = true;
+      this.havePersistentDialog = true;
+    }
 
     saveTexture() {
+      if (this.havePersistentDialog) return;
       (this.$refs.preview2d as Preview2D).saveTexture();
     }
 
     centerTexture() {
+      if (this.havePersistentDialog) return;
       (this.$refs.preview2d as Preview2D).centerTexture();
     }
   }
