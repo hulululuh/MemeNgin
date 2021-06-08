@@ -32,7 +32,7 @@ import { MapFloatNode } from "./library/nodes/mapfloatnode";
 
 const HALF = 0.5;
 
-function canvasToURL(img: HTMLCanvasElement) {
+export function canvasToURL(img: HTMLCanvasElement) {
   let canvas = document.createElement("canvas");
   canvas.width = img.width;
   canvas.height = img.height;
@@ -50,7 +50,7 @@ enum FitMode {
 }
 const fitMode: FitMode = FitMode.Height;
 
-function canvasToThumbnailURL(img: HTMLCanvasElement) {
+export function canvasToThumbnailURL(img: HTMLCanvasElement) {
   let canvas = document.createElement("canvas");
   canvas.width = 256;
   canvas.height = 256;
@@ -872,7 +872,6 @@ export class Designer {
 
       let props = {};
       for (let prop of node.properties) {
-        // itself
         props[prop.name] = {};
         props[prop.name]["value"] = prop.getValue();
         props[prop.name]["exposed"] = prop.getExposed();
@@ -975,25 +974,7 @@ export class Designer {
       // todo: support left index
       d.addConnection(left, right, con.rightNodeInput);
     }
-    /*
-        for(let dvar of this.variables) {
-            let v = {};
-            v["id"] = dvar.id;
-            v["type"] = dvar.type;
-            v["property"] = dvar.property;
 
-            let nodeIds = new Array();
-            for(let n of dvar.nodes) {
-                nodeIds.push({
-                    nodeId:n.node.id,
-                    name:n.propertyName
-                });
-            }
-            v["linkedProperties"] = nodeIds;
-            variables.push(v);
-            console.log(v);
-        }
-        */
     if (data.variables) {
       let variables = <DesignerVariable[]>data.variables;
       for (let v of variables) {
@@ -1056,6 +1037,18 @@ export class Designer {
     console.log(nodes.length + " nodes");
     console.log(connections.length + " connections");
     return d;
+  }
+
+  getThumbnail() {
+    let outputNode = this.nodes.find((item) => item instanceof OutputNode);
+    if (!outputNode) {
+      console.error("Can not find output node, this sould not happen");
+      return;
+    } else {
+      let outputCanvas = Editor.getScene().getNodeById(outputNode.id)
+        .imageCanvas.canvas;
+      return canvasToThumbnailURL(outputCanvas);
+    }
   }
 
   findLeftNode(rightNodeId: string, rightNodeInput: string): DesignerNode {

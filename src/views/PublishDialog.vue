@@ -1,39 +1,34 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="800px" max-height="800px">
+  <v-dialog v-model="dialog" persistent max-width="960px" max-height="800px">
     <v-card>
       <v-card-title class="text-h5 grey lighten-2">
         Publish your work on steam workshop.
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-text-field label="Title*" required></v-text-field>
-        </v-row>
-        <v-row>
-          <v-textarea name="input-7-1" label="Description"></v-textarea>
-        </v-row>
-        <v-row>
-          <v-select
-            :items="['0-17', '18-29', '30-54', '54+']"
-            label="Age*"
-            required
-          ></v-select>
-        </v-row>
-        <v-row>
-          <v-autocomplete
-            :items="[
-              'Skiing',
-              'Ice hockey',
-              'Soccer',
-              'Basketball',
-              'Hockey',
-              'Reading',
-              'Writing',
-              'Coding',
-              'Basejump',
-            ]"
-            label="Interests"
-            multiple
-          ></v-autocomplete>
+          <v-col cols="8">
+            <v-text-field label="Title*" required></v-text-field>
+            <v-textarea name="input-5-1" label="Description"></v-textarea>
+            <v-select :items="ratings" label="Age rating*" required></v-select>
+            <v-autocomplete
+              chips
+              :items="tags"
+              label="Tags"
+              multiple
+            ></v-autocomplete>
+          </v-col>
+          <v-col align="center" justify="center" cols="4">
+            Thumbnail
+            <v-card width="256px">
+              <img
+                class="align-center"
+                style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
+                height="256px"
+                v-bind:src="img"
+                lazy-src="assets/icons/image.svg"
+              />
+            </v-card>
+          </v-col>
         </v-row>
         <small>*indicates required field</small>
       </v-card-text>
@@ -55,7 +50,10 @@
 </style>
 
 <script lang="ts">
-  import { Vue, Component, Emit } from "vue-property-decorator";
+  import { Vue, Component, Emit, Watch } from "vue-property-decorator";
+  import { AGE_RATING, TAGS_TEST } from "@/userdata";
+  import { Editor } from "@/lib/editor";
+  import { canvasToThumbnailURL } from "@/lib/designer";
 
   @Component
   export default class PublishDialog extends Vue {
@@ -64,8 +62,8 @@
     sound: boolean = true;
     widgets: boolean = false;
     tabs: number[] = null;
-
-    opened() {}
+    ratings: string[] = AGE_RATING;
+    tags: string[] = TAGS_TEST;
 
     @Emit()
     onCancel() {
@@ -75,6 +73,24 @@
 
     tryClose() {
       if (this.dialog) this.dialog = false;
+    }
+
+    get img() {
+      return this.$store.state.thumbnail;
+    }
+
+    show() {
+      this.dialog = true;
+      this.prepareThumbnail();
+    }
+
+    hide() {
+      this.dialog = false;
+    }
+
+    prepareThumbnail() {
+      let outputCanvas = Editor.getScene().outputNode.imageCanvas.canvas;
+      this.$store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
     }
   }
 </script>

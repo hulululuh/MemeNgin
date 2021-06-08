@@ -51,6 +51,14 @@
       this.$emit("onCancel");
     }
 
+    show() {
+      this.dialog = true;
+    }
+
+    hide() {
+      this.dialog = false;
+    }
+
     get textMessage() {
       return TextManager.translate("${close_dialog.message}");
     }

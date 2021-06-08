@@ -405,13 +405,7 @@ export class Editor {
     };
 
     this.nodeScene.onnodedeleted = function(node: NodeGraphicsItem) {
-      // remove node from channels
-      //console.log(self);
       self.designer.removeNode(node.id);
-
-      // if (self.onpreviewnode) {
-      //   self.onpreviewnode(null, null);
-      // }
     };
 
     this.nodeScene.oninputnodecreationattempt = function() {
@@ -462,21 +456,12 @@ export class Editor {
       cons: ConnectionGraphicsItem[],
       nodes: NodeGraphicsItem[]
     ) {
-      // if (self.onpreviewnode) {
-      //   self.onpreviewnode(null, null);
-      // }
-      // clear selected items
-
       for (let node of nodes) {
         let idx = self.nodeScene.selectedItems.indexOf(node);
         if (idx != -1) {
           self.nodeScene.selectedItems.splice(idx, 1);
         }
       }
-      // self.nodeScene.selectedItems.splice(
-      //   0,
-      //   self.nodeScene.selectedItems.length
-      // );
     };
 
     this.nodeScene.oncopy = function(evt: ClipboardEvent) {

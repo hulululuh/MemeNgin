@@ -52,7 +52,6 @@
     IProperyUi,
     PropertyChangeComplete,
   } from "../components/properties/ipropertyui";
-  import { OutputNode } from "@/lib/library/nodes/outputnode";
 
   /* eslint-disable */
 

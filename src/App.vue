@@ -215,8 +215,6 @@
     titleName: string = "";
     edited: boolean = false;
 
-    havePersistentDialog: boolean = false;
-
     constructor() {
       super();
 
@@ -227,6 +225,13 @@
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       this.isMaximized = WIN.isMaximized();
+    }
+
+    get havePersistentDialog() {
+      return (
+        (this.$refs.closeDialog as CloseDialog).dialog ||
+        (this.$refs.publishDialog as PublishDialog).dialog
+      );
     }
 
     get title() {
@@ -561,9 +566,7 @@
       WIN.close();
     }
 
-    onCancelled() {
-      this.havePersistentDialog = false;
-    }
+    onCancelled() {}
 
     saveProject() {
       if (!this.saveable) return;
@@ -747,8 +750,7 @@
       if (!this.edited) {
         WIN.close();
       } else {
-        (this.$refs.closeDialog as CloseDialog).dialog = true;
-        this.havePersistentDialog = true;
+        (this.$refs.closeDialog as CloseDialog).show();
       }
     }
 
@@ -763,8 +765,7 @@
     publishItem() {
       if (this.havePersistentDialog) return;
 
-      (this.$refs.publishDialog as PublishDialog).dialog = true;
-      this.havePersistentDialog = true;
+      (this.$refs.publishDialog as PublishDialog).show();
     }
 
     saveTexture() {
