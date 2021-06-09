@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="290">
+  <v-dialog
+    v-model="dialog"
+    persistent
+    max-width="290"
+    @keydown.esc="dialog = false"
+  >
     <v-card>
       <v-card-title class="headline grey lighten-2">
         MemeNgin

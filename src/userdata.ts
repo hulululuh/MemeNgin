@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { ProjectItemData } from "@/community/ProjectItemData";
+import { LocalItemData, ProjectItemData } from "@/community/ProjectItemData";
 
 const MAX_RECENT_FILE = 8;
 const app = require("electron").remote.app;
@@ -99,10 +99,9 @@ export class UserData {
         instance.recentFiles.splice(i, 1);
       }
 
-      for (let item of instance.recentFiles) {
-        let projectItem: ProjectItemData = new ProjectItemData();
-        projectItem.localPath = item;
-        instance.recentItems.push(projectItem);
+      for (let path of instance.recentFiles) {
+        let item = ProjectItemData.fromLocalPath(path);
+        if (item) instance.recentItems.push(item);
       }
 
       console.log(
@@ -144,11 +143,8 @@ export class UserData {
       this.recentItems.splice(idx, 1);
     }
 
-    let projectItem: ProjectItemData = new ProjectItemData();
-    projectItem.localPath = path;
-
-    //this
-    this.recentItems = [projectItem, ...this.recentItems];
+    let item = ProjectItemData.fromLocalPath(path);
+    if (item) this.recentItems = [item, ...this.recentItems];
 
     // cut overflowed item
     if (this.recentItems.length > MAX_RECENT_FILE) {

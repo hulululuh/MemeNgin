@@ -3,7 +3,6 @@ import fs from "fs";
 export class Project {
   name: string = null;
   path: string = null;
-
   data: object = null;
 }
 

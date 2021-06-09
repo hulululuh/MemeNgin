@@ -15,7 +15,7 @@
         @click="open"
       >
         <v-card-title class="justify-center" fluid style="font-size:18px">
-          {{ itemData.filename }}
+          {{ itemData.title }}
         </v-card-title>
 
         <v-expand-transition>
@@ -25,7 +25,7 @@
             style="height: 35%; background-color: rgba(255, 255, 255, 0.42); font-size:13px; font-weight: bold;
               text-shadow: none; color:#000; line-height: 1.125;"
           >
-            {{ itemData.desc.substring(0, 200) }}
+            {{ itemData.description.substring(0, 200) }}
           </div>
         </v-expand-transition>
       </v-img>
@@ -39,14 +39,12 @@
 
 <script lang="ts">
   import { Vue, Prop, Component } from "vue-property-decorator";
-  import { ProjectManager } from "@/lib/project";
-  import App from "../App.vue";
   import { ProjectItemData } from "@/community/ProjectItemData";
+  import App from "../App.vue";
 
   @Component
   export default class ProjectItem extends Vue {
     @Prop() itemData: ProjectItemData;
-    data: any;
 
     open() {
       console.log("tried to open");
@@ -56,15 +54,7 @@
     }
 
     get thumbnail() {
-      if (this.itemData.localPath) {
-        let project = ProjectManager.load(this.itemData.localPath);
-        if (project) {
-          this.data = project.data;
-          return project.data["thumbnail"];
-        }
-      } else if (this.itemData.thumbnailUrl) {
-        return this.itemData.thumbnailUrl;
-      }
+      return this.itemData.thumbnail;
     }
   }
 </script>

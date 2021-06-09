@@ -38,7 +38,7 @@
     @Prop() lists: ProjectItemData[];
 
     exists(item: ProjectItemData) {
-      return fs.existsSync(item.localPath) || item.thumbnailUrl;
+      return item.isValid;
     }
   }
 </script>

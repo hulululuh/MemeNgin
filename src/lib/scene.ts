@@ -1187,11 +1187,6 @@ export class NodeScene {
       n["w"] = node.getWidth();
       n["h"] = node.getHeight();
 
-      // if (node.dNode instanceof TextureNode) {
-      //   let imgDataURL = canvasToURL(node.imageCanvas.canvas);
-      //   n["imgDataURL"] = imgDataURL;
-      // }
-
       nodes[node.id] = n;
     }
     data["nodes"] = nodes;
@@ -1204,9 +1199,7 @@ export class NodeScene {
       n["y"] = frame.top;
       n["width"] = frame.getWidth();
       n["height"] = frame.getHeight();
-
       n["color"] = frame.fillColor.toHex();
-
       frames.push(n);
     }
     data["frames"] = frames;

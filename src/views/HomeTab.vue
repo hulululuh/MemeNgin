@@ -23,7 +23,7 @@
   import { Vue, Component } from "vue-property-decorator";
   import { getAllFiles } from "@/assets/assetmanager";
   import path from "path";
-  import { ProjectItemData } from "@/community/ProjectItemData";
+  import { LocalItemData, ProjectItemData } from "@/community/ProjectItemData";
   declare let __static: any;
 
   @Component({
@@ -45,9 +45,8 @@
 
       let items: ProjectItemData[] = [];
       for (let path of assetFiles) {
-        let item = new ProjectItemData();
-        item.localPath = path;
-        items.push(item);
+        let item = ProjectItemData.fromLocalPath(path);
+        if (item) items.push(item);
       }
 
       return items;
@@ -63,9 +62,8 @@
       let items: ProjectItemData[] = [];
       let idx = 0;
       for (let path of assetFiles) {
-        let item = new ProjectItemData();
-        item.localPath = path;
-        items.push(item);
+        let item = ProjectItemData.fromLocalPath(path);
+        if (item) items.push(item);
       }
 
       return items;

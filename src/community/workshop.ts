@@ -1,8 +1,7 @@
 import { UserData, QueryTarget } from "@/userdata";
-import { ProjectItemData } from "./ProjectItemData";
-import { readFileSync, writeFileSync } from "fs";
+import { ProjectItemData, WorkshopItemData } from "./ProjectItemData";
+import fs, { readFileSync, writeFileSync } from "fs";
 import path from "path";
-import fs from "fs";
 
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
@@ -79,17 +78,8 @@ export class WorkshopManager {
 
           let searchedItems: ProjectItemData[] = [];
           for (let item of items) {
-            let prjItem = new ProjectItemData();
-            prjItem.id = item.file;
-            prjItem.title = item.title;
-            prjItem.description = item.description;
-            prjItem.thumbnailUrl = item.PreviewImageUrl;
-            prjItem.publisherId = item.steamIDOwner;
-            prjItem.numSubscribed = item.NumFollowers;
-            prjItem.numLikes = item.votesUp;
-            prjItem.numDislikes = item.votesDown;
-
-            searchedItems.push(prjItem);
+            let pItem = ProjectItemData.fromMetadata(item);
+            if (pItem) searchedItems.push(pItem);
           }
           UserData.getInstance().updateSearchedItems(searchedItems, target);
         },

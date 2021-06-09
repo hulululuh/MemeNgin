@@ -1,5 +1,11 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="960px" max-height="800px">
+  <v-dialog
+    v-model="dialog"
+    persistent
+    max-width="960px"
+    max-height="800px"
+    @keydown.esc="dialog = false"
+  >
     <v-card>
       <v-card-title class="text-h5 grey lighten-2">
         Publish your work on steam workshop.
@@ -20,7 +26,7 @@
           <v-col align="center" justify="center" cols="4">
             Thumbnail
             <v-card width="256px">
-              <img
+              <v-img
                 class="align-center"
                 style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
                 height="256px"
