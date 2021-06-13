@@ -47,7 +47,6 @@ export class WorkshopManager {
 
   requestPage(num: number, target: QueryTarget) {
     const userData = UserData.getInstance();
-    // target == QueryTarget.Search
     let rank = greenworks.UGCQueryType.RankedByPublicationDate;
     let tags = userData.tags;
     let excludedTags = userData.excludedTags;

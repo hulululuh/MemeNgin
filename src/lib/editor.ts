@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import store from "../store";
 
 import { Designer } from "./designer";
 import { DesignerNode } from "./designer/designernode";
@@ -11,6 +12,7 @@ import { NodeScene } from "./scene";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
 
+import { ProjectItemData } from "@/community/ProjectItemData";
 import { createLibrary, getCurrentLibraryVersion } from "@/lib/library/library";
 import { Color } from "./designer/color";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
@@ -23,9 +25,9 @@ import { AddItemsAction } from "./actions/additemsaction";
 import { RemoveItemsAction } from "./actions/removeitemsaction";
 import { DetectNode } from "./library/nodes/detectnode";
 import { ImageDesignerNode } from "./designer/imagedesignernode";
-import { ITransformable } from "./designer/transformable";
+import { plainToClass } from "class-transformer";
+
 const isDataUri = require("is-data-uri");
-const NativeImage = require("electron").nativeImage;
 
 function hexToRgb(hex) {
   let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -53,6 +55,7 @@ export class Editor {
   canvas: HTMLCanvasElement;
 
   library: DesignerLibrary;
+  metadata: ProjectItemData;
   nodeScene: NodeScene;
   designer: Designer;
   selectedNodeId: string;
@@ -87,6 +90,11 @@ export class Editor {
       Editor.instance = new Editor();
     }
     return Editor.instance;
+  }
+
+  static getMetadata() {
+    const editor = this.getInstance();
+    return editor.metadata;
   }
 
   static getDesigner() {
@@ -138,6 +146,7 @@ export class Editor {
   // create empty scene
   createEmptyScene() {
     this.library = createLibrary();
+    this.setMetadata(ProjectItemData.fromNothing());
     this.setDesigner(new Designer());
     this.setScene(new NodeScene(this.canvas));
 
@@ -186,7 +195,10 @@ export class Editor {
 
   setSceneCanvas(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    //this.setScene(new NodeScene(canvas));
+  }
+
+  setMetadata(data: ProjectItemData) {
+    this.metadata = data;
   }
 
   setDesigner(designer: Designer) {
@@ -622,10 +634,10 @@ export class Editor {
     // load graph
     let g = NodeScene.load(d, data["scene"], this.canvas);
 
-    //todo: properly destroy existing graph
+    // load metadata
+    let md = plainToClass(ProjectItemData, data["item"]);
 
-    //this.designer = d;
-    //this.graph = g;
+    this.setMetadata(md);
     this.setDesigner(d);
     this.setScene(g);
 
@@ -665,6 +677,7 @@ export class Editor {
     let data = this.designer.save();
     data["scene"] = this.nodeScene.save();
     data["libraryVersion"] = getCurrentLibraryVersion();
+    data["item"] = store.state.metadata.save();
 
     return data;
   }

@@ -1210,10 +1210,8 @@ export class NodeScene {
       let n: any = {};
       n["x"] = comment.left;
       n["y"] = comment.top;
-
       n["text"] = comment.text;
       n["color"] = comment.color.toHex();
-
       comments.push(n);
     }
     data["comments"] = comments;
@@ -1224,7 +1222,6 @@ export class NodeScene {
       let n: any = {};
       n["x"] = nav.left;
       n["y"] = nav.top;
-
       navs.push(n);
     }
     data["navigations"] = navs;

@@ -713,7 +713,6 @@
 
     setResolution(evt) {
       let value = parseInt(evt.target.value);
-      //console.log(value);
       this.resolution = value;
       this.editor.designer.setTextureSize(value, value);
     }

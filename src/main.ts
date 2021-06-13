@@ -1,6 +1,4 @@
 import Vue from "vue";
-//import vgl from "vue-golden-layout";
-//import "golden-layout/src/css/goldenlayout-dark-theme.css";
 import "../public/scss/scrollbar.scss";
 import "./utils/inspectelement";
 import "boxicons/css/boxicons.css";

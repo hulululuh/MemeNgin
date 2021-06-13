@@ -13,7 +13,12 @@
       <v-card-text>
         <v-row>
           <v-col cols="8">
-            <v-text-field label="Title*" required></v-text-field>
+            <v-text-field
+              v-model="title"
+              label="Title*"
+              required
+              ref="titl"
+            ></v-text-field>
             <v-textarea name="input-5-1" label="Description"></v-textarea>
             <v-select :items="ratings" label="Age rating*" required></v-select>
             <v-autocomplete
@@ -46,6 +51,9 @@
         <v-btn color="blue darken-1" text @click="dialog = false">
           Save
         </v-btn>
+        <v-btn color="blue darken-1" text @click="onPublish">
+          Publish
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -56,10 +64,11 @@
 </style>
 
 <script lang="ts">
-  import { Vue, Component, Emit, Watch } from "vue-property-decorator";
+  import { Vue, Component, Emit } from "vue-property-decorator";
   import { AGE_RATING, TAGS_TEST } from "@/userdata";
   import { Editor } from "@/lib/editor";
   import { canvasToThumbnailURL } from "@/lib/designer";
+  import { ProjectItemData } from "@/community/ProjectItemData";
 
   @Component
   export default class PublishDialog extends Vue {
@@ -77,6 +86,10 @@
       this.$emit("onCancel");
     }
 
+    onPublish() {
+      this.dialog = false;
+    }
+
     tryClose() {
       if (this.dialog) this.dialog = false;
     }
@@ -85,18 +98,36 @@
       return this.$store.state.thumbnail;
     }
 
+    get title() {
+      return this.$store.state.metadata.title;
+    }
+
+    set title(value: string) {
+      this.$store.state.metadata.title = value;
+    }
+
+    // get selectedTags() {
+    //   return this.metadata
+    // }
+
+    // get metadata() {
+    //   return this.$store.state.metadata;
+    // }
+
     show() {
       this.dialog = true;
-      this.prepareThumbnail();
+      this.prepareModel();
     }
 
     hide() {
       this.dialog = false;
     }
 
-    prepareThumbnail() {
+    prepareModel() {
       let outputCanvas = Editor.getScene().outputNode.imageCanvas.canvas;
       this.$store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
+      this.$store.state.metadata = Editor.getMetadata();
+      this.$forceUpdate();
     }
   }
 </script>
