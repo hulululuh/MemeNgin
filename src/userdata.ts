@@ -1,51 +1,97 @@
 import path from "path";
 import fs from "fs";
-import { LocalItemData, ProjectItemData } from "@/community/ProjectItemData";
+import { ProjectItemData } from "@/community/ProjectItemData";
 
 const MAX_RECENT_FILE = 8;
 const app = require("electron").remote.app;
 const userDataPath = path.join(app.getPath("userData"), "userData.json");
-
-// export enum AgeRating {
-//   Everyone = "everyone",
-//   Unsure = "unsure",
-//   Mature = "mature",
-// }
 
 export enum QueryTarget {
   Search = "Search",
   Best = "Best",
 }
 
-export const AGE_RATING: string[] = ["Everyone", "Questionable", "Mature"];
+export const DERIVATIVE_TAG: string = "Derivative Allowed";
+export const AGE_RATING_DEFAULT: string = "Questionable";
+export const AGE_RATING: string[] = ["Everyone", AGE_RATING_DEFAULT, "Mature"];
+
+// export const TAGS_TEST: string[] = [
+//   "Abstract",
+//   "Animal",
+//   "Anime",
+//   "Audio response",
+//   "Cartoon",
+//   "CGI",
+//   "Cyberpunk",
+//   "Fantasy",
+//   "Game",
+//   "Girls",
+//   "Guys",
+//   "Landscape",
+//   "Medieval",
+//   "Memes",
+//   "MMD",
+//   "Music",
+//   "Nature",
+//   "Pixel art",
+//   "Relaxing",
+//   "Retro",
+//   "Sci-fi",
+//   "Sports",
+//   "Technology",
+//   "Television",
+//   "Vehicle",
+//   "Unspecified",
+// ];
 
 export const TAGS_TEST: string[] = [
-  "Abstract",
+  "Actor",
+  "Advertisement",
   "Animal",
   "Anime",
-  "Audio response",
+  "Art",
+  "Artist",
+  "Blog",
+  "Book",
   "Cartoon",
-  "CGI",
-  "Cyberpunk",
-  "Fantasy",
-  "Game",
-  "Girls",
-  "Guys",
-  "Landscape",
-  "Medieval",
-  "Memes",
-  "MMD",
-  "Music",
-  "Nature",
-  "Pixel art",
-  "Relaxing",
-  "Retro",
-  "Sci-fi",
-  "Sports",
+  "Catchphrase",
+  "Character",
+  "Cliche",
+  "Comic Book",
+  "Company",
+  "Controversy",
+  "Copypasta",
+  "Disaster",
+  "Exploitable",
+  "Fan Art",
+  "Fauna",
+  "Film",
+  "Forum",
+  "Gamer",
+  "Generator",
+  "Hashtag",
+  "Image Macro",
+  "Media Host",
+  "Musician",
+  "Parody",
+  "Politician",
+  "Pop Culture",
+  "Product",
+  "Reaction",
+  "Reference",
+  "Remix",
+  "Slang",
+  "Snowclone",
+  "Social Game",
+  "Social Network",
+  "Song",
   "Technology",
-  "Television",
-  "Vehicle",
-  "Unspecified",
+  "TV Show",
+  "Video Game",
+  "Viral Video",
+  "Vlogger",
+  "Web Series",
+  "Webcomic",
 ];
 
 export class UserData {

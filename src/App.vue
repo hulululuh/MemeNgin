@@ -513,12 +513,14 @@
     }
 
     newProject() {
-      // reset states of all components
       // load default scene
       (this.$refs.preview2d as any).reset();
 
       // an empty scene
       this.editor.createEmptyScene();
+
+      // reset states of all components
+      (this.$refs.publishDialog as PublishDialog).reset();
 
       this.library = this.editor.library;
 

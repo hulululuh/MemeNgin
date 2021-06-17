@@ -5,8 +5,9 @@ import path from "path";
 
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
-const APP_ID = 431960;
 //const APP_ID = 480;
+//const APP_ID = 431960;
+const APP_ID = 1632910;
 const UPDATE_DELAY = 1000;
 
 export class WorkshopManager {
@@ -16,6 +17,7 @@ export class WorkshopManager {
     [QueryTarget.Search, false],
   ]);
   private activeTimerId;
+  private steamId;
   initialized: boolean = false;
   static getInstance() {
     if (!WorkshopManager._instance) {
@@ -37,12 +39,18 @@ export class WorkshopManager {
       this.initialized = greenworks.init();
       if (this.initialized) {
         console.log("Steam API has been initialized.");
+
+        this.steamId = greenworks.getSteamId().steamId;
         this.requestPage(1, QueryTarget.Search);
         this.requestPage(1, QueryTarget.Best);
       }
     } catch (err) {
       console.warn(err);
     }
+  }
+
+  get SteamId() {
+    return this.steamId;
   }
 
   requestPage(num: number, target: QueryTarget) {
@@ -122,5 +130,9 @@ export class WorkshopManager {
     } catch {
       return false;
     }
+  }
+
+  publish(): boolean {
+    return true;
   }
 }

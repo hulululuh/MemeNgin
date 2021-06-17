@@ -11,6 +11,14 @@ export default new Vuex.Store({
     thumbnail: "",
     metadata: ProjectItemData.fromNothing(),
   },
-  mutations: {},
-  actions: {},
+  mutations: {
+    setMetadata(state, data) {
+      state.metadata = data;
+    },
+  },
+  actions: {
+    changeMetadata({ commit }, data) {
+      commit("setMetadata", data);
+    },
+  },
 });

@@ -1,17 +1,31 @@
 import { ProjectManager } from "@/lib/project";
-import { AGE_RATING } from "@/userdata";
+import {
+  AGE_RATING,
+  AGE_RATING_DEFAULT,
+  TAGS_TEST,
+  DERIVATIVE_TAG,
+} from "@/userdata";
 import fs from "fs";
 import path from "path";
 
-function ageRatingFromTags(tags: Array<string>) {
-  let rating = "Questionable";
+function ageRatingToExcludedTag(value: string) {
+  let exTag = [];
+  for (let rating of AGE_RATING) {
+    if (rating != value) exTag.push(rating);
+  }
+  return exTag;
+}
 
-  for (let tag of tags) {
-    let idx = AGE_RATING.findIndex((item) => item == tag);
-    if (idx != -1) return AGE_RATING[idx];
+function ageRatingFromTags(tags: Array<string>) {
+  for (let age of TAGS_TEST) {
+    if (!tags.find((item) => item == age)) return age;
   }
 
-  return rating;
+  return AGE_RATING_DEFAULT;
+}
+
+function allowDerivativeWorkFromTags(tags: Array<string>): boolean {
+  return tags.find((item) => item == DERIVATIVE_TAG) ? true : false;
 }
 
 export class ProjectItemData {
@@ -33,6 +47,7 @@ export class ProjectItemData {
   }
 
   set title(value: string) {
+    this.localItem.title = value;
     this.workshopItem.title = value;
   }
 
@@ -42,8 +57,40 @@ export class ProjectItemData {
       : this.localItem.description;
   }
 
+  set description(value: string) {
+    this.localItem.description = value;
+    this.workshopItem.description = value;
+  }
+
+  get ageRating() {
+    const rating = this.workshopItem.ageRating;
+    return rating ? rating : AGE_RATING_DEFAULT;
+  }
+
+  set ageRating(value: string) {
+    this.workshopItem.ageRating = value;
+  }
+
+  get tags() {
+    return this.workshopItem.tags
+      ? this.workshopItem.tags
+      : new Array<string>();
+  }
+
+  set tags(value: Array<string>) {
+    this.workshopItem.tags = value;
+  }
+
+  get allowDerivativeWork() {
+    return this.isWorkshopItem ? this.workshopItem.allowDerivativeWork : false;
+  }
+
+  set allowDerivativeWork(value: boolean) {
+    if (this.isWorkshopItem) this.workshopItem.allowDerivativeWork = value;
+  }
+
   get isWorkshopItem() {
-    return this.workshopItem;
+    return this.workshopItem != null && this.workshopItem.isValid;
   }
 
   get thumbnail() {
@@ -53,9 +100,13 @@ export class ProjectItemData {
   }
 
   get isValid() {
-    return this.isWorkshopItem
-      ? this.workshopItem.isValid
-      : this.localItem.isValid;
+    return (
+      (this.workshopItem && this.workshopItem.isValid) || this.localItem.isValid
+    );
+  }
+
+  get publisherId() {
+    return this.isWorkshopItem ? this.workshopItem.publisherId : "";
   }
 
   save(): any {
@@ -163,13 +214,25 @@ export class WorkshopItemData {
   numSubscribed: number;
   numLikes: number;
   numDislikes: number;
-  tags: Array<string>;
-
-  // calculated
   ageRating: string;
+  tags: Array<string>;
+  allowDerivativeWork: boolean;
 
   get isValid() {
-    return this.itemId && this.publisherId && this.thumbnailUrl;
+    return (
+      this.itemId && this.publisherId && this.thumbnailUrl && this.ageRating
+    );
+  }
+
+  get excludedTag() {
+    return ageRatingToExcludedTag(this.ageRating);
+  }
+
+  addTag(value: string) {
+    const idx = this.tags.findIndex((item) => item == value);
+    if (idx != -1) {
+      this.tags.push(value);
+    }
   }
 
   save(): any {
@@ -185,6 +248,7 @@ export class WorkshopItemData {
     data["numDislikes"] = this.numDislikes;
     data["tags"] = this.tags;
     data["ageRating"] = this.ageRating;
+    data["allowDerivativework"] = this.allowDerivativeWork;
 
     return data;
   }
@@ -199,12 +263,17 @@ export class WorkshopItemData {
     item.numSubscribed = data.NumFollowers;
     item.numLikes = data.votesUp;
     item.numDislikes = data.votesDown;
-    item.ageRating = ageRatingFromTags(data.tags);
+    item.tags = data.tags.split(",");
+    item.ageRating = ageRatingFromTags(item.tags);
+    item.allowDerivativeWork = allowDerivativeWorkFromTags(item.tags);
     return item.isValid ? item : null;
   }
 
   static fromId(id: string) {
+    // TODO: finish this
     let data = [];
+
+    //greenworks
     return this.fromMetadata(data);
   }
 }

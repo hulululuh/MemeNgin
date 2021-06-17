@@ -12,7 +12,11 @@ import { NodeScene } from "./scene";
 import { ConnectionGraphicsItem } from "./scene/connectiongraphicsitem";
 import { NodeGraphicsItem } from "./scene/nodegraphicsitem";
 
-import { ProjectItemData } from "@/community/ProjectItemData";
+import {
+  LocalItemData,
+  ProjectItemData,
+  WorkshopItemData,
+} from "@/community/ProjectItemData";
 import { createLibrary, getCurrentLibraryVersion } from "@/lib/library/library";
 import { Color } from "./designer/color";
 import { CommentGraphicsItem } from "./scene/commentgraphicsitem";
@@ -635,7 +639,20 @@ export class Editor {
     let g = NodeScene.load(d, data["scene"], this.canvas);
 
     // load metadata
-    let md = plainToClass(ProjectItemData, data["item"]);
+    let md = ProjectItemData.fromNothing();
+
+    if (data["item"]) {
+      const item = data["item"];
+      if (item["localItem"]) {
+        md.localItem = plainToClass(LocalItemData, data["item"]["localItem"]);
+      }
+      if (item["workshopItem"]) {
+        md.workshopItem = plainToClass(
+          WorkshopItemData,
+          data["item"]["workshopItem"]
+        );
+      }
+    }
 
     this.setMetadata(md);
     this.setDesigner(d);

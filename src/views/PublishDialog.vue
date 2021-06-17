@@ -13,20 +13,40 @@
       <v-card-text>
         <v-row>
           <v-col cols="8">
-            <v-text-field
-              v-model="title"
-              label="Title*"
-              required
-              ref="titl"
-            ></v-text-field>
-            <v-textarea name="input-5-1" label="Description"></v-textarea>
-            <v-select :items="ratings" label="Age rating*" required></v-select>
-            <v-autocomplete
-              chips
-              :items="tags"
-              label="Tags"
-              multiple
-            ></v-autocomplete>
+            <v-form ref="form" lazy-validation>
+              <v-text-field
+                v-model="title"
+                label="Title*"
+                required
+                :rules="titleRules"
+              ></v-text-field>
+              <v-textarea
+                v-model="description"
+                name="input-5-1"
+                label="Description"
+              ></v-textarea>
+              <v-select
+                v-model="ageRating"
+                :items="ratings"
+                label="Age rating*"
+                required
+                :rules="ageRatingRules"
+              ></v-select>
+              <v-autocomplete
+                v-model="selectedTags"
+                chips
+                :items="tags"
+                label="Tags"
+                multiple
+              />
+              <v-checkbox
+                v-model="allowDerivativeWork"
+                class="ma-0 pa-0"
+                :label="
+                  `Allow others to make derivative work from this publication.`
+                "
+              />
+            </v-form>
           </v-col>
           <v-col align="center" justify="center" cols="4">
             Thumbnail
@@ -48,10 +68,20 @@
         <v-btn color="blue darken-1" text @click="onCancel">
           Close
         </v-btn>
-        <v-btn color="blue darken-1" text @click="dialog = false">
-          Save
+        <v-btn
+          v-show="isUpdatable"
+          color="blue darken-1"
+          text
+          @click="dialog = false"
+        >
+          Update
         </v-btn>
-        <v-btn color="blue darken-1" text @click="onPublish">
+        <v-btn
+          v-show="isPublishable"
+          color="blue darken-1"
+          text
+          @click="onPublish"
+        >
           Publish
         </v-btn>
       </v-card-actions>
@@ -68,7 +98,7 @@
   import { AGE_RATING, TAGS_TEST } from "@/userdata";
   import { Editor } from "@/lib/editor";
   import { canvasToThumbnailURL } from "@/lib/designer";
-  import { ProjectItemData } from "@/community/ProjectItemData";
+  import { WorkshopManager } from "@/community/workshop";
 
   @Component
   export default class PublishDialog extends Vue {
@@ -80,6 +110,8 @@
     ratings: string[] = AGE_RATING;
     tags: string[] = TAGS_TEST;
 
+    key: number = 0;
+
     @Emit()
     onCancel() {
       this.dialog = false;
@@ -87,36 +119,109 @@
     }
 
     onPublish() {
-      this.dialog = false;
+      // following line looks too complex, but it is a walkaround for error.
+      // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element
+      if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+        this.dialog = false;
+      }
     }
 
     tryClose() {
       if (this.dialog) this.dialog = false;
     }
 
+    titleRules = [
+      (v) => !!v || "Name is required",
+      (v) => (v && v.length <= 25) || "Name must be less than 25 characters",
+    ];
+
+    ageRatingRules = [(v) => !!v || "Age rating is required"];
+
     get img() {
       return this.$store.state.thumbnail;
     }
 
     get title() {
+      //return this.metadata.title;
       return this.$store.state.metadata.title;
     }
 
     set title(value: string) {
+      //this.metadata.title = value;
       this.$store.state.metadata.title = value;
     }
 
-    // get selectedTags() {
-    //   return this.metadata
-    // }
+    get description() {
+      return this.$store.state.metadata.description;
+    }
 
-    // get metadata() {
-    //   return this.$store.state.metadata;
-    // }
+    set description(value: string) {
+      this.$store.state.metadata.description = value;
+    }
+
+    get ageRating() {
+      return this.$store.state.metadata.ageRating;
+    }
+
+    set ageRating(value: string) {
+      this.$store.state.metadata.ageRating = value;
+    }
+
+    get selectedTags() {
+      return this.$store.state.metadata.tags;
+    }
+
+    set selectedTags(value: Array<string>) {
+      this.$store.state.metadata.tags = value;
+    }
+
+    get allowDerivativeWork() {
+      return this.$store.state.metadata.allowDerivativeWork;
+    }
+
+    set allowDerivativeWork(value: boolean) {
+      this.$store.state.metadata.allowDerivativeWork = value;
+    }
+
+    get isPublished() {
+      return this.$store.state.metadata.publisherId;
+    }
+
+    get isUpdatable() {
+      return (
+        this.isPublished &&
+        this.$store.state.metadata.publisherId ==
+          WorkshopManager.getInstance().SteamId
+      );
+    }
+
+    get isPublishable() {
+      // unpublished work
+      if (!this.isPublished) {
+        return true;
+      } else {
+        const myWork =
+          this.$store.state.metadata.publisherId ==
+          WorkshopManager.getInstance().SteamId;
+        // published work
+        let publishable =
+          myWork || (!myWork && this.$store.state.metadata.allowDerivativeWork);
+
+        return publishable;
+      }
+    }
+
+    reset() {
+      if (this.$refs.form) {
+        (this.$refs.form as HTMLFormElement).reset();
+      }
+      this.$store.dispatch("changeMetadata", Editor.getMetadata());
+      this.$forceUpdate();
+    }
 
     show() {
-      this.dialog = true;
       this.prepareModel();
+      this.dialog = true;
     }
 
     hide() {
@@ -126,7 +231,7 @@
     prepareModel() {
       let outputCanvas = Editor.getScene().outputNode.imageCanvas.canvas;
       this.$store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
-      this.$store.state.metadata = Editor.getMetadata();
+      this.$store.dispatch("changeMetadata", Editor.getMetadata());
       this.$forceUpdate();
     }
   }
