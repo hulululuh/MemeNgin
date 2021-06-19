@@ -19,19 +19,34 @@
                 label="Title*"
                 required
                 :rules="titleRules"
-              ></v-text-field>
+              />
               <v-textarea
                 v-model="description"
                 name="input-5-1"
                 label="Description"
-              ></v-textarea>
-              <v-select
-                v-model="ageRating"
-                :items="ratings"
-                label="Age rating*"
-                required
-                :rules="ageRatingRules"
-              ></v-select>
+              />
+              <v-list-item class="ma-0 pa-0">
+                <v-select
+                  v-model="ageRating"
+                  label="Age rating*"
+                  required
+                  :items="ratings"
+                  :rules="ageRatingRules"
+                />
+
+                <v-btn
+                  class="mx-2"
+                  fab
+                  dark
+                  small
+                  color="primary"
+                  @click="showAgeDialog"
+                >
+                  <v-icon dark>
+                    mdi-help
+                  </v-icon>
+                </v-btn>
+              </v-list-item>
               <v-autocomplete
                 v-model="selectedTags"
                 chips
@@ -46,11 +61,34 @@
                   `Allow others to make derivative work from this publication.`
                 "
               />
+              <v-list-item class="ma-0 pa-0">
+                <v-checkbox
+                  v-model="agreed"
+                  required
+                  class="ma-0 pa-0"
+                  :label="`I agree terms and conditions*`"
+                  :rules="agreeRules"
+                />
+                <v-spacer />
+                <v-btn
+                  class="mx-2"
+                  fab
+                  dark
+                  small
+                  color="primary"
+                  @click="showLegalDialog"
+                >
+                  <v-icon dark>
+                    mdi-help
+                  </v-icon>
+                </v-btn>
+              </v-list-item>
             </v-form>
           </v-col>
           <v-col align="center" justify="center" cols="4">
+            <v-spacer />
             Thumbnail
-            <v-card width="256px">
+            <v-card width="256px" class="mx-2" fab dark small>
               <v-img
                 class="align-center"
                 style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
@@ -59,12 +97,19 @@
                 lazy-src="assets/icons/image.svg"
               />
             </v-card>
+            <v-btn block :disabled="isPublished" @click="openItemLink">
+              Find it on steam
+            </v-btn>
+            <v-btn block :disabled="isPublished" @click="openAuthorLink">
+              <v-icon> mdi-close </v-icon>
+              {{ authorName }}
+            </v-btn>
           </v-col>
         </v-row>
         <small>*indicates required field</small>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn color="blue darken-1" text @click="onCancel">
           Close
         </v-btn>
@@ -73,6 +118,7 @@
           color="blue darken-1"
           text
           @click="dialog = false"
+          :disabled="!agreed"
         >
           Update
         </v-btn>
@@ -81,11 +127,14 @@
           color="blue darken-1"
           text
           @click="onPublish"
+          :disabled="!agreed"
         >
           Publish
         </v-btn>
       </v-card-actions>
     </v-card>
+    <age-dialog ref="ageDialog" />
+    <legal-dialog ref="legalDialog" />
   </v-dialog>
 </template>
 
@@ -99,8 +148,15 @@
   import { Editor } from "@/lib/editor";
   import { canvasToThumbnailURL } from "@/lib/designer";
   import { WorkshopManager } from "@/community/workshop";
+  import AgeDialog from "@/views/AgeDialog.vue";
+  import LegalDialog from "@/views/LegalDialog.vue";
 
-  @Component
+  @Component({
+    components: {
+      legalDialog: LegalDialog,
+      ageDialog: AgeDialog,
+    },
+  })
   export default class PublishDialog extends Vue {
     dialog: boolean = false;
     notifications: boolean = false;
@@ -111,6 +167,7 @@
     tags: string[] = TAGS_TEST;
 
     key: number = 0;
+    agreed: boolean = false;
 
     @Emit()
     onCancel() {
@@ -136,6 +193,12 @@
     ];
 
     ageRatingRules = [(v) => !!v || "Age rating is required"];
+
+    agreeRules = [
+      (v) =>
+        (!!v && v == true) ||
+        "You need to agree terms and conditions to submit your work on workshop.",
+    ];
 
     get img() {
       return this.$store.state.thumbnail;
@@ -210,6 +273,22 @@
         return publishable;
       }
     }
+
+    get authorName() {
+      return "Author Name";
+    }
+
+    showAgeDialog() {
+      (this.$refs.ageDialog as AgeDialog).dialog = true;
+    }
+
+    showLegalDialog() {
+      (this.$refs.legalDialog as LegalDialog).dialog = true;
+    }
+
+    openItemLink() {}
+
+    openAuthorLink() {}
 
     reset() {
       if (this.$refs.form) {
