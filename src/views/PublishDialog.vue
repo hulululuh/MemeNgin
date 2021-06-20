@@ -8,7 +8,7 @@
   >
     <v-card>
       <v-card-title class="text-h5 grey lighten-2">
-        Publish your work on steam workshop.
+        {{ textTitle }}
       </v-card-title>
       <v-card-text>
         <v-row>
@@ -16,20 +16,20 @@
             <v-form ref="form" lazy-validation>
               <v-text-field
                 v-model="title"
-                label="Title*"
+                :label="textTitleItem"
                 required
                 :rules="titleRules"
               />
               <v-textarea
                 v-model="description"
                 name="input-5-1"
-                label="Description"
+                :label="textDescription"
               />
               <v-list-item class="ma-0 pa-0">
                 <v-select
                   v-model="ageRating"
-                  label="Age rating*"
                   required
+                  :label="textAgeRating"
                   :items="ratings"
                   :rules="ageRatingRules"
                 />
@@ -51,22 +51,20 @@
                 v-model="selectedTags"
                 chips
                 :items="tags"
-                label="Tags"
+                :label="textTags"
                 multiple
               />
               <v-checkbox
                 v-model="allowDerivativeWork"
                 class="ma-0 pa-0"
-                :label="
-                  `Allow others to make derivative work from this publication.`
-                "
+                :label="textDerivative"
               />
               <v-list-item class="ma-0 pa-0">
                 <v-checkbox
                   v-model="agreed"
                   required
                   class="ma-0 pa-0"
-                  :label="`I agree terms and conditions*`"
+                  :label="textAgreeTerms"
                   :rules="agreeRules"
                 />
                 <v-spacer />
@@ -87,7 +85,7 @@
           </v-col>
           <v-col align="center" justify="center" cols="4">
             <v-spacer />
-            Thumbnail
+            {{ textThumbnail }}
             <v-card width="256px" class="mx-2" fab dark small>
               <v-img
                 class="align-center"
@@ -98,7 +96,7 @@
               />
             </v-card>
             <v-btn block :disabled="isPublished" @click="openItemLink">
-              Find it on steam
+              {{ textFindOnSteam }}
             </v-btn>
             <v-btn block :disabled="isPublished" @click="openAuthorLink">
               <v-icon> mdi-close </v-icon>
@@ -106,12 +104,12 @@
             </v-btn>
           </v-col>
         </v-row>
-        <small>*indicates required field</small>
+        <small>{{ textRequired }}</small>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn color="blue darken-1" text @click="onCancel">
-          Close
+          {{ textClose }}
         </v-btn>
         <v-btn
           v-show="isUpdatable"
@@ -120,7 +118,7 @@
           @click="dialog = false"
           :disabled="!agreed"
         >
-          Update
+          {{ textUpdate }}
         </v-btn>
         <v-btn
           v-show="isPublishable"
@@ -129,7 +127,7 @@
           @click="onPublish"
           :disabled="!agreed"
         >
-          Publish
+          {{ textPublish }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -148,6 +146,7 @@
   import { Editor } from "@/lib/editor";
   import { canvasToThumbnailURL } from "@/lib/designer";
   import { WorkshopManager } from "@/community/workshop";
+  import { TextManager } from "@/assets/textmanager";
   import AgeDialog from "@/views/AgeDialog.vue";
   import LegalDialog from "@/views/LegalDialog.vue";
 
@@ -205,12 +204,10 @@
     }
 
     get title() {
-      //return this.metadata.title;
       return this.$store.state.metadata.title;
     }
 
     set title(value: string) {
-      //this.metadata.title = value;
       this.$store.state.metadata.title = value;
     }
 
@@ -276,6 +273,58 @@
 
     get authorName() {
       return "Author Name";
+    }
+
+    get textTitle() {
+      return TextManager.translate("${publish_dialog.title}");
+    }
+
+    get textTitleItem() {
+      return TextManager.translate("${publish_dialog.title_item}");
+    }
+
+    get textDescription() {
+      return TextManager.translate("${publish_dialog.description}");
+    }
+
+    get textAgeRating() {
+      return TextManager.translate("${publish_dialog.age_rating}");
+    }
+
+    get textTags() {
+      return TextManager.translate("${publish_dialog.tags}");
+    }
+
+    get textDerivative() {
+      return TextManager.translate("${publish_dialog.derivative}");
+    }
+
+    get textAgreeTerms() {
+      return TextManager.translate("${publish_dialog.agree_terms}");
+    }
+
+    get textClose() {
+      return TextManager.translate("${ui_general.close}");
+    }
+
+    get textUpdate() {
+      return TextManager.translate("${ui_general.update}");
+    }
+
+    get textRequired() {
+      return TextManager.translate("${publish_dialog.required}");
+    }
+
+    get textThumbnail() {
+      return TextManager.translate("${publish_dialog.thumbnail}");
+    }
+
+    get textFindOnSteam() {
+      return TextManager.translate("${publish_dialog.find_on_steam}");
+    }
+
+    get textPublish() {
+      return TextManager.translate("${ui_general.publish}");
     }
 
     showAgeDialog() {

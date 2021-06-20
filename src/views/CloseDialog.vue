@@ -2,15 +2,15 @@
   <v-dialog
     v-model="dialog"
     persistent
-    max-width="290"
+    max-width="360"
     @keydown.esc="dialog = false"
   >
     <v-card>
       <v-card-title class="headline grey lighten-2">
-        MemeNgin
+        {{ textTitle }}
       </v-card-title>
       <v-card-text>{{ textMessage }}</v-card-text>
-      <v-card-actions>
+      <v-card-actions justify-center>
         <v-spacer></v-spacer>
         <v-btn text @click="onSave">
           {{ textSave }}
@@ -64,20 +64,24 @@
       this.dialog = false;
     }
 
+    get textTitle() {
+      return TextManager.translate("${close_dialog.title}");
+    }
+
     get textMessage() {
       return TextManager.translate("${close_dialog.message}");
     }
 
     get textSave() {
-      return TextManager.translate("${close_dialog.save}");
+      return TextManager.translate("${ui_general.save}");
     }
 
     get textClose() {
-      return TextManager.translate("${close_dialog.close}");
+      return TextManager.translate("${ui_general.do_not_save}");
     }
 
     get textCancel() {
-      return TextManager.translate("${close_dialog.cancel}");
+      return TextManager.translate("${ui_general.cancel}");
     }
   }
 </script>

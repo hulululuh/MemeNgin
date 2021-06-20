@@ -7,16 +7,16 @@
     :scrollable="true"
     ><v-card>
       <v-card-title class="text-h5 grey lighten-2">
-        Terms of the agreement
+        {{ textTitle }}
       </v-card-title>
       <v-card-text d-flex>
-        {{ terms }}
+        {{ textTerms }}
       </v-card-text>
       <v-divider />
       <v-card-actions>
         <v-spacer />
-        <v-btn width="50%" dark @click="agree">Agree</v-btn>
-        <v-btn width="50%" @click="disagree">Disagree</v-btn>
+        <v-btn width="50%" dark @click="agree">{{ textAgree }}</v-btn>
+        <v-btn width="50%" @click="disagree">{{ textDisagree }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -27,13 +27,26 @@
 </style>
 
 <script lang="ts">
+  import { TextManager } from "@/assets/textmanager";
   import { Vue, Component } from "vue-property-decorator";
 
   @Component
   export default class LegalDialog extends Vue {
     dialog: boolean = false;
-    get terms() {
-      return "blah blah";
+    get textTitle() {
+      return TextManager.translate("${legal_dialog.title}");
+    }
+
+    get textTerms() {
+      return TextManager.translate("${legal_dialog.message}");
+    }
+
+    get textAgree() {
+      return TextManager.translate("${ui_general.agree}");
+    }
+
+    get textDisagree() {
+      return TextManager.translate("${ui_general.disagree}");
     }
 
     agree() {
