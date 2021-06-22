@@ -66,6 +66,7 @@
                   class="ma-0 pa-0"
                   :label="textAgreeTerms"
                   :rules="agreeRules"
+                  @click="onAgreeing"
                 />
                 <v-spacer />
                 <v-btn
@@ -149,6 +150,7 @@
   import { TextManager } from "@/assets/textmanager";
   import AgeDialog from "@/views/AgeDialog.vue";
   import LegalDialog from "@/views/LegalDialog.vue";
+  import App from "@/App.vue";
 
   @Component({
     components: {
@@ -166,7 +168,6 @@
     tags: string[] = TAGS_TEST;
 
     key: number = 0;
-    agreed: boolean = false;
 
     @Emit()
     onCancel() {
@@ -179,6 +180,12 @@
       // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element
       if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
         this.dialog = false;
+        const app = this.$root.$children[0] as App;
+        if (app.saveable) {
+          app.saveProject();
+        }
+
+        WorkshopManager.getInstance().publish(app.project.path);
       }
     }
 
@@ -241,6 +248,14 @@
 
     set allowDerivativeWork(value: boolean) {
       this.$store.state.metadata.allowDerivativeWork = value;
+    }
+
+    get agreed() {
+      return this.$store.state.userData.agreed;
+    }
+
+    set agreed(value: boolean) {
+      this.$store.state.userData.agreed = value;
     }
 
     get isPublished() {
@@ -333,6 +348,13 @@
 
     showLegalDialog() {
       (this.$refs.legalDialog as LegalDialog).dialog = true;
+      this.$store.state.seenLegal = true;
+    }
+
+    onAgreeing() {
+      if (this.$store.state.userData.agreed && !this.$store.state.seenLegal) {
+        this.showLegalDialog();
+      }
     }
 
     openItemLink() {}

@@ -1,7 +1,8 @@
 import { UserData, QueryTarget } from "@/userdata";
-import { ProjectItemData, WorkshopItemData } from "./ProjectItemData";
+import { ProjectItemData } from "@/community/ProjectItemData";
 import fs, { readFileSync, writeFileSync } from "fs";
 import path from "path";
+import { Editor } from "@/lib/editor";
 
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
@@ -51,6 +52,43 @@ export class WorkshopManager {
 
   get SteamId() {
     return this.steamId;
+  }
+
+  get UserWorks() {
+    let files = [];
+
+    if (this.initialized) {
+      const count = greenworks.getFileCount();
+      for (let i = 0; i < count; i++) {
+        let obj = greenworks.getFileNameAndSize(i);
+        const fileName = obj.name;
+        const fileExt = fileName.split(".").pop();
+
+        if (fileExt === "mmng") files.push(obj.name);
+      }
+    }
+    return files;
+  }
+
+  async ReadTextFromFile(filename: string): Promise<any> {
+    if (!this.initialized) {
+      return Promise.reject();
+    }
+
+    let fetched = await new Promise((resolve, reject) => {
+      greenworks.readTextFromFile(
+        filename,
+        (file_content) => {
+          console.info(`File loaded: ${filename}`);
+          resolve(file_content);
+        },
+        (err) => {
+          reject(err);
+        }
+      );
+    });
+
+    return Promise.resolve(fetched);
   }
 
   requestPage(num: number, target: QueryTarget) {
@@ -132,7 +170,72 @@ export class WorkshopManager {
     }
   }
 
-  publish(): boolean {
-    return true;
+  publish(projectPath: string): boolean {
+    if (fs.existsSync(projectPath)) {
+      const data = Editor.getMetadata();
+      const pathResolved = path.resolve(projectPath);
+      const thumbnailPathResolved = path.resolve(
+        "C:/Users/hulul/Desktop/testImage/projects_/thumb.png"
+      );
+
+      // greenworks.deleteFile(
+      //   "test.mmng",
+      //   () => {
+      //     console.info(`File delete successs: test.mmng`);
+      //   },
+      //   (err) => {
+      //     console.error(err);
+      //   }
+      // );
+      // return true;
+
+      if (!greenworks.isCloudEnabledForUser()) {
+        console.warn("You need to turn on cloud feature to use this feature");
+      }
+      if (!greenworks.isCloudEnabled()) {
+        greenworks.enableCloud(true);
+      }
+
+      greenworks.saveFilesToCloud(
+        [pathResolved],
+        () => {
+          console.info(`File save successs: ${path.basename(projectPath)}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+
+      // greenworks.publishWorkshopFile(
+      //   { "app_id": APP_ID, "tags": data.tags },
+      //   pathResolved,
+      //   thumbnailPathResolved,
+      //   data.title,
+      //   data.description,
+      //   (publish_file_handle) => {},
+      //   (err) => {
+      //     console.error(err);
+      //   }
+      // );
+
+      // greenworks.ugcPublish(
+      //   pathResolved,
+      //   data.title,
+      //   data.description,
+      //   thumbnailPathResolved,
+      //   (published) => {
+      //     console.log(`Your work has successfully published`);
+      //     console.log(published);
+      //   },
+      //   (err) => {
+      //     console.error(err);
+      //   },
+      //   (progress) => {}
+      // );
+      return true;
+    } else {
+      console.error(`file does not exists: ${projectPath}`);
+      return false;
+    }
   }
 }

@@ -5,6 +5,7 @@
     }}</v-subheader>
     <v-divider class="pb-1" />
     <v-row class="grid pa-1">
+      <new-document v-if="newDocument" />
       <v-col
         v-for="(item, i) in lists"
         :key="i"
@@ -26,14 +27,16 @@
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectItemData } from "@/community/ProjectItemData";
   import ProjectItem from "@/views/ProjectItem.vue";
-  import fs from "fs";
+  import NewDocument from "@/views/NewDocument.vue";
 
   @Component({
     components: {
       projectItem: ProjectItem,
+      newDocument: NewDocument,
     },
   })
   export default class ItemList extends Vue {
+    @Prop() newDocument: boolean;
     @Prop() categoryName: string;
     @Prop() lists: ProjectItemData[];
 

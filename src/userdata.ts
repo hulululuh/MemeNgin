@@ -14,36 +14,6 @@ export enum QueryTarget {
 export const DERIVATIVE_TAG: string = "Derivative Allowed";
 export const AGE_RATING_DEFAULT: string = "Questionable";
 export const AGE_RATING: string[] = ["Everyone", AGE_RATING_DEFAULT, "Mature"];
-
-// export const TAGS_TEST: string[] = [
-//   "Abstract",
-//   "Animal",
-//   "Anime",
-//   "Audio response",
-//   "Cartoon",
-//   "CGI",
-//   "Cyberpunk",
-//   "Fantasy",
-//   "Game",
-//   "Girls",
-//   "Guys",
-//   "Landscape",
-//   "Medieval",
-//   "Memes",
-//   "MMD",
-//   "Music",
-//   "Nature",
-//   "Pixel art",
-//   "Relaxing",
-//   "Retro",
-//   "Sci-fi",
-//   "Sports",
-//   "Technology",
-//   "Television",
-//   "Vehicle",
-//   "Unspecified",
-// ];
-
 export const TAGS_TEST: string[] = [
   "Actor",
   "Advertisement",
@@ -115,6 +85,10 @@ export class UserData {
   //tags: string[] = ["Abstract", "Fantasy"];
   //excludedTags: string[] = ["Everyone", "Questionable", "Mature"];
   excludedTags: string[] = ["Questionable", "Mature"];
+  derivative: boolean = false;
+  agreed: boolean = false;
+  seenDerivative: boolean = false;
+  seenLegal: boolean = false;
 
   static _instance: UserData = null;
   static getInstance(): UserData {
@@ -134,6 +108,11 @@ export class UserData {
       if (parsed.subscribedProject)
         instance.subscribedProject = parsed.subscribedProject;
       if (parsed.followedUser) instance.followedUser = parsed.followedUser;
+      if (parsed.agreed) instance.agreed = parsed.agreed;
+      if (parsed.derivative) instance.derivative = parsed.derivative;
+      if (parsed.seenDerivative)
+        instance.seenDerivative = parsed.seenDerivative;
+      if (parsed.seenLegal) instance.seenLegal = parsed.seenLegal;
 
       // validate data and remove invalid path
       let invalids = [];
@@ -184,7 +163,7 @@ export class UserData {
   }
 
   registerRecentItem(path: string) {
-    let idx = this.recentItems.findIndex((item) => item.localPath == path);
+    let idx = this.recentItems.findIndex((item) => item.path == path);
     if (idx > -1) {
       this.recentItems.splice(idx, 1);
     }

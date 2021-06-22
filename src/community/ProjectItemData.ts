@@ -1,10 +1,12 @@
 import { ProjectManager } from "@/lib/project";
+import { WorkshopManager } from "@/community/workshop";
 import {
   AGE_RATING,
   AGE_RATING_DEFAULT,
   TAGS_TEST,
   DERIVATIVE_TAG,
 } from "@/userdata";
+import { plainToClass } from "class-transformer";
 import fs from "fs";
 import path from "path";
 
@@ -38,8 +40,8 @@ export class ProjectItemData {
       : this.localItem.itemId;
   }
 
-  get localPath() {
-    return this.localItem ? this.localItem.localPath : "";
+  get path() {
+    return this.localItem ? this.localItem.path : "";
   }
 
   get title() {
@@ -75,6 +77,20 @@ export class ProjectItemData {
     return this.workshopItem.tags
       ? this.workshopItem.tags
       : new Array<string>();
+  }
+
+  get tagsCalculated() {
+    if (this.workshopItem) {
+      let tags = [...this.workshopItem.tags, this.workshopItem.ageRating];
+      if (this.workshopItem.allowDerivativeWork) tags.push("Derivable");
+
+      let calc: string = "";
+      tags.forEach((v, i) => {
+        const lastIndex = i == tags.length - 1;
+        calc += lastIndex ? v : `${v}, `;
+      });
+      return calc;
+    } else return "";
   }
 
   set tags(value: Array<string>) {
@@ -123,6 +139,30 @@ export class ProjectItemData {
     return item;
   }
 
+  static async fromCloud(path: string): Promise<any> {
+    let item = new ProjectItemData();
+    let contents = JSON.parse(
+      await WorkshopManager.getInstance().ReadTextFromFile(path)
+    );
+
+    if (contents) {
+      item.localItem = LocalItemData.fromCloud(
+        path,
+        contents.item.localItem.title,
+        contents.item.localItem.description,
+        contents.thumbnail
+      );
+
+      item.workshopItem = plainToClass(
+        WorkshopItemData,
+        contents.item.workshopItem
+      );
+      return item;
+    } else {
+      Promise.reject();
+    }
+  }
+
   static fromLocalPath(localPath: string): ProjectItemData {
     let item = new ProjectItemData();
     let exists = fs.existsSync(localPath);
@@ -166,10 +206,11 @@ export class LocalItemData {
   thumbnail: string;
 
   // local item
-  localPath: string;
+  path: string;
+  isCloud: boolean;
 
   get isValid() {
-    return this.title && this.thumbnail && this.localPath;
+    return this.title && this.thumbnail && this.path;
   }
 
   save(): any {
@@ -179,22 +220,42 @@ export class LocalItemData {
     data["title"] = this.title;
     data["description"] = this.description;
     data["thumbnail"] = this.thumbnail;
-    data["localPath"] = this.localPath;
+    data["path"] = this.path;
 
     return data;
+  }
+
+  static fromCloud(
+    path: string,
+    title: string,
+    description: string,
+    thumbnail: string
+  ) {
+    let item = new LocalItemData();
+
+    // general
+    item.title = title;
+    item.path = path;
+    item.isCloud = true;
+    item.description = description;
+    item.thumbnail = thumbnail;
+
+    // do parsing
+    return item.isValid ? item : null;
   }
 
   static fromLocalPath(
     project: any,
     title: string,
-    localPath: string
+    path: string
   ): LocalItemData {
     let item = new LocalItemData();
 
     // general
     // item.itemId; // keep it empty until it is published on steam
     item.title = title;
-    item.localPath = localPath;
+    item.path = path;
+    item.isCloud = false;
     item.description = project.data["description"];
     item.thumbnail = project.data["thumbnail"];
 

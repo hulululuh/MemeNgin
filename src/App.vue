@@ -354,13 +354,7 @@
 
         if (item.type == "node") {
           let nodeName = item.name;
-
           let dnode = this.library.create(nodeName);
-          // let n = this.editor.addNode(
-          // 	dnode,
-          // 	evt.clientX - rect.left,
-          // 	evt.clientY - rect.top
-          // );
           let n = this.editor.addNode(dnode);
           n.setCenter(pos.x, pos.y);
 
@@ -513,6 +507,9 @@
     }
 
     newProject() {
+      // close startup menu if needed
+      (this.$refs.startupMenu as StartupMenu).tryClose();
+
       // load default scene
       (this.$refs.preview2d as any).reset();
 
@@ -647,8 +644,8 @@
     }
 
     openProjectWithPath(path: string) {
-      let startupMenu = this.$refs.startupMenu as StartupMenu;
-      startupMenu.tryClose();
+      // close startup menu if needed
+      (this.$refs.startupMenu as StartupMenu).tryClose();
 
       let project = ProjectManager.load(path);
       if (!project) return;

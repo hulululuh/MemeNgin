@@ -40,7 +40,7 @@
 <script lang="ts">
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectItemData } from "@/community/ProjectItemData";
-  import App from "../App.vue";
+  import App from "@/App.vue";
 
   @Component
   export default class ProjectItem extends Vue {
@@ -48,9 +48,8 @@
 
     open() {
       console.log("tried to open");
-      (this.$root.$children[0] as App).openProjectWithPath(
-        this.itemData.localPath
-      );
+
+      (this.$root.$children[0] as App).openProjectWithPath(this.itemData.path);
     }
 
     get thumbnail() {

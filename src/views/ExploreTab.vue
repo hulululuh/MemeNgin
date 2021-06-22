@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="pa-0 ma-0">
     <v-container fluid class="pa-0 ma-0" v-if="!initialized">
-      Steam needs to be initialized!!!
+      {{ steamMustRun }}
     </v-container>
     <v-container
       fluid
@@ -71,6 +71,7 @@
   import ItemList from "@/views/ItemList.vue";
   import WorkshopFilter from "@/views/WorkshopFilter.vue";
   import { Vue, Component } from "vue-property-decorator";
+  import { TextManager } from "@/assets/textmanager";
 
   @Component({
     components: {
@@ -106,6 +107,10 @@
     set page(value) {
       this.index = value;
       WorkshopManager.getInstance().requestPage(value, QueryTarget.Search);
+    }
+
+    get steamMustRun() {
+      return TextManager.translate("${ui_general.steam_must_run}");
     }
   }
 </script>

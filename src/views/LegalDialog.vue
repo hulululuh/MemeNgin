@@ -15,7 +15,9 @@
       <v-divider />
       <v-card-actions>
         <v-spacer />
-        <v-btn width="50%" dark @click="agree">{{ textAgree }}</v-btn>
+        <v-btn width="50%" color="primary" dark @click="agree">{{
+          textAgree
+        }}</v-btn>
         <v-btn width="50%" @click="disagree">{{ textDisagree }}</v-btn>
       </v-card-actions>
     </v-card>
@@ -50,10 +52,12 @@
     }
 
     agree() {
+      this.$store.state.userData.agreed = true;
       this.dialog = false;
     }
 
     disagree() {
+      this.$store.state.userData.agreed = false;
       this.dialog = false;
     }
   }

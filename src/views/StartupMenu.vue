@@ -14,22 +14,29 @@
     </template>
 
     <v-card>
-      <v-btn color="primary" dark @click="dialog = false">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
+      <v-card-actions class="pa-0 ma-0">
+        <v-btn color="primary" dark @click="dialog = false">
+          <v-icon>mdi-menu</v-icon>
+        </v-btn>
+        <v-spacer />
+        <v-btn depressed small fab dark @click="dialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-actions>
+
       <v-tabs Left v-model="tabs">
         <v-tab>Home</v-tab>
-        <v-tab>Personal</v-tab>
+        <v-tab @click="onPersonalTabSelected">Personal</v-tab>
         <v-tab>Explore</v-tab>
       </v-tabs>
       <v-tabs-items v-model="tabs">
-        <v-tab-item justify="center" :key="0">
+        <v-tab-item eager justify="center" :key="0">
           <home-tab ref="home" />
         </v-tab-item>
-        <v-tab-item justify="center" :key="1">
+        <v-tab-item eager justify="center" :key="1">
           <personal-tab ref="personal" />
         </v-tab-item>
-        <v-tab-item justify="center" :key="2">
+        <v-tab-item eager justify="center" :key="2">
           <explore-tab ref="explore" />
         </v-tab-item>
       </v-tabs-items>
@@ -62,6 +69,10 @@
     tabs: number[] = null;
 
     opened() {}
+
+    onPersonalTabSelected() {
+      (this.$refs.personal as PersonalTab).getUserWorks();
+    }
 
     tryClose() {
       if (this.dialog) this.dialog = false;
