@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { UserData } from "@/userdata";
+import { CloudData } from "@/clouddata";
 import { ProjectItemData } from "@/community/ProjectItemData";
 
 Vue.use(Vuex);
@@ -8,6 +9,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     userData: UserData.getInstance(),
+    cloudData: CloudData.getInstance(),
     thumbnail: "",
     metadata: ProjectItemData.fromNothing(),
   },

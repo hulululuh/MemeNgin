@@ -19,7 +19,7 @@
           <v-icon>mdi-menu</v-icon>
         </v-btn>
         <v-spacer />
-        <v-btn depressed small fab dark @click="dialog = false">
+        <v-btn class="mr-1" depressed x-small fab dark @click="dialog = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-actions>
@@ -50,6 +50,7 @@
 
 <script lang="ts">
   import { Vue, Component } from "vue-property-decorator";
+  import { CloudData } from "@/clouddata";
   import HomeTab from "@/views/HomeTab.vue";
   import ExploreTab from "@/views/ExploreTab.vue";
   import PersonalTab from "@/views/PersonalTab.vue";
@@ -71,7 +72,7 @@
     opened() {}
 
     onPersonalTabSelected() {
-      (this.$refs.personal as PersonalTab).getUserWorks();
+      CloudData.getInstance().getUserWorks();
     }
 
     tryClose() {

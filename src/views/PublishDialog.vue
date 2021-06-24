@@ -17,8 +17,8 @@
               <v-text-field
                 v-model="title"
                 :label="textTitleItem"
-                required
                 :rules="titleRules"
+                required
               />
               <v-textarea
                 v-model="description"
@@ -33,7 +33,6 @@
                   :items="ratings"
                   :rules="ageRatingRules"
                 />
-
                 <v-btn
                   class="mx-2"
                   fab
@@ -152,6 +151,10 @@
   import LegalDialog from "@/views/LegalDialog.vue";
   import App from "@/App.vue";
 
+  export const TITLE_RULES = [
+    (v) => !!v || "Name is required",
+    (v) => (v && v.length <= 25) || "Name must be less than 25 characters",
+  ];
   @Component({
     components: {
       legalDialog: LegalDialog,
@@ -193,10 +196,9 @@
       if (this.dialog) this.dialog = false;
     }
 
-    titleRules = [
-      (v) => !!v || "Name is required",
-      (v) => (v && v.length <= 25) || "Name must be less than 25 characters",
-    ];
+    get titleRules() {
+      return TITLE_RULES;
+    }
 
     ageRatingRules = [(v) => !!v || "Age rating is required"];
 
@@ -295,7 +297,7 @@
     }
 
     get textTitleItem() {
-      return TextManager.translate("${publish_dialog.title_item}");
+      return TextManager.translate("${publish_dialog.title_item}") + "*";
     }
 
     get textDescription() {
@@ -303,7 +305,7 @@
     }
 
     get textAgeRating() {
-      return TextManager.translate("${publish_dialog.age_rating}");
+      return TextManager.translate("${publish_dialog.age_rating}") + "*";
     }
 
     get textTags() {

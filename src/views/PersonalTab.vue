@@ -19,12 +19,6 @@
               ref="searched"
             />
             <item-list categoryName="Subscribed" :lists="best" ref="searched" />
-            <!-- <v-pagination
-              bottom
-              v-model="page"
-              :length="numPages"
-              :total-visible="9"
-            /> -->
           </v-card>
         </v-col>
       </v-row>
@@ -37,7 +31,6 @@
 </style>
 
 <script lang="ts">
-  import { ProjectItemData } from "@/community/ProjectItemData";
   import { WorkshopManager } from "@/community/workshop";
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
@@ -50,7 +43,6 @@
   })
   export default class PersonalTab extends Vue {
     panel: number[] = [0, 1];
-    userWorks = [];
 
     get initialized() {
       return WorkshopManager.getInstance().initialized;
@@ -64,15 +56,8 @@
       return TextManager.translate("${ui_general.steam_must_run}");
     }
 
-    async getUserWorks() {
-      const cloudFiles = WorkshopManager.getInstance().UserWorks;
-      let items = [];
-
-      for (let file of cloudFiles) {
-        let item = await ProjectItemData.fromCloud(file);
-        items.push(item);
-      }
-      this.userWorks = items;
+    get userWorks() {
+      return this.$store.state.cloudData.userWorks;
     }
   }
 </script>

@@ -25,3 +25,4 @@ yarn-error.log*
 /dist_electron
 /build/icons
 /steam/
+/projects/

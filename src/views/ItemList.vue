@@ -3,7 +3,7 @@
     <v-subheader style="font-size: 1rem; font-weight: 400;">{{
       categoryName
     }}</v-subheader>
-    <v-divider class="pb-1" />
+    <v-divider class="mt-0 pb-2" />
     <v-row class="grid pa-1">
       <new-document v-if="newDocument" />
       <v-col
@@ -12,6 +12,8 @@
         cols="auto"
         md="auto"
         class="pa-1"
+        width="192px"
+        height="192px"
       >
         <project-item v-if="exists(item)" :itemData="item" />
       </v-col>

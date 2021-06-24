@@ -1,19 +1,36 @@
 <template v-on:change="onChanged">
   <v-hover v-slot="{ hover }">
     <v-card
+      class="pa-0 ma-0"
       width="192px"
+      height="192px"
       :elevation="hover ? 16 : 2"
       :class="{ 'on-hover': hover }"
+      v-on:click="open"
     >
       <v-img
         id="thumbnail"
         class="white--text align-center"
-        style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
-        height="192px"
+        style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
+        height="100%"
+        width="100%"
         v-bind:src="thumbnail"
         lazy-src="assets/icons/image.svg"
-        @click="open"
       >
+        <div>
+          <v-scale-transition>
+            <v-btn
+              style="position:absolute; right: 0px; top: 0px;"
+              fab
+              x-small
+              v-show="hover"
+              justify-right
+              v-on:click="remove"
+            >
+              <v-icon> mdi-delete</v-icon>
+            </v-btn>
+          </v-scale-transition>
+        </div>
         <v-card-title class="justify-center" fluid style="font-size:18px">
           {{ itemData.title }}
         </v-card-title>
@@ -25,7 +42,7 @@
             style="height: 35%; background-color: rgba(255, 255, 255, 0.42); font-size:13px; font-weight: bold;
               text-shadow: none; color:#000; line-height: 1.125;"
           >
-            {{ itemData.description.substring(0, 200) }}
+            {{ description }}
           </div>
         </v-expand-transition>
       </v-img>
@@ -48,12 +65,21 @@
 
     open() {
       console.log("tried to open");
-
       (this.$root.$children[0] as App).openProjectWithPath(this.itemData.path);
+    }
+
+    remove() {
+      (this.$root.$children[0] as App).removeProject(this.itemData);
     }
 
     get thumbnail() {
       return this.itemData.thumbnail;
+    }
+
+    get description() {
+      return this.itemData.description
+        ? this.itemData.description.substring(0, 200)
+        : "";
     }
   }
 </script>

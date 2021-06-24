@@ -165,18 +165,29 @@
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
+  import fs from "fs";
   import path from "path";
   import { UserData } from "@/userdata";
   import { IPropertyHolder } from "./lib/designer/properties";
   import { AddItemsAction } from "./lib/actions/additemsaction";
   import { UndoStack } from "./lib/undostack";
   import { ApplicationSettings } from "./settings";
+  import { WorkshopManager } from "@/community/workshop";
+  import { CloudData } from "@/clouddata";
+  import { ProjectItemData } from "./community/ProjectItemData";
 
   const electron = require("electron");
   const remote = electron.remote;
   const { dialog } = remote;
   const app = remote.app;
   const userDataPath = path.join(app.getPath("userData"), "userData.json");
+
+  const MY_WORKS_PATH = path.join(path.resolve("."), "/projects/my_works/");
+  const DEFAULT_WORKS_PATH = path.join(
+    path.resolve("."),
+    "/projects/default_works/"
+  );
+
   declare let __static: any;
 
   @Component({
@@ -506,6 +517,50 @@
       console.log("resize!");
     }
 
+    createProject(name: string) {
+      this.newProject();
+      this.editor.metadata.title = name;
+
+      // make directory if not exists
+      const targetDir = path.join(MY_WORKS_PATH, `/${name}/`);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      this.project.path = path.join(MY_WORKS_PATH, `/${name}/${name}.mmng`);
+      this.project.name = name;
+      this.titleName = this.project.name;
+
+      // wait for scene is setup
+      setTimeout(() => {
+        this.saveProject(true);
+        WorkshopManager.getInstance().create(this.project.path);
+      }, 100);
+
+      setTimeout(() => {
+        CloudData.getInstance().getUserWorks();
+      }, 1000);
+    }
+
+    removeProject(itemData: ProjectItemData) {
+      WorkshopManager.getInstance().remove(itemData);
+      let isCloudItem = itemData.localItem.isCloud;
+      // update cloud item list
+      if (isCloudItem) {
+        CloudData.getInstance().getUserWorks();
+      }
+
+      // remove corresponding local files
+      let targetPath = path.join(MY_WORKS_PATH, `/${itemData.title}/`);
+      if (!fs.existsSync(targetPath))
+        targetPath = path.join(MY_WORKS_PATH, `/${itemData.localItem.path}/`);
+
+      if (fs.existsSync(targetPath)) {
+        fs.rmdirSync(targetPath, { recursive: true });
+        console.info(`Local project ${targetPath} is removed`);
+      }
+      //itemData.localItem.path
+    }
+
     newProject() {
       // close startup menu if needed
       (this.$refs.startupMenu as StartupMenu).tryClose();
@@ -567,8 +622,8 @@
 
     onCancelled() {}
 
-    saveProject() {
-      if (!this.saveable) return;
+    saveProject(force: boolean = false) {
+      if (!(force || this.saveable)) return;
 
       // trying to save new project
       if (!this.project.path) {

@@ -170,6 +170,55 @@ export class WorkshopManager {
     }
   }
 
+  create(projectPath: string): boolean {
+    if (fs.existsSync(projectPath)) {
+      const pathResolved = path.resolve(projectPath);
+
+      if (!greenworks.isCloudEnabledForUser()) {
+        console.warn("You need to turn on cloud feature to use this feature");
+      }
+      if (!greenworks.isCloudEnabled()) {
+        greenworks.enableCloud(true);
+      }
+
+      greenworks.saveFilesToCloud(
+        [pathResolved],
+        () => {
+          console.info(`File save succeed: ${path.basename(projectPath)}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+      return true;
+    } else {
+      console.error(`file does not exists: ${projectPath}`);
+      return false;
+    }
+  }
+
+  load(data: ProjectItemData) {}
+
+  save(data: ProjectItemData) {}
+
+  remove(data: ProjectItemData) {
+    if (!this.initialized) {
+      console.error("The steam client must be running!!!");
+      return;
+    }
+    if (data.localItem.isCloud) {
+      greenworks.deleteFile(
+        data.localItem.path,
+        () => {
+          console.info(`File remove succeed: ${data.localItem.path}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    }
+  }
+
   publish(projectPath: string): boolean {
     if (fs.existsSync(projectPath)) {
       const data = Editor.getMetadata();
@@ -199,7 +248,7 @@ export class WorkshopManager {
       greenworks.saveFilesToCloud(
         [pathResolved],
         () => {
-          console.info(`File save successs: ${path.basename(projectPath)}`);
+          console.info(`File save succeed: ${path.basename(projectPath)}`);
         },
         (err) => {
           console.error(err);
