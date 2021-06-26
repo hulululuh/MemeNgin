@@ -25,7 +25,6 @@
           {{ title }}
         </v-card-title>
       </v-img>
-      <project-name-dialog ref="dialog" />
     </v-card>
   </v-hover>
 </template>
@@ -38,14 +37,11 @@
   import { Vue, Component } from "vue-property-decorator";
   import ProjectNameDialog from "@/views/ProjectNameDialog.vue";
 
-  @Component({
-    components: {
-      projectNameDialog: ProjectNameDialog,
-    },
-  })
+  @Component
   export default class NewDocument extends Vue {
     open() {
-      (this.$refs.dialog as ProjectNameDialog).dialog = true;
+      (this.$root.$children[0].$refs
+        .projectNameDialog as ProjectNameDialog).dialog = true;
     }
 
     get title() {

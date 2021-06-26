@@ -5,6 +5,7 @@ import {
   readPropertyAsColor,
   readPropertyAsNumber,
 } from "./utils/scsshelper";
+import path from "path";
 
 export class ApplicationSettings {
   colorPrimary: string = "#21252bff";

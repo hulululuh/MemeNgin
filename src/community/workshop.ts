@@ -171,6 +171,10 @@ export class WorkshopManager {
   }
 
   create(projectPath: string): boolean {
+    if (!this.initialized) {
+      console.warn("The steam client must be running!!!");
+      return false;
+    }
     if (fs.existsSync(projectPath)) {
       const pathResolved = path.resolve(projectPath);
 
@@ -197,14 +201,28 @@ export class WorkshopManager {
     }
   }
 
-  load(data: ProjectItemData) {}
+  load(localPath: string) {}
 
-  save(data: ProjectItemData) {}
+  save(localPath: string) {
+    const fileExt = localPath.split(".").pop();
+    // check path valid
+    if (fs.existsSync(localPath) && fileExt == "mmng") {
+      greenworks.saveFilesToCloud(
+        [localPath],
+        () => {
+          console.info(`File save succeed: ${path.basename(localPath)}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    }
+  }
 
-  remove(data: ProjectItemData) {
+  remove(data: ProjectItemData): boolean {
     if (!this.initialized) {
-      console.error("The steam client must be running!!!");
-      return;
+      console.warn("The steam client must be running!!!");
+      return false;
     }
     if (data.localItem.isCloud) {
       greenworks.deleteFile(
@@ -216,7 +234,10 @@ export class WorkshopManager {
           console.error(err);
         }
       );
+
+      return true;
     }
+    return false;
   }
 
   publish(projectPath: string): boolean {

@@ -6,7 +6,7 @@
       height="192px"
       :elevation="hover ? 16 : 2"
       :class="{ 'on-hover': hover }"
-      v-on:click="open"
+      @click="open"
     >
       <v-img
         id="thumbnail"
@@ -25,7 +25,7 @@
               x-small
               v-show="hover"
               justify-right
-              v-on:click="remove"
+              @click.stop="remove"
             >
               <v-icon> mdi-delete</v-icon>
             </v-btn>
@@ -65,7 +65,7 @@
 
     open() {
       console.log("tried to open");
-      (this.$root.$children[0] as App).openProjectWithPath(this.itemData.path);
+      (this.$root.$children[0] as App).openProjectWithItem(this.itemData);
     }
 
     remove() {

@@ -47,6 +47,9 @@
   import { TextManager } from "@/assets/textmanager";
   import { TITLE_RULES } from "@/views/PublishDialog.vue";
   import App from "@/App.vue";
+  import { WorkshopManager } from "@/community/workshop";
+
+  const MAX_ATTEMPT = 50;
 
   @Component
   export default class ProjectNameDialog extends Vue {
@@ -55,9 +58,22 @@
 
     onCreate() {
       if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+        let nameCalculated = this.name;
+
+        const cloudFiles = WorkshopManager.getInstance().UserWorks;
+        for (let idx = 0; idx <= MAX_ATTEMPT; idx++) {
+          // abort new document there is too many similar named projects
+          if (idx == MAX_ATTEMPT) return;
+          if (cloudFiles.find((item) => item == `${nameCalculated}.mmng`)) {
+            nameCalculated = `${this.name}_${idx}`;
+          } else {
+            break;
+          }
+        }
+
         // create an empty project
         let app = this.$root.$children[0] as App;
-        app.createProject(this.name);
+        app.createProject(nameCalculated);
         this.dialog = false;
       }
     }

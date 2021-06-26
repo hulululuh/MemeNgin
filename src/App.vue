@@ -21,7 +21,7 @@
       <tooltip-button
         icon="mdi-note-plus-outline"
         tooltip="New project"
-        @click="newProject"
+        @click="openNewProjectDialog"
       />
       <tooltip-button
         icon="mdi-content-save-outline"
@@ -117,6 +117,7 @@
         @onClose="closeAnyway"
         @onCancel="onCancelled"
       />
+      <project-name-dialog ref="projectNameDialog" />
       <v-container
         fluid
         flex
@@ -162,6 +163,7 @@
   import StartupMenu from "@/views/StartupMenu.vue";
   import CloseDialog from "@/views/CloseDialog.vue";
   import PublishDialog from "@/views/PublishDialog.vue";
+  import ProjectNameDialog from "@/views/ProjectNameDialog.vue";
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
   import { MenuCommands } from "./menu";
@@ -182,8 +184,13 @@
   const app = remote.app;
   const userDataPath = path.join(app.getPath("userData"), "userData.json");
 
-  const MY_WORKS_PATH = path.join(path.resolve("."), "/projects/my_works/");
-  const DEFAULT_WORKS_PATH = path.join(
+  //export const MY_WORKS_PATH = ApplicationSettings.getInstance().myWorksPath;
+
+  export const MY_WORKS_PATH = path.join(
+    path.resolve("."),
+    "/projects/my_works/"
+  );
+  export const DEFAULT_WORKS_PATH = path.join(
     path.resolve("."),
     "/projects/default_works/"
   );
@@ -201,6 +208,7 @@
       closeDialog: CloseDialog,
       tooltipButton: TooltipButton,
       publishDialog: PublishDialog,
+      projectNameDialog: ProjectNameDialog,
     },
   })
   export default class App extends Vue {
@@ -302,6 +310,7 @@
       window.removeEventListener("resize", this.windowResize);
       document.removeEventListener("editStarted", this.onEditStarted);
       document.removeEventListener("editEnded", this.onEditEnded);
+      document.removeEventListener("projectSaved", this.onProjectSaved);
     }
 
     onEditStarted() {
@@ -337,12 +346,19 @@
       }
     }
 
+    onProjectSaved() {
+      setTimeout(() => {
+        CloudData.getInstance().getUserWorks();
+      }, 1000);
+    }
+
     mounted() {
       this.setupMenu();
 
       window.addEventListener("resize", this.windowResize);
       document.addEventListener("editStarted", this.onEditStarted);
       document.addEventListener("editEnded", this.onEditEnded);
+      document.addEventListener("projectSaved", this.onProjectSaved);
 
       document.addEventListener("mousemove", (evt) => {
         this.mouseX = evt.pageX;
@@ -520,6 +536,7 @@
     createProject(name: string) {
       this.newProject();
       this.editor.metadata.title = name;
+      this.editor.metadata.localItem.isCloud = true;
 
       // make directory if not exists
       const targetDir = path.join(MY_WORKS_PATH, `/${name}/`);
@@ -533,20 +550,17 @@
       // wait for scene is setup
       setTimeout(() => {
         this.saveProject(true);
-        WorkshopManager.getInstance().create(this.project.path);
-      }, 100);
-
-      setTimeout(() => {
-        CloudData.getInstance().getUserWorks();
-      }, 1000);
+      }, 0);
     }
 
     removeProject(itemData: ProjectItemData) {
-      WorkshopManager.getInstance().remove(itemData);
-      let isCloudItem = itemData.localItem.isCloud;
-      // update cloud item list
-      if (isCloudItem) {
-        CloudData.getInstance().getUserWorks();
+      let success = WorkshopManager.getInstance().remove(itemData);
+      if (success) {
+        let isCloudItem = itemData.localItem.isCloud;
+        // update cloud item list
+        if (isCloudItem) {
+          CloudData.getInstance().getUserWorks();
+        }
       }
 
       // remove corresponding local files
@@ -558,7 +572,10 @@
         fs.rmdirSync(targetPath, { recursive: true });
         console.info(`Local project ${targetPath} is removed`);
       }
-      //itemData.localItem.path
+    }
+
+    openNewProjectDialog() {
+      (this.$refs.projectNameDialog as ProjectNameDialog).dialog = true;
     }
 
     newProject() {
@@ -607,7 +624,7 @@
         console.log(data);
         this.project.data = data;
         this.project.data["appVersion"] = this.version;
-        ProjectManager.save(this.project.path, this.project);
+        ProjectManager.save(this.project.localPath, this.project);
         UndoStack.current.reset();
         this.edited = false;
         WIN.close();
@@ -633,15 +650,18 @@
         console.log(data);
         this.project.data = data;
         this.project.data["appVersion"] = this.version;
-        ProjectManager.save(this.project.path, this.project);
+
+        ProjectManager.save(this.project.localPath, this.project);
+        WorkshopManager.getInstance().create(this.project.localPath);
         UndoStack.current.reset();
         this.edited = false;
+
+        document.dispatchEvent(new Event("projectSaved"));
       }
     }
 
     async saveProjectAs() {
-      // if project has no name then it hasnt been saved yet
-
+      // if project has no name then it hasn't been saved yet
       try {
         let result = await dialog.showSaveDialog({
           filters: [
@@ -653,23 +673,24 @@
           defaultPath: "material.mmng",
         });
 
-        let path = result.filePath;
-        if (!path) return false;
+        let filePath = result.filePath;
+        if (!filePath) return false;
         let data = this.editor.save();
         console.log(data);
         this.project.data = data;
         this.project.data["appVersion"] = this.version;
 
-        //console.log(path);
-        if (!path.endsWith(".mmng")) path += ".mmng";
+        if (!filePath.endsWith(".mmng")) filePath += ".mmng";
 
-        this.project.name = path.replace(/^.*[\\\/]/, "");
-        this.project.path = path;
+        this.project.name = filePath.replace(/^.*[\\\/]/, "");
+        this.project.path = filePath;
 
-        ProjectManager.save(path, this.project);
+        ProjectManager.save(filePath, this.project);
+        WorkshopManager.getInstance().create(this.project.localPath);
         this.titleName = this.project.name;
         remote.getCurrentWindow().setTitle(this.title);
         UndoStack.current.reset();
+        document.dispatchEvent(new Event("projectSaved"));
         this.edited = false;
         return true;
       } catch (err) {
@@ -698,15 +719,29 @@
         });
     }
 
-    openProjectWithPath(path: string) {
+    async openProjectWithItem(data: ProjectItemData) {
+      if (data.localItem.isCloud) {
+        (this.$refs.startupMenu as StartupMenu).tryClose();
+        let project = await ProjectManager.fromCloud(data.path);
+        this.onProjectOpened(project);
+      } else {
+        this.openProjectWithPath(data.path);
+      }
+    }
+
+    openProjectWithPath(filepath: string) {
       // close startup menu if needed
       (this.$refs.startupMenu as StartupMenu).tryClose();
 
-      let project = ProjectManager.load(path);
+      let project = ProjectManager.load(filepath);
       if (!project) return;
 
+      this.onProjectOpened(project);
+    }
+
+    onProjectOpened(project: Project) {
       let userData: UserData = UserData.getInstance();
-      userData.registerRecent(path);
+      userData.registerRecent(project.localPath);
       console.log(project);
 
       this.titleName = project.name;
@@ -740,8 +775,8 @@
       this._openSample(fullPath);
     }
 
-    _openSample(path: string) {
-      let project = ProjectManager.load(path);
+    _openSample(filepath: string) {
+      let project = ProjectManager.load(filepath);
       console.log(project);
 
       // ensure library exists
@@ -817,7 +852,6 @@
 
     publishItem() {
       if (this.havePersistentDialog) return;
-
       (this.$refs.publishDialog as PublishDialog).show();
     }
 

@@ -115,10 +115,15 @@ export class ProjectItemData {
       : this.localItem.thumbnail;
   }
 
-  get isValid() {
-    return (
-      (this.workshopItem && this.workshopItem.isValid) || this.localItem.isValid
-    );
+  set thumbnail(value) {
+    this.localItem.thumbnail = value;
+    if (this.isWorkshopItem) this.workshopItem.thumbnailUrl = value;
+  }
+
+  get isValid(): boolean {
+    let valid = this.localItem && this.localItem.isValid;
+    valid = valid ? valid : this.workshopItem && this.workshopItem.isValid;
+    return valid;
   }
 
   get publisherId() {
@@ -209,8 +214,8 @@ export class LocalItemData {
   path: string;
   isCloud: boolean;
 
-  get isValid() {
-    return this.title && this.thumbnail && this.path;
+  get isValid(): boolean {
+    return this.title !== "" && this.thumbnail && this.path !== "";
   }
 
   save(): any {
@@ -279,9 +284,12 @@ export class WorkshopItemData {
   tags: Array<string>;
   allowDerivativeWork: boolean;
 
-  get isValid() {
+  get isValid(): boolean {
     return (
-      this.itemId && this.publisherId && this.thumbnailUrl && this.ageRating
+      this.itemId !== "" &&
+      this.publisherId !== "" &&
+      this.thumbnailUrl &&
+      this.ageRating !== ""
     );
   }
 
