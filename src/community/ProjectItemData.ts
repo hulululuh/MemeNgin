@@ -126,6 +126,16 @@ export class ProjectItemData {
     return valid;
   }
 
+  get isCloud(): boolean {
+    return this.localItem ? this.localItem.isCloud : false;
+  }
+
+  set isCloud(value: boolean) {
+    if (this.localItem) {
+      this.localItem.isCloud = value;
+    }
+  }
+
   get publisherId() {
     return this.isWorkshopItem ? this.workshopItem.publisherId : "";
   }
@@ -271,6 +281,8 @@ export class LocalItemData {
 export class WorkshopItemData {
   // id
   itemId: string;
+  fileId: string;
+  thumbnailId: string;
   publisherId: string;
 
   // general

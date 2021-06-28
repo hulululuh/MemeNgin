@@ -188,7 +188,7 @@
           app.saveProject();
         }
 
-        WorkshopManager.getInstance().publish(app.project.path);
+        WorkshopManager.getInstance().publish(app.project.localPath);
       }
     }
 
@@ -383,6 +383,7 @@
     prepareModel() {
       let outputCanvas = Editor.getScene().outputNode.imageCanvas.canvas;
       this.$store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
+      Editor.getMetadata().thumbnail = canvasToThumbnailURL(outputCanvas);
       this.$store.dispatch("changeMetadata", Editor.getMetadata());
       this.$forceUpdate();
     }
