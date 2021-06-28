@@ -240,7 +240,7 @@ export class WorkshopManager {
     return false;
   }
 
-  async publish(projectPath: string): Promise<any> {
+  async publish(projectPath: string) {
     if (fs.existsSync(projectPath)) {
       const data = Editor.getMetadata();
       const parsedPath = path.parse(projectPath);
@@ -253,15 +253,22 @@ export class WorkshopManager {
       const pathCloud = path.parse(pathLocal).base;
       const thumbnailPathCloud = path.parse(thumbnailPathLocal).base;
 
-      // // save thumbnail on the corresponding folder
-      // const nativeImage = await electron.nativeImage.createFromDataURL(
-      //   data.thumbnail
-      // );
-      // const buffer = nativeImage.toPNG();
+      let img = new Image();
+      img.src = data.thumbnail;
+      await img.decode();
+
+      let canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      let ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      const url = canvas.toDataURL("image/png", 1);
+      const nativeImage = electron.nativeImage.createFromDataURL(url);
+      const buffer = nativeImage.toPNG();
 
       try {
-        fs.writeFileSync(thumbnailPathLocal, data.thumbnail);
-        //fs.writeFileSync(thumbnailPathLocal, buffer);
+        fs.writeFileSync(thumbnailPathLocal, buffer);
       } catch (err) {
         if (err) alert("Error saving image: " + err);
       }
