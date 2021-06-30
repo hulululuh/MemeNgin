@@ -106,7 +106,6 @@
     }
     saveTexture() {
       // todo: save image as png
-      //console.log(this.hasImage);
       if (!this.hasImage) return;
 
       dialog

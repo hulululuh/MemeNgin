@@ -6,15 +6,7 @@
     <v-divider class="mt-0 pb-2" />
     <v-row class="grid pa-1">
       <new-document v-if="newDocument" />
-      <v-col
-        v-for="(item, i) in lists"
-        :key="i"
-        cols="auto"
-        md="auto"
-        class="pa-1"
-        width="192px"
-        height="192px"
-      >
+      <v-col v-for="(item, i) in lists" :key="i" class="pa-1">
         <project-item v-if="exists(item)" :itemData="item" />
       </v-col>
     </v-row>

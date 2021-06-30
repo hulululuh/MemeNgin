@@ -178,7 +178,7 @@
       this.$emit("onCancel");
     }
 
-    onPublish() {
+    async onPublish() {
       // following line looks too complex, but it is a walkaround for error.
       // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element
       if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
@@ -188,7 +188,14 @@
           app.saveProject();
         }
 
-        WorkshopManager.getInstance().publish(app.project.localPath);
+        let success = await WorkshopManager.getInstance().publish(
+          app.project.localPath
+        );
+
+        // save issued item id, publisher id and so on.
+        if (success) {
+          app.saveProject(true);
+        }
       }
     }
 

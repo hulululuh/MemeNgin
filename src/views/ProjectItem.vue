@@ -1,9 +1,10 @@
 <template v-on:change="onChanged">
   <v-hover v-slot="{ hover }">
     <v-card
-      class="pa-0 ma-0"
-      width="192px"
-      height="192px"
+      class="pa-0 ma-0 d-flex flex-wrap"
+      min-width="192px"
+      max-width="256px"
+      :aspect-ratio="1"
       :elevation="hover ? 16 : 2"
       :class="{ 'on-hover': hover }"
       @click="open"
@@ -12,8 +13,6 @@
         id="thumbnail"
         class="white--text align-center"
         style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
-        height="100%"
-        width="100%"
         v-bind:src="thumbnail"
         lazy-src="assets/icons/image.svg"
       >

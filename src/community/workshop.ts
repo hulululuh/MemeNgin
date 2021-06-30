@@ -224,7 +224,7 @@ export class WorkshopManager {
       console.warn("The steam client must be running!!!");
       return false;
     }
-    if (data.localItem.isCloud) {
+    if (data.isCloud) {
       greenworks.deleteFile(
         data.localItem.path,
         () => {
@@ -241,122 +241,114 @@ export class WorkshopManager {
   }
 
   async publish(projectPath: string) {
-    if (fs.existsSync(projectPath)) {
-      const data = Editor.getMetadata();
-      const parsedPath = path.parse(projectPath);
-      const pathLocal = path.resolve(projectPath);
-      const thumbnailPathLocal = path.join(
-        parsedPath.dir,
-        `${parsedPath.name}.png`
-      );
+    try {
+      let exists = fs.existsSync(projectPath);
+      let stats = exists && (await fs.statSync(projectPath));
+      let isFile = exists && stats.isFile();
+      if (exists && isFile) {
+        const data = Editor.getMetadata();
+        const parsedPath = path.parse(projectPath);
+        const pathLocal = path.resolve(projectPath);
+        const thumbnailPathLocal = path.join(
+          parsedPath.dir,
+          `${parsedPath.name}.png`
+        );
 
-      const pathCloud = path.parse(pathLocal).base;
-      const thumbnailPathCloud = path.parse(thumbnailPathLocal).base;
+        const pathCloud = path.parse(pathLocal).base;
+        const thumbnailPathCloud = path.parse(thumbnailPathLocal).base;
 
-      let img = new Image();
-      img.src = data.thumbnail;
-      await img.decode();
+        let img = new Image();
+        img.src = data.thumbnail;
+        await img.decode();
 
-      let canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      let ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
+        let canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        let ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
 
-      const url = canvas.toDataURL("image/png", 1);
-      const nativeImage = electron.nativeImage.createFromDataURL(url);
-      const buffer = nativeImage.toPNG();
+        const url = canvas.toDataURL("image/png", 1);
+        const nativeImage = electron.nativeImage.createFromDataURL(url);
+        const buffer = nativeImage.toPNG();
 
-      try {
         fs.writeFileSync(thumbnailPathLocal, buffer);
-      } catch (err) {
-        if (err) alert("Error saving image: " + err);
-      }
 
-      if (!greenworks.isCloudEnabledForUser()) {
-        console.warn("You need to turn on cloud feature to use this feature");
-      }
-      if (!greenworks.isCloudEnabled()) {
-        greenworks.enableCloud(true);
-      }
+        if (!greenworks.isCloudEnabledForUser()) {
+          console.warn("You need to turn on cloud feature to use this feature");
+          return false;
+        }
+        if (!greenworks.isCloudEnabled()) {
+          greenworks.enableCloud(true);
+        }
 
-      // should save this item on the cloud
-      if (!data.localItem.isCloud) {
-        await greenworks.saveFilesToCloud(
-          [pathLocal, thumbnailPathLocal],
-          () => {
-            console.info(`File save succeed: ${path.basename(projectPath)}`);
-            data.isCloud = true;
+        // should save this item on the cloud
+        if (!data.isCloud) {
+          await greenworks.saveFilesToCloud(
+            [pathLocal, thumbnailPathLocal],
+            () => {
+              console.info(`File save succeed: ${path.basename(projectPath)}`);
+              data.isCloud = true;
+            },
+            (err) => {
+              console.error(err);
+              return false;
+            }
+          );
+        }
+
+        await greenworks.fileShare(
+          pathCloud,
+          (file_handle) => {
+            data.workshopItem.fileId = file_handle;
+            console.log(`file shared: ${pathCloud} handle:[${file_handle}]`);
+          },
+          (err) => {
+            console.warn(err);
+          }
+        );
+
+        await greenworks.fileShare(
+          thumbnailPathCloud,
+          (file_handle) => {
+            data.workshopItem.thumbnailId = file_handle;
+            console.log(
+              `file shared: ${thumbnailPathCloud} handle:[${file_handle}]`
+            );
+          },
+          (err) => {
+            console.warn(err);
+          }
+        );
+
+        await greenworks.publishWorkshopFile(
+          { "app_id": APP_ID, "tags": data.tags },
+          pathCloud,
+          thumbnailPathCloud,
+          data.title,
+          data.description,
+          (publish_file_handle) => {
+            data.workshopItem.itemId = publish_file_handle;
+            console.log(
+              `item has successfuly published. handle:[${publish_file_handle}]`
+            );
           },
           (err) => {
             console.error(err);
             return false;
           }
         );
+        return true;
+      } else {
+        console.error(`file does not exists: ${projectPath}`);
+        return false;
       }
-
-      await greenworks.fileShare(
-        pathCloud,
-        (file_handle) => {
-          data.workshopItem.fileId = file_handle;
-          console.log(`file shared: ${pathCloud} handle:[${file_handle}]`);
-        },
-        (err) => {
-          console.warn(err);
-        }
-      );
-      await greenworks.fileShare(
-        thumbnailPathCloud,
-        (file_handle) => {
-          data.workshopItem.thumbnailId = file_handle;
-          console.log(
-            `file shared: ${thumbnailPathCloud} handle:[${file_handle}]`
-          );
-        },
-        (err) => {
-          console.warn(err);
-        }
-      );
-
-      await greenworks.publishWorkshopFile(
-        { "app_id": APP_ID, "tags": data.tags },
-        pathCloud,
-        thumbnailPathCloud,
-        data.title,
-        data.description,
-        (publish_file_handle) => {
-          data.workshopItem.itemId = publish_file_handle;
-          console.log(
-            `item has successfuly published. handle:[${publish_file_handle}]`
-          );
-        },
-        (err) => {
-          console.error(err);
-        }
-      );
-
-      // greenworks.ugcPublish(
-      //   pathResolved,
-      //   data.title,
-      //   data.description,
-      //   thumbnailPathResolved,
-      //   (published) => {
-      //     console.log(`Your work has successfully published`);
-      //     console.log(published);
-      //   },
-      //   (err) => {
-      //     console.error(err);
-      //   },
-      //   (progress) => {}
-      // );
-      return true;
-    } else {
-      console.error(`file does not exists: ${projectPath}`);
+    } catch (err) {
+      console.error(err);
       return false;
     }
   }
 
-  update(projectPath: string): boolean {
+  async update(projectPath: string) {
     return true;
   }
 }

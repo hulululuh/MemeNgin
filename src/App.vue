@@ -556,7 +556,7 @@
     removeProject(itemData: ProjectItemData) {
       let success = WorkshopManager.getInstance().remove(itemData);
       if (success) {
-        let isCloudItem = itemData.localItem.isCloud;
+        let isCloudItem = itemData.isCloud;
         // update cloud item list
         if (isCloudItem) {
           CloudData.getInstance().getUserWorks();
@@ -565,7 +565,7 @@
 
       // remove corresponding local files
       let targetPath = path.join(MY_WORKS_PATH, `/${itemData.title}/`);
-      if (!fs.existsSync(targetPath))
+      if (!fs.existsSync(targetPath) && itemData.localItem)
         targetPath = path.join(MY_WORKS_PATH, `/${itemData.localItem.path}/`);
 
       if (fs.existsSync(targetPath)) {
@@ -720,7 +720,7 @@
     }
 
     async openProjectWithItem(data: ProjectItemData) {
-      if (data.localItem.isCloud) {
+      if (data.isCloud) {
         (this.$refs.startupMenu as StartupMenu).tryClose();
         let project = await ProjectManager.fromCloud(data.path);
         this.onProjectOpened(project);
