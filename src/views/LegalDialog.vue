@@ -11,55 +11,54 @@
       </v-card-title>
       <v-card-text d-flex>
         <v-spacer class="ma-2" />
-        <h2>Steam ToS rules</h2>
-        <h3>Your submission must not violate:</h3>
+        <h2>{{ textSteamToS }}</h2>
+        <h3>{{ textSteamToSMustNot }}</h3>
         <h4>
-          <a href="https://store.steampowered.com/subscriber_agreement/"
-            >Steam Subscriber Agreement</a
-          >
+          <a href="https://store.steampowered.com/subscriber_agreement/">{{
+            textSteamToSSubscriber
+          }}</a>
         </h4>
         <h4>
-          <a href="https://store.steampowered.com/online_conduct/"
-            >Steam Online Conduct</a
-          >
+          <a href="https://store.steampowered.com/online_conduct/">{{
+            textSteamToSConduct
+          }}</a>
         </h4>
         <h4>
           <a
             href="https://support.steampowered.com/kb_article.php?ref=4045-USHJ-3810"
-            >Rules and Guidelines For Steam: Discussions, Reviews, and User
-            Generated Content</a
+            >{{ textSteamToSRules }}</a
           >
         </h4>
         <h4>
           <a
             href="https://support.steampowered.com/kb_article.php?ref=4506-DGHX-5190"
-            >Steam Workshop: Artwork guidelines</a
+            >{{ textSteamToSArtwork }}</a
           >
         </h4>
         <p />
-        <h2>MEMENGIN Terms of Service and UGC guidelines</h2>
+        <h2>{{ textMmngToS }}</h2>
+        <h3>
+          {{ textMmngToSMustNot }}
+        </h3>
         <h4>
-          Your submission must not contain harmful links or message. Even if it
-          is embedded in the QR code, it is prohibited.
+          {{ textMmngToSHarmful }}
         </h4>
         <h4>
-          Your submission must not contain offensive content. (e.g. racism,
-          gore)
+          {{ textMmngToSOffensive }}
         </h4>
         <h4>
-          Your submission must not contain pornographic content. (e.g.
-          pornographic sprays/decals, nudity)
+          {{ textMmngToSPornographic }}
         </h4>
+        <h3>
+          {{ textMmngToSMustOwner }}
+        </h3>
         <h4>
-          You must be the owner of uploaded submission.
-        </h4>
-        <h4>
-          Stolen artwork (even edited) is not allowed
+          {{ textMmngToSStolen }}
         </h4>
         <p />
         <h2>
           <a href="https://steamcommunity.com/workshop/workshoplegalagreement/">
-            You have to agree Steam workshop legal agreement to proceed.
+            {{ textAgreeLegal }}
           </a>
         </h2>
       </v-card-text>
@@ -77,6 +76,18 @@
 
 <style scoped lang="scss">
   @import "../../public/scss/app.scss";
+  h2 {
+    text-indent: 0px;
+  }
+  h3 {
+    text-indent: 15px;
+  }
+  h4 {
+    text-indent: 30px;
+  }
+  h5 {
+    text-indent: 45px;
+  }
 </style>
 
 <script lang="ts">
@@ -90,19 +101,62 @@
       return TextManager.translate("${legal_dialog.title}");
     }
 
-    get textTerms() {
-      //return TextManager.translate("${legal_dialog.message}");
-      return `
-        Steam ToS rules Your submission must not violate: Steam Subscriber
-        Agreement Steam Online Conduct Rules and Guidelines For Steam:
-        Discussions, Reviews, and User Generated Content Steam Workshop Artwork
-        guidelines MEMENGIN Terms of Service and UGC guidelines Your submission
-        must not contain harmful links or message. Even if it is embedded in the
-        QR code, it is prohibited. Your submission must not contain offensive
-        content. (e.g. racism, gore) Your submission must not contain
-        pornographic content. (e.g. pornographic sprays/decals, nudity) You must
-        be the owner of uploaded submission. Stolen artwork (even edited) is not
-        allowed`;
+    get textSteamToS() {
+      return TextManager.translate("${legal_dialog.steam_tos.title}");
+    }
+
+    get textSteamToSMustNot() {
+      return TextManager.translate("${legal_dialog.steam_tos.must_not}");
+    }
+
+    get textSteamToSSubscriber() {
+      return TextManager.translate(
+        "${legal_dialog.steam_tos.subscriber_agreement}"
+      );
+    }
+
+    get textSteamToSConduct() {
+      return TextManager.translate("${legal_dialog.steam_tos.online_conduct}");
+    }
+
+    get textSteamToSRules() {
+      return TextManager.translate("${legal_dialog.steam_tos.rules}");
+    }
+
+    get textSteamToSArtwork() {
+      return TextManager.translate("${legal_dialog.steam_tos.artwork}");
+    }
+
+    get textMmngToS() {
+      return TextManager.translate("${legal_dialog.mmng_tos.title}");
+    }
+
+    get textMmngToSMustNot() {
+      return TextManager.translate("${legal_dialog.mmng_tos.must_not}");
+    }
+
+    get textMmngToSHarmful() {
+      return TextManager.translate("${legal_dialog.mmng_tos.harmful}");
+    }
+
+    get textMmngToSOffensive() {
+      return TextManager.translate("${legal_dialog.mmng_tos.offensive}");
+    }
+
+    get textMmngToSPornographic() {
+      return TextManager.translate("${legal_dialog.mmng_tos.pornographic}");
+    }
+
+    get textMmngToSMustOwner() {
+      return TextManager.translate("${legal_dialog.mmng_tos.must_owner}");
+    }
+
+    get textMmngToSStolen() {
+      return TextManager.translate("${legal_dialog.mmng_tos.stolen}");
+    }
+
+    get textAgreeLegal() {
+      return TextManager.translate("${legal_dialog.agree_legal}");
     }
 
     get textAgree() {
