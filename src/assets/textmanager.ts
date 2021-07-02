@@ -128,6 +128,7 @@ export class TextManager {
   private static _instance: TextManager = new TextManager();
   languageId: string = "en";
   parsed: any;
+  parsedFallback: any;
 
   static getInstance() {
     if (!TextManager._instance) {
@@ -137,29 +138,52 @@ export class TextManager {
   }
 
   static translate(text: string) {
-    return text.replace(/\${(.*?)}/g, (x, g) =>
+    let translated = text.replace(/\${(.*?)}/g, (x, g) =>
       deepValue(this.getInstance().parsed, g)
     );
+
+    // if translation of requested key is not available, then get value in fallback
+    if (translated == "null") {
+      translated = text.replace(/\${(.*?)}/g, (x, g) =>
+        deepValue(this.getInstance().parsedFallback, g)
+      );
+    }
+    return translated;
   }
 
   constructor() {
-    this.setLanguage("en");
+    this.parsedFallback = this.parseLanguage("en");
+    this.setLanguage("kor");
+  }
+
+  parseLanguage(languageId: string) {
+    let metadata = LANGUAGES[languageId];
+    let tsPath = path.join(__static, metadata.data);
+    if (!fs.existsSync(tsPath)) {
+      console.log(`couldn't find ${languageId}`);
+      return null;
+    }
+
+    const file = fs.readFileSync(tsPath, "utf8");
+    return YAML.parse(file);
   }
 
   setLanguage(languageId: string) {
     this.languageId = languageId;
-    let metadata = LANGUAGES[this.languageId];
-    let tsPath = path.join(__static, metadata.data);
-    if (!fs.existsSync(tsPath)) {
-      console.log(
-        `couldn't find ${this.languageId}, fallback to default language(english) `
-      );
-      this.languageId = "en";
-      metadata = LANGUAGES[this.languageId];
-      tsPath = path.join(__static, metadata.data);
-    }
+    this.parsed = this.parseLanguage(this.languageId);
 
-    const file = fs.readFileSync(tsPath, "utf8");
-    this.parsed = YAML.parse(file);
+    // let metadata = LANGUAGES[this.languageId];
+    // let tsPath = path.join(__static, metadata.data);
+    // if (!fs.existsSync(tsPath)) {
+    //   console.log(
+    //     `couldn't find ${this.languageId}, fallback to default language(english) `
+    //   );
+    //   this.languageId = "en";
+    //   metadata = LANGUAGES[this.languageId];
+    //   tsPath = path.join(__static, metadata.data);
+    // }
+
+    // const file = fs.readFileSync(tsPath, "utf8");
+    // this.parsed = YAML.parse(file);
   }
 }
