@@ -4,16 +4,18 @@
       categoryName
     }}</v-subheader>
     <v-divider class="mt-0 pb-2" />
-    <v-row class="grid pa-1">
-      <new-document v-if="newDocument" />
-      <v-col v-for="(item, i) in lists" :key="i" class="pa-1">
-        <project-item
-          v-if="exists(item)"
-          :itemData="item"
-          :clickAction="clickAction"
-        />
-      </v-col>
-    </v-row>
+    <v-list>
+      <v-list-item-group v-model="selectedItem" class="grid pa-1">
+        <v-list-item v-for="(item, i) in lists" :key="i" class="pa-0 ma-0">
+          <project-item
+            v-if="exists(item)"
+            :active="i == selectedItem"
+            :itemData="item"
+            :clickAction="clickAction"
+          />
+        </v-list-item>
+      </v-list-item-group>
+    </v-list>
   </v-flex>
 </template>
 
@@ -25,25 +27,24 @@
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectItemData } from "@/community/ProjectItemData";
   import ProjectItem, { ClickAction } from "@/views/ProjectItem.vue";
-  import NewDocument from "@/views/NewDocument.vue";
 
   @Component({
     components: {
       projectItem: ProjectItem,
-      newDocument: NewDocument,
     },
   })
-  export default class ItemList extends Vue {
-    @Prop() newDocument: boolean;
+  export default class ExploreItemList extends Vue {
     @Prop() categoryName: string;
     @Prop() lists: ProjectItemData[];
+
+    selectedItem: number = -1;
 
     exists(item: ProjectItemData) {
       return item.isValid;
     }
 
     get clickAction() {
-      return ClickAction.Open;
+      return ClickAction.Select;
     }
   }
 </script>

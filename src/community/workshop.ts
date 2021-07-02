@@ -19,7 +19,7 @@ export class WorkshopManager {
   ]);
   private activeTimerId;
   private steamId;
-  initialized: boolean = false;
+
   static getInstance() {
     if (!WorkshopManager._instance) {
       WorkshopManager._instance = new WorkshopManager();
@@ -37,7 +37,6 @@ export class WorkshopManager {
       }
 
       // trying to init api with appid: 0
-      this.initialized = greenworks.init();
       if (this.initialized) {
         console.log("Steam API has been initialized.");
 
@@ -47,6 +46,15 @@ export class WorkshopManager {
       }
     } catch (err) {
       console.warn(err);
+    }
+  }
+
+  get initialized() {
+    try {
+      const init = greenworks.init();
+      return init;
+    } catch (err) {
+      return false;
     }
   }
 
@@ -88,7 +96,7 @@ export class WorkshopManager {
       );
     });
 
-    return Promise.resolve(fetched);
+    return fetched;
   }
 
   requestPage(num: number, target: QueryTarget) {
@@ -350,5 +358,63 @@ export class WorkshopManager {
 
   async update(projectPath: string) {
     return true;
+  }
+
+  async subscribe(file_id: string) {
+    if (this.initialized) {
+      greenworks.ugcSubscribe(
+        file_id,
+        () => {
+          console.log(`subscribed: ${file_id}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    }
+  }
+
+  async unsubscribe(file_id: string) {
+    if (this.initialized) {
+      greenworks.ugcUnsubscribe(
+        file_id,
+        () => {
+          console.log(`unsubscribed: ${file_id}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    }
+  }
+
+  async voteup(file_id: string) {
+    if (this.initialized) {
+      greenworks.ugcVote(
+        file_id,
+        true,
+        () => {
+          console.log(`voted up: ${file_id}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    }
+  }
+
+  async votedown(file_id: string) {
+    if (this.initialized) {
+      greenworks.ugcVote(
+        file_id,
+        false,
+        () => {
+          console.log(`voted down: ${file_id}`);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    }
   }
 }

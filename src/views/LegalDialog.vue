@@ -10,7 +10,58 @@
         {{ textTitle }}
       </v-card-title>
       <v-card-text d-flex>
-        {{ textTerms }}
+        <v-spacer class="ma-2" />
+        <h2>Steam ToS rules</h2>
+        <h3>Your submission must not violate:</h3>
+        <h4>
+          <a href="https://store.steampowered.com/subscriber_agreement/"
+            >Steam Subscriber Agreement</a
+          >
+        </h4>
+        <h4>
+          <a href="https://store.steampowered.com/online_conduct/"
+            >Steam Online Conduct</a
+          >
+        </h4>
+        <h4>
+          <a
+            href="https://support.steampowered.com/kb_article.php?ref=4045-USHJ-3810"
+            >Rules and Guidelines For Steam: Discussions, Reviews, and User
+            Generated Content</a
+          >
+        </h4>
+        <h4>
+          <a
+            href="https://support.steampowered.com/kb_article.php?ref=4506-DGHX-5190"
+            >Steam Workshop: Artwork guidelines</a
+          >
+        </h4>
+        <p />
+        <h2>MEMENGIN Terms of Service and UGC guidelines</h2>
+        <h4>
+          Your submission must not contain harmful links or message. Even if it
+          is embedded in the QR code, it is prohibited.
+        </h4>
+        <h4>
+          Your submission must not contain offensive content. (e.g. racism,
+          gore)
+        </h4>
+        <h4>
+          Your submission must not contain pornographic content. (e.g.
+          pornographic sprays/decals, nudity)
+        </h4>
+        <h4>
+          You must be the owner of uploaded submission.
+        </h4>
+        <h4>
+          Stolen artwork (even edited) is not allowed
+        </h4>
+        <p />
+        <h2>
+          <a href="https://steamcommunity.com/workshop/workshoplegalagreement/">
+            You have to agree Steam workshop legal agreement to proceed.
+          </a>
+        </h2>
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -40,7 +91,18 @@
     }
 
     get textTerms() {
-      return TextManager.translate("${legal_dialog.message}");
+      //return TextManager.translate("${legal_dialog.message}");
+      return `
+        Steam ToS rules Your submission must not violate: Steam Subscriber
+        Agreement Steam Online Conduct Rules and Guidelines For Steam:
+        Discussions, Reviews, and User Generated Content Steam Workshop Artwork
+        guidelines MEMENGIN Terms of Service and UGC guidelines Your submission
+        must not contain harmful links or message. Even if it is embedded in the
+        QR code, it is prohibited. Your submission must not contain offensive
+        content. (e.g. racism, gore) Your submission must not contain
+        pornographic content. (e.g. pornographic sprays/decals, nudity) You must
+        be the owner of uploaded submission. Stolen artwork (even edited) is not
+        allowed`;
     }
 
     get textAgree() {

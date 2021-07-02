@@ -53,11 +53,6 @@
                 :label="textTags"
                 multiple
               />
-              <v-checkbox
-                v-model="allowDerivativeWork"
-                class="ma-0 pa-0"
-                :label="textDerivative"
-              />
               <v-list-item class="ma-0 pa-0">
                 <v-checkbox
                   v-model="agreed"
@@ -251,14 +246,6 @@
       this.$store.state.metadata.tags = value;
     }
 
-    get allowDerivativeWork() {
-      return this.$store.state.metadata.allowDerivativeWork;
-    }
-
-    set allowDerivativeWork(value: boolean) {
-      this.$store.state.metadata.allowDerivativeWork = value;
-    }
-
     get agreed() {
       return this.$store.state.userData.agreed;
     }
@@ -287,11 +274,8 @@
         const myWork =
           this.$store.state.metadata.publisherId ==
           WorkshopManager.getInstance().SteamId;
-        // published work
-        let publishable =
-          myWork || (!myWork && this.$store.state.metadata.allowDerivativeWork);
 
-        return publishable;
+        return myWork;
       }
     }
 

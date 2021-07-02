@@ -1,8 +1,6 @@
 <template>
   <v-container fluid class="pa-0 ma-0">
-    <v-container fluid class="pa-0 ma-0" v-if="!initialized">
-      {{ steamMustRun }}
-    </v-container>
+    <steam-must-run v-if="!initialized" />
     <v-container
       fluid
       v-if="initialized"
@@ -33,12 +31,13 @@
 <script lang="ts">
   import { WorkshopManager } from "@/community/workshop";
   import { Vue, Component } from "vue-property-decorator";
-  import { TextManager } from "@/assets/textmanager";
   import ItemList from "@/views/ItemList.vue";
+  import SteamMustRun from "@/views/SteamMustRun.vue";
 
   @Component({
     components: {
       itemList: ItemList,
+      steamMustRun: SteamMustRun,
     },
   })
   export default class PersonalTab extends Vue {
@@ -50,10 +49,6 @@
 
     get best() {
       return this.$store.state.userData.bestItems;
-    }
-
-    get steamMustRun() {
-      return TextManager.translate("${ui_general.steam_must_run}");
     }
 
     get userWorks() {

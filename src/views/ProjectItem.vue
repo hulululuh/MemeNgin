@@ -6,8 +6,9 @@
       max-width="256px"
       :aspect-ratio="1"
       :elevation="hover ? 16 : 2"
+      :color="active ? selectedColor : ''"
       :class="{ 'on-hover': hover }"
-      @click="open"
+      @click="onClicked"
     >
       <v-img
         id="thumbnail"
@@ -15,11 +16,12 @@
         style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
         v-bind:src="thumbnail"
         lazy-src="assets/icons/image.svg"
+        :gradient="gradient"
       >
         <div>
           <v-scale-transition>
             <v-btn
-              style="position:absolute; right: 0px; top: 0px;"
+              style="position:absolute; right: 0px; top: 0px; background-color: rgba(255, 255, 255, 0.42);"
               fab
               x-small
               v-show="hover"
@@ -58,12 +60,34 @@
   import { ProjectItemData } from "@/community/ProjectItemData";
   import App from "@/App.vue";
 
+  export enum ClickAction {
+    Open,
+    Select,
+  }
   @Component
   export default class ProjectItem extends Vue {
     @Prop() itemData: ProjectItemData;
+    @Prop() clickAction: ClickAction;
+    @Prop() active: boolean;
+
+    get selectedColor() {
+      return "#bbe1faff";
+    }
+
+    get gradient() {
+      return this.active ? "to top right, #bbe1fa11, #bbe1fa22" : "";
+    }
+
+    onClicked() {
+      if (this.clickAction == ClickAction.Open) {
+        console.log("tried to open");
+        this.open();
+      } else {
+        this.$store.state.selectedProject = this.itemData;
+      }
+    }
 
     open() {
-      console.log("tried to open");
       (this.$root.$children[0] as App).openProjectWithItem(this.itemData);
     }
 

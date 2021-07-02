@@ -1,8 +1,6 @@
 <template>
   <v-container fluid class="pa-0 ma-0">
-    <v-container fluid class="pa-0 ma-0" v-if="!initialized">
-      {{ steamMustRun }}
-    </v-container>
+    <steam-must-run v-if="!initialized" />
     <v-container
       fluid
       v-if="initialized"
@@ -19,13 +17,19 @@
         <v-scroll-x-transition>
           <v-col cols="2" v-show="showFilter" style="min-width:360px">
             <v-card>
-              <v-expansion-panels v-model="panel" multiple accordion block>
+              <v-expansion-panels
+                v-model="panel"
+                multiple
+                accordion
+                block
+                class="ma-0 pa-0"
+              >
                 <v-expansion-panel :key="0">
                   <v-expansion-panel-header>{{
                     "Preview"
                   }}</v-expansion-panel-header>
                   <v-expansion-panel-content>
-                    <!-- <workshop-filter /> -->
+                    <workshop-item />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel :key="1">
@@ -43,10 +47,10 @@
         <v-divider vertical />
         <v-col align-content-space-between>
           <v-card fluid clipped class="pa-0 ma-0">
-            <item-list
+            <explore-item-list
+              ref="exploreItemList"
               categoryName="Searched"
               :lists="searched"
-              ref="searched"
             />
             <v-pagination
               bottom
@@ -68,15 +72,19 @@
 <script lang="ts">
   import { WorkshopManager } from "@/community/workshop";
   import { QueryTarget } from "@/userdata";
-  import ItemList from "@/views/ItemList.vue";
+  import ExploreItemList from "@/views/ExploreItemList.vue";
   import WorkshopFilter from "@/views/WorkshopFilter.vue";
+  import WorkshopItem from "@/views/WorkshopItem.vue";
+  import SteamMustRun from "@/views/SteamMustRun.vue";
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
 
   @Component({
     components: {
-      itemList: ItemList,
+      exploreItemList: ExploreItemList,
       workshopFilter: WorkshopFilter,
+      workshopItem: WorkshopItem,
+      steamMustRun: SteamMustRun,
     },
   })
   export default class HomeTab extends Vue {
@@ -86,6 +94,12 @@
 
     toggleFilterVisibility() {
       this.showFilter = !this.showFilter;
+    }
+
+    get selectedItemData() {
+      // let index = (this.$refs.exploreItemList as ExploreItemList).selectedItem;
+      const item = this.$store.state.userData.searchedItems[0];
+      return item ? item : null;
     }
 
     get initialized() {
@@ -107,10 +121,6 @@
     set page(value) {
       this.index = value;
       WorkshopManager.getInstance().requestPage(value, QueryTarget.Search);
-    }
-
-    get steamMustRun() {
-      return TextManager.translate("${ui_general.steam_must_run}");
     }
   }
 </script>
