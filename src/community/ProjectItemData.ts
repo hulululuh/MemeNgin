@@ -282,6 +282,7 @@ export class WorkshopItemData {
   // id
   itemId: string;
   fileId: string;
+  publishedFileId: string;
   thumbnailId: string;
   publisherId: string;
 
@@ -340,6 +341,7 @@ export class WorkshopItemData {
     item.title = data.title;
     item.description = data.description;
     item.thumbnailUrl = data.PreviewImageUrl;
+    item.publishedFileId = data.publishedFileId;
     item.publisherId = data.steamIDOwner;
     item.numSubscribed = data.NumFollowers;
     item.numLikes = data.votesUp;

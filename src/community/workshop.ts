@@ -288,7 +288,6 @@ export class WorkshopManager {
         if (!greenworks.isCloudEnabled()) {
           greenworks.enableCloud(true);
         }
-
         // should save this item on the cloud
         if (!data.isCloud) {
           await greenworks.saveFilesToCloud(
@@ -339,6 +338,22 @@ export class WorkshopManager {
             console.log(
               `item has successfuly published. handle:[${publish_file_handle}]`
             );
+
+            // try to update tag
+            greenworks.updatePublishedWorkshopFile(
+              { "tags": data.tags },
+              publish_file_handle,
+              "",
+              "",
+              "",
+              "",
+              () => {
+                console.log("Published item update complete");
+              },
+              (err) => {
+                console.error(err);
+              }
+            );
           },
           (err) => {
             console.error(err);
@@ -362,7 +377,7 @@ export class WorkshopManager {
 
   async subscribe(file_id: string) {
     if (this.initialized) {
-      greenworks.ugcSubscribe(
+      await greenworks.ugcSubscribe(
         file_id,
         () => {
           console.log(`subscribed: ${file_id}`);
@@ -376,7 +391,7 @@ export class WorkshopManager {
 
   async unsubscribe(file_id: string) {
     if (this.initialized) {
-      greenworks.ugcUnsubscribe(
+      await greenworks.ugcUnsubscribe(
         file_id,
         () => {
           console.log(`unsubscribed: ${file_id}`);
@@ -390,7 +405,7 @@ export class WorkshopManager {
 
   async voteup(file_id: string) {
     if (this.initialized) {
-      greenworks.ugcVote(
+      await greenworks.ugcVote(
         file_id,
         true,
         () => {
@@ -405,7 +420,7 @@ export class WorkshopManager {
 
   async votedown(file_id: string) {
     if (this.initialized) {
-      greenworks.ugcVote(
+      await greenworks.ugcVote(
         file_id,
         false,
         () => {
@@ -416,5 +431,29 @@ export class WorkshopManager {
         }
       );
     }
+  }
+
+  async getItemState(file_id: string): Promise<any> {
+    if (this.initialized) {
+      let itemState = await new Promise((resolve, reject) => {
+        greenworks.ugcGetItemState(
+          file_id,
+          (state) => {
+            resolve(state);
+          },
+          (err) => {
+            reject(err);
+          }
+        );
+      });
+      return itemState;
+    }
+
+    const defaultState = {
+      state: greenworks.UGCItemState.None,
+      votedUp: false,
+      votedDown: false,
+    };
+    return defaultState;
   }
 }

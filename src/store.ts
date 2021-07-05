@@ -13,6 +13,7 @@ export default new Vuex.Store({
     thumbnail: "",
     metadata: ProjectItemData.fromNothing(),
     selectedProject: null,
+    selectedProjectState: null,
   },
   mutations: {
     setMetadata(state, data) {

@@ -90,12 +90,21 @@
                 lazy-src="assets/icons/image.svg"
               />
             </v-card>
-            <v-btn block :disabled="isPublished" @click="openItemLink">
+            <v-btn block :disabled="!isPublished" @click="openItemLink">
               {{ textFindOnSteam }}
             </v-btn>
-            <v-btn block :disabled="isPublished" @click="openAuthorLink">
-              <v-icon> mdi-close </v-icon>
+            <v-btn
+              style="text-transform: unset !important;"
+              block
+              :disabled="!isPublished"
+              @click="openAuthorLink"
+            >
+              <v-spacer />
+              <v-card class="mr-2" elevation="0">
+                <v-img :src="authorAvatar" max-height="32" max-width="32" />
+              </v-card>
               {{ authorName }}
+              <v-spacer />
             </v-btn>
           </v-col>
         </v-row>

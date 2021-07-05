@@ -59,6 +59,7 @@
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectItemData } from "@/community/ProjectItemData";
   import App from "@/App.vue";
+  import { WorkshopManager } from "@/community/workshop";
 
   export enum ClickAction {
     Open,
@@ -78,12 +79,15 @@
       return this.active ? "to top right, #bbe1fa11, #bbe1fa22" : "";
     }
 
-    onClicked() {
+    async onClicked() {
       if (this.clickAction == ClickAction.Open) {
         console.log("tried to open");
         this.open();
       } else {
         this.$store.state.selectedProject = this.itemData;
+        this.$store.state.selectedProjectState = await WorkshopManager.getInstance().getItemState(
+          this.itemData.workshopItem.publishedFileId
+        );
       }
     }
 

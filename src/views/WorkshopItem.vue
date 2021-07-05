@@ -10,31 +10,39 @@
         />
       </v-card>
     </v-layout>
-    <v-layout class="justify-center align-center">
+    <v-layout class="justify-center align-center mt-1">
       <v-spacer />
-      <v-btn width="150px" @click="onSubscribeButton">
+      <v-btn width="150px" @click="onSubscribeButton" :color="colorSubscribe">
+        <v-icon dark>
+          mdi-plus
+        </v-icon>
         {{ textSubscribe }}
       </v-btn>
       <v-spacer />
-      <v-checkbox
-        :on-icon="'mdi-thumb-up'"
-        :off-icon="'mdi-thumb-up-outline'"
-        @click="onVoteUp"
-      />
-      <v-checkbox
-        :on-icon="'mdi-thumb-down'"
-        :off-icon="'mdi-thumb-down-outline'"
-        @click="onVoteDown"
-      />
+      <v-btn icon :color="colorVotedUp" @click="onVoteUp">
+        <v-icon>mdi-thumb-up</v-icon>
+      </v-btn>
+      <v-btn icon :color="colorVotedDown" @click="onVoteDown">
+        <v-icon>mdi-thumb-down</v-icon>
+      </v-btn>
       <v-spacer />
     </v-layout>
     <v-divider class="mt-0 mt-2 pb-2" />
-    <v-btn block :disabled="isPublished" @click="openItemLink">
+    <v-btn block :disabled="!isPublished" @click="openItemLink">
       {{ textFindOnSteam }}
     </v-btn>
-    <v-btn block :disabled="isPublished" @click="openAuthorLink">
-      <v-icon> mdi-close </v-icon>
+    <v-btn
+      style="text-transform: unset !important;"
+      block
+      :disabled="!isPublished"
+      @click="openAuthorLink"
+    >
+      <v-spacer />
+      <v-card class="mr-2" elevation="0">
+        <v-img :src="authorAvatar" max-height="32" max-width="32" />
+      </v-card>
       {{ authorName }}
+      <v-spacer />
     </v-btn>
   </v-flex>
 </template>
@@ -47,6 +55,10 @@
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
   import { WorkshopManager } from "@/community/workshop";
+  const greenworks = require("greenworks");
+  const electron = require("electron");
+  const nativeImage = electron.nativeImage;
+  const shell = electron.shell;
 
   @Component
   export default class WorkshopItem extends Vue {
@@ -59,11 +71,45 @@
     }
 
     get isPublished() {
-      return this.$store.state.metadata.publisherId;
+      return this.itemData ? this.itemData.workshopItem.itemId : false;
+    }
+
+    get authorAvatar() {
+      if (!this.itemData) {
+        return "mdi-account-box";
+      } else {
+        const imgHandle = greenworks.getMediumFriendAvatar(
+          this.itemData.workshopItem.publisherId
+        );
+        let rgba = greenworks.getImageRGBA(imgHandle);
+
+        const w = 64;
+        const h = 64;
+        const row = 64 * 64;
+        let buffer = new Uint8ClampedArray(w * h * 4);
+        for (let i = 0; i < w * h; i++) {
+          const idx = i * 4;
+          buffer[idx + 0] = rgba[idx + 2];
+          buffer[idx + 1] = rgba[idx + 1];
+          buffer[idx + 2] = rgba[idx + 0];
+          buffer[idx + 3] = rgba[idx + 3]; // a
+        }
+        let nativeImg = nativeImage.createFromBuffer(Buffer.from(buffer), {
+          width: w,
+          height: h,
+        });
+        return nativeImg.toDataURL();
+      }
     }
 
     get authorName() {
-      return "Author Name";
+      if (!this.itemData) {
+        return "Author Name";
+      } else {
+        return greenworks.getFriendPersonaName(
+          this.itemData.workshopItem.publisherId
+        );
+      }
     }
 
     get textFindOnSteam() {
@@ -71,33 +117,101 @@
     }
 
     get textSubscribe() {
-      return TextManager.translate("${ui_general.subscribe}");
+      if (!this.isSubscribed)
+        return TextManager.translate("${ui_general.subscribe}");
+      else return TextManager.translate("${ui_general.unsubscribe}");
+    }
+
+    get colorSubscribe() {
+      if (!this.isSubscribed) return "";
+      else return "primary";
+    }
+
+    get colorVotedUp() {
+      return this.isVotedUp ? "primary" : "";
+    }
+
+    get colorVotedDown() {
+      return this.isVotedDown ? "primary" : "";
     }
 
     get textUnSubscribe() {
       return TextManager.translate("${ui_general.unsubscribe}");
     }
 
+    get isSubscribed() {
+      if (!this.$store.state.selectedProjectState) return false;
+      else {
+        return (
+          (this.$store.state.selectedProjectState.itemState &
+            greenworks.UGCItemState.Subscribed) >
+          0
+        );
+      }
+    }
+
+    get isVotedUp() {
+      return this.$store.state.selectedProjectState
+        ? this.$store.state.selectedProjectState.votedUp
+        : false;
+    }
+
+    get isVotedDown() {
+      return this.$store.state.selectedProjectState
+        ? this.$store.state.selectedProjectState.votedDown
+        : false;
+    }
+
     openItemLink() {
-      this.itemData.workshopitem.itemId;
-    }
-
-    openAuthorLink() {
-      this.itemData.workshopitem.publisherId;
-    }
-
-    onSubscribeButton() {
-      WorkshopManager.getInstance().subscribe(
-        this.itemData.workshopItem.itemId
+      if (!this.itemData || !this.itemData.workshopItem) return;
+      shell.openExternal(
+        `steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=${this.itemData.workshopItem.publishedFileId}`
       );
     }
 
+    openAuthorLink() {
+      if (!this.itemData || !this.itemData.workshopItem) return;
+      shell.openExternal(
+        `steam://openurl/https://steamcommunity.com/profiles/${this.itemData.workshopItem.publisherId}`
+      );
+    }
+
+    onSubscribeButton() {
+      if (!this.itemData || !this.itemData.workshopItem) return;
+
+      if (!this.isSubscribed) {
+        WorkshopManager.getInstance().subscribe(
+          this.itemData.workshopItem.publishedFileId
+        );
+        this.$store.state.selectedProjectState.itemState =
+          greenworks.UGCItemState.Subscribed;
+      } else {
+        WorkshopManager.getInstance().unsubscribe(
+          this.itemData.workshopItem.publishedFileId
+        );
+        this.$store.state.selectedProjectState.itemState =
+          greenworks.UGCItemState.None;
+      }
+    }
+
     onVoteUp() {
-      WorkshopManager.getInstance().voteup(this.itemData.workshopItem.itemId);
+      if (!this.itemData || !this.itemData.workshopItem) return;
+      WorkshopManager.getInstance().voteup(
+        this.itemData.workshopItem.publishedFileId
+      );
+
+      this.$store.state.selectedProjectState.votedUp = true;
+      this.$store.state.selectedProjectState.votedDown = false;
     }
 
     onVoteDown() {
-      WorkshopManager.getInstance().votedown(this.itemData.workshopItem.itemId);
+      if (!this.itemData || !this.itemData.workshopItem) return;
+      WorkshopManager.getInstance().votedown(
+        this.itemData.workshopItem.publishedFileId
+      );
+
+      this.$store.state.selectedProjectState.votedUp = false;
+      this.$store.state.selectedProjectState.votedDown = true;
     }
   }
 </script>
