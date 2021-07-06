@@ -157,6 +157,8 @@
   import App from "@/App.vue";
 
   const greenworks = require("greenworks");
+  const electron = require("electron");
+  const shell = electron.shell;
 
   export const TITLE_RULES = [
     (v) => !!v || "Name is required",
@@ -291,14 +293,17 @@
       }
     }
 
+    get itemData() {
+      return this.$store.state.selectedProject;
+    }
+
     get authorAvatar() {
       if (!WorkshopManager.getInstance().initialized) return "mdi-account-box";
-      const itemData = this.$store.state.metadata;
-      if (!itemData || !itemData.workshopItem.publisherId) {
+      if (!this.itemData || !this.itemData.workshopItem.publisherId) {
         return "mdi-account-box";
       } else {
         const imgHandle = greenworks.getMediumFriendAvatar(
-          itemData.workshopItem.publisherId
+          this.itemData.workshopItem.publisherId
         );
         let rgba = greenworks.getImageRGBA(imgHandle);
         return toDataURL(64, 64, rgba);
@@ -307,12 +312,11 @@
 
     get authorName() {
       if (!WorkshopManager.getInstance().initialized) return "Author Name";
-      const itemData = this.$store.state.metadata;
-      if (!itemData || !itemData.workshopItem.publisherId) {
+      if (!this.itemData || !this.itemData.workshopItem.publisherId) {
         return "Author Name";
       } else {
         return greenworks.getFriendPersonaName(
-          itemData.workshopItem.publisherId
+          this.itemData.workshopItem.publisherId
         );
       }
     }
@@ -384,9 +388,19 @@
       }
     }
 
-    openItemLink() {}
+    openItemLink() {
+      if (!this.itemData || !this.itemData.workshopItem) return;
+      shell.openExternal(
+        `steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=${this.itemData.workshopItem.publishedFileId}`
+      );
+    }
 
-    openAuthorLink() {}
+    openAuthorLink() {
+      if (!this.itemData || !this.itemData.workshopItem) return;
+      shell.openExternal(
+        `steam://openurl/https://steamcommunity.com/profiles/${this.itemData.workshopItem.publisherId}`
+      );
+    }
 
     reset() {
       if (this.$refs.form) {

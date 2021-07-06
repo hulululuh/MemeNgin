@@ -81,16 +81,23 @@ export class ProjectItemData {
 
   get tagsCalculated() {
     if (this.workshopItem) {
-      let tags = [...this.workshopItem.tags, this.workshopItem.ageRating];
-      if (this.workshopItem.allowDerivativeWork) tags.push("Derivable");
+      let tags = new Set();
 
-      let calc: string = "";
-      tags.forEach((v, i) => {
-        const lastIndex = i == tags.length - 1;
-        calc += lastIndex ? v : `${v}, `;
-      });
-      return calc;
-    } else return "";
+      // user assigned tags
+      for (let tag of this.workshopItem.tags) {
+        tags.add(tag);
+      }
+
+      // age rating
+      tags.add(this.workshopItem.ageRating);
+
+      // derivable
+      if (this.workshopItem.allowDerivativeWork) tags.add("Derivable");
+
+      return [...tags.values()];
+    } else {
+      return [];
+    }
   }
 
   set tags(value: Array<string>) {

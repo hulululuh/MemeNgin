@@ -278,7 +278,7 @@ export class WorkshopManager {
         fs.writeFileSync(thumbnailPathLocal, buffer);
 
         await greenworks.ugcCreateWorkshopItem(
-          { "app_id": APP_ID, "tags": data.tags },
+          { "app_id": APP_ID, "tags": data.tagsCalculated },
           localPath,
           thumbnailPathLocal,
           data.title,
