@@ -255,15 +255,12 @@ export class WorkshopManager {
       let isFile = exists && stats.isFile();
       if (exists && isFile) {
         const data = Editor.getMetadata();
+        const localPath = path.parse(projectPath).dir;
         const parsedPath = path.parse(projectPath);
-        const pathLocal = path.resolve(projectPath);
         const thumbnailPathLocal = path.join(
           parsedPath.dir,
           `${parsedPath.name}.png`
         );
-
-        const pathCloud = path.parse(pathLocal).base;
-        const thumbnailPathCloud = path.parse(thumbnailPathLocal).base;
 
         let img = new Image();
         img.src = data.thumbnail;
@@ -278,59 +275,12 @@ export class WorkshopManager {
         const url = canvas.toDataURL("image/png", 1);
         const nativeImage = electron.nativeImage.createFromDataURL(url);
         const buffer = nativeImage.toPNG();
-
         fs.writeFileSync(thumbnailPathLocal, buffer);
 
-        if (!greenworks.isCloudEnabledForUser()) {
-          console.warn("You need to turn on cloud feature to use this feature");
-          return false;
-        }
-        if (!greenworks.isCloudEnabled()) {
-          greenworks.enableCloud(true);
-        }
-        // should save this item on the cloud
-        if (!data.isCloud) {
-          await greenworks.saveFilesToCloud(
-            [pathLocal, thumbnailPathLocal],
-            () => {
-              console.info(`File save succeed: ${path.basename(projectPath)}`);
-              data.isCloud = true;
-            },
-            (err) => {
-              console.error(err);
-              return false;
-            }
-          );
-        }
-
-        await greenworks.fileShare(
-          pathCloud,
-          (file_handle) => {
-            data.workshopItem.fileId = file_handle;
-            console.log(`file shared: ${pathCloud} handle:[${file_handle}]`);
-          },
-          (err) => {
-            console.warn(err);
-          }
-        );
-
-        await greenworks.fileShare(
-          thumbnailPathCloud,
-          (file_handle) => {
-            data.workshopItem.thumbnailId = file_handle;
-            console.log(
-              `file shared: ${thumbnailPathCloud} handle:[${file_handle}]`
-            );
-          },
-          (err) => {
-            console.warn(err);
-          }
-        );
-
-        await greenworks.publishWorkshopFile(
+        await greenworks.ugcCreateWorkshopItem(
           { "app_id": APP_ID, "tags": data.tags },
-          pathCloud,
-          thumbnailPathCloud,
+          localPath,
+          thumbnailPathLocal,
           data.title,
           data.description,
           (publish_file_handle) => {
@@ -338,28 +288,13 @@ export class WorkshopManager {
             console.log(
               `item has successfuly published. handle:[${publish_file_handle}]`
             );
-
-            // try to update tag
-            greenworks.updatePublishedWorkshopFile(
-              { "tags": data.tags },
-              publish_file_handle,
-              "",
-              "",
-              "",
-              "",
-              () => {
-                console.log("Published item update complete");
-              },
-              (err) => {
-                console.error(err);
-              }
-            );
           },
           (err) => {
             console.error(err);
             return false;
           }
         );
+
         return true;
       } else {
         console.error(`file does not exists: ${projectPath}`);

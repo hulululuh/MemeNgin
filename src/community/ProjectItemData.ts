@@ -209,7 +209,7 @@ export class ProjectItemData {
   static fromMetadata(data: any): ProjectItemData {
     let item = new ProjectItemData();
     item.workshopItem = WorkshopItemData.fromMetadata(data);
-    return item.workshopItem.isValid ? item : null;
+    return item.workshopItem && item.workshopItem.isValid ? item : null;
   }
 }
 
