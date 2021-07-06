@@ -36,7 +36,7 @@ npm run electron:serve
 
 ## Feedback
 
-Got ideas, suggestions or feedback? Reach out to me on [e-mail](hulululuh@gmail.com)
+Got ideas, suggestions or feedback? Reach out to me on [e-mail](admin@memengin.com)
 
 
 ## Built Using
