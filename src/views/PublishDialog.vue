@@ -151,9 +151,12 @@
   import { canvasToThumbnailURL } from "@/lib/designer";
   import { WorkshopManager } from "@/community/workshop";
   import { TextManager } from "@/assets/textmanager";
+  import { toDataURL } from "@/lib/utils";
   import AgeDialog from "@/views/AgeDialog.vue";
   import LegalDialog from "@/views/LegalDialog.vue";
   import App from "@/App.vue";
+
+  const greenworks = require("greenworks");
 
   export const TITLE_RULES = [
     (v) => !!v || "Name is required",
@@ -288,8 +291,30 @@
       }
     }
 
+    get authorAvatar() {
+      if (!WorkshopManager.getInstance().initialized) return "mdi-account-box";
+      const itemData = this.$store.state.metadata;
+      if (!itemData || !itemData.workshopItem.publisherId) {
+        return "mdi-account-box";
+      } else {
+        const imgHandle = greenworks.getMediumFriendAvatar(
+          itemData.workshopItem.publisherId
+        );
+        let rgba = greenworks.getImageRGBA(imgHandle);
+        return toDataURL(64, 64, rgba);
+      }
+    }
+
     get authorName() {
-      return "Author Name";
+      if (!WorkshopManager.getInstance().initialized) return "Author Name";
+      const itemData = this.$store.state.metadata;
+      if (!itemData || !itemData.workshopItem.publisherId) {
+        return "Author Name";
+      } else {
+        return greenworks.getFriendPersonaName(
+          itemData.workshopItem.publisherId
+        );
+      }
     }
 
     get textTitle() {

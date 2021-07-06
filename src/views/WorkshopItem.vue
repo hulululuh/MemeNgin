@@ -55,9 +55,9 @@
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
   import { WorkshopManager } from "@/community/workshop";
+  import { toDataURL } from "@/lib/utils";
   const greenworks = require("greenworks");
   const electron = require("electron");
-  const nativeImage = electron.nativeImage;
   const shell = electron.shell;
 
   @Component
@@ -82,23 +82,7 @@
           this.itemData.workshopItem.publisherId
         );
         let rgba = greenworks.getImageRGBA(imgHandle);
-
-        const w = 64;
-        const h = 64;
-        const row = 64 * 64;
-        let buffer = new Uint8ClampedArray(w * h * 4);
-        for (let i = 0; i < w * h; i++) {
-          const idx = i * 4;
-          buffer[idx + 0] = rgba[idx + 2];
-          buffer[idx + 1] = rgba[idx + 1];
-          buffer[idx + 2] = rgba[idx + 0];
-          buffer[idx + 3] = rgba[idx + 3]; // a
-        }
-        let nativeImg = nativeImage.createFromBuffer(Buffer.from(buffer), {
-          width: w,
-          height: h,
-        });
-        return nativeImg.toDataURL();
+        return toDataURL(64, 64, rgba);
       }
     }
 

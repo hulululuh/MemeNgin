@@ -41,3 +41,30 @@ export async function loadImage(imgPath: string, isDataUrl: boolean) {
   }
   return img;
 }
+
+// currently used for rgba buffer to electron.NativeImage input buffer
+// TODO: better name for this
+export function resolvePixelBuffer(
+  width: number,
+  height: number,
+  bufferToResolve: Uint8Array
+): Buffer {
+  let buffer = new Uint8ClampedArray(width * height * 4);
+  for (let i = 0; i < width * height; i++) {
+    const idx = i * 4;
+    buffer[idx + 0] = bufferToResolve[idx + 2]; // b
+    buffer[idx + 1] = bufferToResolve[idx + 1]; // g
+    buffer[idx + 2] = bufferToResolve[idx + 0]; // r
+    buffer[idx + 3] = bufferToResolve[idx + 3]; // a
+  }
+  return Buffer.from(buffer);
+}
+
+export function toDataURL(width: number, height: number, rgba) {
+  let buffer = resolvePixelBuffer(width, height, rgba);
+  let nativeImg = NativeImage.createFromBuffer(buffer, {
+    width: width,
+    height: height,
+  });
+  return nativeImg.toDataURL();
+}
