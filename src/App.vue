@@ -169,7 +169,7 @@
   import { MenuCommands } from "./menu";
   import fs from "fs";
   import path from "path";
-  import { UserData } from "@/userdata";
+  import { QueryTarget, UserData } from "@/userdata";
   import { IPropertyHolder } from "./lib/designer/properties";
   import { AddItemsAction } from "./lib/actions/additemsaction";
   import { UndoStack } from "./lib/undostack";
@@ -183,7 +183,6 @@
   const { dialog } = remote;
   const app = remote.app;
   const userDataPath = path.join(app.getPath("userData"), "userData.json");
-
   //export const MY_WORKS_PATH = ApplicationSettings.getInstance().myWorksPath;
 
   export const MY_WORKS_PATH = path.join(
@@ -319,6 +318,7 @@
       document.removeEventListener("editStarted", this.onEditStarted);
       document.removeEventListener("editEnded", this.onEditEnded);
       document.removeEventListener("projectSaved", this.onProjectSaved);
+      document.removeEventListener("projectPublished", this.onProjectPublished);
     }
 
     onEditStarted() {
@@ -360,6 +360,12 @@
       }, 1000);
     }
 
+    onProjectPublished() {
+      setTimeout(() => {
+        WorkshopManager.getInstance().requestUpdate(QueryTarget.Search);
+      }, 1000);
+    }
+
     mounted() {
       this.setupMenu();
 
@@ -367,6 +373,7 @@
       document.addEventListener("editStarted", this.onEditStarted);
       document.addEventListener("editEnded", this.onEditEnded);
       document.addEventListener("projectSaved", this.onProjectSaved);
+      document.addEventListener("projectPublished", this.onProjectPublished);
 
       document.addEventListener("mousemove", (evt) => {
         this.mouseX = evt.pageX;

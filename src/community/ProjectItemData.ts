@@ -18,6 +18,16 @@ function ageRatingToExcludedTag(value: string) {
   return exTag;
 }
 
+export function ageRatingsToExcludedTags(tags: Array<string>) {
+  let exTag = [];
+  for (let rating of AGE_RATING) {
+    if (!tags.find((item) => item == rating)) {
+      exTag.push(rating);
+    }
+  }
+  return exTag;
+}
+
 function ageRatingFromTags(tags: Array<string>) {
   for (let age of TAGS_TEST) {
     if (!tags.find((item) => item == age)) return age;

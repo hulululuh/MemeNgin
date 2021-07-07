@@ -25,7 +25,6 @@
             class="thumbnail"
           />
           <div v-else class="thumbnail" />
-          <!-- <span class="thumbnail"></span> -->
 
           <span class="node-name">{{ item.displayName }}</span>
         </div>

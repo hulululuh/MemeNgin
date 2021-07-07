@@ -204,6 +204,7 @@
         // save issued item id, publisher id and so on.
         if (success) {
           app.saveProject(true);
+          document.dispatchEvent(new Event("projectPublished"));
         }
       }
     }

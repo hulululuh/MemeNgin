@@ -1,13 +1,14 @@
-import { UserData, QueryTarget } from "@/userdata";
-import { ProjectItemData } from "@/community/ProjectItemData";
+import { UserData, QueryTarget, SearchOption, SearchType } from "@/userdata";
+import {
+  ProjectItemData,
+  ageRatingsToExcludedTags,
+} from "@/community/ProjectItemData";
 import { Editor } from "@/lib/editor";
 import fs, { readFileSync, writeFileSync } from "fs";
 import path from "path";
 const electron = require("electron");
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
-//const APP_ID = 480;
-//const APP_ID = 431960;
 const APP_ID = 1632910;
 const UPDATE_DELAY = 1000;
 
@@ -97,6 +98,39 @@ export class WorkshopManager {
     });
 
     return fetched;
+  }
+
+  async queryItems(options: SearchOption) {
+    let rank = greenworks.UGCQueryType.RankedByPublicationDate;
+    if (options.type == SearchType.Best) {
+      greenworks.UGCQueryType.RankedByVote;
+    }
+
+    let items = await new Promise((resolve, reject) => {
+      greenworks.ugcGetItems(
+        {
+          "app_id": APP_ID,
+          "page_num": options.pageNum,
+          "tags": options.tags,
+          "excludedTags": ageRatingsToExcludedTags(options.ageRating),
+          "keyword": options.keyword,
+        },
+        greenworks.UGCMatchingType.Items,
+        rank,
+        (items, numResults, numTotalResults) => {
+          let searchedItems: ProjectItemData[] = [];
+          for (let item of items) {
+            let pItem = ProjectItemData.fromMetadata(item);
+            if (pItem) searchedItems.push(pItem);
+          }
+          resolve([items, numResults, numTotalResults]);
+        },
+        (err) => {
+          reject(err);
+        }
+      );
+    });
+    return items;
   }
 
   requestPage(num: number, target: QueryTarget) {

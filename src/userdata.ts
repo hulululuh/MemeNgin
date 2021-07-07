@@ -9,9 +9,11 @@ const userDataPath = path.join(app.getPath("userData"), "userData.json");
 export enum QueryTarget {
   Search = "Search",
   Best = "Best",
+  Recent = "Recent",
 }
 
 export const DERIVATIVE_TAG: string = "Derivative Allowed";
+export const FILTER_TYPE: string[] = ["Best", "Recent"];
 export const AGE_RATING_DEFAULT: string = "Questionable";
 export const AGE_RATING: string[] = ["Everyone", AGE_RATING_DEFAULT, "Mature"];
 export const TAGS_TEST: string[] = [
@@ -64,6 +66,20 @@ export const TAGS_TEST: string[] = [
   "Webcomic",
 ];
 
+export enum SearchType {
+  Best = "Best",
+  Recent = "Recent",
+}
+
+export class SearchOption {
+  pageNum: number = 1;
+  count: number = 50;
+  keyword: string = "";
+  type: SearchType = SearchType.Best;
+  ageRating: Array<string> = [];
+  tags: Array<string> = [];
+}
+
 export class UserData {
   recentFiles: string[] = [];
   subscribedProject: string[] = [];
@@ -78,6 +94,8 @@ export class UserData {
     [QueryTarget.Best, -1],
     [QueryTarget.Search, -1],
   ]);
+
+  searchOption: SearchOption = new SearchOption();
 
   // search tags
   keyword: string = "";
@@ -113,6 +131,7 @@ export class UserData {
       if (parsed.seenDerivative)
         instance.seenDerivative = parsed.seenDerivative;
       if (parsed.seenLegal) instance.seenLegal = parsed.seenLegal;
+      if (parsed.searchOption) instance.searchOption = parsed.searchOption;
 
       // validate data and remove invalid path
       let invalids = [];
