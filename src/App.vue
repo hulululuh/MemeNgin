@@ -271,6 +271,7 @@
       });
 
       UserData.serialize();
+      WorkshopManager.getInstance().refresh();
 
       electron.ipcRenderer.on(MenuCommands.FileNew, (evt, arg) => {
         this.newProject();
@@ -362,7 +363,10 @@
 
     onProjectPublished() {
       setTimeout(() => {
-        WorkshopManager.getInstance().requestUpdate(QueryTarget.Search);
+        WorkshopManager.getInstance().requestSearch(
+          this.$store.state.userData.searchOption,
+          QueryTarget.Search
+        );
       }, 1000);
     }
 

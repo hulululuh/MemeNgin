@@ -4,6 +4,7 @@ import {
   ageRatingsToExcludedTags,
 } from "@/community/ProjectItemData";
 import { Editor } from "@/lib/editor";
+import { plainToClass } from "class-transformer";
 import fs, { readFileSync, writeFileSync } from "fs";
 import path from "path";
 const electron = require("electron");
@@ -11,6 +12,12 @@ const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
 const APP_ID = 1632910;
 const UPDATE_DELAY = 1000;
+
+export class QueryResult {
+  items: Array<ProjectItemData>;
+  numResults: number;
+  numTotalResults: number;
+}
 
 export class WorkshopManager {
   private static _instance: WorkshopManager;
@@ -40,10 +47,6 @@ export class WorkshopManager {
       // trying to init api with appid: 0
       if (this.initialized) {
         console.log("Steam API has been initialized.");
-
-        this.steamId = greenworks.getSteamId().steamId;
-        this.requestPage(1, QueryTarget.Search);
-        this.requestPage(1, QueryTarget.Best);
       }
     } catch (err) {
       console.warn(err);
@@ -79,6 +82,17 @@ export class WorkshopManager {
     return files;
   }
 
+  refresh() {
+    if (this.initialized) {
+      this.steamId = greenworks.getSteamId().steamId;
+      this.requestSearch(
+        UserData.getInstance().searchOption,
+        QueryTarget.Search
+      );
+      this.requestSearch(UserData.getInstance().searchOption, QueryTarget.Best);
+    }
+  }
+
   async ReadTextFromFile(filename: string): Promise<any> {
     if (!this.initialized) {
       return Promise.reject();
@@ -100,10 +114,10 @@ export class WorkshopManager {
     return fetched;
   }
 
-  async queryItems(options: SearchOption) {
+  async queryItems(options: SearchOption): Promise<any> {
     let rank = greenworks.UGCQueryType.RankedByPublicationDate;
     if (options.type == SearchType.Best) {
-      greenworks.UGCQueryType.RankedByVote;
+      rank = greenworks.UGCQueryType.RankedByVote;
     }
 
     let items = await new Promise((resolve, reject) => {
@@ -112,7 +126,7 @@ export class WorkshopManager {
           "app_id": APP_ID,
           "page_num": options.pageNum,
           "tags": options.tags,
-          "excludedTags": ageRatingsToExcludedTags(options.ageRating),
+          "excluded_tags": ageRatingsToExcludedTags(options.ageRating),
           "keyword": options.keyword,
         },
         greenworks.UGCMatchingType.Items,
@@ -123,7 +137,13 @@ export class WorkshopManager {
             let pItem = ProjectItemData.fromMetadata(item);
             if (pItem) searchedItems.push(pItem);
           }
-          resolve([items, numResults, numTotalResults]);
+          resolve(
+            plainToClass(QueryResult, {
+              items: searchedItems,
+              numResults: numResults,
+              numTotalResults: numTotalResults,
+            })
+          );
         },
         (err) => {
           reject(err);
@@ -133,60 +153,26 @@ export class WorkshopManager {
     return items;
   }
 
-  requestPage(num: number, target: QueryTarget) {
-    const userData = UserData.getInstance();
-    let rank = greenworks.UGCQueryType.RankedByPublicationDate;
-    let tags = userData.tags;
-    let excludedTags = userData.excludedTags;
-
-    if (target == QueryTarget.Best) {
-      rank = greenworks.UGCQueryType.RankedByVote;
-      tags = [];
-      excludedTags = [];
-    }
-
-    if (userData.pageIndex.get(target) != num || this._dirty.get(target)) {
-      userData.pageIndex.set(target, num);
-      greenworks.ugcGetItems(
-        {
-          "app_id": APP_ID,
-          "page_num": userData.pageIndex.get(target),
-          "tags": tags,
-          "excludedTags": excludedTags,
-          "keyword": userData.keyword,
-        },
-        greenworks.UGCMatchingType.Items,
-        rank,
-        (items, numResults, numTotalResults) => {
-          UserData.getInstance().numSearchResultInPages = Math.trunc(
-            numTotalResults / 50 + 1
-          );
-          console.log(items);
-
-          let searchedItems: ProjectItemData[] = [];
-          for (let item of items) {
-            let pItem = ProjectItemData.fromMetadata(item);
-            if (pItem) searchedItems.push(pItem);
-          }
-          UserData.getInstance().updateSearchedItems(searchedItems, target);
-        },
-        (err) => {
-          console.error(err);
-        }
-      );
-    }
-  }
-
-  requestUpdate(target: QueryTarget) {
-    if (this._dirty) {
+  requestSearch(options: SearchOption, target: QueryTarget) {
+    if (this._dirty.get(target)) {
       clearTimeout(this.activeTimerId);
     }
 
     this._dirty.set(target, true);
     this.activeTimerId = setTimeout(() => {
-      this.requestPage(UserData.getInstance().pageIndex.get(target), target);
-      this._dirty.set(target, false);
+      this.doSearch(options, target);
     }, UPDATE_DELAY);
+  }
+
+  async doSearch(options: SearchOption, target: QueryTarget) {
+    let result = await this.queryItems(options);
+    if (result instanceof QueryResult) {
+      UserData.getInstance().updateSearchedItems(result.items, target);
+      UserData.getInstance().numSearchResultInPages = Math.trunc(
+        result.numTotalResults / 50 + 1
+      );
+    }
+    this._dirty.set(target, false);
   }
 
   validateAppIdFile(): boolean {

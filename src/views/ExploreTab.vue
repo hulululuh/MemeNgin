@@ -72,12 +72,12 @@
 <script lang="ts">
   import { WorkshopManager } from "@/community/workshop";
   import { QueryTarget } from "@/userdata";
+  import { Vue, Component } from "vue-property-decorator";
   import ExploreItemList from "@/views/ExploreItemList.vue";
   import WorkshopFilter from "@/views/WorkshopFilter.vue";
   import WorkshopItem from "@/views/WorkshopItem.vue";
   import SteamMustRun from "@/views/SteamMustRun.vue";
-  import { Vue, Component } from "vue-property-decorator";
-  import { TextManager } from "@/assets/textmanager";
+  import { ProjectItemData } from "@/community/ProjectItemData";
 
   @Component({
     components: {
@@ -87,7 +87,7 @@
       steamMustRun: SteamMustRun,
     },
   })
-  export default class HomeTab extends Vue {
+  export default class ExploreTab extends Vue {
     showFilter: boolean = true;
     panel: number[] = [0, 1];
     index = 1;
@@ -96,17 +96,11 @@
       this.showFilter = !this.showFilter;
     }
 
-    get selectedItemData() {
-      // let index = (this.$refs.exploreItemList as ExploreItemList).selectedItem;
-      const item = this.$store.state.userData.searchedItems[0];
-      return item ? item : null;
-    }
-
     get initialized() {
       return WorkshopManager.getInstance().initialized;
     }
 
-    get searched() {
+    get searched(): Array<ProjectItemData> {
       return this.$store.state.userData.searchedItems;
     }
 
@@ -120,7 +114,11 @@
 
     set page(value) {
       this.index = value;
-      WorkshopManager.getInstance().requestPage(value, QueryTarget.Search);
+      this.$store.state.userData.searchOption.pageNum = this.index;
+      WorkshopManager.getInstance().requestSearch(
+        this.$store.state.userData.searchOption,
+        QueryTarget.Search
+      );
     }
   }
 </script>

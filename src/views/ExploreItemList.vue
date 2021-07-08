@@ -35,7 +35,7 @@
   })
   export default class ExploreItemList extends Vue {
     @Prop() categoryName: string;
-    @Prop() lists: ProjectItemData[];
+    @Prop() lists: Array<ProjectItemData>;
 
     selectedItem: number = -1;
 

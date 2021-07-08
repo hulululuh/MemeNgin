@@ -98,12 +98,12 @@ export class UserData {
   searchOption: SearchOption = new SearchOption();
 
   // search tags
-  keyword: string = "";
-  tags: string[] = [];
+  //keyword: string = "";
+  //tags: string[] = [];
   //tags: string[] = ["Abstract", "Fantasy"];
   //excludedTags: string[] = ["Everyone", "Questionable", "Mature"];
-  excludedTags: string[] = ["Questionable", "Mature"];
-  derivative: boolean = false;
+  //excludedTags: string[] = ["Questionable", "Mature"];
+  //derivative: boolean = false;
   agreed: boolean = false;
   seenDerivative: boolean = false;
   seenLegal: boolean = false;
@@ -116,7 +116,7 @@ export class UserData {
     return UserData._instance;
   }
 
-  // mem to storage
+  // storage to mem
   static serialize() {
     // parse userdata file, if it exists
     if (fs.existsSync(userDataPath)) {
@@ -127,9 +127,9 @@ export class UserData {
         instance.subscribedProject = parsed.subscribedProject;
       if (parsed.followedUser) instance.followedUser = parsed.followedUser;
       if (parsed.agreed) instance.agreed = parsed.agreed;
-      if (parsed.derivative) instance.derivative = parsed.derivative;
-      if (parsed.seenDerivative)
-        instance.seenDerivative = parsed.seenDerivative;
+      //if (parsed.derivative) instance.derivative = parsed.derivative;
+      // if (parsed.seenDerivative)
+      //   instance.seenDerivative = parsed.seenDerivative;
       if (parsed.seenLegal) instance.seenLegal = parsed.seenLegal;
       if (parsed.searchOption) instance.searchOption = parsed.searchOption;
 
@@ -154,7 +154,7 @@ export class UserData {
     }
   }
 
-  // storage to mem
+  // mem to storage
   static deserialize() {
     try {
       fs.writeFileSync(userDataPath, JSON.stringify(UserData.getInstance()));

@@ -2,10 +2,15 @@
   <v-container fluid class="pa-0 ma-0">
     <v-text-field
       label="Keyword"
+      clearable
+      v-model="keyword"
       :append-icon="'mdi-magnify'"
-      :rules="titleRules"
+      :append-outer-icon="'mdi-cached'"
+      @keydown.enter="onSearchClicked"
+      @click:clear="onClearClicked"
       @click:append="onSearchClicked"
-    ></v-text-field>
+      @click:append-outer="onResetFilter"
+    />
     <v-subheader small style="font-size: 1rem; font-weight: 400;">{{
       "Type"
     }}</v-subheader>
@@ -14,7 +19,7 @@
       column
       mandatory
       active-class="d-flex primary--text"
-      @change="onAgeRatingChanged"
+      @change="onTypeSelected"
     >
       <v-chip v-for="tag in filterType" :key="tag" :value="tag">
         {{ tag }}
@@ -60,39 +65,58 @@
 </style>
 
 <script lang="ts">
-  import { AGE_RATING, TAGS_TEST, FILTER_TYPE } from "@/userdata";
+  import {
+    AGE_RATING,
+    TAGS_TEST,
+    FILTER_TYPE,
+    QueryTarget,
+    SearchOption,
+  } from "@/userdata";
   import { Component, Vue } from "vue-property-decorator";
   import { TITLE_RULES } from "@/views/PublishDialog.vue";
+  import { WorkshopManager } from "@/community/workshop";
 
   @Component
   export default class WorkshopFilter extends Vue {
+    onResetFilter() {
+      this.$store.state.userData.searchOption = new SearchOption();
+      this.requestSearch();
+    }
+
+    onTypeSelected() {
+      this.requestSearch();
+    }
+
     onAgeRatingChanged() {
-      // let ratingsToExclude = Array.from(AGE_RATING);
-      // this.selectedAgeRating.sort();
-      // for (let ageRating of this.selectedAgeRating.reverse()) {
-      //   ratingsToExclude.splice(ageRating, 1);
-      // }
-      // UserData.getInstance().excludedTags = ratingsToExclude;
-      // WorkshopManager.getInstance().requestUpdate(QueryTarget.Search);
+      this.requestSearch();
     }
 
     onTagsChanged() {
-      // let TAGS: string[] = [];
-      // for (let tag of this.selectedTags) {
-      //   TAGS.push(TAGS_TEST[tag]);
-      // }
-      // UserData.getInstance().tags = TAGS;
-      // WorkshopManager.getInstance().requestUpdate(QueryTarget.Search);
+      this.requestSearch();
     }
 
-    onSearchClicked() {}
+    onSearchClicked() {
+      this.requestSearch();
+    }
+
+    onClearClicked() {
+      this.requestSearch();
+    }
+
+    requestSearch() {
+      console.log(`Explore tab: Search requested`);
+      WorkshopManager.getInstance().requestSearch(
+        this.$store.state.userData.searchOption,
+        QueryTarget.Search
+      );
+    }
 
     get keyword() {
       return this.$store.state.userData.searchOption.keyword;
     }
 
     set keyword(value: string) {
-      this.$store.state.userData.searchOption.keyword = value;
+      this.$store.state.userData.searchOption.keyword = value ? value : "";
     }
 
     get selectedFilterType() {
@@ -129,10 +153,6 @@
 
     get tags() {
       return TAGS_TEST;
-    }
-
-    get titleRules() {
-      return TITLE_RULES;
     }
   }
 </script>
