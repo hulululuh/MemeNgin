@@ -253,8 +253,8 @@ export function createLibrary() {
   lib.addNode("less", "LessNode", LessNode, NodeCategory.Logic);
   lib.addNode("lesseq", "LessEqNode", LessEqNode, NodeCategory.Logic);
 
-  lib.addNode("copy", "Copy", CopyNode, NodeCategory.Control);
   lib.addNode("output", "Output", OutputNode, NodeCategory.Control);
+  lib.addNode("copy", "Copy", CopyNode, NodeCategory.Control);
 
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Experimental); // to be logic
   lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Experimental); // to be logic

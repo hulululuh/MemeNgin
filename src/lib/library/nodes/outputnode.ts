@@ -21,7 +21,7 @@ export class OutputNode extends ImageDesignerNode {
     this.title = "Output";
 
     this.addInput("image");
-    this.addStringProperty("description", "Description");
+    //this.addStringProperty("description", "Description");
 
     let source = `
       vec4 process(vec2 uv)

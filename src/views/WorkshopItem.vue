@@ -33,7 +33,12 @@
       <v-spacer />
     </v-layout>
     <v-divider class="mt-0 mt-2 pb-2" />
-    <v-btn block :disabled="!isPublished" @click="openItemLink">
+    <v-btn
+      style="text-transform: unset !important;"
+      block
+      :disabled="!isPublished"
+      @click="openItemLink"
+    >
       {{ textFindOnSteam }}
     </v-btn>
     <v-btn

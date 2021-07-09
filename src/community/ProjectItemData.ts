@@ -123,13 +123,13 @@ export class ProjectItemData {
   }
 
   get isWorkshopItem() {
-    return this.workshopItem != null && this.workshopItem.isValid;
+    return this.workshopItem != null;
   }
 
   get thumbnail() {
-    return this.isWorkshopItem
-      ? this.workshopItem.thumbnailUrl
-      : this.localItem.thumbnail;
+    return this.localItem && this.localItem.thumbnail
+      ? this.localItem.thumbnail
+      : this.workshopItem.thumbnailUrl;
   }
 
   set thumbnail(value) {
