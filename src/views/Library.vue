@@ -6,7 +6,15 @@
     <div id="app" class="node-list">
       <v-expansion-panels v-model="panel" multiple accordion>
         <v-expansion-panel v-for="(item, i) in items" :key="i">
-          <v-expansion-panel-header>{{ item.name }}</v-expansion-panel-header>
+          <v-expansion-panel-header>
+            {{ item.name }}
+            <snackbar
+              v-if="item.name == 'Experimental'"
+              :text="textExperimental"
+              :textClose="textClose"
+              ref="snackbar"
+            />
+          </v-expansion-panel-header>
           <v-expansion-panel-content>
             <div style="overflow:hidden;">
               <span
@@ -49,12 +57,13 @@
   import { Component, Prop, Vue } from "vue-property-decorator";
   import { Editor } from "@/lib/editor";
   import { DesignerLibrary } from "@/lib/designer/library";
-  import { NodeCategory } from "@/lib/designer/designernode";
   import fs from "fs";
   import path from "path";
   import Accordion from "@/components/Accordion.vue";
+  import Snackbar from "@/views/Snackbar.vue";
   import { AddItemsAction } from "../lib/actions/additemsaction";
   import { UndoStack } from "../lib/undostack";
+  import { TextManager } from "@/assets/textmanager";
 
   declare let __static: any;
 
@@ -65,6 +74,8 @@
     Composite = "composite",
     Create = "create",
     Logic = "logic",
+    Control = "control",
+    Experimental = "experimental",
   }
 
   // this abstracts library nodes and other items such as comments
@@ -94,13 +105,12 @@
     }
   }
 
-  @Component({ components: { Accordion } })
+  @Component({
+    components: { Accordion, Snackbar },
+  })
   export default class LibraryView extends Vue {
-    @Prop()
-    library!: DesignerLibrary;
-
-    @Prop()
-    editor!: Editor;
+    @Prop() library!: DesignerLibrary;
+    @Prop() editor!: Editor;
 
     filter: string = "";
 
@@ -115,6 +125,8 @@
         { name: "Composite" },
         { name: "Create" },
         { name: "Logic" },
+        { name: "Control" },
+        { name: "Experimental" },
       ];
 
       this.panel = [...Array(this.items.length).keys()];
@@ -125,6 +137,14 @@
         panel: this.panel,
         items: this.items,
       };
+    }
+
+    get textClose() {
+      return TextManager.translate("${ui_general.close}");
+    }
+
+    get textExperimental() {
+      return TextManager.translate("${experimental}");
     }
 
     get libItems() {
@@ -147,7 +167,7 @@
           0,
           new LibraryItem(
             LibraryItemType.Frame,
-            LibraryItemCategory.Logic,
+            LibraryItemCategory.Control,
             "inputs",
             "Inputs"
           )
@@ -157,7 +177,7 @@
       items.push(
         new LibraryItem(
           LibraryItemType.Comment,
-          LibraryItemCategory.Logic,
+          LibraryItemCategory.Control,
           "comment",
           "Comment"
         )

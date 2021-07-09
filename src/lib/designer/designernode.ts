@@ -59,6 +59,8 @@ export enum NodeCategory {
   Composite = "composite",
   Create = "create",
   Logic = "logic",
+  Control = "control",
+  Experimental = "experimental",
 }
 
 export class DesignerNode implements IPropertyHolder {

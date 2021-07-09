@@ -105,8 +105,6 @@ export function createLibrary() {
 
   lib.addNode("color", "Color", ColorNode, NodeCategory.Color);
   lib.addNode("colorize", "Colorize", ColorizeNode, NodeCategory.Color);
-  // TODO: need to support 16bit texture in order to convey texCoord details
-  //lib.addNode("uvcoord", "UV Coord", UvCoordNode, NodeCategory.Color);
   lib.addNode(
     "coloradjust",
     "Color Adjust",
@@ -152,9 +150,6 @@ export function createLibrary() {
     OpacityOverrideNode,
     NodeCategory.Composite
   );
-
-  // TODO: 16 bit texture, for same reason above
-  //lib.addNode("uvSwap", "Uv Swap", UvSwapNode, NodeCategory.Composite);
 
   lib.addNode("texture", "Texture", TextureNode, NodeCategory.Create);
   lib.addNode("text", "Text", TextNode, NodeCategory.Create);
@@ -235,10 +230,6 @@ export function createLibrary() {
     Vector2PropertyNode,
     NodeCategory.Logic
   );
-  lib.addNode("copy", "Copy", CopyNode, NodeCategory.Logic);
-  lib.addNode("output", "Output", OutputNode, NodeCategory.Logic);
-  lib.addNode("detect", "Detect", DetectNode, NodeCategory.Logic);
-  lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Logic);
   lib.addNode("mapfloat", "MapFloat", MapFloatNode, NodeCategory.Logic);
   lib.addNode("andgate", "AndGate", AndGateNode, NodeCategory.Logic);
   lib.addNode("orgate", "OrGate", OrGateNode, NodeCategory.Logic);
@@ -262,5 +253,16 @@ export function createLibrary() {
   lib.addNode("less", "LessNode", LessNode, NodeCategory.Logic);
   lib.addNode("lesseq", "LessEqNode", LessEqNode, NodeCategory.Logic);
 
+  lib.addNode("copy", "Copy", CopyNode, NodeCategory.Control);
+  lib.addNode("output", "Output", OutputNode, NodeCategory.Control);
+
+  lib.addNode("detect", "Detect", DetectNode, NodeCategory.Experimental); // to be logic
+  lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Experimental); // to be logic
+
+  // TODO: need to support 16 bit texture in order to convey texCoord details
+  lib.addNode("uvcoord", "UV Coord", UvCoordNode, NodeCategory.Experimental); // to be color
+
+  // TODO: 16 bit texture, for same reason above
+  lib.addNode("uvSwap", "Uv Swap", UvSwapNode, NodeCategory.Experimental); // to be composite
   return lib;
 }
