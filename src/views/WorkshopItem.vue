@@ -12,9 +12,14 @@
     </v-layout>
     <v-layout class="justify-center align-center mt-1">
       <v-spacer />
-      <v-btn width="150px" @click="onSubscribeButton" :color="colorSubscribe">
+      <v-btn
+        style="text-transform: unset !important;"
+        width="150px"
+        @click="onSubscribeButton"
+        :color="colorSubscribe"
+      >
         <v-icon dark>
-          mdi-plus
+          {{ iconSubscribe }}
         </v-icon>
         {{ textSubscribe }}
       </v-btn>
@@ -109,6 +114,10 @@
     get colorSubscribe() {
       if (!this.isSubscribed) return "";
       else return "primary";
+    }
+
+    get iconSubscribe() {
+      return this.isSubscribed ? `mdi-minus` : `mdi-plus`;
     }
 
     get colorVotedUp() {
