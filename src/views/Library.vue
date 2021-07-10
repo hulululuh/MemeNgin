@@ -3,10 +3,10 @@
     <div class style="padding-bottom:0em; display:flex; margin:0.5em;">
       <v-text-field hide-details label="Filter..." v-model="filter" />
     </div>
-    <div id="app" class="node-list">
+    <div id="app" class="node-list ma-0 pa-0">
       <v-expansion-panels v-model="panel" multiple accordion>
         <v-expansion-panel v-for="(item, i) in items" :key="i">
-          <v-expansion-panel-header>
+          <v-expansion-panel-header style="max-height:5px;" class="ml-1 pa-1">
             {{ item.name }}
             <snackbar
               v-if="item.name == 'Experimental'"
@@ -15,7 +15,7 @@
               ref="snackbar"
             />
           </v-expansion-panel-header>
-          <v-expansion-panel-content>
+          <v-expansion-panel-content class="ma-0 pa-0">
             <div style="overflow:hidden;">
               <span
                 v-for="listItem in getFilteredListByName(item.name)"

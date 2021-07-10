@@ -64,9 +64,10 @@ export class ProjectItemData {
   }
 
   get description() {
-    return this.isWorkshopItem
+    let desc = this.isWorkshopItem
       ? this.workshopItem.description
       : this.localItem.description;
+    return desc ? desc : "";
   }
 
   set description(value: string) {

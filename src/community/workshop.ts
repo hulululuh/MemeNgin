@@ -2,11 +2,14 @@ import { UserData, QueryTarget, SearchOption, SearchType } from "@/userdata";
 import {
   ProjectItemData,
   ageRatingsToExcludedTags,
+  LocalItemData,
 } from "@/community/ProjectItemData";
 import { Editor } from "@/lib/editor";
 import { plainToClass } from "class-transformer";
 import fs, { readFileSync, writeFileSync } from "fs";
+import { ProjectManager } from "@/lib/project";
 import path from "path";
+import { info } from "node:console";
 const electron = require("electron");
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
@@ -25,7 +28,7 @@ export class WorkshopManager {
     [QueryTarget.Subscribed, false],
     [QueryTarget.Search, false],
   ]);
-  private activeTimerId;
+  private activeTimerId = new Map<QueryTarget, any>();
   private steamId;
 
   static getInstance() {
@@ -156,16 +159,17 @@ export class WorkshopManager {
     return items;
   }
 
-  async queryUserItems(): Promise<any> {
+  async queryUserItems(page_num: number): Promise<any> {
     let items = await new Promise((resolve, reject) => {
       greenworks.ugcGetUserItems(
         {
           "app_id": APP_ID,
-          "page_num": 1,
+          "page_num": page_num,
         },
         greenworks.UGCMatchingType.Items,
-        greenworks.UserUGCListSortOrder.VoteScoreDesc,
-        greenworks.UGCItemState.Subscribed,
+        greenworks.UserUGCListSortOrder.SubscriptionDateDesc,
+        greenworks.UGCItemState.None,
+        //greenworks.UGCItemState.Subscribed,
         (items) => {
           let searchedItems: ProjectItemData[] = [];
           for (let item of items) {
@@ -191,13 +195,14 @@ export class WorkshopManager {
 
   requestSearch(options: SearchOption, target: QueryTarget) {
     if (this._dirty.get(target)) {
-      clearTimeout(this.activeTimerId);
+      clearTimeout(this.activeTimerId.get(target));
     }
 
     this._dirty.set(target, true);
-    this.activeTimerId = setTimeout(() => {
+    let timerId = setTimeout(() => {
       this.doSearch(options, target);
     }, UPDATE_DELAY);
+    this.activeTimerId.set(target, timerId);
   }
 
   async doSearch(options: SearchOption, target: QueryTarget) {
@@ -206,7 +211,7 @@ export class WorkshopManager {
     if (target == QueryTarget.Search) {
       result = await this.queryItems(options);
     } else if (target == QueryTarget.Subscribed) {
-      result = await this.queryUserItems();
+      result = await this.synchroizeItems(1);
     }
 
     if (result instanceof QueryResult) {
@@ -453,5 +458,50 @@ export class WorkshopManager {
       votedDown: false,
     };
     return defaultState;
+  }
+
+  async synchroizeItems(page_num: number): Promise<any> {
+    if (!this.initialized) return;
+
+    let subscribed = [];
+    let result = await this.queryUserItems(page_num);
+    for (let item of result.items) {
+      const file_id = item.workshopItem.publishedFileId;
+      const itemId = item.workshopItem.itemId;
+      const itemState = await this.getItemState(file_id);
+      const state = itemState.itemState;
+      if (state & greenworks.UGCItemState.Subscribed) {
+        let info = await greenworks.ugcGetItemInstallInfo(file_id);
+
+        if (info) {
+          if (!item.localItem) {
+            let list = fs.readdirSync(info.folder);
+            for (let file of list) {
+              const fullPath = path.join(info.folder, file);
+              const stat = fs.statSync(fullPath);
+              if (!stat.isDirectory()) {
+                let parsedPath = path.parse(fullPath);
+                if (parsedPath.ext == ".mmng") {
+                  let project = ProjectManager.load(fullPath);
+                  const name = parsedPath.name;
+                  const path = fullPath;
+                  item.localItem = LocalItemData.fromLocalPath(
+                    project,
+                    name,
+                    fullPath
+                  );
+                }
+              }
+            }
+          }
+          subscribed.push(item);
+        }
+      } else {
+        console.warn(`Should be deleted: ${item.workshopItem.publishedFileId}`);
+      }
+    }
+
+    result.items = subscribed;
+    return result;
   }
 }

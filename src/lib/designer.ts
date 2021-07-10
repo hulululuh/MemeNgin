@@ -927,7 +927,6 @@ export class Designer {
       .canvas;
 
     let data = {};
-    data["description"] = outputNode.getProperty("description");
     data["thumbnail"] = canvasToThumbnailURL(outputCanvas);
     data["nodes"] = nodes;
     data["connections"] = connections;
