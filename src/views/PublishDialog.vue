@@ -90,13 +90,16 @@
                 lazy-src="assets/icons/image.svg"
               />
             </v-card>
-            <v-btn block :disabled="!isPublished" @click="openItemLink">
+            <v-btn
+              block
+              style="text-transform: unset !important;"
+              @click="openItemLink"
+            >
               {{ textFindOnSteam }}
             </v-btn>
             <v-btn
               style="text-transform: unset !important;"
               block
-              :disabled="!isPublished"
               @click="openAuthorLink"
             >
               <v-spacer />
@@ -270,7 +273,7 @@
     }
 
     get isPublished() {
-      return this.$store.state.metadata.publisherId;
+      return this.$store.state.metadata.publisherId != null;
     }
 
     get isUpdatable() {

@@ -8,8 +8,7 @@ const userDataPath = path.join(app.getPath("userData"), "userData.json");
 
 export enum QueryTarget {
   Search = "Search",
-  Best = "Best",
-  Recent = "Recent",
+  Subscribed = "Subscribed",
 }
 
 export const DERIVATIVE_TAG: string = "Derivative Allowed";
@@ -86,12 +85,12 @@ export class UserData {
   followedUser: string[] = [];
 
   recentItems: ProjectItemData[] = [];
-  bestItems: ProjectItemData[] = [];
+  subscribedItems: ProjectItemData[] = [];
   searchedItems: ProjectItemData[] = [];
   numSearchResultInPages: number;
 
   pageIndex = new Map<QueryTarget, number>([
-    [QueryTarget.Best, -1],
+    [QueryTarget.Subscribed, -1],
     [QueryTarget.Search, -1],
   ]);
 
@@ -201,8 +200,8 @@ export class UserData {
       case QueryTarget.Search:
         this.searchedItems = items;
         break;
-      case QueryTarget.Best:
-        this.bestItems = items;
+      case QueryTarget.Subscribed:
+        this.subscribedItems = items;
         break;
     }
   }

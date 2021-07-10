@@ -16,7 +16,11 @@
               :newDocument="true"
               ref="searched"
             />
-            <item-list categoryName="Subscribed" :lists="best" ref="searched" />
+            <item-list
+              categoryName="Subscribed"
+              :lists="subscribed"
+              ref="searched"
+            />
           </v-card>
         </v-col>
       </v-row>
@@ -47,8 +51,8 @@
       return WorkshopManager.getInstance().initialized;
     }
 
-    get best() {
-      return this.$store.state.userData.bestItems;
+    get subscribed() {
+      return this.$store.state.userData.subscribedItems;
     }
 
     get userWorks() {

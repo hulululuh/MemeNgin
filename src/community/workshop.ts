@@ -22,7 +22,7 @@ export class QueryResult {
 export class WorkshopManager {
   private static _instance: WorkshopManager;
   private _dirty = new Map<QueryTarget, boolean>([
-    [QueryTarget.Best, false],
+    [QueryTarget.Subscribed, false],
     [QueryTarget.Search, false],
   ]);
   private activeTimerId;
@@ -89,7 +89,10 @@ export class WorkshopManager {
         UserData.getInstance().searchOption,
         QueryTarget.Search
       );
-      this.requestSearch(UserData.getInstance().searchOption, QueryTarget.Best);
+      this.requestSearch(
+        UserData.getInstance().searchOption,
+        QueryTarget.Subscribed
+      );
     }
   }
 
@@ -153,6 +156,39 @@ export class WorkshopManager {
     return items;
   }
 
+  async queryUserItems(): Promise<any> {
+    let items = await new Promise((resolve, reject) => {
+      greenworks.ugcGetUserItems(
+        {
+          "app_id": APP_ID,
+          "page_num": 1,
+        },
+        greenworks.UGCMatchingType.Items,
+        greenworks.UserUGCListSortOrder.VoteScoreDesc,
+        greenworks.UGCItemState.Subscribed,
+        (items) => {
+          let searchedItems: ProjectItemData[] = [];
+          for (let item of items) {
+            let pItem = ProjectItemData.fromMetadata(item);
+            if (pItem) searchedItems.push(pItem);
+          }
+          resolve(
+            plainToClass(QueryResult, {
+              items: searchedItems,
+              numResults: searchedItems.length,
+              numTotalResults: searchedItems.length,
+            })
+          );
+        },
+        (err) => {
+          reject(err);
+        }
+      );
+    });
+
+    return items;
+  }
+
   requestSearch(options: SearchOption, target: QueryTarget) {
     if (this._dirty.get(target)) {
       clearTimeout(this.activeTimerId);
@@ -165,7 +201,14 @@ export class WorkshopManager {
   }
 
   async doSearch(options: SearchOption, target: QueryTarget) {
-    let result = await this.queryItems(options);
+    let result;
+
+    if (target == QueryTarget.Search) {
+      result = await this.queryItems(options);
+    } else if (target == QueryTarget.Subscribed) {
+      result = await this.queryUserItems();
+    }
+
     if (result instanceof QueryResult) {
       UserData.getInstance().updateSearchedItems(result.items, target);
       UserData.getInstance().numSearchResultInPages = Math.trunc(
