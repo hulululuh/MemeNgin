@@ -44,6 +44,15 @@
   export default class Snackbar extends Vue {
     @Prop() text: string;
     @Prop() textClose: string;
-    @Prop() snackbar: boolean;
+    //@Prop() snackbar: boolean;
+    show: boolean = false;
+
+    get snackbar() {
+      return this.show;
+    }
+
+    set snackbar(value) {
+      this.show = value;
+    }
   }
 </script>

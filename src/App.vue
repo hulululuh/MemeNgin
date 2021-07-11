@@ -764,7 +764,10 @@
 
     onProjectOpened(project: Project) {
       let userData: UserData = UserData.getInstance();
-      userData.registerRecent(project.localPath);
+
+      if (fs.existsSync(project.localPath)) {
+        userData.registerRecent(project.localPath);
+      }
       console.log(project);
 
       this.titleName = project.name;

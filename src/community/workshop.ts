@@ -391,6 +391,10 @@ export class WorkshopManager {
         }
       );
     }
+
+    setTimeout(() => {
+      this.synchroizeItems(1);
+    }, 1000);
   }
 
   async unsubscribe(file_id: string) {
@@ -405,6 +409,10 @@ export class WorkshopManager {
         }
       );
     }
+
+    setTimeout(() => {
+      this.synchroizeItems(1);
+    }, 1000);
   }
 
   async voteup(file_id: string) {
@@ -464,6 +472,10 @@ export class WorkshopManager {
   async synchroizeItems(page_num: number): Promise<any> {
     if (!this.initialized) return;
 
+    let workshopLocalPath = "";
+    // shall be removed if there
+    let ghostItems = [];
+
     let subscribed = [];
     let result = await this.queryUserItems(page_num);
     for (let item of result.items) {
@@ -482,6 +494,7 @@ export class WorkshopManager {
               const stat = fs.statSync(fullPath);
               if (!stat.isDirectory()) {
                 let parsedPath = path.parse(fullPath);
+                workshopLocalPath = path.join(parsedPath.dir, "..");
                 if (parsedPath.ext == ".mmng") {
                   let project = ProjectManager.load(fullPath);
                   const name = parsedPath.name;
@@ -498,7 +511,20 @@ export class WorkshopManager {
           subscribed.push(item);
         }
       } else {
-        console.warn(`Should be deleted: ${item.workshopItem.publishedFileId}`);
+        ghostItems.push(item.workshopItem.publishedFileId);
+      }
+    }
+
+    // try to remove ghost items on local
+    if (ghostItems.length > 0 && workshopLocalPath.length > 0) {
+      for (let item of ghostItems) {
+        const targetDir = path.join(workshopLocalPath, item);
+        if (fs.existsSync(targetDir)) {
+          const stat = fs.statSync(targetDir);
+          if (stat.isDirectory()) {
+            fs.rmdirSync(targetDir, { recursive: true });
+          }
+        }
       }
     }
 
