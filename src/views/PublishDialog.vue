@@ -208,6 +208,16 @@
         if (success) {
           app.saveProject(true);
           document.dispatchEvent(new Event("projectPublished"));
+
+          const title = TextManager.translate("${ui_general.success}");
+          const message = TextManager.translate("${publish_dialog.success}");
+          const close = TextManager.translate("${ui_general.okay}");
+          app.showMessage(title, message, close);
+        } else {
+          const title = TextManager.translate("${ui_general.fail}");
+          const message = TextManager.translate("${publish_dialog.fail}");
+          const close = TextManager.translate("${ui_general.close}");
+          app.showMessage(title, message, close);
         }
       }
     }

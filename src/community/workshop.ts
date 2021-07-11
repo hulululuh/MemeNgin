@@ -9,7 +9,6 @@ import { plainToClass } from "class-transformer";
 import fs, { readFileSync, writeFileSync } from "fs";
 import { ProjectManager } from "@/lib/project";
 import path from "path";
-import { info } from "node:console";
 const electron = require("electron");
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");

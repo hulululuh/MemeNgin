@@ -110,6 +110,7 @@
     </v-navigation-drawer>
 
     <v-main>
+      <message-dialog ref="messageDialog" />
       <publish-dialog @onCancel="onCancelled" ref="publishDialog" />
       <close-dialog
         ref="closeDialog"
@@ -162,6 +163,7 @@
   import TooltipButton from "@/views/TooltipButton.vue";
   import StartupMenu from "@/views/StartupMenu.vue";
   import CloseDialog from "@/views/CloseDialog.vue";
+  import MessageDialog from "@/views/MessageDialog.vue";
   import PublishDialog from "@/views/PublishDialog.vue";
   import ProjectNameDialog from "@/views/ProjectNameDialog.vue";
   import { DesignerLibrary } from "./lib/designer/library";
@@ -205,6 +207,7 @@
       startupMenu: StartupMenu,
       preview2d: Preview2D,
       closeDialog: CloseDialog,
+      messageDialog: MessageDialog,
       tooltipButton: TooltipButton,
       publishDialog: PublishDialog,
       projectNameDialog: ProjectNameDialog,
@@ -882,6 +885,14 @@
     centerTexture() {
       if (this.havePersistentDialog) return;
       (this.$refs.preview2d as Preview2D).centerTexture();
+    }
+
+    showMessage(title: string, message: string, close: string) {
+      const msgDialog = this.$refs.messageDialog as MessageDialog;
+      msgDialog.textTitle = title;
+      msgDialog.textMessage = message;
+      msgDialog.textClose = close;
+      msgDialog.show();
     }
   }
 </script>
