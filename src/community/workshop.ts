@@ -320,6 +320,8 @@ export class WorkshopManager {
       let exists = fs.existsSync(projectPath);
       let stats = exists && (await fs.statSync(projectPath));
       let isFile = exists && stats.isFile();
+
+      // save file if not exists in local repository
       if (exists && isFile) {
         const data = Editor.getMetadata();
         const localPath = path.parse(projectPath).dir;

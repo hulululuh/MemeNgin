@@ -185,7 +185,8 @@
   const { dialog } = remote;
   const app = remote.app;
   const userDataPath = path.join(app.getPath("userData"), "userData.json");
-  //export const MY_WORKS_PATH = ApplicationSettings.getInstance().myWorksPath;
+
+  export const TEMP_PATH = path.join(path.resolve("."), "/projects/temp/");
 
   export const MY_WORKS_PATH = path.join(
     path.resolve("."),

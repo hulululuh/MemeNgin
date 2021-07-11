@@ -30,9 +30,9 @@
   @Component
   export default class MessageDialog extends Vue {
     dialog: boolean = false;
-    textTitle: string;
-    textMessage: string;
-    textClose: string;
+    textTitle: string = "";
+    textMessage: string = "";
+    textClose: string = "";
 
     show() {
       this.dialog = true;
