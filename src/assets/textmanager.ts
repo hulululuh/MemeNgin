@@ -172,19 +172,5 @@ export class TextManager {
   setLanguage(languageId: string) {
     this.languageId = languageId;
     this.parsed = this.parseLanguage(this.languageId);
-
-    // let metadata = LANGUAGES[this.languageId];
-    // let tsPath = path.join(__static, metadata.data);
-    // if (!fs.existsSync(tsPath)) {
-    //   console.log(
-    //     `couldn't find ${this.languageId}, fallback to default language(english) `
-    //   );
-    //   this.languageId = "en";
-    //   metadata = LANGUAGES[this.languageId];
-    //   tsPath = path.join(__static, metadata.data);
-    // }
-
-    // const file = fs.readFileSync(tsPath, "utf8");
-    // this.parsed = YAML.parse(file);
   }
 }
