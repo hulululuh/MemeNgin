@@ -21,8 +21,11 @@ yarn-error.log*
 *.sln
 *.sw?
 
-#Electron-builder output
+# Electron-builder output
 /dist_electron
 /build/icons
 /steam/
 /projects/
+
+# steamworks sdk for greenworks
+/steamworks_sdk/
