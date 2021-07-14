@@ -48,6 +48,11 @@
       />
       <v-spacer />
       <tooltip-button
+        iconPath="assets/icons/comment-question-outline.svg"
+        tooltip="Show tutorials"
+        @click="showTutorials"
+      />
+      <tooltip-button
         iconPath="assets/icons/Steam_Logo_Lockups_24dp.svg"
         tooltip="Publish item"
         @click="publishItem"
@@ -110,6 +115,7 @@
     </v-navigation-drawer>
 
     <v-main>
+      <tutorial-dialog ref="tutorialDialog" />
       <message-dialog ref="messageDialog" />
       <publish-dialog @onCancel="onCancelled" ref="publishDialog" />
       <close-dialog
@@ -179,6 +185,7 @@
   import { WorkshopManager } from "@/community/workshop";
   import { CloudData } from "@/clouddata";
   import { ProjectItemData } from "./community/ProjectItemData";
+  import TutorialDialog from "@/views/TutorialDialog.vue";
 
   const electron = require("electron");
   const remote = electron.remote;
@@ -212,6 +219,7 @@
       tooltipButton: TooltipButton,
       publishDialog: PublishDialog,
       projectNameDialog: ProjectNameDialog,
+      tutorialDialog: TutorialDialog,
     },
   })
   export default class App extends Vue {
@@ -517,6 +525,10 @@
     setupMenu() {
       if (this.isMenuSetup) return;
       this.isMenuSetup = true;
+
+      if (!UserData.getInstance().dontShowIntroAgain) {
+        (this.$refs.tutorialDialog as TutorialDialog).dialog = true;
+      }
     }
 
     showLibraryMenu() {
@@ -789,7 +801,9 @@
 
     loadSample(name: string) {}
 
-    showTutorials() {}
+    showTutorials() {
+      (this.$refs.tutorialDialog as TutorialDialog).dialog = true;
+    }
 
     showAboutDialog() {}
 

@@ -263,6 +263,6 @@ export function createLibrary() {
   lib.addNode("uvcoord", "UV Coord", UvCoordNode, NodeCategory.Experimental); // to be color
 
   // TODO: 16 bit texture, for same reason above
-  lib.addNode("uvSwap", "Uv Swap", UvSwapNode, NodeCategory.Experimental); // to be composite
+  lib.addNode("uvswap", "Uv Swap", UvSwapNode, NodeCategory.Experimental); // to be composite
   return lib;
 }

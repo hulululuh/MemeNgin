@@ -153,8 +153,8 @@ export class TextManager {
 
   constructor() {
     this.parsedFallback = this.parseLanguage("en");
-    this.setLanguage("en");
-    //this.setLanguage("kor");
+    //this.setLanguage("en");
+    this.setLanguage("kor");
   }
 
   parseLanguage(languageId: string) {

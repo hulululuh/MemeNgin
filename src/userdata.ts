@@ -106,6 +106,7 @@ export class UserData {
   agreed: boolean = false;
   seenDerivative: boolean = false;
   seenLegal: boolean = false;
+  dontShowIntroAgain: boolean = false;
 
   static _instance: UserData = null;
   static getInstance(): UserData {
@@ -131,6 +132,8 @@ export class UserData {
       //   instance.seenDerivative = parsed.seenDerivative;
       if (parsed.seenLegal) instance.seenLegal = parsed.seenLegal;
       if (parsed.searchOption) instance.searchOption = parsed.searchOption;
+      if (parsed.dontShowIntroAgain)
+        instance.dontShowIntroAgain = parsed.dontShowIntroAgain;
 
       // validate data and remove invalid path
       let invalids = [];
