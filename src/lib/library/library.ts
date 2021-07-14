@@ -132,7 +132,7 @@ export function createLibrary() {
     BrightnessContrastNode,
     NodeCategory.Color
   );
-  lib.addNode("colorgrade", "Color Grade", ColorGradeNode, NodeCategory.Color);
+  // colorgrade will come here
 
   lib.addNode("overlay", "Overlay", OverlayNode, NodeCategory.Composite);
   lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
@@ -264,5 +264,13 @@ export function createLibrary() {
 
   // TODO: 16 bit texture, for same reason above
   lib.addNode("uvswap", "Uv Swap", UvSwapNode, NodeCategory.Experimental); // to be composite
+
+  lib.addNode(
+    "colorgrade",
+    "Color Grade",
+    ColorGradeNode,
+    NodeCategory.Experimental
+  ); // to be color
+
   return lib;
 }
