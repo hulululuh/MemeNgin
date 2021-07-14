@@ -95,14 +95,6 @@ export class UserData {
   ]);
 
   searchOption: SearchOption = new SearchOption();
-
-  // search tags
-  //keyword: string = "";
-  //tags: string[] = [];
-  //tags: string[] = ["Abstract", "Fantasy"];
-  //excludedTags: string[] = ["Everyone", "Questionable", "Mature"];
-  //excludedTags: string[] = ["Questionable", "Mature"];
-  //derivative: boolean = false;
   agreed: boolean = false;
   seenDerivative: boolean = false;
   seenLegal: boolean = false;
