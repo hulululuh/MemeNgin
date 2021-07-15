@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import { Vector2 } from "@math.gl/core";
 import { Rect } from "@/lib/math/rect";
 

@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import { Color } from "@/lib/designer/color";
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
 import { PropertyType } from "@/lib/designer/properties";

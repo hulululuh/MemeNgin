@@ -1,8 +1,10 @@
-import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+// [GPLv3] modified 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+// [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
 
 // uses single pass gaussian
 // https://www.shadertoy.com/view/4tSyzy
 // https://stackoverflow.com/questions/2157920/why-define-pi-4atan1-d0
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 export class BlurNode extends ImageDesignerNode {
   init() {
     this.title = "Blur";

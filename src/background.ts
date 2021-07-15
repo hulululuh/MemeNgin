@@ -1,14 +1,11 @@
+// [GPLv3] modified 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+// [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
+
 "use strict";
 
-import {
-  app,
-  protocol,
-  BrowserWindow,
-  session,
-  globalShortcut,
-} from "electron";
+import { app, protocol, BrowserWindow, session } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { MenuCommands, setupMenu } from "@/menu";
+import { setupMenu } from "@/menu";
 import path from "path";
 
 const Config = require("electron-config");

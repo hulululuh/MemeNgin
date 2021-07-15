@@ -1,3 +1,6 @@
+// [GPLv3] modified 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+// [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
+
 import { Vector2 } from "@math.gl/core";
 
 const IMAGE_RENDER_SIZE = 1000;

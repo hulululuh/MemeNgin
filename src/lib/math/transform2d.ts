@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import { Vector2, Matrix3 } from "@math.gl/core";
 
 export class Transform2D {

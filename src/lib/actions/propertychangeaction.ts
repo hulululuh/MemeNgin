@@ -1,11 +1,8 @@
+// [GPLv3] modified 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+// [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
+
 import { Action } from "../undostack";
-import { GraphicsItem } from "../scene/graphicsitem";
-import { Rect } from "@/lib/math/rect";
-import { FrameGraphicsItem } from "../scene/framegraphicsitem";
-import { Editor } from "../editor";
 import { IPropertyHolder } from "../designer/properties";
-import { IProperyUi } from "@/components/properties/ipropertyui";
-import App from "@/App.vue";
 
 export class PropertyChangeAction extends Action {
   ui: () => void;

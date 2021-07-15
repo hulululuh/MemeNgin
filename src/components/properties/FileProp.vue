@@ -12,6 +12,8 @@
 </style>
 
 <script lang="ts">
+  // [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
   import { Vue, Prop, Component, Emit } from "vue-property-decorator";
   import { Designer } from "@/lib/designer";
   import { IPropertyHolder } from "../../lib/designer/properties";

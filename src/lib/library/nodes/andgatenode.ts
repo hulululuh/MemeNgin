@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
 import { Property, PropertyType } from "@/lib/designer/properties";
 export class AndGateNode extends LogicDesignerNode {

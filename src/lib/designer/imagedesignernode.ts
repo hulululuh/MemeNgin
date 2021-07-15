@@ -1,5 +1,6 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import { DesignerNode, NodeType, NodeInput } from "@/lib/designer/designernode";
-import { Designer } from "@/lib/designer";
 import { buildShaderProgram } from "@/lib/designer/gl";
 import {
   FloatProperty,

@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 export class UvCoordNode extends ImageDesignerNode {

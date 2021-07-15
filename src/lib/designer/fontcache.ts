@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import opentype from "opentype.js";
 import hash from "object-hash";
 import path from "path";

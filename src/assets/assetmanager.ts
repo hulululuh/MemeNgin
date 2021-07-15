@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import fs from "fs";
 import path from "path";
 import { Guid } from "@/lib/utils";

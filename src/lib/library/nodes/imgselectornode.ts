@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { DesignerNode } from "@/lib/designer/designernode";
 import { Property } from "@/lib/designer/properties";

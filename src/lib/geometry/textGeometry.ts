@@ -1,3 +1,5 @@
+// [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+
 import earcut from "earcut";
 import computeLayout from "opentype-layout-improved";
 import { FontCache } from "@/lib/designer/fontcache";

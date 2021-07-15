@@ -1,3 +1,6 @@
+// [GPLv3] modified 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+// [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
+
 import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2 } from "math.gl";
 import { Color } from "@/lib/designer/color";

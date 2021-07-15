@@ -34,7 +34,6 @@
   import { Designer } from "@/lib/designer";
   import { Gradient, GradientPoint } from "@/lib/designer/gradient";
   import { Color } from "@/lib/designer/color";
-  import elementResizeDetectorMaker from "element-resize-detector";
   import { IPropertyHolder } from "@/lib/designer/properties";
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
   import { UndoStack } from "@/lib/undostack";
