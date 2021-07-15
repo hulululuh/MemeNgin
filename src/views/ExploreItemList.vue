@@ -12,6 +12,7 @@
             :active="i == selectedItem"
             :itemData="item"
             :clickAction="clickAction"
+            :deleteAction="deleteAction"
           />
         </v-list-item>
       </v-list-item-group>
@@ -26,7 +27,10 @@
 <script lang="ts">
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectItemData } from "@/community/ProjectItemData";
-  import ProjectItem, { ClickAction } from "@/views/ProjectItem.vue";
+  import ProjectItem, {
+    ClickAction,
+    DeleteAction,
+  } from "@/views/ProjectItem.vue";
 
   @Component({
     components: {
@@ -36,6 +40,7 @@
   export default class ExploreItemList extends Vue {
     @Prop() categoryName: string;
     @Prop() lists: Array<ProjectItemData>;
+    @Prop() deleteAction: DeleteAction;
 
     selectedItem: number = -1;
 

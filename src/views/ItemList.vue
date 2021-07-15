@@ -11,6 +11,7 @@
           v-if="exists(item)"
           :itemData="item"
           :clickAction="clickAction"
+          :deleteAction="deleteAction"
         />
       </v-col>
     </v-row>
@@ -24,7 +25,10 @@
 <script lang="ts">
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectItemData } from "@/community/ProjectItemData";
-  import ProjectItem, { ClickAction } from "@/views/ProjectItem.vue";
+  import ProjectItem, {
+    ClickAction,
+    DeleteAction,
+  } from "@/views/ProjectItem.vue";
   import NewDocument from "@/views/NewDocument.vue";
 
   @Component({
@@ -37,6 +41,7 @@
     @Prop() newDocument: boolean;
     @Prop() categoryName: string;
     @Prop() lists: ProjectItemData[];
+    @Prop() deleteAction: DeleteAction;
 
     exists(item: ProjectItemData) {
       return item.isValid;

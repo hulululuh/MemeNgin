@@ -185,7 +185,12 @@
   import { WorkshopManager } from "@/community/workshop";
   import { CloudData } from "@/clouddata";
   import { ProjectItemData } from "./community/ProjectItemData";
+  import {
+    DeleteAction,
+    ProjectItemDeleteEvent,
+  } from "@/views/ProjectItem.vue";
   import TutorialDialog from "@/views/TutorialDialog.vue";
+import WorkshopItem from "./views/WorkshopItem.vue";
 
   const electron = require("electron");
   const remote = electron.remote;
@@ -332,6 +337,10 @@
       document.removeEventListener("editEnded", this.onEditEnded);
       document.removeEventListener("projectSaved", this.onProjectSaved);
       document.removeEventListener("projectPublished", this.onProjectPublished);
+      document.removeEventListener(
+        "projectItemDelete",
+        this.onProjectItemDelete
+      );
     }
 
     onEditStarted() {
@@ -390,6 +399,7 @@
       document.addEventListener("editEnded", this.onEditEnded);
       document.addEventListener("projectSaved", this.onProjectSaved);
       document.addEventListener("projectPublished", this.onProjectPublished);
+      document.addEventListener("projectItemDelete", this.onProjectItemDelete);
 
       document.addEventListener("mousemove", (evt) => {
         this.mouseX = evt.pageX;
@@ -673,6 +683,23 @@
     }
 
     onCancelled() {}
+
+    onProjectItemDelete(evt: ProjectItemDeleteEvent) {
+      const item = evt.detail.item;
+      const deleteAction = evt.detail.action;
+
+      if (deleteAction == DeleteAction.Unlist) {
+        UserData.getInstance().removeRecent(item.path);
+      } else if (deleteAction == DeleteAction.Cloud) {
+        this.removeProject(item);
+      } else if (deleteAction == DeleteAction.Unsubscribe) {
+        if (item.workshopItem) {
+          WorkshopManager.getInstance().unsubscribe(item.workshopItem.publishedFileId);
+        } else {
+          console.warn(`You are trying to unsubscribe invalid item.`);
+        }
+      }
+    }
 
     saveProject(force: boolean = false) {
       if (!(force || this.saveable)) return;

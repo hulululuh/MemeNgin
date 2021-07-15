@@ -51,6 +51,7 @@
               ref="exploreItemList"
               categoryName="Searched"
               :lists="searched"
+              :deleteAction="unfavorable"
             />
             <v-pagination
               bottom
@@ -73,6 +74,7 @@
   import { WorkshopManager } from "@/community/workshop";
   import { QueryTarget } from "@/userdata";
   import { Vue, Component } from "vue-property-decorator";
+  import { DeleteAction } from "@/views/ProjectItem.vue";
   import ExploreItemList from "@/views/ExploreItemList.vue";
   import WorkshopFilter from "@/views/WorkshopFilter.vue";
   import WorkshopItem from "@/views/WorkshopItem.vue";
@@ -94,6 +96,10 @@
 
     toggleFilterVisibility() {
       this.showFilter = !this.showFilter;
+    }
+
+    get unfavorable() {
+      return DeleteAction.Unfavorable;
     }
 
     get initialized() {

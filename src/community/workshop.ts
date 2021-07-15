@@ -393,8 +393,8 @@ export class WorkshopManager {
     }
 
     setTimeout(() => {
-      this.synchroizeItems(1);
-    }, 1000);
+      this.doSearch(null, QueryTarget.Subscribed);
+    }, UPDATE_DELAY);
   }
 
   async unsubscribe(file_id: string) {
@@ -411,8 +411,8 @@ export class WorkshopManager {
     }
 
     setTimeout(() => {
-      this.synchroizeItems(1);
-    }, 1000);
+      this.doSearch(null, QueryTarget.Subscribed);
+    }, UPDATE_DELAY);
   }
 
   async voteup(file_id: string) {
@@ -475,12 +475,11 @@ export class WorkshopManager {
     let workshopLocalPath = "";
     // shall be removed if there
     let ghostItems = [];
-
     let subscribed = [];
+    let sholudBeInstalled = [];
     let result = await this.queryUserItems(page_num);
     for (let item of result.items) {
       const file_id = item.workshopItem.publishedFileId;
-      const itemId = item.workshopItem.itemId;
       const itemState = await this.getItemState(file_id);
       const state = itemState.itemState;
       if (state & greenworks.UGCItemState.Subscribed) {
@@ -488,6 +487,13 @@ export class WorkshopManager {
 
         if (info) {
           if (!item.localItem) {
+            if (!fs.existsSync(info.folder)) {
+              sholudBeInstalled.push({
+                "file_id": file_id,
+                "targetPath": info.folder,
+              });
+              continue;
+            }
             let list = fs.readdirSync(info.folder);
             for (let file of list) {
               const fullPath = path.join(info.folder, file);
@@ -515,6 +521,23 @@ export class WorkshopManager {
       }
     }
 
+    // try to install subscribed item to local
+    for (let item of sholudBeInstalled) {
+      let success = await new Promise((resolve, reject) => {
+        greenworks.ugcDownloadItem(
+          item.file_id,
+          item.targetPath,
+          () => {
+            resolve(true);
+          },
+          (err) => {
+            console.error(err);
+            resolve(false);
+          }
+        );
+      });
+    }
+
     // try to remove ghost items on local
     if (ghostItems.length > 0 && workshopLocalPath.length > 0) {
       for (let item of ghostItems) {
@@ -530,5 +553,25 @@ export class WorkshopManager {
 
     result.items = subscribed;
     return result;
+  }
+
+  async doSyncItems(destFolder: string) {
+    let items = await new Promise((resolve, reject) => {
+      greenworks.ugcSynchronizeItems(
+        {
+          "app_id": APP_ID,
+          "page_num": 1,
+        },
+        destFolder,
+        (items) => {
+          resolve(items);
+        },
+        (err) => {
+          reject(err);
+        }
+      );
+    });
+
+    return items;
   }
 }

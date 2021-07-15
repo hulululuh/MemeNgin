@@ -14,11 +14,13 @@
               categoryName="Your works"
               :lists="userWorks"
               :newDocument="true"
+              :deleteAction="cloud"
               ref="searched"
             />
             <item-list
               categoryName="Subscribed"
               :lists="subscribed"
+              :deleteAction="unsubscribe"
               ref="searched"
             />
           </v-card>
@@ -37,6 +39,7 @@
   import { Vue, Component } from "vue-property-decorator";
   import ItemList from "@/views/ItemList.vue";
   import SteamMustRun from "@/views/SteamMustRun.vue";
+  import { DeleteAction } from "@/views/ProjectItem.vue";
 
   @Component({
     components: {
@@ -46,6 +49,14 @@
   })
   export default class PersonalTab extends Vue {
     panel: number[] = [0, 1];
+
+    get cloud() {
+      return DeleteAction.Cloud;
+    }
+
+    get unsubscribe() {
+      return DeleteAction.Unsubscribe;
+    }
 
     get initialized() {
       return WorkshopManager.getInstance().initialized;

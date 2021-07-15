@@ -24,7 +24,7 @@
               style="position:absolute; right: 0px; top: 0px; background-color: rgba(255, 255, 255, 0.42);"
               fab
               x-small
-              v-show="hover"
+              v-show="hover && deletable"
               justify-right
               @click.stop="remove"
             >
@@ -61,14 +61,29 @@
   import App from "@/App.vue";
   import { WorkshopManager } from "@/community/workshop";
 
+  export class ProjectItemDeleteEvent extends CustomEvent<any> {
+    item: ProjectItemData;
+    action: DeleteAction;
+  }
+
   export enum ClickAction {
     Open,
     Select,
   }
+
+  export enum DeleteAction {
+    None, // no button
+    Unlist, // recent
+    Cloud, // my work
+    Unsubscribe, // usbscribed
+    Unfavorable, // search result
+  }
+
   @Component
   export default class ProjectItem extends Vue {
     @Prop() itemData: ProjectItemData;
     @Prop() clickAction: ClickAction;
+    @Prop() deleteAction: DeleteAction;
     @Prop() active: boolean;
 
     get selectedColor() {
@@ -91,12 +106,25 @@
       }
     }
 
+    get deletable() {
+      return (
+        this.deleteAction != DeleteAction.None &&
+        this.deleteAction != DeleteAction.Unfavorable
+      );
+    }
+
     open() {
       (this.$root.$children[0] as App).openProjectWithItem(this.itemData);
     }
 
     remove() {
-      (this.$root.$children[0] as App).removeProject(this.itemData);
+      let event = new ProjectItemDeleteEvent("projectItemDelete", {
+        detail: {
+          item: this.itemData,
+          action: this.deleteAction,
+        },
+      });
+      document.dispatchEvent(event);
     }
 
     get thumbnail() {

@@ -190,6 +190,25 @@ export class UserData {
     }
   }
 
+  removeRecent(path: string) {
+    const idx = this.recentFiles.findIndex((item) => item == path);
+
+    // found
+    if (idx != -1) {
+      this.recentFiles.splice(idx, 1);
+      this.removeRecentItem(path);
+    }
+  }
+
+  removeRecentItem(path: string) {
+    const idx = this.recentItems.findIndex((item) => item.path == path);
+
+    // found
+    if (idx != -1) {
+      this.recentItems.splice(idx, 1);
+    }
+  }
+
   updateSearchedItems(items: ProjectItemData[], target: QueryTarget) {
     switch (target) {
       case QueryTarget.Search:
