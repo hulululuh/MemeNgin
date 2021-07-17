@@ -16,13 +16,6 @@ import { ResizeFrameAction } from "../actions/resizeframeaction";
 import { LogicDesignerNode } from "../designer/logicdesignernode";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
 
-// TODO: need to fix application settings on production.
-// import { ApplicationSettings } from "@/settings";
-// const settings = ApplicationSettings.getInstance();
-// const strokeColor = Color.parse(settings.colorInputsStroke);
-// const fillColor = Color.parse(settings.colorInputsFill);
-// const textColor = Color.parse(settings.colorEditorText);
-
 const strokeColor = Color.parse("#33333333");
 const fillColor = Color.parse("#ffffffff");
 const textColor = Color.parse("#000000ff");

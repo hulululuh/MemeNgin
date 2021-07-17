@@ -1,3 +1,6 @@
+// [GPLv3] modified 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
+// [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
+
 import {
   SocketGraphicsItem,
   SocketInOut,
@@ -89,7 +92,7 @@ export class NodeGraphicsItem extends GraphicsItem {
 
     if (this.dNode instanceof StringPropertyNode)
       this.dNode.updateVariableProperty();
-    
+
     for (let input of node.getInputs()) {
       this.addSocket(input, input, SocketInOut.In, PropertyType.Image);
     }
