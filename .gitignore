@@ -28,4 +28,4 @@ yarn-error.log*
 /projects/
 
 # steamworks sdk for greenworks
-/steamworks_sdk/
+/external_deps/
