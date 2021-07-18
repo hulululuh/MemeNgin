@@ -18,31 +18,33 @@ git submodule update --init
 
 ```
 
-1. Setup **[greenworks fork](https://github.com/hulululuh/greenworks)** for MemeNgin.
+1. Prepare to materials to build **[greenworks fork](https://github.com/hulululuh/greenworks)** for MemeNgin.
   - Download lastest **[Steamworks SDK](https://partner.steamgames.com/downloads/list)** (v1.51)
   - extract root folder 'sdk' from zip, then rename this folder to 'steamworks_sdk'
-  - move 'steamworks_sdk' folder into /[PROJECT_ROOT]/
-  - type following command
-   ```
-   ./pre_build.bat
-   ```
-  - this commands automates following **[tasks](https://github.com/greenheartgames/greenworks/blob/master/docs/get-steamworks-sdk.md)**
+  - move 'steamworks_sdk' folder into /[PROJECT_ROOT]/external_deps
 
-Please note that 'steamworks_sdk' folder is in .gitignore and we shold not commit steamworks sdk for GPLv3 project. you may refer to greenworks & electron **[Build instructions](https://github.com/greenheartgames/greenworks/blob/master/docs/build-instructions-electron.md)**, if it is not working.
-
-2. install - We use yarn as a package manager(npm probably work).
+2. install packages - We use yarn as a package manager(npm probably work).
 ```
 yarn install
 ```
+  * greenworks will failed to install in this stage and that's okay.(we will deal with this step 3 and 4)
 
-3. run
+3. Type following command, this command copys steamworks_sdk into greenworks node_modules 
+  - this commands automates following **[tasks](https://github.com/greenheartgames/greenworks/blob/master/docs/get-steamworks-sdk.md)**
 ```
-yarn electron:serve
+./pre_build.bat
+
 ```
+Please note that 'external_deps' folder is in .gitignore and we shold not commit steamworks sdk for GPLv3 project. you may refer to greenworks & electron **[Build instructions](https://github.com/greenheartgames/greenworks/blob/master/docs/build-instructions-electron.md)**, if it is not working.
 
 4. build
 ```
 yarn electron:build
+```
+
+5. run
+```
+yarn electron:serve
 ```
 
 ## Steam version
