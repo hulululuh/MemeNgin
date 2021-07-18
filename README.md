@@ -35,7 +35,6 @@ yarn install
   - this commands automates following **[tasks](https://github.com/greenheartgames/greenworks/blob/master/docs/get-steamworks-sdk.md)**
 ```
 ./pre_build.bat
-
 ```
 Please note that 'external_deps' folder is in .gitignore and we shold not commit steamworks sdk for GPLv3 project. you may refer to greenworks & electron **[Build instructions](https://github.com/greenheartgames/greenworks/blob/master/docs/build-instructions-electron.md)**, if it is not working.
 
