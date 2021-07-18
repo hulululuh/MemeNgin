@@ -23,11 +23,13 @@ git submodule update --init
   - extract root folder 'sdk' from zip, then rename this folder to 'steamworks_sdk'
   - move 'steamworks_sdk' folder into /[PROJECT_ROOT]/external_deps
 
+
 2. install packages - We use yarn as a package manager(npm probably work).
 ```
 yarn install
 ```
   * greenworks will failed to install in this stage and that's okay.(we will deal with this step 3 and 4)
+
 
 3. Type following command, this command copys steamworks_sdk into greenworks node_modules 
   - this commands automates following **[tasks](https://github.com/greenheartgames/greenworks/blob/master/docs/get-steamworks-sdk.md)**
@@ -37,12 +39,14 @@ yarn install
 ```
 Please note that 'external_deps' folder is in .gitignore and we shold not commit steamworks sdk for GPLv3 project. you may refer to greenworks & electron **[Build instructions](https://github.com/greenheartgames/greenworks/blob/master/docs/build-instructions-electron.md)**, if it is not working.
 
+
 4. build
 ```
 yarn electron:build
 ```
 
-5. run
+
+5. run (requires to build at a first time)
 ```
 yarn electron:serve
 ```
