@@ -100,6 +100,12 @@ export class WorkshopManager {
     }
   }
 
+  shutdown() {
+    if (this.initialized) {
+      greenworks.shutdown();
+    }
+  }
+
   async ReadTextFromFile(filename: string): Promise<any> {
     if (!this.initialized) {
       return Promise.reject();

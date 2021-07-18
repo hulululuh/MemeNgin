@@ -63,6 +63,7 @@ export function setupMenu() {
         },
         {
           label: "Exit",
+          accelerator: "Alt+F4",
           click: (item, focusedWindow) => {
             focusedWindow.webContents.send(MenuCommands.FileExit);
           },

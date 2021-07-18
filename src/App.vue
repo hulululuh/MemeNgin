@@ -121,7 +121,7 @@
       <close-dialog
         ref="closeDialog"
         @onSave="saveAndClose"
-        @onClose="closeAnyway"
+        @onClose="close"
         @onCancel="onCancelled"
       />
       <project-name-dialog ref="projectNameDialog" />
@@ -190,7 +190,6 @@
     ProjectItemDeleteEvent,
   } from "@/views/ProjectItem.vue";
   import TutorialDialog from "@/views/TutorialDialog.vue";
-import WorkshopItem from "./views/WorkshopItem.vue";
 
   const electron = require("electron");
   const remote = electron.remote;
@@ -301,6 +300,9 @@ import WorkshopItem from "./views/WorkshopItem.vue";
       });
       electron.ipcRenderer.on(MenuCommands.FileSaveAs, (evt, arg) => {
         this.saveProjectAs();
+      });
+      electron.ipcRenderer.on(MenuCommands.FileExit, (evt, arg) => {
+        this.closeWindow();
       });
 
       electron.ipcRenderer.on(MenuCommands.EditUndo, async (evt, arg) => {
@@ -663,7 +665,7 @@ import WorkshopItem from "./views/WorkshopItem.vue";
       // trying to save new project
       if (!this.project.path) {
         let sucess = await this.saveProjectAs();
-        if (sucess) WIN.close();
+        if (sucess) this.close();
       } else {
         let data = this.editor.save();
         console.log(data);
@@ -672,11 +674,11 @@ import WorkshopItem from "./views/WorkshopItem.vue";
         ProjectManager.save(this.project.localPath, this.project);
         UndoStack.current.reset();
         this.edited = false;
-        WIN.close();
+        this.close();
       }
     }
 
-    closeAnyway() {
+    close() {
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();
       WIN.close();
@@ -694,7 +696,9 @@ import WorkshopItem from "./views/WorkshopItem.vue";
         this.removeProject(item);
       } else if (deleteAction == DeleteAction.Unsubscribe) {
         if (item.workshopItem) {
-          WorkshopManager.getInstance().unsubscribe(item.workshopItem.publishedFileId);
+          WorkshopManager.getInstance().unsubscribe(
+            item.workshopItem.publishedFileId
+          );
         } else {
           console.warn(`You are trying to unsubscribe invalid item.`);
         }
@@ -899,11 +903,8 @@ import WorkshopItem from "./views/WorkshopItem.vue";
 
       UserData.deserialize();
 
-      const remote = window.require ? window.require("electron").remote : null;
-      const WIN = remote.getCurrentWindow();
-
       if (!this.edited) {
-        WIN.close();
+        this.close();
       } else {
         (this.$refs.closeDialog as CloseDialog).show();
       }
