@@ -20,15 +20,15 @@ git submodule update --init
 
 1. Prepare to materials to build **[greenworks fork](https://github.com/hulululuh/greenworks)** for MemeNgin.
   - Download lastest **[Steamworks SDK](https://partner.steamgames.com/downloads/list)** (v1.51)
-  - extract root folder 'sdk' from zip, then rename this folder to 'steamworks_sdk'
-  - move 'steamworks_sdk' folder into /[PROJECT_ROOT]/external_deps
+  - Extract root folder 'sdk' from zip, then rename this folder to 'steamworks_sdk'
+  - Move 'steamworks_sdk' folder into /[PROJECT_ROOT]/external_deps
 
 
-2. install packages - We use yarn as a package manager(npm probably work).
+2. Install packages - We use yarn as a package manager(npm probably work).
 ```
 yarn install
 ```
-  * greenworks will failed to install in this stage and that's okay.(we will deal with this step 3 and 4)
+  * greenworks will fail to install at this stage and that's okay.(will deal with this step 3 and 4)
 
 
 3. Type following command, this command copys steamworks_sdk into greenworks node_modules 
