@@ -83,8 +83,6 @@ export class SearchOption {
 
 export class UserData {
   recentFiles: string[] = [];
-  subscribedProject: string[] = [];
-  followedUser: string[] = [];
 
   recentItems: ProjectItemData[] = [];
   subscribedItems: ProjectItemData[] = [];
@@ -117,9 +115,6 @@ export class UserData {
       let parsed = JSON.parse(fs.readFileSync(userDataPath).toString());
       let instance = UserData.getInstance();
       if (parsed.recentFiles) instance.recentFiles = parsed.recentFiles;
-      if (parsed.subscribedProject)
-        instance.subscribedProject = parsed.subscribedProject;
-      if (parsed.followedUser) instance.followedUser = parsed.followedUser;
       if (parsed.agreed) instance.agreed = parsed.agreed;
       //if (parsed.derivative) instance.derivative = parsed.derivative;
       // if (parsed.seenDerivative)
@@ -132,7 +127,7 @@ export class UserData {
       // validate data and remove invalid path
       let invalids = [];
       instance.recentFiles.forEach((v, i) => {
-        if (!fs.existsSync(v)) invalids.push(i);
+        if (!fs.existsSync(v) && path.parse(v).ext != ".mmng") invalids.push(i);
       });
 
       for (let i of invalids.reverse()) {
@@ -152,8 +147,11 @@ export class UserData {
 
   // mem to storage
   static deserialize() {
+    let instance = UserData.getInstance();
+    instance.cleanup();
+
     try {
-      fs.writeFileSync(userDataPath, JSON.stringify(UserData.getInstance()));
+      fs.writeFileSync(userDataPath, JSON.stringify(instance));
     } catch (err) {
       alert("Error saving user data: " + err);
     }
@@ -219,6 +217,18 @@ export class UserData {
       case QueryTarget.Subscribed:
         this.subscribedItems = items;
         break;
+    }
+  }
+
+  cleanup() {
+    // validate data and remove invalid path
+    let invalids = [];
+    this.recentFiles.forEach((v, i) => {
+      if (!fs.existsSync(v) && path.parse(v).ext != ".mmng") invalids.push(i);
+    });
+
+    for (let i of invalids.reverse()) {
+      this.recentFiles.splice(i, 1);
     }
   }
 }

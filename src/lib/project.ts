@@ -24,16 +24,29 @@ export class Project {
       return path.join(MY_WORKS_PATH, `/${name}/${base}`);
     }
   }
+
+  get isValid() {
+    return (
+      this.name && this.name.length > 0 && this.path && fs.existsSync(this.path)
+    );
+  }
 }
 
 export class ProjectManager {
-  static load(path: string): Project {
+  static load(projpath: string): Project {
+    if (path.parse(projpath).ext != ".mmng") return null;
     let project = new Project();
-    if (!fs.existsSync(path)) return null;
-    project.path = path;
-    project.name = path.replace(/^.*[\\]/, "");
-    project.data = JSON.parse(fs.readFileSync(path).toString());
-    return project;
+    if (!fs.existsSync(projpath)) return null;
+    project.path = projpath;
+    project.name = projpath.replace(/^.*[\\]/, "");
+    try {
+      project.data = JSON.parse(fs.readFileSync(projpath).toString());
+    } catch (err) {
+      console.warn(`Project [${project.name}] has failed to parse`);
+      return null;
+    }
+
+    return project.isValid ? project : null;
   }
 
   static async fromCloud(filePath: string): Promise<any> {

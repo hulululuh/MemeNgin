@@ -199,6 +199,7 @@ export class ProjectItemData {
   }
 
   static fromLocalPath(localPath: string): ProjectItemData {
+    if (path.parse(localPath).ext != ".mmng") return null;
     let item = new ProjectItemData();
     let exists = fs.existsSync(localPath);
 
@@ -207,15 +208,17 @@ export class ProjectItemData {
       return null;
     } else {
       let project = ProjectManager.load(localPath);
-      item.localItem = LocalItemData.fromLocalPath(
-        project,
-        path.parse(localPath).name,
-        localPath
-      );
+      if (project) {
+        item.localItem = LocalItemData.fromLocalPath(
+          project,
+          path.parse(localPath).name,
+          localPath
+        );
 
-      let itemData = project.data["item"];
-      if (itemData && itemData["workshopItem"]) {
-        item.workshopItem = itemData["workshopItem"];
+        let itemData = project.data["item"];
+        if (itemData && itemData["workshopItem"]) {
+          item.workshopItem = itemData["workshopItem"];
+        }
       }
     }
 

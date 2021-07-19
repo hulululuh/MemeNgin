@@ -511,6 +511,7 @@ export class WorkshopManager {
                 workshopLocalPath = path.join(parsedPath.dir, "..");
                 if (parsedPath.ext == ".mmng") {
                   let project = ProjectManager.load(fullPath);
+                  if (!project) continue;
                   const name = parsedPath.name;
                   const path = fullPath;
                   item.localItem = LocalItemData.fromLocalPath(

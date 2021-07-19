@@ -807,11 +807,9 @@
 
     onProjectOpened(project: Project) {
       let userData: UserData = UserData.getInstance();
-
       if (fs.existsSync(project.localPath)) {
         userData.registerRecent(project.localPath);
       }
-      console.log(project);
 
       this.titleName = project.name;
       remote.getCurrentWindow().setTitle(this.title);
@@ -839,37 +837,6 @@
     showAboutDialog() {}
 
     submitBugs() {}
-
-    openExample(fileName: string) {
-      let fullPath = path.join(__static, "assets/examples/", fileName);
-
-      this._openSample(fullPath);
-    }
-
-    _openSample(filepath: string) {
-      let project = ProjectManager.load(filepath);
-      console.log(project);
-
-      // ensure library exists
-      let libName = project.data["libraryVersion"];
-      let libraries = ["v0", "v1"];
-      if (libraries.indexOf(libName) == -1) {
-        alert(
-          `Project contains unknown library version '${libName}'. It must have been created with a new version of MemeNgin`
-        );
-        return;
-      }
-
-      this.titleName = project.name;
-      remote.getCurrentWindow().setTitle(project.name);
-      this.editor.load(project.data);
-      this.resolution = 1024;
-      this.randomSeed = 32;
-
-      project.path = null; // this ensures saving pops SaveAs dialog
-      this.project = project;
-      this.library = this.editor.library;
-    }
 
     setResolution(evt) {
       let value = parseInt(evt.target.value);
