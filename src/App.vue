@@ -5,6 +5,9 @@
       <v-spacer />
       {{ this.title }}
       <v-spacer />
+      <v-btn class="system-bar-button" @click="showTutorials">
+        <v-img :src="tutorialIcon"> </v-img>
+      </v-btn>
       <v-btn class="system-bar-button" @click="minimizeWindow">
         <v-icon>mdi-minus</v-icon>
       </v-btn>
@@ -47,11 +50,6 @@
         @click="zoomSelection"
       />
       <v-spacer />
-      <tooltip-button
-        iconPath="assets/icons/comment-question-outline.svg"
-        tooltip="Show tutorials"
-        @click="showTutorials"
-      />
       <tooltip-button
         iconPath="assets/icons/Steam_Logo_Lockups_24dp.svg"
         tooltip="Publish item"
@@ -275,6 +273,10 @@
     get isEdited() {
       if (UndoStack.current) return UndoStack.current.pointer > -1;
       else return false;
+    }
+
+    get tutorialIcon() {
+      return "assets/icons/comment-question-outline.svg";
     }
 
     created() {
