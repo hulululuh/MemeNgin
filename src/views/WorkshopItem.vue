@@ -88,11 +88,15 @@
       if (!this.itemData) {
         return "mdi-account-box";
       } else {
-        const imgHandle = greenworks.getMediumFriendAvatar(
-          this.itemData.workshopItem.publisherId
-        );
-        let rgba = greenworks.getImageRGBA(imgHandle);
-        return toDataURL(64, 64, rgba);
+        try {
+          const imgHandle = greenworks.getMediumFriendAvatar(
+            this.itemData.workshopItem.publisherId
+          );
+          let rgba = greenworks.getImageRGBA(imgHandle);
+          return toDataURL(64, 64, rgba);
+        } catch (err) {
+          return "mdi-account-box";
+        }
       }
     }
 

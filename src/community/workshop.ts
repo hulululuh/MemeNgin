@@ -175,8 +175,7 @@ export class WorkshopManager {
         },
         greenworks.UGCMatchingType.Items,
         greenworks.UserUGCListSortOrder.SubscriptionDateDesc,
-        greenworks.UGCItemState.None,
-        //greenworks.UGCItemState.Subscribed,
+        greenworks.UserUGCList.Subscribed,
         (items) => {
           let searchedItems: ProjectItemData[] = [];
           for (let item of items) {
