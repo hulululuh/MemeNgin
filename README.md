@@ -1,4 +1,5 @@
-![hero_graphic](https://user-images.githubusercontent.com/5396978/126052932-0a23f3a9-0b07-40ce-a4a5-0571da22c6de.png)
+![website header](https://user-images.githubusercontent.com/5396978/126163160-9899251b-2895-4cb6-aa3a-40170786c536.jpg)
+
 <h1 align="center">
   MemeNgin
 </h1>
