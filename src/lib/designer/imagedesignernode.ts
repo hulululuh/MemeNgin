@@ -145,6 +145,18 @@ export class ImageDesignerNode extends DesignerNode {
     this.height = 1024;
     this.parentIndex = "image";
     this.customSize = false;
+
+    this.notifyRightNodes = function() {
+      let rightNodes = this.designer.findRightNodes(this.id, "output");
+      if (rightNodes) {
+        for (let node of rightNodes) {
+          let imgNode = node as ImageDesignerNode;
+          if (imgNode) {
+            imgNode.connected(this, "output");
+          }
+        }
+      }
+    };
   }
 
   _init() {

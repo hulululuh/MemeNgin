@@ -134,6 +134,7 @@ export class DesignerNode implements IPropertyHolder {
   onthumbnailgenerated: (DesignerNode, HTMLImageElement) => void;
   onnodepropertychanged?: (prop: Property) => void;
   ondisconnected?: (node: DesignerNode, name: string) => void;
+  notifyRightNodes?: () => void;
 
   onnodeexposechanged(prop: Property) {
     const scene = Editor.getScene();
@@ -161,6 +162,9 @@ export class DesignerNode implements IPropertyHolder {
   // all output connected nodes are invalidated as well
   requestUpdate() {
     this.designer.requestUpdate(this);
+    if (this.notifyRightNodes) {
+      this.notifyRightNodes();
+    }
   }
 
   getInputs(): string[] {

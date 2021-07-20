@@ -1067,15 +1067,12 @@ export class Designer {
   }
 
   findRightNodes(leftNodeId: string, leftNodeOutput: string): DesignerNode[] {
-    let conn = this.conns.filter(
-      (conn) =>
-        conn.leftNode.id === leftNodeId &&
-        conn.leftNodeOutput === leftNodeOutput
-    );
-    let rightNodes;
+    let conn = this.conns.filter((conn) => conn.leftNode.id === leftNodeId);
+    // && conn.leftNodeOutput === leftNodeOutput
+    let rightNodes = [];
 
     for (let con of conn) {
-      rightNodes.add(con.rightNode);
+      rightNodes.push(con.rightNode);
     }
 
     return rightNodes;
