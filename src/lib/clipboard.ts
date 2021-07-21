@@ -21,6 +21,8 @@ import { Rect } from "@/lib/math/rect";
 import { TextureNode } from "./library/nodes/texturenode";
 import { Editor } from "@/lib/editor";
 
+const isDataUri = require("is-data-uri");
+
 export class ItemClipboard {
   static copyItems(
     designer: Designer,
@@ -114,6 +116,69 @@ export class ItemClipboard {
     console.log(data);
 
     clipboard.setData("json/nodes", json);
+  }
+
+  static pasteImages(
+    designer: Designer,
+    library: DesignerLibrary,
+    scene: NodeScene,
+    clipboard: DataTransfer
+  ) {
+    let droppedHtml = clipboard.getData("text/html");
+    if (droppedHtml) {
+      let dropContext = $("<div>").append(droppedHtml);
+      let imgUrl = $(dropContext)
+        .find("img")
+        .attr("src");
+
+      let viewNodes = [];
+      let nodes = [];
+      let offset = [0, 0];
+      if (isDataUri(imgUrl)) {
+        let n = Editor.getInstance().createTextureNodeFromUrl(imgUrl, 0, 0);
+        nodes.push(n[0]);
+        viewNodes.push(n[1]);
+      } else {
+        (async function() {
+          let blob = await fetch(imgUrl).then((r) => r.blob());
+          await new Promise(() => {
+            let reader = new FileReader();
+            reader.onload = () => {
+              let dataUrl = reader.result.toString();
+              if (isDataUri(dataUrl)) {
+                let n = Editor.getInstance().createTextureNodeFromUrl(
+                  dataUrl,
+                  0,
+                  0
+                );
+                nodes.push(n[0]);
+                viewNodes.push(n[1]);
+              }
+            };
+            reader.readAsDataURL(blob);
+          });
+        })();
+      }
+      offset = [offset[0] + 15, offset[1] + 15];
+
+      if (nodes.length === viewNodes.length && nodes.length > 0) {
+        let action = new AddItemsAction(
+          scene,
+          designer,
+          [],
+          [],
+          [],
+          [],
+          viewNodes,
+          nodes
+        );
+        UndoStack.current.push(action);
+      } else {
+        console.log(
+          "something is dragged into editor, but it's not handled properly"
+        );
+      }
+    }
   }
 
   static pasteItems(

@@ -271,33 +271,107 @@ export class Editor {
 
       let viewNodes = [];
       let nodes = [];
-
       let offset = [0, 0];
 
       let droppedHtml = ev.dataTransfer.getData("text/html");
+      var itemJson = ev.dataTransfer.getData("text/plain");
 
+      let item = null;
+      try {
+        item = JSON.parse(itemJson);
+      } catch {}
+
+      if (item) {
+        const canv = self.canvas;
+        let rect = canv.getBoundingClientRect();
+        var pos = self.nodeScene.view.canvasToSceneXY(
+          ev.clientX - rect.left,
+          ev.clientY - rect.top
+        );
+
+        let action: AddItemsAction = null;
+
+        if (item.type == "node") {
+          let nodeName = item.name;
+
+          let dnode = self.library.create(nodeName);
+          let n = self.addNode(dnode);
+          n.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            self.nodeScene,
+            self.designer,
+            [],
+            [],
+            [],
+            [],
+            [n],
+            [dnode]
+          );
+        } else if (item.type == "comment") {
+          let d = self.createComment();
+          d.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            self.nodeScene,
+            self.designer,
+            [],
+            [item],
+            [],
+            [],
+            [],
+            []
+          );
+        } else if (item.type == "frame") {
+          let d = self.createFrame();
+          d.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            self.nodeScene,
+            self.designer,
+            [item],
+            [],
+            [],
+            [],
+            [],
+            []
+          );
+        } else if (item.type == "navigation") {
+          let d = self.createNavigation();
+          d.setCenter(pos.x, pos.y);
+
+          action = new AddItemsAction(
+            self.nodeScene,
+            self.designer,
+            [],
+            [],
+            [item],
+            [],
+            [],
+            []
+          );
+        }
+
+        if (action != null) {
+          UndoStack.current.push(action);
+        }
+        console.log("drop");
+      }
       // dragged from web browser
-      if (droppedHtml) {
+      else if (droppedHtml) {
         let dropContext = $("<div>").append(droppedHtml);
         let imgUrl = $(dropContext)
           .find("img")
           .attr("src");
 
-        let createTextureNodeFromUrl = (dataUrl: string) => {
-          let node;
-          node = self.library.create("texture", dataUrl, true);
-
-          let nodeView = self.addNode(node, 0, 0);
-          nodeView.setCenter(x + offset[0], y + offset[1]);
-
-          nodes.push(node);
-          viewNodes.push(nodeView);
-
-          offset = [offset[0] + 15, offset[1] + 15];
-        };
-
+        let n;
+        const posX = offset[0] + x;
+        const posY = offset[1] + y;
         if (isDataUri(imgUrl)) {
-          createTextureNodeFromUrl(imgUrl);
+          n = self.createTextureNodeFromUrl(imgUrl, posX, posY);
+          nodes.push(n[0]);
+          viewNodes.push(n[1]);
+          offset = [offset[0] + 15, offset[1] + 15];
         } else {
           (async function() {
             let blob = await fetch(imgUrl).then((r) => r.blob());
@@ -306,7 +380,10 @@ export class Editor {
               reader.onload = () => {
                 let dataUrl = reader.result.toString();
                 if (isDataUri(dataUrl)) {
-                  createTextureNodeFromUrl(dataUrl);
+                  n = self.createTextureNodeFromUrl(dataUrl, posX, posY);
+                  nodes.push(n[0]);
+                  viewNodes.push(n[1]);
+                  offset = [offset[0] + 15, offset[1] + 15];
                 }
               };
               reader.readAsDataURL(blob);
@@ -522,12 +599,25 @@ export class Editor {
   }
 
   executePaste(evt: ClipboardEvent) {
-    ItemClipboard.pasteItems(
-      this.designer,
-      this.library,
-      this.nodeScene,
-      evt.clipboardData
-    );
+    const itemJson = evt.clipboardData.getData("text/html");
+    const files = evt.clipboardData.getData("Files");
+    let item = itemJson ? JSON.parse(itemJson) : null;
+
+    if (item) {
+      ItemClipboard.pasteImages(
+        this.designer,
+        this.library,
+        this.nodeScene,
+        item
+      );
+    } else {
+      ItemClipboard.pasteItems(
+        this.designer,
+        this.library,
+        this.nodeScene,
+        evt.clipboardData
+      );
+    }
   }
 
   // adds node
@@ -548,6 +638,16 @@ export class Editor {
     node.setCenter(pos.x, pos.y);
 
     return node;
+  }
+
+  createTextureNodeFromUrl(dataUrl: string, x: number, y: number) {
+    let node;
+    node = this.library.create("texture", dataUrl, true);
+
+    let nodeView = this.addNode(node, 0, 0);
+    //nodeView.setCenter(x + offset[0], y + offset[1]);
+    nodeView.setCenter(x, y);
+    return [node, nodeView];
   }
 
   createComment(): CommentGraphicsItem {
