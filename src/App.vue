@@ -5,7 +5,7 @@
       <v-spacer />
       {{ this.title }}
       <v-spacer />
-      <v-btn class="system-bar-button" @click="showTutorials">
+      <v-btn fab icon x-small class="system-bar-button" @click="showTutorials">
         <v-img :src="tutorialIcon"> </v-img>
       </v-btn>
       <v-btn class="system-bar-button" @click="minimizeWindow">
