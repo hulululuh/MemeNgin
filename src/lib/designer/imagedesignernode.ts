@@ -288,6 +288,10 @@ export class ImageDesignerNode extends DesignerNode {
       this.onResized();
     }
 
+    if (this.notifyRightNodes) {
+      this.notifyRightNodes();
+    }
+
     // find a corresponding NodeGraphicsItem
     const gNodes = Editor.getInstance().nodeScene.nodes.find(
       (x) => x.id === this.id

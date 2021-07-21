@@ -162,9 +162,6 @@ export class DesignerNode implements IPropertyHolder {
   // all output connected nodes are invalidated as well
   requestUpdate() {
     this.designer.requestUpdate(this);
-    if (this.notifyRightNodes) {
-      this.notifyRightNodes();
-    }
   }
 
   getInputs(): string[] {
