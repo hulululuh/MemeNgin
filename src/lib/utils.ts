@@ -20,7 +20,11 @@ export async function loadImage(imgPath: string, isDataUrl: boolean) {
   if (isDataUrl) {
     img = new Image();
     img.src = imgPath;
-    await img.decode();
+    try {
+      await img.decode();
+    } catch {
+      return null;
+    }
 
     let canvas = <HTMLCanvasElement>document.createElement("canvas");
     let context = canvas.getContext("2d");

@@ -264,7 +264,7 @@ export class Editor {
       rightNode.setThumbnail(null);
     };
 
-    this.canvas.ondrop = function(ev: DragEvent) {
+    this.canvas.ondrop = async function(ev: DragEvent) {
       const zoomFactor = self.nodeScene.view.zoomFactor;
       const x = (ev.offsetX - self.nodeScene.view.offset[0]) / zoomFactor;
       const y = (ev.offsetY - self.nodeScene.view.offset[1]) / zoomFactor;
@@ -274,7 +274,7 @@ export class Editor {
       let offset = [0, 0];
 
       let droppedHtml = ev.dataTransfer.getData("text/html");
-      var itemJson = ev.dataTransfer.getData("text/plain");
+      let itemJson = ev.dataTransfer.getData("text/plain");
 
       let item = null;
       try {
@@ -284,13 +284,12 @@ export class Editor {
       if (item) {
         const canv = self.canvas;
         let rect = canv.getBoundingClientRect();
-        var pos = self.nodeScene.view.canvasToSceneXY(
+        let pos = self.nodeScene.view.canvasToSceneXY(
           ev.clientX - rect.left,
           ev.clientY - rect.top
         );
 
         let action: AddItemsAction = null;
-
         if (item.type == "node") {
           let nodeName = item.name;
 
@@ -359,36 +358,14 @@ export class Editor {
       }
       // dragged from web browser
       else if (droppedHtml) {
-        let dropContext = $("<div>").append(droppedHtml);
-        let imgUrl = $(dropContext)
-          .find("img")
-          .attr("src");
-
-        let n;
-        const posX = offset[0] + x;
-        const posY = offset[1] + y;
-        if (isDataUri(imgUrl)) {
-          n = self.createTextureNodeFromUrl(imgUrl, posX, posY);
+        let dataUrl = await self.getImageUrl(droppedHtml);
+        if (dataUrl) {
+          const posX = offset[0] + x;
+          const posY = offset[1] + y;
+          let n = self.createTextureNodeFromUrl(dataUrl, posX, posY);
+          offset = [offset[0] + 15, offset[1] + 15];
           nodes.push(n[0]);
           viewNodes.push(n[1]);
-          offset = [offset[0] + 15, offset[1] + 15];
-        } else {
-          (async function() {
-            let blob = await fetch(imgUrl).then((r) => r.blob());
-            await new Promise(() => {
-              let reader = new FileReader();
-              reader.onload = () => {
-                let dataUrl = reader.result.toString();
-                if (isDataUri(dataUrl)) {
-                  n = self.createTextureNodeFromUrl(dataUrl, posX, posY);
-                  nodes.push(n[0]);
-                  viewNodes.push(n[1]);
-                  offset = [offset[0] + 15, offset[1] + 15];
-                }
-              };
-              reader.readAsDataURL(blob);
-            });
-          })();
         }
       }
 
@@ -598,18 +575,19 @@ export class Editor {
     );
   }
 
-  executePaste(evt: ClipboardEvent) {
-    const itemJson = evt.clipboardData.getData("text/html");
-    const files = evt.clipboardData.getData("Files");
-    let item = itemJson ? JSON.parse(itemJson) : null;
-
-    if (item) {
-      ItemClipboard.pasteImages(
-        this.designer,
-        this.library,
-        this.nodeScene,
-        item
-      );
+  async executePaste(evt: ClipboardEvent) {
+    let self = this;
+    const html = evt.clipboardData.getData("text/html");
+    if (html) {
+      let dataUrl = await self.getImageUrl(html);
+      if (dataUrl) {
+        ItemClipboard.pasteImages(
+          this.designer,
+          this.library,
+          this.nodeScene,
+          dataUrl
+        );
+      }
     } else {
       ItemClipboard.pasteItems(
         this.designer,
@@ -640,12 +618,35 @@ export class Editor {
     return node;
   }
 
+  async getImageUrl(html: string): Promise<any> {
+    let dropContext = $("<div>").append(html);
+    let imgUrl = $(dropContext)
+      .find("img")
+      .attr("src");
+
+    if (isDataUri(imgUrl)) {
+      return imgUrl;
+    } else {
+      let blob = await fetch(imgUrl).then((r) => r.blob());
+      let dataUrl = await new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.onload = () => {
+          let dataUrl = reader.result.toString();
+          if (isDataUri(dataUrl)) {
+            resolve(dataUrl);
+          }
+        };
+        reader.readAsDataURL(blob);
+      });
+      return dataUrl;
+    }
+  }
+
   createTextureNodeFromUrl(dataUrl: string, x: number, y: number) {
     let node;
     node = this.library.create("texture", dataUrl, true);
 
     let nodeView = this.addNode(node, 0, 0);
-    //nodeView.setCenter(x + offset[0], y + offset[1]);
     nodeView.setCenter(x, y);
     return [node, nodeView];
   }

@@ -68,6 +68,7 @@ export class NodeScene {
   conns: ConnectionGraphicsItem[];
   selection: SelectionGraphicsItem;
 
+  _cursorPos: Vector2;
   dragMode: DragMode_Scene;
   selectionRect: Rect;
   draggedNode?: NodeGraphicsItem;
@@ -159,6 +160,7 @@ export class NodeScene {
     this.selectedItems = [];
     this.hitItem = null;
     this.dragMode = null;
+    this._cursorPos = new Vector2();
 
     let self = this;
 
@@ -1021,6 +1023,7 @@ export class NodeScene {
 
   onMouseMove(evt: MouseEvent) {
     let pos = this.getScenePos(evt);
+    this._cursorPos = new Vector2(pos);
 
     if (this.hitItem) {
       let mouseEvent = new MouseMoveEvent();
