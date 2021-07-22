@@ -31,7 +31,7 @@ git submodule update --init
 yarn install
 ```
   * greenworks will fail to install at this stage and that's okay.(will deal with this step 3 and 4)
-
+  * I know it's messy around here i'll fix it later 😅. 
 
 3. Type following command, this command copys steamworks_sdk into greenworks node_modules 
   - this commands automates following **[tasks](https://github.com/greenheartgames/greenworks/blob/master/docs/get-steamworks-sdk.md)**
