@@ -13,9 +13,9 @@
           src="assets/icons/filter_alt_black_24dp.svg"
         />
       </v-btn>
-      <v-row no-gutters fluid>
+      <v-row no-gutters flex>
         <v-scroll-x-transition>
-          <v-col cols="2" v-show="showFilter" style="min-width:360px">
+          <v-col v-show="showFilter" style="min-width:360px; max-width:360px">
             <v-card>
               <v-expansion-panels
                 v-model="panel"
@@ -45,7 +45,12 @@
           </v-col>
         </v-scroll-x-transition>
         <v-divider vertical />
-        <v-col align-content-space-between>
+        <v-col
+          :style="{
+            'max-width': showFilter ? 'calc(100% - 362px)' : '100%',
+          }"
+          align-content-space-between
+        >
           <v-card fluid clipped class="pa-0 ma-0">
             <explore-item-list
               ref="exploreItemList"
