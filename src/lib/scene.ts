@@ -890,7 +890,6 @@ export class NodeScene {
         if (mouseEvent.isAccepted) {
           this.hitItem = hitItem;
 
-          //console.log(hitItem);
           if (hitItem instanceof NodeGraphicsItem) {
             let hitNode = <NodeGraphicsItem>hitItem;
             //move node to stop of stack
@@ -991,10 +990,6 @@ export class NodeScene {
 
         const isClearingSelection = hitItem instanceof SelectionGraphicsItem;
         if (isClearingSelection) {
-          // for (const widget of this.widgets.values()) {
-          //   widget.setEnable(false);
-          // }
-
           for (const key of this.widgets.keys()) {
             const disableEvent = new WidgetEvent("widgetUpdate", {
               detail: {
@@ -1004,16 +999,6 @@ export class NodeScene {
             });
             document.dispatchEvent(disableEvent);
           }
-          // if (document) {
-          //   const event = new WidgetEvent("widgetUpdate", {
-          //     detail: {
-          //       enable: false,
-          //       widget: WidgetType.None,
-          //     },
-          //   });
-
-          //   document.dispatchEvent(event);
-          // }
         }
 
         this.hitItem = null;

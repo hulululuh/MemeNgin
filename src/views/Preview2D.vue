@@ -24,11 +24,6 @@
 
   @Component
   export default class Preview2D extends Vue {
-    // props: {
-    //   editor: {
-    //     type: Object
-    //   }
-    // },
     data() {
       return {
         node: null,
@@ -39,6 +34,7 @@
         flex: null,
       };
     }
+
     mounted() {
       let dragZoom = new DragZoom(this.$refs.canvas);
       const draw = () => {
@@ -55,6 +51,7 @@
         this.resizeImage(event.detail.width, event.detail.height);
       });
     }
+
     setEditor(editor) {
       this.editor = editor;
       let self = this;
@@ -76,6 +73,7 @@
         }
       };
     }
+
     resize(width, height) {
       width = this.$refs.flex.clientWidth;
       height = this.$refs.flex.clientHeight;
@@ -84,7 +82,12 @@
         this.dragZoom = new DragZoom(this.$refs.canvas);
       }
       this.dragZoom.onResize(width, height);
+
+      setTimeout(() => {
+        this.centerTexture();
+      }, 1);
     }
+
     resizeImage(width, height) {
       if (!this.$refs.canvas) return;
       fitCanvasToContainer(this.$refs.canvas);
@@ -96,6 +99,7 @@
       const zoomFactor = Math.min(1.0, Math.min(ratioW, ratioH));
       this.dragZoom.centerImage(zoomFactor);
     }
+
     paint() {
       if (!this.image) return;
 
@@ -104,6 +108,7 @@
 
       ctx.drawImage(this.image, 0, 0, canvas.width, canvas.height);
     }
+
     saveTexture() {
       // todo: save image as png
       if (!this.hasImage) return;
@@ -141,6 +146,7 @@
           });
         });
     }
+
     centerTexture() {
       if (this.$refs.canvas && this.node) {
         const w = this.$refs.canvas.width / this.node.getWidth();
@@ -153,6 +159,7 @@
         this.dragZoom.centerImage();
       }
     }
+
     reset() {
       this.dragZoom.centerImage();
       this.dragZoom.setImage(null);
