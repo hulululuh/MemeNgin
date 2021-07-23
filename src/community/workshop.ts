@@ -584,9 +584,12 @@ export class WorkshopManager {
     return items;
   }
 
+  requestUserInfo(userId: string) {
+    return greenworks.requestUserInformation(userId, false);
+  }
+
   getAuthorAvatar(userId: string) {
     try {
-      greenworks.requestUserInformation(userId, false);
       const imgHandle = greenworks.getMediumFriendAvatar(userId);
       let rgba = greenworks.getImageRGBA(imgHandle);
       return toDataURL(64, 64, rgba);
@@ -597,7 +600,6 @@ export class WorkshopManager {
 
   getAuthorName(userId: string) {
     try {
-      greenworks.requestUserInformation(userId, false);
       return greenworks.getFriendPersonaName(userId);
     } catch {
       console.warn(`failed to access author name`);
