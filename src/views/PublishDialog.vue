@@ -312,30 +312,37 @@
     }
 
     get authorAvatar() {
-      if (!WorkshopManager.getInstance().initialized) return "mdi-account-box";
-      if (!this.itemData || !this.itemData.workshopItem.publisherId) {
+      let id;
+      let success = true;
+
+      try {
+        id = this.$store.state.metadata.workshopItem.publisherId;
+        if (!id) success = false;
+      } catch {
+        success = false;
+      }
+
+      if (!success) {
         return "mdi-account-box";
       } else {
-        try {
-          const imgHandle = greenworks.getMediumFriendAvatar(
-            this.itemData.workshopItem.publisherId
-          );
-          let rgba = greenworks.getImageRGBA(imgHandle);
-          return toDataURL(64, 64, rgba);
-        } catch (err) {
-          return "mdi-account-box";
-        }
+        return WorkshopManager.getInstance().getAuthorAvatar(id);
       }
     }
 
     get authorName() {
-      if (!WorkshopManager.getInstance().initialized) return "Author Name";
-      if (!this.itemData || !this.itemData.workshopItem.publisherId) {
+      let id;
+      let success = true;
+
+      try {
+        id = this.$store.state.metadata.workshopItem.publisherId;
+        if (!id) success = false;
+      } catch {
+        success = false;
+      }
+      if (!this.itemData) {
         return "Author Name";
       } else {
-        return greenworks.getFriendPersonaName(
-          this.itemData.workshopItem.publisherId
-        );
+        return WorkshopManager.getInstance().getAuthorName(id);
       }
     }
 

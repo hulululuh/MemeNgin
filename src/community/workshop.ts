@@ -11,6 +11,7 @@ import { plainToClass } from "class-transformer";
 import fs, { readFileSync, writeFileSync } from "fs";
 import { ProjectManager } from "@/lib/project";
 import path from "path";
+import { toDataURL } from "@/lib/utils";
 const electron = require("electron");
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
@@ -581,5 +582,26 @@ export class WorkshopManager {
     });
 
     return items;
+  }
+
+  getAuthorAvatar(userId: string) {
+    try {
+      greenworks.requestUserInformation(userId, false);
+      const imgHandle = greenworks.getMediumFriendAvatar(userId);
+      let rgba = greenworks.getImageRGBA(imgHandle);
+      return toDataURL(64, 64, rgba);
+    } catch (err) {
+      return "mdi-account-box";
+    }
+  }
+
+  getAuthorName(userId: string) {
+    try {
+      greenworks.requestUserInformation(userId, false);
+      return greenworks.getFriendPersonaName(userId);
+    } catch {
+      console.warn(`failed to access author name`);
+      return `Unknown`;
+    }
   }
 }

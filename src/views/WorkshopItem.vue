@@ -88,15 +88,9 @@
       if (!this.itemData) {
         return "mdi-account-box";
       } else {
-        try {
-          const imgHandle = greenworks.getMediumFriendAvatar(
-            this.itemData.workshopItem.publisherId
-          );
-          let rgba = greenworks.getImageRGBA(imgHandle);
-          return toDataURL(64, 64, rgba);
-        } catch (err) {
-          return "mdi-account-box";
-        }
+        return WorkshopManager.getInstance().getAuthorAvatar(
+          this.itemData.workshopItem.publisherId
+        );
       }
     }
 
@@ -104,7 +98,7 @@
       if (!this.itemData) {
         return "Author Name";
       } else {
-        return greenworks.getFriendPersonaName(
+        return WorkshopManager.getInstance().getAuthorName(
           this.itemData.workshopItem.publisherId
         );
       }

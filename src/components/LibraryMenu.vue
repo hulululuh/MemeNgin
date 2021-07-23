@@ -49,6 +49,10 @@
 
   declare let __static: any;
 
+  function compare(a: LibraryItem, b: LibraryItem) {
+    return a.name > b.name ? 1 : a.name == b.name ? 0 : -1;
+  }
+
   @Component
   export default class LibraryMenu extends Vue {
     @Prop() library!: DesignerLibrary;
@@ -112,6 +116,8 @@
       let list = Object.values(this.items).filter(function(item) {
         return item.name.toLowerCase().includes(kw.toLowerCase());
       });
+
+      //list.sort(compare);
       return list;
     }
 
@@ -325,12 +331,10 @@
     }
 
     imageExists(node: string) {
-      //return fs.existsSync(`./public/assets/nodes/${node}.png`);
       return fs.existsSync(path.join(__static, `assets/nodes/${node}.png`));
     }
 
     calcImagePath(node: string) {
-      //return `./assets/nodes/${node}.png`;
       if (process.env.NODE_ENV == "production")
         return (
           "file://" +

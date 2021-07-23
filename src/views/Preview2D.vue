@@ -1,13 +1,5 @@
 <template>
   <v-container>
-    <!-- <v-flex>
-      <v-btn @click="saveTexture">
-        <v-icon> mdi-download </v-icon>
-      </v-btn>
-      <v-btn @click="centerTexture">
-        <v-icon> mdi-fit-to-page-outline </v-icon>
-      </v-btn>
-    </v-flex> -->
     <v-flex fill-height justify-center v-resize="resize" ref="flex">
       <canvas id="_2dpreview" ref="canvas"></canvas>
     </v-flex>
@@ -83,6 +75,7 @@
       }
       this.dragZoom.onResize(width, height);
 
+      // TODO: I don't think its best
       setTimeout(() => {
         this.centerTexture();
       }, 1);
