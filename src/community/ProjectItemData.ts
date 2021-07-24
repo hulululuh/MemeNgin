@@ -97,8 +97,10 @@ export class ProjectItemData {
       let tags = new Set();
 
       // user assigned tags
-      for (let tag of this.workshopItem.tags) {
-        tags.add(tag);
+      if (this.workshopItem.tags) {
+        for (let tag of this.workshopItem.tags) {
+          tags.add(tag);
+        }
       }
 
       // age rating
@@ -170,7 +172,7 @@ export class ProjectItemData {
   static fromNothing() {
     let item = new ProjectItemData();
     item.localItem = new LocalItemData();
-    item.workshopItem = new WorkshopItemData();
+    item.workshopItem = WorkshopItemData.fromNothing();
     return item;
   }
 
@@ -381,5 +383,15 @@ export class WorkshopItemData {
 
     //greenworks
     return this.fromMetadata(data);
+  }
+
+  static fromNothing() {
+    let item = new WorkshopItemData();
+    item.itemId = "";
+    item.publisherId = "";
+    item.thumbnailUrl = "";
+    item.ageRating = "Questionable";
+    item.tags = [];
+    return item;
   }
 }

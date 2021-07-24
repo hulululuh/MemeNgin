@@ -177,7 +177,7 @@
   import path from "path";
   import { QueryTarget, UserData } from "@/userdata";
   import { IPropertyHolder } from "./lib/designer/properties";
-  import { AddItemsAction } from "./lib/actions/additemsaction";
+  import { TextManager } from "@/assets/textmanager";
   import { UndoStack } from "./lib/undostack";
   import { ApplicationSettings } from "./settings";
   import { WorkshopManager } from "@/community/workshop";
@@ -188,7 +188,9 @@
     ProjectItemDeleteEvent,
   } from "@/views/ProjectItem.vue";
   import TutorialDialog from "@/views/TutorialDialog.vue";
+  import { PUBLISH_TEMP_PATH } from "@/lib/project";
 
+  const fsExtra = require("fs-extra");
   const electron = require("electron");
   const remote = electron.remote;
   const { dialog } = remote;
@@ -340,6 +342,7 @@
       document.removeEventListener("editStarted", this.onEditStarted);
       document.removeEventListener("editEnded", this.onEditEnded);
       document.removeEventListener("projectSaved", this.onProjectSaved);
+      document.removeEventListener("publishRequested", this.onPublishRequested);
       document.removeEventListener("projectPublished", this.onProjectPublished);
       document.removeEventListener(
         "projectItemDelete",
@@ -403,6 +406,7 @@
       document.addEventListener("editEnded", this.onEditEnded);
       document.addEventListener("projectSaved", this.onProjectSaved);
       document.addEventListener("projectPublished", this.onProjectPublished);
+      document.addEventListener("publishRequested", this.onPublishRequested);
       document.addEventListener("projectItemDelete", this.onProjectItemDelete);
 
       document.addEventListener("mousemove", (evt) => {
@@ -422,8 +426,6 @@
       };
       this.editor.onframeselected = (frame) => {};
       this.editor.onlibrarymenu = this.showLibraryMenu;
-
-      // const _2dview = <HTMLCanvasElement>document.getElementById("_2dview");
       (this.$refs.preview2d as any).setEditor(this.editor);
 
       this.newProject();
@@ -610,6 +612,46 @@
     }
 
     onCancelled() {}
+
+    async onPublishRequested() {
+      const app = this;
+      const projectPath = app.project.localPath;
+      // save changes
+      app.saveProject(true);
+
+      // move current project to temp path
+      if (!fs.existsSync(PUBLISH_TEMP_PATH)) {
+        fs.mkdirSync(PUBLISH_TEMP_PATH, { recursive: true });
+      }
+
+      // cleanup temp folder
+      fsExtra.emptyDirSync(PUBLISH_TEMP_PATH);
+
+      const dest = path.join(
+        PUBLISH_TEMP_PATH,
+        path.parse(app.project.path).base
+      );
+      fs.copyFileSync(projectPath, dest);
+
+      // make thumbnail file
+      // publish items
+      let success = await WorkshopManager.getInstance().publish(dest);
+
+      // save issued item id, publisher id and so on.
+      if (success) {
+        document.dispatchEvent(new Event("projectPublished"));
+
+        const title = TextManager.translate("${ui_general.success}");
+        const message = TextManager.translate("${publish_dialog.success}");
+        const close = TextManager.translate("${ui_general.okay}");
+        app.showMessage(title, message, close);
+      } else {
+        const title = TextManager.translate("${ui_general.fail}");
+        const message = TextManager.translate("${publish_dialog.fail}");
+        const close = TextManager.translate("${ui_general.close}");
+        app.showMessage(title, message, close);
+      }
+    }
 
     onProjectItemDelete(evt: ProjectItemDeleteEvent) {
       const item = evt.detail.item;

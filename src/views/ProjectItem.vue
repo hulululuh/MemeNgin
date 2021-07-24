@@ -102,6 +102,7 @@
         WorkshopManager.getInstance().requestUserInfo(
           this.itemData.workshopItem.publisherId
         );
+        await new Promise((resolve) => setTimeout(resolve, 100));
         this.$store.state.selectedProject = this.itemData;
         this.$store.state.selectedProjectState = await WorkshopManager.getInstance().getItemState(
           this.itemData.workshopItem.publishedFileId

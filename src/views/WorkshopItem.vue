@@ -65,7 +65,6 @@
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
   import { WorkshopManager } from "@/community/workshop";
-  import { toDataURL } from "@/lib/utils";
   const greenworks = require("greenworks");
   const electron = require("electron");
   const shell = electron.shell;

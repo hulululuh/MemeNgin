@@ -131,7 +131,7 @@
           v-show="isPublishable"
           color="blue darken-1"
           text
-          @click="onPublish"
+          @click="publishClicked"
           :disabled="!agreed"
         >
           {{ textPublish }}
@@ -190,35 +190,12 @@
       this.$emit("onCancel");
     }
 
-    async onPublish() {
+    publishClicked() {
       // following line looks too complex, but it is a walkaround for error.
       // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element
       if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
         this.dialog = false;
-        const app = this.$root.$children[0] as App;
-        if (app.saveable) {
-          app.saveProject();
-        }
-
-        let success = await WorkshopManager.getInstance().publish(
-          app.project.localPath
-        );
-
-        // save issued item id, publisher id and so on.
-        if (success) {
-          app.saveProject(true);
-          document.dispatchEvent(new Event("projectPublished"));
-
-          const title = TextManager.translate("${ui_general.success}");
-          const message = TextManager.translate("${publish_dialog.success}");
-          const close = TextManager.translate("${ui_general.okay}");
-          app.showMessage(title, message, close);
-        } else {
-          const title = TextManager.translate("${ui_general.fail}");
-          const message = TextManager.translate("${publish_dialog.fail}");
-          const close = TextManager.translate("${ui_general.close}");
-          app.showMessage(title, message, close);
-        }
+        document.dispatchEvent(new Event("publishRequested"));
       }
     }
 
@@ -295,16 +272,17 @@
     }
 
     get isPublishable() {
-      // unpublished work
-      if (!this.isPublished) {
-        return true;
-      } else {
-        const myWork =
-          this.$store.state.metadata.publisherId ==
-          WorkshopManager.getInstance().SteamId;
+      return true;
+      // // unpublished work
+      // if (!this.isPublished) {
+      //   return true;
+      // } else {
+      //   const myWork =
+      //     this.$store.state.metadata.publisherId ==
+      //     WorkshopManager.getInstance().SteamId;
 
-        return myWork;
-      }
+      //   return myWork;
+      // }
     }
 
     get itemData() {

@@ -10,6 +10,11 @@ export const MY_WORKS_PATH = path.join(
   "/projects/my_works/"
 );
 
+export const PUBLISH_TEMP_PATH = path.join(
+  path.resolve("."),
+  "/projects/my_works/temp"
+);
+
 export class Project {
   name: string = null;
   path: string = null;
