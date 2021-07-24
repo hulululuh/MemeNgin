@@ -134,10 +134,11 @@ export class UserData {
         instance.recentFiles.splice(i, 1);
       }
 
-      for (let path of instance.recentFiles) {
+      instance.recentFiles.reverse().forEach((path, index) => {
         let item = ProjectItemData.fromLocalPath(path);
         if (item) instance.recentItems.push(item);
-      }
+        else instance.recentFiles.splice(index, 1);
+      });
 
       console.log(
         `found ${invalids.length} invalid path, removed from recentFiles`

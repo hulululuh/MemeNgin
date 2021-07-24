@@ -12,9 +12,15 @@
     </v-layout>
     <v-layout class="justify-center align-center mt-1">
       <v-spacer />
+      <tooltip-button
+        icon="mdi-folder-open-outline"
+        tooltip="Open project"
+        :disabled="!isReady"
+        @click="openProject"
+      />
       <v-btn
         style="text-transform: unset !important;"
-        width="150px"
+        width="130px"
         @click="onSubscribeButton"
         :color="colorSubscribe"
       >
@@ -23,7 +29,6 @@
         </v-icon>
         {{ textSubscribe }}
       </v-btn>
-      <v-spacer />
       <v-btn icon :color="colorVotedUp" @click="onVoteUp">
         <v-icon>mdi-thumb-up</v-icon>
       </v-btn>
@@ -65,11 +70,19 @@
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
   import { WorkshopManager } from "@/community/workshop";
+  import App from "@/App.vue";
+  import TooltipButton from "@/views/TooltipButton.vue";
+  import fs from "fs";
+  import path from "path";
   const greenworks = require("greenworks");
   const electron = require("electron");
   const shell = electron.shell;
 
-  @Component
+  @Component({
+    components: {
+      tooltipButton: TooltipButton,
+    },
+  })
   export default class WorkshopItem extends Vue {
     get itemData() {
       return this.$store.state.selectedProject;
@@ -155,6 +168,24 @@
       return this.$store.state.selectedProjectState
         ? this.$store.state.selectedProjectState.votedDown
         : false;
+    }
+
+    get isReady() {
+      return this.$store.state.selectedProjectState
+        ? this.$store.state.selectedProjectState.itemState &
+            greenworks.UGCItemState.Installed
+        : false;
+    }
+
+    async openProject() {
+      try {
+        let item = await WorkshopManager.getInstance().synchroizeItem(
+          this.$store.state.selectedProject
+        );
+        (this.$root.$children[0] as App).openProjectWithItem(item);
+      } catch {
+        console.error(`open project failed`);
+      }
     }
 
     openItemLink() {

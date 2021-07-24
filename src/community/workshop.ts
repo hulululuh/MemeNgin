@@ -477,6 +477,41 @@ export class WorkshopManager {
     return defaultState;
   }
 
+  async synchroizeItem(item: ProjectItemData) {
+    const file_id = item.workshopItem.publishedFileId;
+    const itemState = await this.getItemState(file_id);
+    const state = itemState.itemState;
+    if (state & greenworks.UGCItemState.Subscribed) {
+      let info = await greenworks.ugcGetItemInstallInfo(file_id);
+
+      if (info) {
+        if (!item.localItem) {
+          let list = fs.readdirSync(info.folder);
+          for (let file of list) {
+            const fullPath = path.join(info.folder, file);
+            const stat = fs.statSync(fullPath);
+            if (!stat.isDirectory()) {
+              let parsedPath = path.parse(fullPath);
+              let workshopLocalPath = path.join(parsedPath.dir, "..");
+              if (parsedPath.ext == ".mmng") {
+                let project = ProjectManager.load(fullPath);
+                if (!project) continue;
+                const name = parsedPath.name;
+                const path = fullPath;
+                item.localItem = LocalItemData.fromLocalPath(
+                  project,
+                  name,
+                  fullPath
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+    return item;
+  }
+
   async synchroizeItems(page_num: number): Promise<any> {
     if (!this.initialized) return;
 
@@ -599,11 +634,13 @@ export class WorkshopManager {
   }
 
   getAuthorName(userId: string) {
-    try {
-      return greenworks.getFriendPersonaName(userId);
-    } catch {
-      console.warn(`failed to access author name`);
-      return `Unknown`;
+    if (this.initialized) {
+      try {
+        return greenworks.getFriendPersonaName(userId);
+      } catch {
+        console.warn(`failed to access author name`);
+        return `Unknown`;
+      }
     }
   }
 }
