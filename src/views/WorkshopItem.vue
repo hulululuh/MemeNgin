@@ -7,7 +7,17 @@
           style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
           lazy-src="assets/icons/image.svg"
           v-bind:src="thumbnail"
-        />
+        >
+          <v-spacer />
+          <v-progress-linear
+            v-show="isDownloading"
+            color="rgba(0, 149, 255, 0.4)"
+            :value="downloaded"
+            height="100%"
+            striped
+          >
+          </v-progress-linear>
+        </v-img>
       </v-card>
     </v-layout>
     <v-layout class="justify-center align-center mt-1">
@@ -69,11 +79,9 @@
 <script lang="ts">
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
-  import { WorkshopManager } from "@/community/workshop";
+  import { WorkshopManager, PROGRESS_TICK } from "@/community/workshop";
   import App from "@/App.vue";
   import TooltipButton from "@/views/TooltipButton.vue";
-  import fs from "fs";
-  import path from "path";
   const greenworks = require("greenworks");
   const electron = require("electron");
   const shell = electron.shell;
@@ -84,6 +92,64 @@
     },
   })
   export default class WorkshopItem extends Vue {
+    progress: number = 0;
+    isDownloading: boolean = false;
+    selectedItemId: string = "";
+
+    mounted() {
+      document.addEventListener("selectionChanged", this.onSelectionChanged);
+      document.addEventListener("downloadStarted", this.onDownloadStarted);
+      document.addEventListener("downloadEnded", this.onDownloadEnded);
+    }
+
+    destroyed() {
+      document.removeEventListener("selectionChanged", this.onSelectionChanged);
+      document.removeEventListener("downloadStarted", this.onDownloadStarted);
+      document.removeEventListener("downloadEnded", this.onDownloadEnded);
+    }
+
+    async onSelectionChanged(evt: CustomEvent) {
+      this.selectedItemId = evt.detail.itemId;
+      const state = await WorkshopManager.getInstance().getItemState(
+        this.selectedItemId
+      );
+
+      if (state & greenworks.UGCItemState.Downloading) {
+        if (!this.isDownloading) {
+          this.isDownloading = true;
+          this.onDownloading();
+        }
+      } else {
+        this.isDownloading = false;
+      }
+    }
+
+    onDownloadStarted() {
+      this.isDownloading = true;
+      this.onDownloading();
+    }
+
+    async onDownloading() {
+      if (this.isDownloading) {
+        while (this.isDownloading) {
+          // download loop
+          this.isDownloading = await this.refreshDownloadProgress(
+            this.selectedItemId
+          );
+          await setTimeout(() => {}, PROGRESS_TICK);
+        }
+        document.dispatchEvent(new CustomEvent("downloadEnded"));
+      }
+    }
+
+    onDownloadEnded() {
+      if (this.isDownloading) this.isDownloading = false;
+    }
+
+    get downloaded() {
+      return this.progress * 100;
+    }
+
     get itemData() {
       return this.$store.state.selectedProject;
     }
@@ -175,6 +241,34 @@
         ? this.$store.state.selectedProjectState.itemState &
             greenworks.UGCItemState.Installed
         : false;
+    }
+
+    async refreshDownloadProgress(itemId: string): Promise<boolean> {
+      const state = await WorkshopManager.getInstance().getItemState(itemId);
+
+      let progress = 1;
+      let isDownloading = false;
+      if (state & greenworks.UGCItemState.Installed) {
+        progress = 1;
+      } else if (state & greenworks.UGCItemState.DownloadPending) {
+        progress = 0;
+      } else if (state & greenworks.UGCItemState.Downloading) {
+        // state & greenworks.UGCItemState.Downloading
+        let downloadProgress = await WorkshopManager.getInstance().getDownloadProgress(
+          itemId
+        );
+
+        if (downloadProgress.expected == 0) {
+          progress = 0;
+        } else {
+          progress = downloadProgress.downloaded / downloadProgress.expected;
+          isDownloading = true;
+        }
+      }
+
+      this.progress = progress;
+
+      return isDownloading;
     }
 
     async openProject() {

@@ -107,6 +107,15 @@
         this.$store.state.selectedProjectState = await WorkshopManager.getInstance().getItemState(
           this.itemData.workshopItem.publishedFileId
         );
+
+        // send selection event to workshopItem.vue
+        document.dispatchEvent(
+          new CustomEvent("selectionChanged", {
+            detail: {
+              itemId: this.itemData.workshopItem.publishedFileId,
+            },
+          })
+        );
       }
     }
 

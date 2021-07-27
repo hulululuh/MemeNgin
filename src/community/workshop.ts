@@ -8,15 +8,16 @@ import {
 } from "@/community/ProjectItemData";
 import { Editor } from "@/lib/editor";
 import { plainToClass } from "class-transformer";
-import fs, { readFileSync, writeFileSync } from "fs";
 import { ProjectManager } from "@/lib/project";
-import path from "path";
 import { toDataURL } from "@/lib/utils";
+import fs, { readFileSync, writeFileSync } from "fs";
+import path from "path";
 const electron = require("electron");
 const appidPath = path.join(path.resolve("."), "/steam_appid.txt");
 const greenworks = require("greenworks");
 const APP_ID = 1632910;
 const UPDATE_DELAY = 1000;
+export const PROGRESS_TICK = 8;
 
 export class QueryResult {
   items: Array<ProjectItemData>;
@@ -403,6 +404,8 @@ export class WorkshopManager {
     setTimeout(() => {
       this.doSearch(null, QueryTarget.Subscribed);
     }, UPDATE_DELAY);
+
+    document.dispatchEvent(new Event("downloadStarted"));
   }
 
   async unsubscribe(file_id: string) {
@@ -525,41 +528,52 @@ export class WorkshopManager {
       const file_id = item.workshopItem.publishedFileId;
       const itemState = await this.getItemState(file_id);
       const state = itemState.itemState;
-      if (state & greenworks.UGCItemState.Subscribed) {
-        let info = await greenworks.ugcGetItemInstallInfo(file_id);
+      // if (state & greenworks.UGCItemState.Downloading)
+      // if (state & greenworks.UGCItemState.DownloadPending)
+      // if (state & greenworks.UGCItemState.Installed)
 
-        if (info) {
-          if (!item.localItem) {
-            if (!fs.existsSync(info.folder)) {
-              sholudBeInstalled.push({
-                "file_id": file_id,
-                "targetPath": info.folder,
-              });
-              continue;
-            }
-            let list = fs.readdirSync(info.folder);
-            for (let file of list) {
-              const fullPath = path.join(info.folder, file);
-              const stat = fs.statSync(fullPath);
-              if (!stat.isDirectory()) {
-                let parsedPath = path.parse(fullPath);
-                workshopLocalPath = path.join(parsedPath.dir, "..");
-                if (parsedPath.ext == ".mmng") {
-                  let project = ProjectManager.load(fullPath);
-                  if (!project) continue;
-                  const name = parsedPath.name;
-                  const path = fullPath;
-                  item.localItem = LocalItemData.fromLocalPath(
-                    project,
-                    name,
-                    fullPath
-                  );
+      if (state & greenworks.UGCItemState.Subscribed) {
+        if (state & greenworks.UGCItemState.Installed) {
+          let info = await greenworks.ugcGetItemInstallInfo(file_id);
+          if (info) {
+            if (!item.localItem) {
+              if (!fs.existsSync(info.folder)) {
+                sholudBeInstalled.push({
+                  "file_id": file_id,
+                  "targetPath": info.folder,
+                });
+                continue;
+              }
+              let list = fs.readdirSync(info.folder);
+              for (let file of list) {
+                const fullPath = path.join(info.folder, file);
+                const stat = fs.statSync(fullPath);
+                if (!stat.isDirectory()) {
+                  let parsedPath = path.parse(fullPath);
+                  workshopLocalPath = path.join(parsedPath.dir, "..");
+                  if (parsedPath.ext == ".mmng") {
+                    let project = ProjectManager.load(fullPath);
+                    if (!project) continue;
+                    const name = parsedPath.name;
+                    const path = fullPath;
+                    item.localItem = LocalItemData.fromLocalPath(
+                      project,
+                      name,
+                      fullPath
+                    );
+                  }
                 }
               }
             }
           }
-          subscribed.push(item);
+        } else if (state & greenworks.UGCItemState.Downloading) {
+          const TEST_INTERVAL = 100;
+          await setTimeout(() => {}, TEST_INTERVAL);
+          this.getDownloadProgress(file_id);
+        } else if (state & greenworks.UGCItemState.DownloadPending) {
         }
+
+        subscribed.push(item);
       } else {
         ghostItems.push(item.workshopItem.publishedFileId);
       }
@@ -642,5 +656,27 @@ export class WorkshopManager {
         return `Unknown`;
       }
     }
+  }
+
+  async getDownloadProgress(fileId: string) {
+    let progress = { "downloaded": 0, "expected": 0 };
+    if (this.initialized) {
+      progress = await new Promise((resolve, reject) => {
+        greenworks.ugcGetItemDownloadProgress(
+          fileId,
+          (bytesDownloaded, bytesExpected) => {
+            resolve({
+              "downloaded": bytesDownloaded,
+              "expected": bytesExpected,
+            });
+          },
+          (err) => {
+            reject();
+            console.warn(err);
+          }
+        );
+      });
+    }
+    return progress;
   }
 }
