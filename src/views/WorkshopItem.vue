@@ -94,6 +94,7 @@
   export default class WorkshopItem extends Vue {
     progress: number = 0;
     isDownloading: boolean = false;
+    isFinished: boolean = false;
     selectedItemId: string = "";
 
     mounted() {
@@ -109,12 +110,20 @@
     }
 
     async onSelectionChanged(evt: CustomEvent) {
+      // finish current download progress
+      this.isFinished = true;
+
+      // change target
       this.selectedItemId = evt.detail.itemId;
       const state = await WorkshopManager.getInstance().getItemState(
         this.selectedItemId
       );
+      const itemState = state.itemState;
 
-      if (state & greenworks.UGCItemState.Downloading) {
+      if (
+        itemState & greenworks.UGCItemState.Downloading ||
+        itemState & greenworks.UGCItemState.NeedsUpdate
+      ) {
         if (!this.isDownloading) {
           this.isDownloading = true;
           this.onDownloading();
@@ -131,9 +140,10 @@
 
     async onDownloading() {
       if (this.isDownloading) {
-        while (this.isDownloading) {
+        this.isFinished = false;
+        while (!this.isFinished) {
           // download loop
-          this.isDownloading = await this.refreshDownloadProgress(
+          this.isFinished = await this.refreshDownloadProgress(
             this.selectedItemId
           );
           await setTimeout(() => {}, PROGRESS_TICK);
@@ -142,8 +152,17 @@
       }
     }
 
-    onDownloadEnded() {
-      if (this.isDownloading) this.isDownloading = false;
+    async onDownloadEnded() {
+      // set progress value to 1 for animation
+      this.progress = 1;
+      await setTimeout(() => {
+        // then clear progress states
+        if (this.isDownloading) this.isDownloading = false;
+        this.progress = 0;
+
+        // update downloaded items
+        WorkshopManager.getInstance().refresh();
+      }, 300);
     }
 
     get downloaded() {
@@ -245,30 +264,34 @@
 
     async refreshDownloadProgress(itemId: string): Promise<boolean> {
       const state = await WorkshopManager.getInstance().getItemState(itemId);
+      const itemState = state.itemState;
 
       let progress = 1;
-      let isDownloading = false;
-      if (state & greenworks.UGCItemState.Installed) {
-        progress = 1;
-      } else if (state & greenworks.UGCItemState.DownloadPending) {
-        progress = 0;
-      } else if (state & greenworks.UGCItemState.Downloading) {
-        // state & greenworks.UGCItemState.Downloading
+      let isFinished = false;
+      if (
+        itemState & greenworks.UGCItemState.Downloading ||
+        itemState & greenworks.UGCItemState.NeedsUpdate
+      ) {
         let downloadProgress = await WorkshopManager.getInstance().getDownloadProgress(
           itemId
         );
 
         if (downloadProgress.expected == 0) {
-          progress = 0;
+          progress = Math.ceil(this.progress);
         } else {
           progress = downloadProgress.downloaded / downloadProgress.expected;
-          isDownloading = true;
         }
+      } else if (itemState & greenworks.UGCItemState.Installed) {
+        progress = 1;
+      } else if (itemState & greenworks.UGCItemState.DownloadPending) {
+        progress = 0;
       }
 
       this.progress = progress;
+      console.warn(this.progress);
+      if (progress == 1) isFinished = true;
 
-      return isDownloading;
+      return isFinished;
     }
 
     async openProject() {

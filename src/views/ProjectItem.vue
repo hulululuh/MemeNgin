@@ -103,19 +103,23 @@
           this.itemData.workshopItem.publisherId
         );
         await new Promise((resolve) => setTimeout(resolve, 100));
-        this.$store.state.selectedProject = this.itemData;
-        this.$store.state.selectedProjectState = await WorkshopManager.getInstance().getItemState(
-          this.itemData.workshopItem.publishedFileId
-        );
 
-        // send selection event to workshopItem.vue
-        document.dispatchEvent(
-          new CustomEvent("selectionChanged", {
-            detail: {
-              itemId: this.itemData.workshopItem.publishedFileId,
-            },
-          })
-        );
+        const selectedItemId = this.itemData.workshopItem.publishedFileId;
+        if (this.$store.state.selectedItemId != selectedItemId) {
+          this.$store.state.selectedProject = this.itemData;
+          this.$store.state.selectedProjectState = await WorkshopManager.getInstance().getItemState(
+            selectedItemId
+          );
+
+          // send selection event to workshopItem.vue
+          document.dispatchEvent(
+            new CustomEvent("selectionChanged", {
+              detail: {
+                itemId: selectedItemId,
+              },
+            })
+          );
+        }
       }
     }
 
