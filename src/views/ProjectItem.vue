@@ -17,6 +17,8 @@
         v-bind:src="thumbnail"
         lazy-src="assets/icons/image.svg"
         :gradient="gradient"
+        width="100%"
+        height="100%"
       >
         <div>
           <v-scale-transition>
@@ -53,6 +55,7 @@
         color="rgba(0, 149, 255, 0.4)"
         :value="downloaded"
         striped
+        bottom
       >
       </v-progress-linear>
     </v-card>
