@@ -405,7 +405,13 @@ export class WorkshopManager {
       this.doSearch(null, QueryTarget.Subscribed);
     }, UPDATE_DELAY);
 
-    document.dispatchEvent(new Event("downloadStarted"));
+    document.dispatchEvent(
+      new CustomEvent("downloadStarted", {
+        detail: {
+          itemId: file_id,
+        },
+      })
+    );
   }
 
   async unsubscribe(file_id: string) {

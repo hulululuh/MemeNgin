@@ -365,6 +365,12 @@
       if (remote) remote.getCurrentWindow().setTitle(this.title);
     }
 
+    async refreshSelectedItem() {
+      this.$store.state.selectedProjectState = await WorkshopManager.getInstance().getItemState(
+        this.$store.state.selectedProject.workshopItem.publishedFileId
+      );
+    }
+
     windowResize() {
       const remote = window.require ? window.require("electron").remote : null;
       const WIN = remote.getCurrentWindow();

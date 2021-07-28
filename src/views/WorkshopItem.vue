@@ -133,7 +133,7 @@
       }
     }
 
-    onDownloadStarted() {
+    onDownloadStarted(evt: CustomEvent) {
       this.isDownloading = true;
       this.onDownloading();
     }
@@ -148,20 +148,28 @@
           );
           await setTimeout(() => {}, PROGRESS_TICK);
         }
-        document.dispatchEvent(new CustomEvent("downloadEnded"));
+        document.dispatchEvent(
+          new CustomEvent("downloadEnded", {
+            detail: {
+              itemId: this.selectedItemId,
+            },
+          })
+        );
       }
     }
 
-    async onDownloadEnded() {
+    async onDownloadEnded(evt: CustomEvent) {
       // set progress value to 1 for animation
       this.progress = 1;
-      await setTimeout(() => {
+      setTimeout(() => {
         // then clear progress states
         if (this.isDownloading) this.isDownloading = false;
         this.progress = 0;
 
         // update downloaded items
         WorkshopManager.getInstance().refresh();
+
+        (this.$root.$children[0] as App).refreshSelectedItem();
       }, 300);
     }
 

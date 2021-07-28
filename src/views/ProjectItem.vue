@@ -47,6 +47,14 @@
           </div>
         </v-expand-transition>
       </v-img>
+      <v-spacer />
+      <v-progress-linear
+        v-show="isDownloading"
+        color="rgba(0, 149, 255, 0.4)"
+        :value="downloaded"
+        striped
+      >
+      </v-progress-linear>
     </v-card>
   </v-hover>
 </template>
@@ -59,7 +67,8 @@
   import { Vue, Prop, Component } from "vue-property-decorator";
   import { ProjectItemData } from "@/community/ProjectItemData";
   import App from "@/App.vue";
-  import { WorkshopManager } from "@/community/workshop";
+  import { WorkshopManager, PROGRESS_TICK } from "@/community/workshop";
+  const greenworks = require("greenworks");
 
   export class ProjectItemDeleteEvent extends CustomEvent<any> {
     item: ProjectItemData;
@@ -85,6 +94,90 @@
     @Prop() clickAction: ClickAction;
     @Prop() deleteAction: DeleteAction;
     @Prop() active: boolean;
+    progress: number = 0;
+    isDownloading: boolean = false;
+    isFinished: boolean = false;
+
+    mounted() {
+      document.addEventListener("downloadStarted", this.onDownloadStarted);
+      document.addEventListener("downloadEnded", this.onDownloadEnded);
+
+      // update download status on creation
+      this.onDownloadStarted(
+        new CustomEvent("downloadStarted", {
+          detail: { itemId: this.itemData.workshopItem.publishedFileId },
+        })
+      );
+    }
+
+    destroyed() {
+      document.removeEventListener("downloadStarted", this.onDownloadStarted);
+      document.removeEventListener("downloadEnded", this.onDownloadEnded);
+    }
+
+    async onDownloadStarted(evt: CustomEvent) {
+      if (
+        evt.detail.itemId &&
+        evt.detail.itemId == this.itemData.workshopItem.publishedFileId
+      ) {
+        // change target
+        const state = await WorkshopManager.getInstance().getItemState(
+          evt.detail.itemId
+        );
+        const itemState = state.itemState;
+
+        if (
+          itemState & greenworks.UGCItemState.Downloading ||
+          itemState & greenworks.UGCItemState.NeedsUpdate
+        ) {
+          this.isDownloading = true;
+          this.onDownloading();
+        }
+      }
+    }
+
+    async onDownloading() {
+      const itemId = this.itemData.workshopItem.publishedFileId;
+      if (this.isDownloading) {
+        this.isFinished = false;
+        while (!this.isFinished) {
+          // download loop
+          this.isFinished = await this.refreshDownloadProgress(itemId);
+          await setTimeout(() => {}, PROGRESS_TICK);
+        }
+        document.dispatchEvent(
+          new CustomEvent("downloadEnded", {
+            detail: {
+              itemId: itemId,
+            },
+          })
+        );
+      }
+    }
+
+    async onDownloadEnded(evt: CustomEvent) {
+      if (
+        evt.detail.itemId &&
+        evt.detail.itemId == this.itemData.workshopItem.publishedFileId
+      ) {
+        // set progress value to 1 for animation
+        this.progress = 1;
+        await setTimeout(() => {
+          // then clear progress states
+          if (this.isDownloading) this.isDownloading = false;
+          this.progress = 0;
+
+          // update downloaded items
+          WorkshopManager.getInstance().refresh();
+
+          (this.$root.$children[0] as App).refreshSelectedItem();
+        }, 300);
+      }
+    }
+
+    get downloaded() {
+      return this.progress * 100;
+    }
 
     get selectedColor() {
       return "#bbe1faff";
@@ -121,6 +214,38 @@
           );
         }
       }
+    }
+
+    async refreshDownloadProgress(itemId: string): Promise<boolean> {
+      const state = await WorkshopManager.getInstance().getItemState(itemId);
+      const itemState = state.itemState;
+
+      let progress = 1;
+      let isFinished = false;
+      if (
+        itemState & greenworks.UGCItemState.Downloading ||
+        itemState & greenworks.UGCItemState.NeedsUpdate
+      ) {
+        let downloadProgress = await WorkshopManager.getInstance().getDownloadProgress(
+          itemId
+        );
+
+        if (downloadProgress.expected == 0) {
+          progress = Math.ceil(this.progress);
+        } else {
+          progress = downloadProgress.downloaded / downloadProgress.expected;
+        }
+      } else if (itemState & greenworks.UGCItemState.Installed) {
+        progress = 1;
+      } else if (itemState & greenworks.UGCItemState.DownloadPending) {
+        progress = 0;
+      }
+
+      this.progress = progress;
+      console.warn(this.progress);
+      if (progress == 1) isFinished = true;
+
+      return isFinished;
     }
 
     get deletable() {
