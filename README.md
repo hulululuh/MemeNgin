@@ -53,7 +53,7 @@ yarn electron:serve
 ```
 
 ## Steam version
-The **[Steam version](https://store.steampowered.com/app/1632910/MemeNgin/)** includes a workshop feature, allowing you to share your works with other users.
+The **[Steam version](https://store.steampowered.com/app/1632910/MemeNgin/)** includes a workshop and cloud feature, allowing you to share your works with other users. Consider checking it out.
 
 ## Community
 You can communicate about this project on the **[Discord community](https://discord.gg/9vewbmkGHE)**.
