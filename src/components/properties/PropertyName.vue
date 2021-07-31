@@ -28,6 +28,18 @@
           onApply();
         }
       "
+      @keydown.enter="
+        if (name.length > 0 && isEditingName) {
+          isEditingName = !isEditingName;
+          onApply();
+        }
+      "
+      @keydown.esc="
+        if (isEditingName) {
+          isEditingName = false;
+          onCancel();
+        }
+      "
     />
   </v-hover>
 </template>
