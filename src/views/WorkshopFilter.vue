@@ -73,7 +73,6 @@
     SearchOption,
   } from "@/userdata";
   import { Component, Vue } from "vue-property-decorator";
-  import { TITLE_RULES } from "@/views/PublishDialog.vue";
   import { WorkshopManager } from "@/community/workshop";
 
   @Component

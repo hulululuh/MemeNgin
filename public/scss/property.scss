@@ -14,6 +14,11 @@
   flex-flow: column;
 }
 
+.propertyName {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .propertyList {
   flex: 1 1 auto;
   overflow-x: hidden;

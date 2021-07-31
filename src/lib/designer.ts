@@ -878,6 +878,7 @@ export class Designer {
         props[prop.name] = {};
         props[prop.name]["value"] = prop.getValue();
         props[prop.name]["exposed"] = prop.getExposed();
+        props[prop.name]["displayName"] = prop.getDisplayName();
 
         // load child property
         if (prop.hasChildren) {
@@ -885,6 +886,7 @@ export class Designer {
             props[childProp.name] = {};
             props[childProp.name]["value"] = childProp.getValue();
             props[childProp.name]["exposed"] = childProp.getExposed();
+            props[childProp.name]["displayName"] = childProp.getDisplayName();
           }
         }
       }

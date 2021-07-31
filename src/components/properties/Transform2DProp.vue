@@ -1,7 +1,11 @@
 <template>
   <v-container class="field ma-0 pa-0">
     <v-subheader class="ma-0 pa-0">
-      <label>{{ prop.displayName }}</label>
+      <property-name
+        ref="propertyName"
+        @onApply="onApply"
+        @onCancel="onCancel"
+      />
     </v-subheader>
     <v-container>
       <v-row no-gutters>
@@ -126,6 +130,7 @@
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
   import { Transform2D } from "@/lib/math/transform2d";
   import { Vector2 } from "@math.gl/core";
+  import PropertyName from "@/components/properties/PropertyName.vue";
 
   export enum Transform2DComponent {
     PositionX,
@@ -136,7 +141,11 @@
     None,
   }
 
-  @Component
+  @Component({
+    components: {
+      propertyName: PropertyName,
+    },
+  })
   export default class Transform2DPropertyView extends Vue {
     positionX: number;
     positionY: number;
@@ -173,6 +182,19 @@
       this.scaleY = transform.scale[1];
       this.rotation = transform.rotation;
       this.dirtyComponent = Transform2DComponent.None;
+      this.propertyName.name = this.prop.displayName;
+    }
+
+    get propertyName() {
+      return this.$refs.propertyName as PropertyName;
+    }
+
+    onApply() {
+      this.prop.displayName = this.propertyName.name;
+    }
+
+    onCancel() {
+      this.propertyName.name = this.prop.displayName;
     }
 
     focus() {

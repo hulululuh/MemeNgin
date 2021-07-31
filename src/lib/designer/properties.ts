@@ -8,6 +8,11 @@ import { Gradient } from "@/lib/designer/gradient";
 import { AssetType } from "@/assets/assetmanager";
 import { Editor } from "@/lib/editor";
 
+export const PROPERTY_NAME_RULES = [
+  (v) => !!v || "Property name is required",
+  (v) => (v && v.length <= 25) || "Name must be less than 25 characters",
+];
+
 // for use in code after build
 export enum PropertyType {
   Float = "float",
@@ -43,6 +48,14 @@ export class Property {
 
   get hasChildren() {
     return this.children.length > 0;
+  }
+
+  getDisplayName(): string {
+    return this.displayName;
+  }
+
+  setDisplayName(val: string) {
+    this.displayName = val;
   }
 
   getParentValue(): any {

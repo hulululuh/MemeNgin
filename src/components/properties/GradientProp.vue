@@ -1,7 +1,11 @@
 <template>
   <v-container class="field ma-0 pa-0" v-click-outside="blur">
     <v-subheader class="ma-0 pa-0">
-      <label>{{ prop.displayName }}</label>
+      <property-name
+        ref="propertyName"
+        @onApply="onApply"
+        @onCancel="onCancel"
+      />
     </v-subheader>
     <v-input
       class="ma-0 pa-0"
@@ -37,8 +41,13 @@
   import { IPropertyHolder } from "@/lib/designer/properties";
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
   import { UndoStack } from "@/lib/undostack";
+  import PropertyName from "@/components/properties/PropertyName.vue";
 
-  @Component
+  @Component({
+    components: {
+      propertyName: PropertyName,
+    },
+  })
   export default class GradientPropertyView extends Vue {
     @Prop()
     // FloatProperty
@@ -73,6 +82,7 @@
       this.widget.setGradient(this.prop.value.clone());
       this.widget.onvaluechanged = this.updateChanged;
       this.widget.oninput = this.updateInput;
+      this.propertyName.name = this.prop.displayName;
 
       // let erd = new elementResizeDetectorMaker();
       // erd.listenTo(this.$refs.inputHolder, (element) => {
@@ -81,6 +91,18 @@
 
       //   this.widget.resize(width, height);
       // });
+    }
+
+    get propertyName() {
+      return this.$refs.propertyName as PropertyName;
+    }
+
+    onApply() {
+      this.prop.displayName = this.propertyName.name;
+    }
+
+    onCancel() {
+      this.propertyName.name = this.prop.displayName;
     }
 
     get isOpen() {

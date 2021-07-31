@@ -1,7 +1,11 @@
 <template>
   <v-container class="field ma-0 pa-0">
     <v-subheader class="ma-0 pa-0">
-      <label>{{ prop.displayName }}</label>
+      <property-name
+        ref="propertyName"
+        @onApply="onApply"
+        @onCancel="onCancel"
+      />
     </v-subheader>
     <v-input>
       <v-slider
@@ -53,12 +57,20 @@
 <script lang="ts">
   import { Vue, Prop, Component, Emit } from "vue-property-decorator";
   import { Designer } from "@/lib/designer";
-  import { IPropertyHolder } from "../../lib/designer/properties";
+  import {
+    IPropertyHolder,
+    PROPERTY_NAME_RULES,
+  } from "../../lib/designer/properties";
   import { PropertyChangeComplete } from "./ipropertyui";
   import { UndoStack } from "@/lib/undostack";
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
+  import PropertyName from "@/components/properties/PropertyName.vue";
 
-  @Component
+  @Component({
+    components: {
+      propertyName: PropertyName,
+    },
+  })
   export default class FloatPropertyView extends Vue {
     @Prop()
     // FloatProperty
@@ -76,6 +88,10 @@
 
     isEditing: boolean;
 
+    get propertyName() {
+      return this.$refs.propertyName as PropertyName;
+    }
+
     mounted() {
       this.isEditing = false;
       this.text = this.prop.value.toString();
@@ -83,6 +99,15 @@
         value: this.prop.getValue(),
         exposed: this.prop.getExposed(),
       };
+      this.propertyName.name = this.prop.displayName;
+    }
+
+    onApply() {
+      this.prop.displayName = this.propertyName.name;
+    }
+
+    onCancel() {
+      this.propertyName.name = this.prop.displayName;
     }
 
     @Emit()
@@ -100,6 +125,10 @@
     propertyExposeChanged() {
       this.$emit("propertyExposeChanged", this.prop, this.propHolder);
       return this.prop.name;
+    }
+
+    get propertyNameRules() {
+      return PROPERTY_NAME_RULES;
     }
 
     updateExposed(value) {

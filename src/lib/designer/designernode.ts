@@ -237,6 +237,11 @@ export class DesignerNode implements IPropertyHolder {
       }
 
       prop.setExposed(value["exposed"]);
+
+      const displayName = value["displayName"];
+      if (displayName) {
+        prop.setDisplayName(displayName);
+      }
       this.requestUpdate();
     } else {
       console.error("can not find property: " + name);

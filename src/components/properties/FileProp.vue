@@ -1,9 +1,13 @@
 <template>
   <v-container class="field ma-0 pa-0">
     <v-subheader class="ma-0 pa-0">
-      <label>{{ prop.displayName }}</label>
+      <property-name
+        ref="propertyName"
+        @onApply="onApply"
+        @onCancel="onCancel"
+      />
     </v-subheader>
-    <v-file-input @change="updateValue" />
+    <v-file-input dense @change="updateValue" />
   </v-container>
 </template>
 
@@ -20,11 +24,15 @@
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
   import { UndoStack } from "@/lib/undostack";
   import { remote } from "electron";
+  import PropertyName from "@/components/properties/PropertyName.vue";
   import fs from "fs";
   const dialog = remote.dialog;
 
-  //const { dialog } = require("electron").remote;
-  @Component
+  @Component({
+    components: {
+      propertyName: PropertyName,
+    },
+  })
   export default class FilePropertyView extends Vue {
     @Prop()
     // FloatProperty
@@ -40,9 +48,21 @@
 
     path: string = "";
 
-    // mounted() {
-    //   this.propertyChanged();
-    // }
+    get propertyName() {
+      return this.$refs.propertyName as PropertyName;
+    }
+
+    mounted() {
+      this.propertyName.name = this.prop.displayName;
+    }
+
+    onApply() {
+      this.prop.displayName = this.propertyName.name;
+    }
+
+    onCancel() {
+      this.propertyName.name = this.prop.displayName;
+    }
 
     @Emit()
     propertyChanged() {

@@ -1,9 +1,12 @@
 <template>
   <v-container class="field ma-0 pa-0">
     <v-subheader class="ma-0 pa-0">
-      <label>{{ prop.displayName }}</label>
+      <property-name
+        ref="propertyName"
+        @onApply="onApply"
+        @onCancel="onCancel"
+      />
     </v-subheader>
-
     <v-input>
       <v-checkbox
         v-model="prop.exposed"
@@ -55,8 +58,13 @@
   import { UndoStack } from "@/lib/undostack";
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
   import { Vector2 } from "@math.gl/core";
+  import PropertyName from "@/components/properties/PropertyName.vue";
 
-  @Component
+  @Component({
+    components: {
+      propertyName: PropertyName,
+    },
+  })
   export default class Vector2PropertyView extends Vue {
     @Prop()
     // FloatProperty
@@ -81,6 +89,19 @@
         value: new Vector2(this.valX, this.valY),
         exposed: this.prop.getExposed(),
       };
+      this.propertyName.name = this.prop.displayName;
+    }
+
+    get propertyName() {
+      return this.$refs.propertyName as PropertyName;
+    }
+
+    onApply() {
+      this.prop.displayName = this.propertyName.name;
+    }
+
+    onCancel() {
+      this.propertyName.name = this.prop.displayName;
     }
 
     @Emit()

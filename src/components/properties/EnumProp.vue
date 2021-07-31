@@ -1,7 +1,11 @@
 <template>
   <v-container class="field ma-0 pa-0">
     <v-subheader class="ma-0 pa-0">
-      <label>{{ prop.displayName }}</label>
+      <property-name
+        ref="propertyName"
+        @onApply="onApply"
+        @onCancel="onCancel"
+      />
     </v-subheader>
     <v-input class="ma-0 pa-0" hide-details>
       <template v-slot:prepend>
@@ -35,8 +39,13 @@
   import { IPropertyHolder } from "@/lib/designer/properties";
   import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
   import { UndoStack } from "@/lib/undostack";
+  import PropertyName from "@/components/properties/PropertyName.vue";
 
-  @Component
+  @Component({
+    components: {
+      propertyName: PropertyName,
+    },
+  })
   export default class EnumPropertyView extends Vue {
     @Prop()
     // EnumProperty
@@ -66,6 +75,22 @@
         exposed: value,
       });
       this.propertyExposeChanged();
+    }
+
+    mounted() {
+      this.propertyName.name = this.prop.displayName;
+    }
+
+    get propertyName() {
+      return this.$refs.propertyName as PropertyName;
+    }
+
+    onApply() {
+      this.prop.displayName = this.propertyName.name;
+    }
+
+    onCancel() {
+      this.propertyName.name = this.prop.displayName;
     }
 
     updateValue(value) {
