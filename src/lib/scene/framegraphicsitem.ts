@@ -95,18 +95,10 @@ export class FrameGraphicsItem extends GraphicsItem {
     this.nodes = this.getHoveredNodes();
     let props = [];
     for (let item of this.nodes) {
-      // if (item.dNode instanceof TextureNode) {
-      //   let fileProp = item.dNode.properties.find(
-      //     (item) => item.name == "file"
-      //   );
-      //   if (fileProp) props.push({ "holder": item.dNode, "prop": fileProp });
-      // } else if (item.dNode instanceof LogicDesignerNode) {
-      //   for (let prop of item.dNode.properties) {
-      //     props.push({ "holder": item.dNode, "prop": prop });
-      //   }
-      // }
-      if (item.dNode instanceof TextureNode ||
-        item.dNode instanceof LogicDesignerNode) {
+      if (
+        item.dNode instanceof TextureNode ||
+        item.dNode instanceof LogicDesignerNode
+      ) {
         for (let prop of item.dNode.properties) {
           props.push({ "holder": item.dNode, "prop": prop });
         }
@@ -322,6 +314,7 @@ export class FrameGraphicsItem extends GraphicsItem {
 
   // return all scene's nodes in this frame
   getHoveredNodes(): NodeGraphicsItem[] {
+    const isHorizontal = this.getWidth() > this.getHeight();
     let nodes: NodeGraphicsItem[] = [];
     for (let node of this.scene.nodes) {
       // node must be entirely inside frame
@@ -334,6 +327,17 @@ export class FrameGraphicsItem extends GraphicsItem {
         nodes.push(node);
       }
     }
+
+    nodes.sort((a, b) => {
+      const aPos = a.getPos();
+      const bPos = b.getPos();
+
+      if (isHorizontal) {
+        return aPos.x - bPos.x;
+      } else {
+        return aPos.y - bPos.y;
+      }
+    });
 
     return nodes;
   }
