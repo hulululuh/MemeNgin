@@ -348,6 +348,12 @@ export class NodeScene {
 
   get inputNode(): GraphicsItem {
     let input = this.frames[0];
+
+    // for (let item of this.nodes) {
+    //   const box = BoundingBox.fromRect(item.getRect());
+    //   //isInside.
+    // }
+
     return input;
   }
 

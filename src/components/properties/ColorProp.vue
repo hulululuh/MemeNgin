@@ -88,13 +88,13 @@
 
     @Emit()
     propertyChanged() {
-      this.$emit("propertyChanged", this.prop);
+      this.$emit("propertyChanged", this.prop, this.propHolder);
       return this.prop.name;
     }
 
     @Emit()
     propertyExposeChanged() {
-      this.$emit("propertyExposeChanged", this.prop);
+      this.$emit("propertyExposeChanged", this.prop, this.propHolder);
       return this.prop.name;
     }
 

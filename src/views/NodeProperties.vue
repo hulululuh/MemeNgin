@@ -15,7 +15,7 @@
             v-for="(p, index) in this.properties"
             :is="p.componentName"
             :prop="p.prop"
-            :propHolder="node"
+            :propHolder="p.holder ? p.holder : node"
             :editor="editor"
             @propertyChanged="propertyChanged"
             @property-change-completed="propertyChangeCompleted"
@@ -35,6 +35,7 @@
 <script lang="ts">
   import { Editor } from "@/lib/editor";
   import { DesignerNode } from "@/lib/designer/designernode";
+  import { OutputNode } from "@/lib/library/nodes/outputnode";
   import { Property, IPropertyHolder } from "@/lib/designer/properties";
   import { Vue, Prop, Component } from "vue-property-decorator";
   import FloatPropertyView from "@/components/properties/FloatProp.vue";
@@ -58,6 +59,7 @@
   class PropHolder {
     prop: Property;
     componentName: string;
+    holder: IPropertyHolder;
   }
 
   @Component({
@@ -101,16 +103,18 @@
       };
     }
 
-    propertyChanged(prop: Property) {
-      if (this.node.onnodepropertychanged) {
+    propertyChanged(prop: Property, holder: IPropertyHolder) {
+      if (holder && holder.onnodepropertychanged) {
+        holder.onnodepropertychanged(prop);
+      } else if (this.node.onnodepropertychanged) {
         this.node.onnodepropertychanged(prop);
       }
-      // if (this.editor.onnodepropertychanged)
-      //   this.editor.onnodepropertychanged(self.node, prop);
     }
 
-    propertyExposeChanged(prop: Property) {
-      if (this.node.onnodeexposechanged) {
+    propertyExposeChanged(prop: Property, holder: IPropertyHolder) {
+      if (holder && holder.onnodeexposechanged) {
+        holder.onnodeexposechanged(prop);
+      } else if (this.node.onnodeexposechanged) {
         this.node.onnodeexposechanged(prop);
       }
     }
@@ -137,39 +141,36 @@
       return false;
     }
 
+    get isOutputNode() {
+      return this.node instanceof OutputNode;
+    }
+
     // calculated
     get properties(): PropHolder[] {
-      // if (this.node instanceof OutputNode) {
-      //   let inputprops = Editor.getInstance().getInputItem().inputProperties;
-      //   let props: PropHolder[] = [];
+      if (this.node instanceof OutputNode) {
+        let inputprops = Editor.getInstance().getInputItem().inputProperties;
+        let props: PropHolder[] = [];
 
-      //   for (let prop of inputprops) {
-      //     props.push({ prop: prop, componentName: prop.type });
-      //   }
-      //   return props;
-      // } else {
-      //   let props: PropHolder[] = this.node.properties.map((prop) => {
-      //     //let name: string = "";
-      //     return {
-      //       prop: prop,
-      //       componentName: prop.type,
-      //     };
-      //   });
+        for (let pair of inputprops) {
+          const prop = pair.prop;
+          props.push({
+            prop: prop,
+            componentName: prop.type,
+            holder: pair.holder,
+          });
+        }
+        return props;
+      } else {
+        let props: PropHolder[] = this.node.properties.map((prop) => {
+          return {
+            prop: prop,
+            componentName: prop.type,
+            holder: null,
+          };
+        });
 
-      //   //console.log(props);
-      //   return props;
-      // }
-
-      let props: PropHolder[] = this.node.properties.map((prop) => {
-        //let name: string = "";
-        return {
-          prop: prop,
-          componentName: prop.type,
-        };
-      });
-
-      //console.log(props);
-      return props;
+        return props;
+      }
     }
 
     get isInstanceNode() {

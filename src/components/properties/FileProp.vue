@@ -46,7 +46,7 @@
 
     @Emit()
     propertyChanged() {
-      this.$emit("propertyChanged", this.prop);
+      this.$emit("propertyChanged", this.prop, this.propHolder);
       return this.prop.name;
     }
 
