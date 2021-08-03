@@ -33,6 +33,7 @@ export class WorkshopManager {
   ]);
   private activeTimerId = new Map<QueryTarget, any>();
   private steamId;
+  private workshopRoot;
 
   static getInstance() {
     if (!WorkshopManager._instance) {
@@ -66,6 +67,10 @@ export class WorkshopManager {
     } catch (err) {
       return false;
     }
+  }
+
+  get WorkshopRoot() {
+    return this.workshopRoot;
   }
 
   get SteamId() {
@@ -501,7 +506,6 @@ export class WorkshopManager {
             const stat = fs.statSync(fullPath);
             if (!stat.isDirectory()) {
               let parsedPath = path.parse(fullPath);
-              let workshopLocalPath = path.join(parsedPath.dir, "..");
               if (parsedPath.ext == ".mmng") {
                 let project = ProjectManager.load(fullPath);
                 if (!project) continue;
@@ -524,7 +528,6 @@ export class WorkshopManager {
   async synchroizeItems(page_num: number): Promise<any> {
     if (!this.initialized) return;
 
-    let workshopLocalPath = "";
     // shall be removed if there
     let ghostItems = [];
     let subscribed = [];
@@ -556,7 +559,7 @@ export class WorkshopManager {
                 const stat = fs.statSync(fullPath);
                 if (!stat.isDirectory()) {
                   let parsedPath = path.parse(fullPath);
-                  workshopLocalPath = path.join(parsedPath.dir, "..");
+                  this.workshopRoot = path.join(parsedPath.dir, "..");
                   if (parsedPath.ext == ".mmng") {
                     let project = ProjectManager.load(fullPath);
                     if (!project) continue;
@@ -603,9 +606,9 @@ export class WorkshopManager {
     }
 
     // try to remove ghost items on local
-    if (ghostItems.length > 0 && workshopLocalPath.length > 0) {
+    if (ghostItems.length > 0 && this.workshopRoot.length > 0) {
       for (let item of ghostItems) {
-        const targetDir = path.join(workshopLocalPath, item);
+        const targetDir = path.join(this.workshopRoot, item);
         if (fs.existsSync(targetDir)) {
           const stat = fs.statSync(targetDir);
           if (stat.isDirectory()) {

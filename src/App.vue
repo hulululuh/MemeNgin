@@ -189,6 +189,12 @@
   } from "@/views/ProjectItem.vue";
   import TutorialDialog from "@/views/TutorialDialog.vue";
   import { PUBLISH_TEMP_PATH } from "@/lib/project";
+  import {
+    TEMP_PATH,
+    RESOURCE_PATH,
+    MY_WORKS_PATH,
+    isInsideReservedPath,
+  } from "@/lib/utils";
 
   const fsExtra = require("fs-extra");
   const electron = require("electron");
@@ -196,17 +202,6 @@
   const { dialog } = remote;
   const app = remote.app;
   const userDataPath = path.join(app.getPath("userData"), "userData.json");
-
-  export const TEMP_PATH = path.join(path.resolve("."), "/projects/temp/");
-
-  export const MY_WORKS_PATH = path.join(
-    path.resolve("."),
-    "/projects/my_works/"
-  );
-  export const DEFAULT_WORKS_PATH = path.join(
-    path.resolve("."),
-    "/projects/default_works/"
-  );
 
   declare let __static: any;
 
@@ -248,6 +243,7 @@
 
     titleName: string = "";
     edited: boolean = false;
+    isReadOnly: boolean = false;
 
     constructor() {
       super();
@@ -586,7 +582,7 @@
     }
 
     get saveable() {
-      return this.edited || this.project.path == null;
+      return !this.isReadOnly && (this.edited || this.project.path == null);
     }
 
     async saveAndClose() {
@@ -759,6 +755,8 @@
     }
 
     async openProjectWithItem(data: ProjectItemData) {
+      this.isReadOnly = data.isOthersWork;
+
       if (data.isCloud) {
         (this.$refs.startupMenu as StartupMenu).tryClose();
         let project = await ProjectManager.fromCloud(data.path);
@@ -795,6 +793,10 @@
 
       UndoStack.current.reset();
       this.edited = false;
+
+      if (isInsideReservedPath(project.localPath)) {
+        this.isReadOnly = true;
+      }
     }
 
     zoomSelection() {

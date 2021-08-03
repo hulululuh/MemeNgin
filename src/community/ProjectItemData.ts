@@ -131,6 +131,14 @@ export class ProjectItemData {
     return this.workshopItem != null;
   }
 
+  get isOthersWork() {
+    if (!this.workshopItem) return false;
+    if (!this.workshopItem.publisherId) return false;
+    return (
+      this.workshopItem.publishedFileId != WorkshopManager.getInstance().SteamId
+    );
+  }
+
   get thumbnail() {
     return this.localItem && this.localItem.thumbnail
       ? this.localItem.thumbnail

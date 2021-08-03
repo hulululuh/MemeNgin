@@ -12,6 +12,7 @@
           :itemData="item"
           :clickAction="clickAction"
           :deleteAction="deleteAction"
+          :readonly="readonly"
         />
       </v-col>
     </v-row>
@@ -42,6 +43,7 @@
     @Prop() categoryName: string;
     @Prop() lists: ProjectItemData[];
     @Prop() deleteAction: DeleteAction;
+    @Prop() readonly: boolean;
 
     exists(item: ProjectItemData) {
       return item.isValid;

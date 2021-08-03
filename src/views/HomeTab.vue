@@ -10,12 +10,14 @@
       categoryName="Tutorials"
       :lists="tutorialsList"
       :deleteAction="none"
+      :readonly="true"
       ref="tutorials"
     />
     <item-list
       categoryName="Applications"
       :lists="applicationsList"
       :deleteAction="none"
+      :readonly="true"
       ref="applications"
     />
   </v-container>

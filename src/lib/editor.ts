@@ -792,6 +792,12 @@ export class Editor {
     }
 
     this.refreshWidget();
+
+    // zoom all nodes
+    this.nodeScene.zoomSelected([...this.nodeScene.nodes]);
+
+    // select outputNode
+    this.nodeScene.setSelectedItems([this.nodeScene.outputNode]);
   }
 
   save(): any {

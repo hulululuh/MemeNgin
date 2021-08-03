@@ -23,6 +23,19 @@
         <div>
           <v-scale-transition>
             <v-btn
+              style="position:absolute; left: 0px; top: 0px; background-color: rgba(255, 255, 255, 0.42);"
+              fab
+              x-small
+              v-show="hover && isReadonly"
+              justify-left
+              @click.stop=""
+            >
+              <v-icon> mdi-lock-outline </v-icon>
+            </v-btn>
+          </v-scale-transition>
+
+          <v-scale-transition>
+            <v-btn
               style="position:absolute; right: 0px; top: 0px; background-color: rgba(255, 255, 255, 0.42);"
               fab
               x-small
@@ -71,6 +84,7 @@
   import { ProjectItemData } from "@/community/ProjectItemData";
   import App from "@/App.vue";
   import { WorkshopManager, PROGRESS_TICK } from "@/community/workshop";
+  import { isInsideReservedPath } from "@/lib/utils";
   const greenworks = require("greenworks");
 
   export class ProjectItemDeleteEvent extends CustomEvent<any> {
@@ -96,6 +110,7 @@
     @Prop() itemData: ProjectItemData;
     @Prop() clickAction: ClickAction;
     @Prop() deleteAction: DeleteAction;
+    @Prop() readonly: boolean;
     @Prop() active: boolean;
     progress: number = 0;
     isDownloading: boolean = false;
@@ -256,6 +271,11 @@
         this.deleteAction != DeleteAction.None &&
         this.deleteAction != DeleteAction.Unfavorable
       );
+    }
+
+    get isReadonly() {
+      if (isInsideReservedPath(this.itemData.path)) return true;
+      return this.readonly;
     }
 
     open() {

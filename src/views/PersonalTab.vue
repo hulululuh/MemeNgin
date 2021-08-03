@@ -21,6 +21,7 @@
               categoryName="Subscribed"
               :lists="subscribed"
               :deleteAction="unsubscribe"
+              :readonly="true"
               ref="searched"
             />
           </v-card>

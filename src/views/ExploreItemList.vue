@@ -13,6 +13,7 @@
             :itemData="item"
             :clickAction="clickAction"
             :deleteAction="deleteAction"
+            :readonly="readonly"
           />
         </v-list-item>
       </v-list-item-group>
@@ -41,6 +42,7 @@
     @Prop() categoryName: string;
     @Prop() lists: Array<ProjectItemData>;
     @Prop() deleteAction: DeleteAction;
+    @Prop() readonly: boolean;
 
     selectedItem: number = -1;
 

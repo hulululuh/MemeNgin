@@ -57,6 +57,7 @@
               categoryName="Searched"
               :lists="searched"
               :deleteAction="unfavorable"
+              :readonly="true"
             />
             <v-pagination
               bottom
