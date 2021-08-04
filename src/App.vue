@@ -756,6 +756,7 @@
 
     async openProjectWithItem(data: ProjectItemData) {
       this.isReadOnly = data.isOthersWork;
+      this.updatePublisherInfo(data.workshopItem.publisherId);
 
       if (data.isCloud) {
         (this.$refs.startupMenu as StartupMenu).tryClose();
@@ -797,6 +798,17 @@
       if (isInsideReservedPath(project.localPath)) {
         this.isReadOnly = true;
       }
+    }
+
+    async updatePublisherInfo(publisherId) {
+      WorkshopManager.getInstance().requestUserInfo(publisherId);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      this.$store.state.currentProjectAuthorName = WorkshopManager.getInstance().getAuthorName(
+        publisherId
+      );
+      this.$store.state.currentProjectAuthorAvatar = WorkshopManager.getInstance().getAuthorAvatar(
+        publisherId
+      );
     }
 
     zoomSelection() {

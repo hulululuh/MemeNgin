@@ -16,6 +16,10 @@ export default new Vuex.Store({
     metadata: ProjectItemData.fromNothing(),
     selectedProject: null,
     selectedProjectState: null,
+    selectedAuthorAvatar: null,
+    selectedAuthorName: "",
+    currentProjectAuthorAvatar: null,
+    currentProjectAuthorName: "",
   },
   mutations: {
     setMetadata(state, data) {

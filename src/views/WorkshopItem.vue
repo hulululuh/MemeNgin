@@ -190,22 +190,20 @@
     }
 
     get authorAvatar() {
-      if (!this.itemData) {
+      const avatar = this.$store.state.selectedAuthorAvatar;
+      if (!avatar) {
         return "mdi-account-box";
       } else {
-        return WorkshopManager.getInstance().getAuthorAvatar(
-          this.itemData.workshopItem.publisherId
-        );
+        return avatar;
       }
     }
 
     get authorName() {
-      if (!this.itemData) {
+      const name = this.$store.state.selectedAuthorName;
+      if (!name || name == "") {
         return "Author Name";
       } else {
-        return WorkshopManager.getInstance().getAuthorName(
-          this.itemData.workshopItem.publisherId
-        );
+        return name;
       }
     }
 

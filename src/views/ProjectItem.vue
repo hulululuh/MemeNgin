@@ -121,11 +121,13 @@
       document.addEventListener("downloadEnded", this.onDownloadEnded);
 
       // update download status on creation
-      this.onDownloadStarted(
-        new CustomEvent("downloadStarted", {
-          detail: { itemId: this.itemData.workshopItem.publishedFileId },
-        })
-      );
+      if (this.itemData.workshopItem) {
+        this.onDownloadStarted(
+          new CustomEvent("downloadStarted", {
+            detail: { itemId: this.itemData.workshopItem.publishedFileId },
+          })
+        );
+      }
     }
 
     destroyed() {
@@ -210,16 +212,21 @@
         console.log("tried to open");
         this.open();
       } else {
-        WorkshopManager.getInstance().requestUserInfo(
-          this.itemData.workshopItem.publisherId
-        );
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
         const selectedItemId = this.itemData.workshopItem.publishedFileId;
         if (this.$store.state.selectedItemId != selectedItemId) {
           this.$store.state.selectedProject = this.itemData;
           this.$store.state.selectedProjectState = await WorkshopManager.getInstance().getItemState(
             selectedItemId
+          );
+
+          const publisherId = this.itemData.workshopItem.publisherId;
+          WorkshopManager.getInstance().requestUserInfo(publisherId);
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          this.$store.state.selectedAuthorName = WorkshopManager.getInstance().getAuthorName(
+            publisherId
+          );
+          this.$store.state.selectedAuthorAvatar = WorkshopManager.getInstance().getAuthorAvatar(
+            publisherId
           );
 
           // send selection event to workshopItem.vue

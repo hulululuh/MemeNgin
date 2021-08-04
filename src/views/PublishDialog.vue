@@ -290,37 +290,20 @@
     }
 
     get authorAvatar() {
-      let id;
-      let success = true;
-
-      try {
-        id = this.$store.state.metadata.workshopItem.publisherId;
-        if (!id) success = false;
-      } catch {
-        success = false;
-      }
-
-      if (!success) {
+      const avatar = this.$store.state.currentProjectAuthorAvatar;
+      if (!avatar) {
         return "mdi-account-box";
       } else {
-        return WorkshopManager.getInstance().getAuthorAvatar(id);
+        return avatar;
       }
     }
 
     get authorName() {
-      let id;
-      let success = true;
-
-      try {
-        id = this.$store.state.metadata.workshopItem.publisherId;
-        if (!id) success = false;
-      } catch {
-        success = false;
-      }
-      if (!this.itemData) {
-        return "Author Name";
+      const name = this.$store.state.currentProjectAuthorName;
+      if (name && name.length > 0) {
+        return name;
       } else {
-        return WorkshopManager.getInstance().getAuthorName(id);
+        return "Author Name";
       }
     }
 
