@@ -62,7 +62,6 @@ export class Editor {
   canvas: HTMLCanvasElement;
 
   library: DesignerLibrary;
-  metadata: ProjectItemData;
   nodeScene: NodeScene;
   designer: Designer;
   selectedNodeId: string;
@@ -71,11 +70,6 @@ export class Editor {
 
   preview2D: HTMLCanvasElement;
   preview2DCtx: CanvasRenderingContext2D;
-
-  //scene3D: any; // todo: set a type
-
-  //   propGen: PropertyGenerator;
-  //   varGen: VariableGenerator;
 
   onnodeselected?: (item: DesignerNode) => void;
   oncommentselected?: (item: CommentGraphicsItem) => void;
@@ -100,8 +94,7 @@ export class Editor {
   }
 
   static getMetadata() {
-    const editor = this.getInstance();
-    return editor.metadata;
+    return store.state.metadata;
   }
 
   static getDesigner() {
@@ -205,7 +198,7 @@ export class Editor {
   }
 
   setMetadata(data: ProjectItemData) {
-    this.metadata = data;
+    store.state.metadata = data;
   }
 
   setDesigner(designer: Designer) {

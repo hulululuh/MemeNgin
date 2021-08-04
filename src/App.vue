@@ -510,8 +510,8 @@
 
     createProject(name: string) {
       this.newProject();
-      this.editor.metadata.title = name;
-      this.editor.metadata.localItem.isCloud = true;
+      this.$store.state.metadata.title = name;
+      this.$store.state.metadata.localItem.isCloud = true;
 
       // make directory if not exists
       const targetDir = path.join(MY_WORKS_PATH, `/${name}/`);
@@ -800,6 +800,7 @@
     }
 
     async updatePublisherInfo(publisherId) {
+      if (!publisherId || publisherId.length == 0) return;
       WorkshopManager.getInstance().requestUserInfo(publisherId);
       await new Promise((resolve) => setTimeout(resolve, 200));
       this.$store.state.currentProjectAuthorName = WorkshopManager.getInstance().getAuthorName(
