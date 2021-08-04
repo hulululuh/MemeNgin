@@ -380,8 +380,7 @@
       canvas.height = view.clientHeight;
       let scene = this.editor.nodeScene;
       if (scene) {
-        scene.view.onResized();
-        scene.view.reset();
+        scene.resetView();
       }
     }
 

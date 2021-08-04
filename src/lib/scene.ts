@@ -216,7 +216,7 @@ export class NodeScene {
           if (self.selectedItems.length !== 0) {
             self.zoomSelected(self.selectedItems);
           } else {
-            self.view.reset();
+            self.resetView();
           }
         }
 
@@ -583,7 +583,7 @@ export class NodeScene {
     }
   }
 
-  zoomSelected(selectedItems: GraphicsItem[]) {
+  zoomSelected(selectedItems: GraphicsItem[], doAnimate: boolean = true) {
     if (selectedItems.length == 0) return;
 
     // TODO: move it to utility library
@@ -597,7 +597,7 @@ export class NodeScene {
     };
 
     const box = getSelectedBounds(selectedItems);
-    this.view.zoomToBoundingBox(box);
+    this.view.zoomToBoundingBox(box, doAnimate);
   }
 
   getNodeById(id: string): NodeGraphicsItem {
@@ -1298,6 +1298,10 @@ export class NodeScene {
     }
 
     return s;
+  }
+
+  resetView() {
+    this.zoomSelected([...this.nodes, ...this.frames], false);
   }
 }
 

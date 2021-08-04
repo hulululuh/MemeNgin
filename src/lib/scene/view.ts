@@ -48,7 +48,7 @@ export class SceneView {
   mouseDownPos: Vector2; // pos of last mouse down
   mouseDragDiff: Vector2; // mouse drag diff
 
-  zoomFactor: number;
+  private _zoomFactor: number;
   offset: Vector2;
 
   panning: boolean;
@@ -215,9 +215,17 @@ export class SceneView {
     return this.canvasToSceneXY(this.canvas.width / 2, this.canvas.height / 2);
   }
 
+  get zoomFactor() {
+    return this._zoomFactor;
+  }
+
+  set zoomFactor(value) {
+    this._zoomFactor = value == 0 ? 0.00001 : value;
+  }
+
   zoom(x: number, y: number, level: number) {}
 
-  zoomToBoundingBox(box: BoundingBox) {
+  zoomToBoundingBox(box: BoundingBox, doAnimate: boolean = true) {
     const zoomMargin = 0.8;
     const zoomX = (this.canvas.width / box.width()) * zoomMargin;
     const zoomY = (this.canvas.height / box.height()) * zoomMargin;
@@ -229,7 +237,7 @@ export class SceneView {
       this.canvas.height / 2
     );
     targetOffset.sub(center);
-    this.changeView(targetOffset, zoomFactor);
+    this.changeView(targetOffset, zoomFactor, doAnimate);
   }
 
   changeView(

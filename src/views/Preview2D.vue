@@ -73,7 +73,6 @@
       if (!this.dragZoom) {
         this.dragZoom = new DragZoom(this.$refs.canvas);
       }
-      this.dragZoom.onResize(width, height);
 
       // TODO: I don't think its best
       setTimeout(() => {
