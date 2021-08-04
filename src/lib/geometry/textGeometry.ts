@@ -216,8 +216,7 @@ export class TextGeometry {
   }
 
   async setupFont(fontId: string) {
-    let font = null;
-    font = await FontCache.getInstance().getFontById(fontId);
+    let font = await FontCache.getInstance().getFontById(fontId);
     if (font) {
       this.font = font;
       this.needsUpdate = true;

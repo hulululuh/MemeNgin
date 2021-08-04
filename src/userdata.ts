@@ -3,8 +3,9 @@
 import path from "path";
 import fs from "fs";
 import { ProjectItemData } from "@/community/ProjectItemData";
+import { isInsideReservedPath } from "@/lib/utils";
 
-const MAX_RECENT_FILE = 8;
+const MAX_RECENT_FILE = 12;
 const app = require("electron").remote.app;
 const userDataPath = path.join(app.getPath("userData"), "userData.json");
 
@@ -159,6 +160,8 @@ export class UserData {
   }
 
   registerRecent(path: string) {
+    if (isInsideReservedPath(path)) return;
+
     // remove target from list
     let idx = this.recentFiles.findIndex((item) => item === path);
     if (idx > -1) {
