@@ -27,6 +27,8 @@
           isEditingName = !isEditingName;
           onApply();
         }
+
+        if (isEditingName) focus();
       "
       @keydown.enter="
         if (name.length > 0 && isEditingName) {
@@ -40,6 +42,7 @@
           onCancel();
         }
       "
+      ref="textField"
     />
   </v-hover>
 </template>
@@ -75,6 +78,10 @@
     @Emit()
     onApply() {
       this.$emit("onApply");
+    }
+
+    focus() {
+      (this.$refs.textField as Vue & { focus: () => boolean }).focus();
     }
 
     get propertyNameRules() {
