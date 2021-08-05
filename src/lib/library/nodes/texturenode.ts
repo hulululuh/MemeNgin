@@ -6,6 +6,7 @@ import {
   UpdateTexture,
 } from "@/lib/designer/imagedesignernode";
 import { Property, FileProperty } from "@/lib/designer/properties";
+import { Editor } from "@/lib/editor";
 import { loadImage } from "@/lib/utils";
 
 export class TextureNode extends ImageDesignerNode {
@@ -49,6 +50,15 @@ export class TextureNode extends ImageDesignerNode {
       this.createTexture();
       this.requestUpdate();
     });
+  }
+
+  getImageData() {
+    if (!this.imgData) {
+      this.imgData = Editor.getScene()
+        .getNodeById(this.id)
+        .imageCanvas.canvas.toDataURL();
+    }
+    return this.imgData;
   }
 
   setImageData(imgDataURL: string, isUrl: boolean) {

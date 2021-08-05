@@ -59,26 +59,6 @@ export class ItemClipboard {
     data.nodes = this.getNodes(designer, nodeList);
     data.connections = this.getConnections(data.nodes, designer, nodeList);
 
-    if (false) {
-      // FRAMES
-      let frames = [];
-      for (let item of items) {
-        if (!(item instanceof FrameGraphicsItem)) continue;
-        let frame = <FrameGraphicsItem>item;
-
-        let n: any = {};
-        n["x"] = frame.left;
-        n["y"] = frame.top;
-        n["width"] = frame.getWidth();
-        n["height"] = frame.getHeight();
-
-        //n["color"] = frame.fillColor.toHex();
-
-        frames.push(n);
-      }
-      data.frames = frames;
-    }
-
     // COMMENTS
     let comments = [];
     for (let item of items) {
@@ -180,19 +160,6 @@ export class ItemClipboard {
     // for selecting pasted items
     let focusItems: GraphicsItem[] = [];
 
-    // FRAMES
-    if (data.frames) {
-      for (let d of data.frames) {
-        let frame = new FrameGraphicsItem(scene.view);
-        frame.setPos(d.x, d.y);
-        frame.setSize(d.width, d.height);
-
-        scene.addFrame(frame);
-        frames.push(frame);
-        focusItems.push(frame);
-      }
-    }
-
     // COMMENTS
     if (data.comments) {
       for (let d of data.comments) {
@@ -233,7 +200,8 @@ export class ItemClipboard {
 
       if (dNode instanceof TextureNode) {
         let srcNode = Editor.getDesigner().getNodeById(n.id) as TextureNode;
-        dNode.setImageData(srcNode.imgData, true);
+        if (!srcNode) continue;
+        dNode.setImageData(srcNode.getImageData(), true);
       }
 
       // assign properties

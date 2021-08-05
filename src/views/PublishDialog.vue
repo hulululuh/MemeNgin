@@ -154,12 +154,9 @@
   import { canvasToThumbnailURL } from "@/lib/designer";
   import { WorkshopManager } from "@/community/workshop";
   import { TextManager } from "@/assets/textmanager";
-  import { toDataURL } from "@/lib/utils";
   import AgeDialog from "@/views/AgeDialog.vue";
   import LegalDialog from "@/views/LegalDialog.vue";
-  import App from "@/App.vue";
 
-  const greenworks = require("greenworks");
   const electron = require("electron");
   const shell = electron.shell;
 
