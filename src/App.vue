@@ -344,6 +344,8 @@
         "projectItemDelete",
         this.onProjectItemDelete
       );
+      document.removeEventListener("mousemove", this.onMouseMove);
+      document.removeEventListener("metadataChanged", this.onMetadataChanged);
     }
 
     onEditStarted() {
@@ -409,11 +411,8 @@
       document.addEventListener("projectPublished", this.onProjectPublished);
       document.addEventListener("publishRequested", this.onPublishRequested);
       document.addEventListener("projectItemDelete", this.onProjectItemDelete);
-
-      document.addEventListener("mousemove", (evt) => {
-        this.mouseX = evt.pageX;
-        this.mouseY = evt.pageY;
-      });
+      document.addEventListener("mousemove", this.onMouseMove);
+      document.addEventListener("metadataChanged", this.onMetadataChanged);
 
       const canvas = document.getElementById("editor") as HTMLCanvasElement;
       this.editor.setSceneCanvas(canvas);
@@ -671,6 +670,15 @@
           console.warn(`You are trying to unsubscribe invalid item.`);
         }
       }
+    }
+
+    onMouseMove(evt) {
+      this.mouseX = evt.pageX;
+      this.mouseY = evt.pageY;
+    }
+
+    onMetadataChanged() {
+      this.edited = true;
     }
 
     saveProject(force: boolean = false) {

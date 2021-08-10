@@ -19,11 +19,13 @@
                 :label="textTitleItem"
                 :rules="titleRules"
                 required
+                @change="onFormChange"
               />
               <v-textarea
                 v-model="description"
                 name="input-5-1"
                 :label="textDescription"
+                @change="onFormChange"
               />
               <v-list-item class="ma-0 pa-0">
                 <v-select
@@ -32,6 +34,7 @@
                   :label="textAgeRating"
                   :items="ratings"
                   :rules="ageRatingRules"
+                  @change="onFormChange"
                 />
                 <v-btn
                   class="mx-2"
@@ -52,6 +55,7 @@
                 :items="tags"
                 :label="textTags"
                 multiple
+                @change="onFormChange"
               />
               <v-list-item class="ma-0 pa-0">
                 <v-checkbox
@@ -354,6 +358,10 @@
 
     get textPublish() {
       return TextManager.translate("${ui_general.publish}");
+    }
+
+    onFormChange() {
+      document.dispatchEvent(new Event("metadataChanged"));
     }
 
     showAgeDialog() {
