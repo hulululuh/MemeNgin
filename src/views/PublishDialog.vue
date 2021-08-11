@@ -165,6 +165,7 @@
   const shell = electron.shell;
 
   export const TITLE_RULES = [
+    (v) => /^(\w+\.?)*\w+$/.test(v) || "project name is not valid",
     (v) => !!v || "Name is required",
     (v) => (v && v.length <= 25) || "Name must be less than 25 characters",
   ];
