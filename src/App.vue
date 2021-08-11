@@ -260,7 +260,8 @@
     get havePersistentDialog() {
       return (
         (this.$refs.closeDialog as CloseDialog).dialog ||
-        (this.$refs.publishDialog as PublishDialog).dialog
+        (this.$refs.publishDialog as PublishDialog).dialog ||
+        (this.$refs.startupMenu as StartupMenu).dialog
       );
     }
 
@@ -346,6 +347,8 @@
       );
       document.removeEventListener("mousemove", this.onMouseMove);
       document.removeEventListener("metadataChanged", this.onMetadataChanged);
+      document.removeEventListener("undo", this.undoAction);
+      document.removeEventListener("redo", this.redoAction);
     }
 
     onEditStarted() {
@@ -413,6 +416,8 @@
       document.addEventListener("projectItemDelete", this.onProjectItemDelete);
       document.addEventListener("mousemove", this.onMouseMove);
       document.addEventListener("metadataChanged", this.onMetadataChanged);
+      document.addEventListener("undo", this.undoAction);
+      document.addEventListener("redo", this.redoAction);
 
       const canvas = document.getElementById("editor") as HTMLCanvasElement;
       this.editor.setSceneCanvas(canvas);

@@ -224,6 +224,20 @@ export class NodeScene {
         if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === "a") {
           self.selectedItems = self.nodes;
         }
+
+        // Undo
+        if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === "z") {
+          document.dispatchEvent(new Event("undo"));
+        }
+
+        // Redo
+        if (
+          (evt.ctrlKey || evt.metaKey) &&
+          evt.shiftKey &&
+          evt.key.toLowerCase() === "z"
+        ) {
+          document.dispatchEvent(new Event("redo"));
+        }
       }
 
       // Library menu

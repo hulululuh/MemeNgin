@@ -11,12 +11,12 @@
       />
       <div class="card-list">
         <div
-          v-for="item in filteredList"
-          @click="itemClicked(item.type, item.name)"
-          :key="item.name"
           class="libcard"
+          v-for="item in filteredList"
           href="#"
           draggable="true"
+          @click="itemClicked(item.type, item.name)"
+          :key="item.name"
           :class="item == selectedItem ? 'selected-card' : ''"
         >
           <img

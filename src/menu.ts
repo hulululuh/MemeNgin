@@ -73,20 +73,20 @@ export function setupMenu() {
     {
       label: "Edit",
       submenu: [
-        {
-          label: "Undo",
-          accelerator: "CmdOrCtrl+Z",
-          click: (item, focusedWindow) => {
-            focusedWindow.webContents.send(MenuCommands.EditUndo);
-          },
-        },
-        {
-          label: "Redo",
-          accelerator: "CmdOrCtrl+Shift+Z",
-          click: (item, focusedWindow) => {
-            focusedWindow.webContents.send(MenuCommands.EditRedo);
-          },
-        },
+        // {
+        //   label: "Undo",
+        //   accelerator: "CmdOrCtrl+Z",
+        //   click: (item, focusedWindow) => {
+        //     focusedWindow.webContents.send(MenuCommands.EditUndo);
+        //   },
+        // },
+        // {
+        //   label: "Redo",
+        //   accelerator: "CmdOrCtrl+Shift+Z",
+        //   click: (item, focusedWindow) => {
+        //     focusedWindow.webContents.send(MenuCommands.EditRedo);
+        //   },
+        // },
         {
           label: "Cut",
           accelerator: "CmdOrCtrl+X",
