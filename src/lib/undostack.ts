@@ -24,7 +24,6 @@ export class UndoStack {
   push(action: any) {
     this.pointer += 1;
     this.stack.splice(this.pointer);
-
     this.stack.push(action);
     console.log(action);
 
@@ -62,6 +61,11 @@ export class UndoStack {
     if (this.pointer >= this.stack.length - 1) return;
 
     this.pointer += 1;
+
+    if (document && this.pointer == 0) {
+      const event = new UndoStackEvent("editStarted");
+      document.dispatchEvent(event);
+    }
 
     let action = this.stack[this.pointer];
     if (action instanceof Action) {

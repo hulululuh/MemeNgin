@@ -246,6 +246,12 @@ export class DesignerNode implements IPropertyHolder {
     } else {
       console.error("can not find property: " + name);
     }
+
+    // editing started
+    if (document) {
+      const event = new Event("editStarted");
+      document.dispatchEvent(event);
+    }
   }
 
   _init() {}
