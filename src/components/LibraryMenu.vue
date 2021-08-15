@@ -46,12 +46,9 @@
   import path from "path";
   import { AddItemsAction } from "@/lib/actions/additemsaction";
   import { UndoStack } from "@/lib/undostack";
+  const levenshtein = require("fast-levenshtein");
 
   declare let __static: any;
-
-  function compare(a: LibraryItem, b: LibraryItem) {
-    return a.name > b.name ? 1 : a.name == b.name ? 0 : -1;
-  }
 
   @Component
   export default class LibraryMenu extends Vue {
@@ -117,7 +114,12 @@
         return item.name.toLowerCase().includes(kw.toLowerCase());
       });
 
-      //list.sort(compare);
+      list.sort((a, b) => {
+        const distA = levenshtein.get(a.name.toLowerCase(), kw.toLowerCase());
+        const distB = levenshtein.get(b.name.toLowerCase(), kw.toLowerCase());
+        return distA == distB ? 0 : distA > distB ? 1 : -1;
+      });
+
       return list;
     }
 
