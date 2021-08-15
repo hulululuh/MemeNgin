@@ -20,6 +20,7 @@ export default new Vuex.Store({
     selectedAuthorName: "",
     currentProjectAuthorAvatar: null,
     currentProjectAuthorName: "",
+    undoStack: null,
   },
   mutations: {
     setMetadata(state, data) {

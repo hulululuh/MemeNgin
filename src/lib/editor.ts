@@ -84,6 +84,8 @@ export class Editor {
     DetectNode.loadModelAsync();
     this.selectedNodeId = "";
     this.undoStack = new UndoStack();
+    UndoStack.current = this.undoStack;
+    store.state.undoStack = UndoStack.current;
   }
 
   static getInstance() {
@@ -222,6 +224,7 @@ export class Editor {
     if (this.undoStack) this.undoStack.reset();
     this.undoStack = new UndoStack();
     UndoStack.current = this.undoStack;
+    store.state.undoStack = UndoStack.current;
 
     let self = this;
     this.nodeScene.onconnectioncreated = function(con: ConnectionGraphicsItem) {

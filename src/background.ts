@@ -12,8 +12,6 @@ const Config = require("electron-config");
 const config = new Config();
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-const undoShortcut = "CmdOrCtrl+Z";
-const redoShortcut = "CmdOrCtrl+Shift+Z";
 declare let __static: any;
 
 let vueDevToolsPath = null;

@@ -42,7 +42,12 @@
         tooltip="Open project"
         @click="openProject"
       />
-      <tooltip-button icon="mdi-undo" tooltip="Undo" @click="undoAction" />
+      <tooltip-button
+        icon="mdi-undo"
+        tooltip="Undo"
+        @click="undoAction"
+        :disabled="!undoable"
+      />
       <tooltip-button icon="mdi-redo" tooltip="Redo" @click="redoAction" />
       <tooltip-button
         icon="mdi-image-filter-center-focus-strong"
@@ -195,6 +200,7 @@
     MY_WORKS_PATH,
     isInsideReservedPath,
   } from "@/lib/utils";
+import store from "./store";
 
   const fsExtra = require("fs-extra");
   const electron = require("electron");
@@ -269,13 +275,13 @@
       return this.edited ? `${this.titleName} *` : this.titleName;
     }
 
-    get isEdited() {
-      if (UndoStack.current) return UndoStack.current.pointer > -1;
-      else return false;
-    }
-
     get tutorialIcon() {
       return "assets/icons/comment-question-outline.svg";
+    }
+
+    get undoable() {
+      const current = this.$store.state.undoStack;
+      return current ? current.pointer > -1 : false;
     }
 
     created() {
