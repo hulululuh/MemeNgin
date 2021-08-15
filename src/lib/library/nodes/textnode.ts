@@ -73,7 +73,7 @@ export class TextNode extends ImageDesignerNode {
 
         if (asset && this.selectedFontId != asset.id) {
           this.selectedFontId = asset.id;
-          this.textGeom.setupFont(this.selectedFontId);
+          this.textGeom.requestSetupFont(this.selectedFontId);
         }
       } else if (prop.name === "text" && value != this.textGeom.text) {
         this.textGeom.updateText(value);
@@ -110,7 +110,7 @@ export class TextNode extends ImageDesignerNode {
 
     this.onPropertyLoaded = () => {
       this.selectedFontId = this.fontProp.values[this.fontProp.index];
-      this.textGeom.setupFont(this.selectedFontId);
+      this.textGeom.requestSetupFont(this.selectedFontId);
       this.textGeom.updateAlign(<TextAlign>this.getProperty("align"));
       this.textGeom.updateAlignVertical(
         <TextAlignVertical>this.getProperty("alignVertical")
