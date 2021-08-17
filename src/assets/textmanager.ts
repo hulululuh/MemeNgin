@@ -16,7 +16,7 @@ export const LANGUAGES = {
     code: "en",
     region: "us",
   },
-  "es-419": {
+  "es": {
     name: "Español",
     data: "assets/translations/text-es.yaml",
     code: "es",
@@ -38,15 +38,15 @@ export const LANGUAGES = {
     // simplified
     name: "中文简体",
     data: "assets/translations/text-zh-CN.yaml",
-    code: "zh",
-    region: "CN",
+    code: "zh-CN",
+    region: "cn",
   },
   "zh-TW": {
     // traditional
     name: "中文繁體",
     data: "assets/translations/text-zh-TW.yaml",
-    code: "zh",
-    region: "TW",
+    code: "zh-TW",
+    region: "tw",
   },
   "fr": {
     name: "Français",
@@ -75,13 +75,13 @@ export const LANGUAGES = {
   "pt-PT": {
     name: "Português (Portugal)",
     data: "assets/translations/text-pt-PT.yaml",
-    code: "pt",
+    code: "pt-PT",
     region: "PT",
   },
   "pt-BR": {
     name: "Português (Brasil)",
     data: "assets/translations/text-pt-BR.yaml",
-    code: "pt",
+    code: "pt-BR",
     region: "BR",
   },
   "pl": {
