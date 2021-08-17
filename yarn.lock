@@ -16403,6 +16403,11 @@ vue-color@^2.7.1:
     material-colors "^1.0.0"
     tinycolor2 "^1.1.2"
 
+vue-country-flag@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/vue-country-flag/-/vue-country-flag-2.2.0.tgz#931c6b0acadee901468a8530378cd67c292dc7cd"
+  integrity sha512-Nn45mcy5uLWj2Lc0OWSwkUukKR4m2AOD0YlW+2eZ2qjB5nMCczZB75z8bQORaZ+yWEwrL2fS/e2SsP4CdYwgcg==
+
 vue-eslint-parser@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/vue-eslint-parser/-/vue-eslint-parser-5.0.0.tgz"
