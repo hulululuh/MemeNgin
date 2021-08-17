@@ -90,10 +90,10 @@ export const LANGUAGES = {
     code: "pl",
     region: "pol",
   },
-  "cs": {
+  "cz": {
     name: "Čeština",
-    data: "assets/translations/text-cs.yaml",
-    code: "cs",
+    data: "assets/translations/text-cz.yaml",
+    code: "cz",
     region: "cze",
   },
   "no": {
