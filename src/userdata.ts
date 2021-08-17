@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { ProjectItemData } from "@/community/ProjectItemData";
 import { isInsideReservedPath } from "@/lib/utils";
+import { TextManager } from "./assets/textmanager";
 
 const MAX_RECENT_FILE = 12;
 const app = require("electron").remote.app;
@@ -84,7 +85,6 @@ export class SearchOption {
 
 export class UserData {
   recentFiles: string[] = [];
-
   recentItems: ProjectItemData[] = [];
   subscribedItems: ProjectItemData[] = [];
   searchedItems: ProjectItemData[] = [];
@@ -100,6 +100,7 @@ export class UserData {
   seenDerivative: boolean = false;
   seenLegal: boolean = false;
   dontShowIntroAgain: boolean = false;
+  languageId: string = "en";
 
   static _instance: UserData = null;
   static getInstance(): UserData {
@@ -124,6 +125,10 @@ export class UserData {
       if (parsed.searchOption) instance.searchOption = parsed.searchOption;
       if (parsed.dontShowIntroAgain)
         instance.dontShowIntroAgain = parsed.dontShowIntroAgain;
+      if (parsed.languageId) {
+        instance.languageId = parsed.languageId;
+        TextManager.getInstance().setLanguage(parsed.languageId);
+      }
 
       // validate data and remove invalid path
       let invalids = [];

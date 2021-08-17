@@ -1,5 +1,6 @@
 // [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
 
+import { UserData } from "@/userdata";
 import fs from "fs";
 import path from "path";
 import YAML from "yaml";
@@ -13,85 +14,25 @@ export const LANGUAGES = {
     name: "English",
     data: "assets/translations/text-en.yaml",
     code: "en",
-    region: "",
-  },
-  "kor": {
-    name: "한국어",
-    data: "assets/translations/text-kor.yaml",
-    code: "kor",
-    region: "",
-  },
-  "de": {
-    name: "Deutsch",
-    data: "assets/translations/text-de.yaml",
-    code: "de",
-    region: "",
-  },
-  "fr": {
-    name: "Français",
-    data: "assets/translations/text-fr.yaml",
-    code: "fr",
-    region: "",
-  },
-  "ja": {
-    name: "日本語",
-    data: "assets/translations/text-ja.yaml",
-    code: "ja",
-    region: "",
-  },
-  "pt-PT": {
-    name: "Português (Portugal)",
-    data: "assets/translations/text-pt-PT.yaml",
-    code: "pt",
-    region: "PT",
-  },
-  "pt-BR": {
-    name: "Português (Brasil)",
-    data: "assets/translations/text-pt-BR.yaml",
-    code: "pt",
-    region: "BR",
-  },
-  "ru": {
-    name: "Русский",
-    data: "assets/translations/text-ru.yaml",
-    code: "ru",
-    region: "",
-  },
-  "cs": {
-    name: "Čeština",
-    data: "assets/translations/text-cs.yaml",
-    code: "cs",
-    region: "",
+    region: "us",
   },
   "es-419": {
     name: "Español",
     data: "assets/translations/text-es.yaml",
     code: "es",
-    region: "",
+    region: "es",
   },
-  "pl": {
-    name: "Polski",
-    data: "assets/translations/text-pl.yaml",
-    code: "pl",
-    region: "",
+  "kor": {
+    name: "한국어",
+    data: "assets/translations/text-kor.yaml",
+    code: "kor",
+    region: "kr",
   },
-  "nl": {
-    name: "Nederlands",
-    data: "assets/translations/text-nl.yaml",
-    code: "nl",
-    region: "",
-  },
-  "no": {
-    name: "Norsk",
-    data: "assets/translations/text-no.yaml",
-    code: "no",
-    region: "",
-  },
-  "tr": {
-    name: "Türkçe",
-    data: "assets/translations/text-tr.yaml",
-    code: "tr",
-    region: "",
+  "ja": {
+    name: "日本語",
+    data: "assets/translations/text-ja.yaml",
+    code: "ja",
+    region: "jpn",
   },
   "zh-CN": {
     // simplified
@@ -107,17 +48,77 @@ export const LANGUAGES = {
     code: "zh",
     region: "TW",
   },
+  "fr": {
+    name: "Français",
+    data: "assets/translations/text-fr.yaml",
+    code: "fr",
+    region: "fra",
+  },
+  "de": {
+    name: "Deutsch",
+    data: "assets/translations/text-de.yaml",
+    code: "de",
+    region: "deu",
+  },
+  "ru": {
+    name: "Русский",
+    data: "assets/translations/text-ru.yaml",
+    code: "ru",
+    region: "rus",
+  },
+  "tr": {
+    name: "Türkçe",
+    data: "assets/translations/text-tr.yaml",
+    code: "tr",
+    region: "tur",
+  },
+  "pt-PT": {
+    name: "Português (Portugal)",
+    data: "assets/translations/text-pt-PT.yaml",
+    code: "pt",
+    region: "PT",
+  },
+  "pt-BR": {
+    name: "Português (Brasil)",
+    data: "assets/translations/text-pt-BR.yaml",
+    code: "pt",
+    region: "BR",
+  },
+  "pl": {
+    name: "Polski",
+    data: "assets/translations/text-pl.yaml",
+    code: "pl",
+    region: "pol",
+  },
+  "cs": {
+    name: "Čeština",
+    data: "assets/translations/text-cs.yaml",
+    code: "cs",
+    region: "cze",
+  },
+  "no": {
+    name: "Norsk",
+    data: "assets/translations/text-no.yaml",
+    code: "no",
+    region: "nor",
+  },
   "sv": {
     name: "Svenska",
     data: "assets/translations/text-sv.yaml",
     code: "sv",
-    region: "",
+    region: "swe",
   },
   "da": {
     name: "Dansk",
     data: "assets/translations/text-da.yaml",
     code: "da",
-    region: "",
+    region: "dnk",
+  },
+  "nl": {
+    name: "Nederlands",
+    data: "assets/translations/text-nl.yaml",
+    code: "nl",
+    region: "nld",
   },
 };
 
@@ -155,8 +156,6 @@ export class TextManager {
 
   constructor() {
     this.parsedFallback = this.parseLanguage("en");
-    this.setLanguage("en");
-    //this.setLanguage("kor");
   }
 
   parseLanguage(languageId: string) {
@@ -174,5 +173,6 @@ export class TextManager {
   setLanguage(languageId: string) {
     this.languageId = languageId;
     this.parsed = this.parseLanguage(this.languageId);
+    UserData.getInstance().languageId = this.languageId;
   }
 }

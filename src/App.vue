@@ -8,6 +8,9 @@
       <v-btn fab icon x-small class="system-bar-button" @click="showTutorials">
         <v-img :src="tutorialIcon"> </v-img>
       </v-btn>
+      <v-btn fab icon x-small class="system-bar-button" @click="showLanguages">
+        <country-flag :country="language" size="normal" :rounded="true" />
+      </v-btn>
       <v-btn class="system-bar-button" @click="minimizeWindow">
         <v-icon>mdi-minus</v-icon>
       </v-btn>
@@ -118,6 +121,7 @@
     </v-navigation-drawer>
 
     <v-main>
+      <language-dialog ref="languageDialog" />
       <tutorial-dialog ref="tutorialDialog" />
       <message-dialog ref="messageDialog" />
       <publish-dialog @onCancel="onCancelled" ref="publishDialog" />
@@ -182,7 +186,7 @@
   import path from "path";
   import { QueryTarget, UserData } from "@/userdata";
   import { IPropertyHolder } from "./lib/designer/properties";
-  import { TextManager } from "@/assets/textmanager";
+  import { TextManager, LANGUAGES } from "@/assets/textmanager";
   import { UndoStack } from "./lib/undostack";
   import { ApplicationSettings } from "./settings";
   import { WorkshopManager } from "@/community/workshop";
@@ -193,6 +197,7 @@
     ProjectItemDeleteEvent,
   } from "@/views/ProjectItem.vue";
   import TutorialDialog from "@/views/TutorialDialog.vue";
+  import LanguageDialog from "@/views/LanguageDialog.vue";
   import { PUBLISH_TEMP_PATH } from "@/lib/project";
   import {
     TEMP_PATH,
@@ -200,7 +205,7 @@
     MY_WORKS_PATH,
     isInsideReservedPath,
   } from "@/lib/utils";
-import store from "./store";
+  import CountryFlag from "vue-country-flag";
 
   const fsExtra = require("fs-extra");
   const electron = require("electron");
@@ -217,6 +222,7 @@ import store from "./store";
       LibraryView,
       NodePropertiesView,
       LibraryMenu,
+      CountryFlag,
       startupMenu: StartupMenu,
       preview2d: Preview2D,
       closeDialog: CloseDialog,
@@ -225,6 +231,7 @@ import store from "./store";
       publishDialog: PublishDialog,
       projectNameDialog: ProjectNameDialog,
       tutorialDialog: TutorialDialog,
+      languageDialog: LanguageDialog,
     },
   })
   export default class App extends Vue {
@@ -265,6 +272,7 @@ import store from "./store";
 
     get havePersistentDialog() {
       return (
+        (this.$refs.languageDialog as StartupMenu).dialog ||
         (this.$refs.closeDialog as CloseDialog).dialog ||
         (this.$refs.publishDialog as PublishDialog).dialog ||
         (this.$refs.startupMenu as StartupMenu).dialog
@@ -282,6 +290,11 @@ import store from "./store";
     get undoable() {
       const current = this.$store.state.undoStack;
       return current ? current.pointer > -1 : false;
+    }
+
+    get language() {
+      const lanId = UserData.getInstance().languageId;
+      return LANGUAGES[lanId].region;
     }
 
     created() {
@@ -835,6 +848,10 @@ import store from "./store";
     }
 
     loadSample(name: string) {}
+
+    showLanguages() {
+      (this.$refs.languageDialog as LanguageDialog).dialog = true;
+    }
 
     showTutorials() {
       (this.$refs.tutorialDialog as TutorialDialog).dialog = true;
