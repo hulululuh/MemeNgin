@@ -124,6 +124,13 @@ export const LANGUAGES = {
 
 declare let __static: any;
 
+export enum WrapPolicy {
+  Space, // English, spanish, korean and many other languages
+  Width, // Chinese, Japanese and so on
+}
+
+const wrapWidth: string[] = ["ja", "zh-CN", "zh-TW"];
+
 const deepValue = (obj, path) =>
   path.split(".").reduce((p, c) => (p && p[c]) || null, obj);
 
@@ -152,6 +159,16 @@ export class TextManager {
       );
     }
     return translated;
+  }
+
+  static wrapPolicy(): WrapPolicy {
+    const languageId = this.getInstance()
+      ? this.getInstance().languageId
+      : "en";
+    const isWrapByWidth =
+      wrapWidth.findIndex((item) => item == languageId) != -1;
+
+    return isWrapByWidth ? WrapPolicy.Width : WrapPolicy.Space;
   }
 
   constructor() {

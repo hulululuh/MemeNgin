@@ -18,8 +18,9 @@ import {
 import { MoveItemsAction } from "../actions/moveItemsaction";
 import { UndoStack } from "../undostack";
 import { ApplicationSettings } from "@/settings";
-import { TextManager } from "@/assets/textmanager";
+import { TextManager, WrapPolicy } from "@/assets/textmanager";
 const settings = ApplicationSettings.getInstance();
+const MAX_WIDTH = 800;
 
 // https://stackoverflow.com/questions/5026961/html5-canvas-ctx-filltext-wont-do-line-breaks
 export class CommentGraphicsItem extends GraphicsItem
@@ -91,6 +92,47 @@ export class CommentGraphicsItem extends GraphicsItem
     // console.log(lines);
     // console.log(ctx);
     // console.log(ctx.font);
+
+    const wrapPolicy = TextManager.wrapPolicy();
+    if (wrapPolicy == WrapPolicy.Width) {
+      for (let idx = 0; idx < lines.length; idx++) {
+        let metrics = ctx.measureText(lines[idx]);
+        let testWidth = metrics.width;
+
+        // japanese & chinese doesn't seems to using space between words, need to split lines manually here.
+        // https://www.w3.org/International/articles/typography/linebreak.en
+        //const numLines = Math.ceil(testWidth / MAX_WIDTH);
+        const CHAR_MARGIN = 4;
+        const charPerLines =
+          Math.floor(lines[idx].length / (testWidth / MAX_WIDTH)) - CHAR_MARGIN;
+        const numLines = Math.ceil(lines[idx].length / charPerLines);
+
+        let _words = lines[idx];
+        let beginIdx = 0;
+        let splitted = [];
+
+        if (numLines > 1) {
+          for (let i = 0; i < numLines; i++) {
+            const endIdx = Math.min(beginIdx + charPerLines, _words.length);
+            const sliced = _words.substring(beginIdx, endIdx);
+            splitted.push(sliced);
+            beginIdx = endIdx;
+          }
+
+          lines[idx] = "";
+          for (let split of splitted) {
+            lines[idx] += `${split} `;
+          }
+        }
+      }
+
+      this.formatted = "";
+
+      for (let line of lines) {
+        this.formatted += `${line}\n`;
+      }
+    }
+
     for (let i = 0; i < lines.length; ++i) {
       let size = ctx.measureText(lines[i]);
       //console.log("INITIAL WITH: " + size.width);
@@ -141,6 +183,7 @@ export class CommentGraphicsItem extends GraphicsItem
       let testLine = line + words[n] + " ";
       let metrics = ctx.measureText(testLine);
       let testWidth = metrics.width;
+
       if (testWidth > maxWidth && n > 0) {
         line = words[n] + " ";
         y += lineHeight;
@@ -160,6 +203,7 @@ export class CommentGraphicsItem extends GraphicsItem
       let testLine = line + words[n] + " ";
       let metrics = ctx.measureText(testLine);
       let testWidth = metrics.width;
+
       if (testWidth > maxWidth && n > 0) {
         ctx.fillText(line, x, y);
         line = words[n] + " ";
