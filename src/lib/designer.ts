@@ -793,7 +793,6 @@ export class Designer {
         variable.property = new AssetProperty(
           name,
           displayName,
-          [],
           AssetType.Font
         );
         break;

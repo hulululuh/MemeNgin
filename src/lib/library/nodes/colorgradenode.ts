@@ -4,8 +4,8 @@ import { NodeType, NodeCategory } from "../../designer/designernode";
 import {
   ImageDesignerNode,
   TexPrecision,
-  UpdateTexture,
 } from "@/lib/designer/imagedesignernode";
+import { UpdateTexture } from "@/lib/utils";
 
 let parseCubeLUT = require("parse-cube-lut");
 import * as fs from "fs";

@@ -1,10 +1,8 @@
 // [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
 
 import { DesignerNode, NodeType } from "../../designer/designernode";
-import {
-  ImageDesignerNode,
-  UpdateTexture,
-} from "@/lib/designer/imagedesignernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+import { UpdateTexture } from "@/lib/utils";
 import * as mi from "@magenta/image";
 
 const NativeImage = require("electron").nativeImage;

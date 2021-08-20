@@ -5,7 +5,7 @@ import { Transform2D } from "@/lib/math/transform2d";
 import { Vector2 } from "math.gl";
 import { Color } from "@/lib/designer/color";
 import { Gradient } from "@/lib/designer/gradient";
-import { AssetType } from "@/assets/assetmanager";
+import { AssetManager, AssetType } from "@/assets/assetmanager";
 import { Editor } from "@/lib/editor";
 
 export const PROPERTY_NAME_RULES = [
@@ -221,26 +221,24 @@ export class BoolProperty extends Property {
 }
 
 export class AssetProperty extends Property {
-  values: string[];
-  index: number;
   value: string;
   assetType: AssetType;
 
-  constructor(
-    name: string,
-    displayName: string,
-    values: string[],
-    assetType: AssetType
-  ) {
+  constructor(name: string, displayName: string, assetType: AssetType) {
     super();
     this.name = name;
     this.displayName = displayName;
-    this.index = 0;
-    this.values = values;
-    this.value = this.values[this.index];
-    this.parentValue = this.index;
+
+    if (!this.value) {
+      this.value = this.values[0];
+    }
+    this.parentValue = this.value;
     this.type = PropertyType.Asset;
     this.assetType = assetType;
+  }
+
+  get values(): string[] {
+    return AssetManager.getInstance().fontIds;
   }
 
   getValues(): string[] {
@@ -248,28 +246,27 @@ export class AssetProperty extends Property {
   }
 
   getValue(): any {
-    return this.values[this.index];
+    return this.value;
   }
 
   setValue(val: any) {
-    this.index = this.values.indexOf(val);
+    this.value = val;
   }
 
   clone(): Property {
     let prop = new AssetProperty(
       this.name,
       this.displayName,
-      this.values.slice(0),
+      //this.values.slice(0),
       this.assetType
     );
-    prop.index = this.index;
 
     return prop;
   }
 
   copyValuesFrom(prop: AssetProperty) {
-    this.values = prop.values;
-    this.index = prop.index;
+    //this.values = prop.values;
+    this.value = prop.value;
   }
 }
 

@@ -1,10 +1,8 @@
 // [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
 
 import { NodeType } from "@/lib/designer/designernode";
-import {
-  ImageDesignerNode,
-  UpdateTexture,
-} from "@/lib/designer/imagedesignernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+import { UpdateTexture } from "@/lib/utils";
 import { buildShaderProgram } from "@/lib/designer/gl";
 import { Property, AssetProperty } from "@/lib/designer/properties";
 import { Color } from "@/lib/designer/color";
@@ -37,9 +35,7 @@ export class TextNode extends ImageDesignerNode {
     this.color = new Color(1.0, 1.0, 1.0);
 
     // Font
-    let fontAssetList = AssetManager.getInstance().getAssetLists(
-      AssetType.Font
-    );
+    let fontAssetList = AssetManager.getInstance().fontIds;
 
     if (!this.selectedFontId) {
       this.selectedFontId = fontAssetList[0];
@@ -108,9 +104,7 @@ export class TextNode extends ImageDesignerNode {
       }
     };
 
-    this.onPropertyLoaded = () => {
-      this.selectedFontId = this.fontProp.values[this.fontProp.index];
-      this.textGeom.requestSetupFont(this.selectedFontId);
+    this.onPropertyLoaded = async () => {
       this.textGeom.updateAlign(<TextAlign>this.getProperty("align"));
       this.textGeom.updateAlignVertical(
         <TextAlignVertical>this.getProperty("alignVertical")
@@ -120,6 +114,20 @@ export class TextNode extends ImageDesignerNode {
       this.textGeom.updateLetterSpacing(this.getProperty("letterSpacing"));
       this.textGeom.updateLineHeight(this.getProperty("lineHeight"));
       this.color = this.getProperty("color");
+
+      // if font property is using font of different locale
+      const isForeignFont =
+        this.fontProp.values.findIndex((item) => this.fontProp.value == item) !=
+        -1;
+
+      if (isForeignFont) {
+        await AssetManager.getInstance().findForeignFont(this.fontProp.value);
+      }
+
+      if (this.selectedFontId != this.fontProp.getValue()) {
+        this.selectedFontId = this.fontProp.value;
+        this.textGeom.requestSetupFont(this.selectedFontId);
+      }
 
       this.updateGeom();
     };
@@ -266,15 +274,7 @@ export class TextNode extends ImageDesignerNode {
     this.title = "Text";
 
     // Font
-    let fontAssetList = AssetManager.getInstance().getAssetLists(
-      AssetType.Font
-    );
-    this.fontProp = this.addAssetProperty(
-      "font",
-      "Font",
-      fontAssetList,
-      AssetType.Font
-    );
+    this.fontProp = this.addAssetProperty("font", "Font", AssetType.Font);
 
     // color
     this.addColorProperty("color", "Color", this.color);

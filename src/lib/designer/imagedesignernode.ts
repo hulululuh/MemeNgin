@@ -14,105 +14,12 @@ import {
 } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
 import { Matrix4 } from "@math.gl/core";
+import { UpdateTexture } from "@/lib/utils";
 
 export enum TexPrecision {
   lowp,
   midiump,
   highp,
-}
-
-const POTs: number[] = [
-  1,
-  2,
-  4,
-  8,
-  16,
-  32,
-  64,
-  128,
-  256,
-  512,
-  1024,
-  2048,
-  4096,
-];
-
-export function UpdateTexture<T>(
-  level: number,
-  internalFormat: number,
-  width: number,
-  height: number,
-  border: number,
-  format: number,
-  type: number,
-  pixels: ArrayBufferView,
-  nodetype: NodeType,
-  gl: WebGL2RenderingContext,
-  souldConvertChannel: boolean = false,
-  shouldFlip: boolean = false
-): WebGLTexture {
-  let tex = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, tex);
-  // bind a dummy texture to suppress WebGL warning.
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    1,
-    1,
-    0,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    new Uint8Array([255, 0, 255, 255])
-  ); // red
-
-  if (shouldFlip) {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-  } else {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
-  }
-
-  if (souldConvertChannel) {
-    // TODO: this should be fixed by using proper glAPI for texture format
-    for (let i = 0; i < width * height; i++) {
-      let pixelIdx = i * 4;
-      [pixels[pixelIdx], pixels[pixelIdx + 2]] = [
-        pixels[pixelIdx + 2],
-        pixels[pixelIdx],
-      ];
-    }
-  }
-
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    level,
-    internalFormat,
-    width,
-    height,
-    border,
-    format,
-    type,
-    pixels
-  );
-
-  const isPot = width === height && POTs.find((element) => element === width);
-  if (isPot) {
-    // set the filtering so we don't need mips
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-  } else {
-    // NPOT textures
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  }
-
-  gl.bindTexture(gl.TEXTURE_2D, null);
-
-  return tex;
 }
 
 export class ImageDesignerNode extends DesignerNode {

@@ -306,7 +306,6 @@
         shell.openExternal(`steam://openurl/${this.href}`);
       });
 
-      UserData.serialize();
       WorkshopManager.getInstance().refresh();
 
       electron.ipcRenderer.on(MenuCommands.FileNew, (evt, arg) => {

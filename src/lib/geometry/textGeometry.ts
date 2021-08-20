@@ -37,6 +37,7 @@ const BEZIER_STEP_SIZE = 3.0;
 // this is for inside checks - doesn't have to be particularly
 // small because glyphs have finite resolution
 const EPSILON = 1e-6;
+const FALLBACK_FONT_INTERVAL = 200;
 const TIMER_INTERVAL = 50;
 
 // class for converting path commands into point data
@@ -108,7 +109,7 @@ class Polygon {
 
 export class TextGeometry {
   text: string;
-  fontUrl: string;
+  fontId: string;
   size: number;
   thick: boolean;
   italic: boolean;
@@ -131,7 +132,7 @@ export class TextGeometry {
 
   constructor(
     text?,
-    fontUrl?,
+    fontId?,
     size?,
     thick?,
     italic?,
@@ -155,7 +156,7 @@ export class TextGeometry {
 
     this.font = FontCache.getInstance().fallbackFont;
 
-    this.requestSetupFont(fontUrl);
+    this.requestSetupFont(fontId, FALLBACK_FONT_INTERVAL);
   }
 
   updateSize(size: number) {
@@ -201,7 +202,7 @@ export class TextGeometry {
   }
 
   updateFont(fontUrl: string) {
-    if (this.fontUrl !== fontUrl) {
+    if (this.fontId !== fontUrl) {
       this.requestSetupFont(fontUrl);
     }
   }
@@ -231,13 +232,14 @@ export class TextGeometry {
     }
   }
 
-  async requestSetupFont(fontId: string) {
+  async requestSetupFont(fontId: string, interval: number = TIMER_INTERVAL) {
+    console.warn("font setup");
     // interval for skip duplicated requests
     clearTimeout(this.fontSetupTimer);
 
     this.fontSetupTimer = setTimeout(() => {
       this.setupFont(fontId);
-    }, TIMER_INTERVAL);
+    }, interval);
   }
 
   makeFontGeometry() {

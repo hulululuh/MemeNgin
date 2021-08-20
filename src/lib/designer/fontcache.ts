@@ -4,9 +4,14 @@ import opentype from "opentype.js";
 import hash from "object-hash";
 import path from "path";
 import { Dictionary } from "dictionary-types";
-import { AssetManager, AssetType, ASSET_FOLDER } from "@/assets/assetmanager";
+import {
+  AssetManager,
+  AssetType,
+  ASSET_FOLDER,
+  getAllFiles,
+} from "@/assets/assetmanager";
 
-const fontPath = "assets/fonts/Roboto/Roboto-Regular.ttf";
+const fontPath = "assets/fonts/fallback/NotoSansCJKjp-Regular.otf";
 
 export function CalcFontPath(pathToFont: string) {
   //return `./assets/nodes/${node}.png`;
@@ -30,7 +35,9 @@ export class FontCache {
     let self = this;
     opentype.load(fontPath, function(err, font) {
       if (err) {
-        alert("Font could not be loaded: " + err);
+        alert(
+          `[${path.parse(fontPath).name}] Font could not be loaded - ${err}`
+        );
       } else {
         self._fallbackFont = font;
       }
@@ -49,12 +56,17 @@ export class FontCache {
   }
 
   async getFontById(id: string): Promise<any> {
+    // abort, if invalid id is given
+    if (!id) return;
+
     const fonts = AssetManager.getInstance().assets.get(AssetType.Font);
-    const fontAsset = fonts.get(id);
-    const fontUrl = path.join(
-      `assets/${ASSET_FOLDER.get(AssetType.Font)}/`,
-      fontAsset.path
-    );
+    let fontAsset = fonts.get(id);
+
+    // if requested font not found in current locale, then user probably viewing other languages.
+    if (!fontAsset) {
+      fontAsset = await AssetManager.getInstance().findForeignFont(id);
+    }
+    const fontUrl = fontAsset.assetPath;
     const key = id;
 
     // use if font exits on the cache

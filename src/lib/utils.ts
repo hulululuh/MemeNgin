@@ -3,6 +3,7 @@
 
 import path from "path";
 import { WorkshopManager } from "@/community/workshop";
+import { NodeType } from "@/lib/designer/designernode";
 const NativeImage = require("electron").nativeImage;
 
 export const TEMP_PATH = path.join(path.resolve("."), "/projects/temp/");
@@ -113,4 +114,140 @@ export function isInsideReservedPath(target: string) {
   if (workshopRoot && isContainedBy(target, workshopRoot)) return true;
 
   return false;
+}
+
+const POTs: number[] = [
+  1,
+  2,
+  4,
+  8,
+  16,
+  32,
+  64,
+  128,
+  256,
+  512,
+  1024,
+  2048,
+  4096,
+];
+
+export function UpdateTexture<T>(
+  level: number,
+  internalFormat: number,
+  width: number,
+  height: number,
+  border: number,
+  format: number,
+  type: number,
+  pixels: ArrayBufferView,
+  nodetype: NodeType,
+  gl: WebGL2RenderingContext,
+  souldConvertChannel: boolean = false,
+  shouldFlip: boolean = false
+): WebGLTexture {
+  let tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  // bind a dummy texture to suppress WebGL warning.
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    1,
+    1,
+    0,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    new Uint8Array([255, 0, 255, 255])
+  ); // red
+
+  if (shouldFlip) {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+  } else {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+  }
+
+  if (souldConvertChannel) {
+    // TODO: this should be fixed by using proper glAPI for texture format
+    for (let i = 0; i < width * height; i++) {
+      let pixelIdx = i * 4;
+      [pixels[pixelIdx], pixels[pixelIdx + 2]] = [
+        pixels[pixelIdx + 2],
+        pixels[pixelIdx],
+      ];
+    }
+  }
+
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    level,
+    internalFormat,
+    width,
+    height,
+    border,
+    format,
+    type,
+    pixels
+  );
+
+  const isPot = width === height && POTs.find((element) => element === width);
+  if (isPot) {
+    // set the filtering so we don't need mips
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+  } else {
+    // NPOT textures
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  }
+
+  gl.bindTexture(gl.TEXTURE_2D, null);
+
+  return tex;
+}
+
+const latin: string[] = [
+  "en",
+  "es",
+  "fr",
+  "de",
+  "tr",
+  "pt-PT",
+  "pt-BR",
+  "pl",
+  "cz",
+  "no",
+  "sv",
+  "da",
+  "nl",
+];
+const chineseSC: string[] = ["zh-CN"];
+const chineseTC: string[] = ["zh-TW"];
+const japanese: string[] = ["ja"];
+const cyrillic: string[] = ["ru"];
+const korean: string[] = ["kor"];
+
+export function evaluateFontType(languageId: string): string {
+  if (latin.findIndex((item) => item == languageId) != -1) {
+    return "latin";
+  }
+  if (chineseSC.findIndex((item) => item == languageId) != -1) {
+    return "chineseSC";
+  }
+  if (japanese.findIndex((item) => item == languageId) != -1) {
+    return "japanese";
+  }
+  if (cyrillic.findIndex((item) => item == languageId) != -1) {
+    return "cyrillic";
+  }
+  if (korean.findIndex((item) => item == languageId) != -1) {
+    return "korean";
+  }
+  if (chineseTC.findIndex((item) => item == languageId) != -1) {
+    return "chineseTC";
+  }
 }

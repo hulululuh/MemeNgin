@@ -334,10 +334,9 @@ export class DesignerNode implements IPropertyHolder {
   addAssetProperty(
     id: string,
     displayName: string,
-    defaultVal: string[] = [],
     assetType: AssetType
   ): AssetProperty {
-    let prop = new AssetProperty(id, displayName, defaultVal, assetType);
+    let prop = new AssetProperty(id, displayName, assetType);
 
     this.properties.push(prop);
     return prop;

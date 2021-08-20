@@ -2,7 +2,7 @@
 
 import fs from "fs";
 import path from "path";
-import { Guid } from "@/lib/utils";
+import { Guid, evaluateFontType } from "@/lib/utils";
 import {
   TextGeometry,
   TextAlign,
@@ -11,8 +11,9 @@ import {
 import { Editor } from "@/lib/editor";
 import { NodeType } from "@/lib/designer/designernode";
 import { Color } from "@/lib/designer/color";
-import { UpdateTexture } from "@/lib/designer/imagedesignernode";
+import { UpdateTexture } from "@/lib/utils";
 import { buildShaderProgram } from "@/lib/designer/gl";
+import { UserData } from "@/userdata";
 const electron = require("electron");
 
 declare let __static: any;
@@ -75,14 +76,24 @@ export const ASSET_FOLDER = new Map([
 export class Asset {
   id!: any;
   name: string;
+  nickname?: string;
   path: string;
   icon: string;
   type: AssetType;
+  protected _assetPath: string;
   protected _isReady;
 
-  init(id: string, name: string, path: string, icon: string, type: string) {
+  init(
+    id: string,
+    name: string,
+    path: string,
+    icon: string,
+    type: string,
+    nickname: string
+  ) {
     this.id = id;
     this.name = name;
+    this.nickname = nickname;
     this.path = path;
     this.icon = icon;
     const t = type as AssetType;
@@ -114,9 +125,13 @@ export class Asset {
       this.id = Guid.newGuid();
     }
 
-    const assetRoot = "assets/" + ASSET_FOLDER.get(this.type) + "/";
-    const iconPath = path.join(__static, assetRoot, this.icon);
-    const assetPath = path.join(__static, assetRoot, this.path);
+    // save asset.json
+    const jsonPath = path.join(__static, this._assetPath, "asset.json");
+
+    let json = JSON.stringify(this, null, 4);
+    fs.writeFileSync(jsonPath, json);
+
+    const iconPath = path.join(__static, this.iconPath);
     if (!fs.existsSync(iconPath)) {
       try {
         let iconCreated = await this.buildIcon();
@@ -126,16 +141,6 @@ export class Asset {
         return;
       }
     }
-
-    // save asset.json
-    const jsonPath = path.join(__static, assetRoot, this.name, "asset.json");
-
-    let json = JSON.stringify(this, null, 4);
-    fs.writeFile(jsonPath, json, function(err) {
-      if (err) {
-        console.log(err);
-      }
-    });
   }
 
   load() {}
@@ -145,7 +150,11 @@ export class Asset {
   }
 
   get iconPath(): string {
-    return `assets/${ASSET_FOLDER.get(this.type)}/${this.icon}`;
+    return path.join(this._assetPath, this.icon);
+  }
+
+  get assetPath(): string {
+    return path.join(this._assetPath, this.path);
   }
 }
 
@@ -190,20 +199,26 @@ function createImageFromTexture(gl, texture, width, height) {
 
 export class FontAsset extends Asset {
   async buildIcon(): Promise<any> {
-    const assetRoot = "assets/" + ASSET_FOLDER.get(this.type) + "/";
-    const iconPath = path.join(__static, assetRoot, this.icon);
-    const fontPath = path.join(assetRoot, this.path);
+    const iconPath = path.join(__static, this.iconPath);
+    const name = this.nickname.length > 0 ? this.nickname : this.name;
+
+    let [height, alignVert] = [fontHeight * 0.7, TextAlignVertical.Center];
+
+    const isJP = true;
+    if (isJP) {
+      [height, alignVert] = [fontHeight * 0.6, TextAlignVertical.Top];
+    }
     let textGeom = new TextGeometry(
-      this.name,
-      fontPath,
-      fontHeight * 0.7,
+      name,
+      this.id,
+      height,
       false,
       false,
       1,
       0,
       1.5,
       TextAlign.Left,
-      TextAlignVertical.Center
+      alignVert
     );
 
     textGeom.onFontChanged = () => {
@@ -374,32 +389,77 @@ export class AssetManager {
     this.addFactory("lut", LutAsset);
     this.addFactory("icon", IconAsset);
 
+    UserData.serialize();
     this.initialize();
   }
 
-  initialize() {
+  async initialize() {
+    let assetFiles = [];
     for (const value of Object.values(AssetType)) {
       const assetRoot = "assets/" + ASSET_FOLDER.get(value as AssetType) + "/";
       const assetPath = path.join(__static, assetRoot);
+      if (value == AssetType.Font) {
+        const id = UserData.getInstance().languageId;
+        const fontType: string = evaluateFontType(id);
 
-      let assetFiles = [];
-      getAllFiles(assetPath, assetFiles, "asset.json");
+        // locale
+        if (fontType != "latin") {
+          const fontsLocalePath = path.join(assetPath, fontType);
+          getAllFiles(fontsLocalePath, assetFiles, "asset.json");
+        }
 
-      let self = this;
-      for (const assetFile of assetFiles) {
-        const relPath = path.relative(__static, assetFile);
-        fetch(relPath).then((res) => {
-          return res.json().then((json) => {
-            let asset = this.create(json);
-            if (asset) self.assets.get(json.type).set(asset.id, asset);
-          });
-        });
+        // plus latin
+        const fontsLatinPath = path.join(assetPath, "latin");
+        getAllFiles(fontsLatinPath, assetFiles, "asset.json");
+      } else {
+        getAllFiles(assetPath, assetFiles, "asset.json");
       }
+    }
+
+    let self = this;
+    for (const assetFile of assetFiles) {
+      const relPath = path.relative(__static, assetFile);
+      let asset = await this.create(relPath);
+      if (asset) self.assets.get(asset.type).set(asset.id, asset);
     }
     console.log(this.assets);
   }
 
-  create(json: any) {
+  async findForeignFont(fontId: string) {
+    let assetFiles = [];
+    const assetRoot = "assets/" + ASSET_FOLDER.get(AssetType.Font) + "/";
+    const assetPath = path.join(__static, assetRoot);
+    getAllFiles(assetPath, assetFiles, "asset.json");
+
+    for (const assetFile of assetFiles) {
+      const relPath = path.relative(__static, assetFile);
+      let asset: Asset = await new Promise((resolve) => {
+        resolve(this.create(relPath));
+      });
+
+      if (asset) {
+        let existed = this.assets.get(AssetType.Font).get(asset.id);
+        if (existed) continue;
+        if (fontId == asset.id) {
+          this.assets.get(AssetType.Font).set(asset.id, asset);
+          return asset;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  //create(json: any) {
+  async create(jsonPath: any) {
+    let json: any = await new Promise((resolve) => {
+      fetch(jsonPath).then((res) => {
+        res.json().then((json) => {
+          resolve(json);
+        });
+      });
+    });
+
     const factoryName = json.type;
     if (!this.factories.has(factoryName)) {
       console.error(`we are not supporting asset ${factoryName} yet.`);
@@ -407,14 +467,20 @@ export class AssetManager {
     }
 
     let asset = this.factories.get(factoryName).create();
+    asset._assetPath = path.parse(jsonPath).dir;
     asset.init(
       json.id,
       json.name,
       json.path,
       json.icon,
-      json.type as AssetType
+      json.type as AssetType,
+      json.nickname ? json.nickname : ""
     );
     return asset;
+  }
+
+  get fontIds(): string[] {
+    return [...this.assets.get(AssetType.Font).keys()];
   }
 
   getAssetLists(type: AssetType) {

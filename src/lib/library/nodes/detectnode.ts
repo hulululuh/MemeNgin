@@ -1,9 +1,7 @@
 // [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
 
-import {
-  ImageDesignerNode,
-  UpdateTexture,
-} from "@/lib/designer/imagedesignernode";
+import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+import { UpdateTexture } from "@/lib/utils";
 import { DesignerNode, NodeType } from "../../designer/designernode";
 import { Editor } from "@/lib/editor";
 
