@@ -50,7 +50,7 @@ You can communicate about this project on the **[Discord community](https://disc
 Got ideas, suggestions or feedback? Reach out to me on [e-mail](mailto:admin@memengin.com)
 
 ## Contribute to the project
-- I need help translating MemeNgin into your language. If you're interested, take a look **[here](https://github.com/hulululuh/MemeNginData/blob/main/translations/README.md)**
+- I need help translating MemeNgin into your language, including english. If you're interested, take a look **[Translation Guidelines](https://github.com/hulululuh/MemeNginData/blob/main/translations/README.md)**.
 - Currently, i didn't thought about accepting pull requests, before current milestone is finished. if you would like to contribute to the project, please DM me in discord.
 
 ## Related Projects
