@@ -49,6 +49,10 @@ You can communicate about this project on the **[Discord community](https://disc
 ## Feedback
 Got ideas, suggestions or feedback? Reach out to me on [e-mail](mailto:admin@memengin.com)
 
+## Contribute to the project
+I need help translating MemeNgin into your language. If you're interested, take a look **[here](https://github.com/hulululuh/MemeNginData/blob/main/translations/README.md)**
+Currently, i didn't thought about accepting pull requests, before current milestone is finished. if you would like to contribute to the project, please DM me in discord.
+
 ## Related Projects
 - This project started by forking **[TextureLab](https://github.com/njbrown/texturelab)**, which allowed me to focus on my goals. If you are looking for a procedural texture generator, I definitely recommend checking out texturelab. Thanks to **[njbrown](https://github.com/njbrown)** for open sourcing his work.
 
