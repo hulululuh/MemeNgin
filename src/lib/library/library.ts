@@ -19,6 +19,7 @@ import { CopyNode } from "./nodes/copynode";
 import { DetectNode } from "./nodes/detectnode";
 import { DirectionalWarpNode } from "./nodes/directionalwarpnode";
 import { FloatPropertyNode } from "./nodes/floatpropertynode";
+import { CurveNode } from "./nodes/curvenode";
 import { Vector2PropertyNode } from "./nodes/vector2propertynode";
 import { FractalNoiseNode } from "./nodes/fractalnoisenode";
 import { GradientMapNode } from "./nodes/gradientmapnode";
@@ -255,6 +256,7 @@ export function createLibrary() {
   lib.addNode("greatereq", "GreaterEqNode", GreaterEqNode, NodeCategory.Logic);
   lib.addNode("less", "LessNode", LessNode, NodeCategory.Logic);
   lib.addNode("lesseq", "LessEqNode", LessEqNode, NodeCategory.Logic);
+  lib.addNode("curve", "CurveNode", CurveNode, NodeCategory.Logic);
 
   lib.addNode("output", "Output", OutputNode, NodeCategory.Control);
   lib.addNode("copy", "Copy", CopyNode, NodeCategory.Control);

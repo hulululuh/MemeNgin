@@ -4,8 +4,8 @@ import { DesignerNode } from "@/lib/designer/designernode";
 import { Property, PropertyType } from "@/lib/designer/properties";
 
 export enum LogicType {
-  Property,
-  Operator,
+  Property, // It's a value
+  Operator, // It's a computed value
 }
 
 export class LogicDesignerNode extends DesignerNode {

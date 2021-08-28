@@ -38,6 +38,7 @@
   import { OutputNode } from "@/lib/library/nodes/outputnode";
   import { Property, IPropertyHolder } from "@/lib/designer/properties";
   import { Vue, Prop, Component } from "vue-property-decorator";
+  import CurvePropertyView from "@/components/properties/CurveProp.vue";
   import FloatPropertyView from "@/components/properties/FloatProp.vue";
   import BoolPropertyView from "@/components/properties/BoolProp.vue";
   import EnumPropertyView from "@/components/properties/EnumProp.vue";
@@ -64,6 +65,7 @@
 
   @Component({
     components: {
+      curve: CurvePropertyView,
       float: FloatPropertyView,
       int: FloatPropertyView,
       bool: BoolPropertyView,

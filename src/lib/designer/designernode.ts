@@ -16,8 +16,10 @@ import {
   GradientProperty,
   IPropertyHolder,
   Transform2DProperty,
+  CurveProperty,
   AssetProperty,
   Vector2Property,
+  CurveData,
 } from "@/lib/designer/properties";
 import { AssetType } from "@/assets/assetmanager";
 import { Color } from "@/lib/designer/color";
@@ -327,6 +329,16 @@ export class DesignerNode implements IPropertyHolder {
   ): BoolProperty {
     let prop = new BoolProperty(id, displayName, defaultVal);
 
+    this.properties.push(prop);
+    return prop;
+  }
+
+  addCurveProperty(
+    id: string,
+    displayName: string,
+    defaultVal: CurveData
+  ): CurveProperty {
+    let prop = new CurveProperty(id, displayName, defaultVal);
     this.properties.push(prop);
     return prop;
   }

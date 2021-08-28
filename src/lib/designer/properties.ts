@@ -25,6 +25,7 @@ export enum PropertyType {
   File = "file",
   Transform2D = "transform2d",
   Vector2 = "vector2",
+  Curve = "curve",
   Asset = "asset",
 
   // use it on the socket
@@ -216,6 +217,63 @@ export class BoolProperty extends Property {
   }
 
   copyValuesFrom(prop: BoolProperty) {
+    this.value = prop.value;
+  }
+}
+
+export class CurveData {
+  cpStart: Array<number>;
+  cpEnd: Array<number>;
+
+  constructor(_cpStart: Array<number>, _cpEnd: Array<number>) {
+    Object.assign(this, { cpStart: _cpStart, cpEnd: _cpEnd });
+  }
+
+  clone() {
+    let data = new CurveData(
+      new Vector2(this.cpStart),
+      new Vector2(this.cpEnd)
+    );
+    return data;
+  }
+
+  equals(other: CurveData) {
+    return (
+      this.cpStart[0] == other.cpStart[0] &&
+      this.cpStart[1] == other.cpStart[1] &&
+      this.cpEnd[0] == other.cpEnd[0] &&
+      this.cpEnd[1] == other.cpEnd[1]
+    );
+  }
+}
+export class CurveProperty extends Property {
+  value: CurveData;
+
+  constructor(name: string, displayName: string, value: CurveData) {
+    super();
+    this.name = name;
+    this.displayName = displayName;
+    this.value = value;
+    this.parentValue = value;
+    this.type = PropertyType.Curve;
+  }
+
+  getValue(): any {
+    return this.value;
+  }
+
+  setValue(val: CurveData) {
+    // todo: validate
+    this.value = val;
+  }
+
+  clone(): Property {
+    let prop = new CurveProperty(this.name, this.displayName, this.value);
+
+    return prop;
+  }
+
+  copyValuesFrom(prop: CurveProperty) {
     this.value = prop.value;
   }
 }

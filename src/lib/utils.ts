@@ -4,6 +4,7 @@
 import path from "path";
 import { WorkshopManager } from "@/community/workshop";
 import { NodeType } from "@/lib/designer/designernode";
+import { Vector2 } from "@math.gl/core";
 const NativeImage = require("electron").nativeImage;
 
 export const TEMP_PATH = path.join(path.resolve("."), "/projects/temp/");
@@ -251,3 +252,35 @@ export function evaluateFontType(languageId: string): string {
     return "chineseTC";
   }
 }
+
+function clampVal(number, min, max) {
+  return Math.max(min, Math.min(number, max));
+}
+
+export function clamp(val: Vector2, min: Vector2, max: Vector2): Vector2 {
+  let clamped = new Vector2(Vector2.ZERO);
+  for (let i = 0; i < 2; i++) {
+    clamped[i] = clampVal(val[i], min[i], max[i]);
+  }
+  return clamped;
+}
+
+export enum Easing {
+  EaseIn_Cubic,
+  EaseOut_Cubic,
+  EaseInOut_Cubic,
+  EaseIn_Expo,
+  EaseOut_Expo,
+  EaseInOut_Expo,
+  Linear,
+}
+
+export const EASING_FUNCTIONS = new Map<Easing, Array<number>>([
+  [Easing.EaseIn_Cubic, [0.32, 0, 0.67, 0]],
+  [Easing.EaseOut_Cubic, [0.33, 1, 0.68, 1]],
+  [Easing.EaseInOut_Cubic, [0.65, 0, 0.35, 1]],
+  [Easing.EaseIn_Expo, [0.7, 0, 0.84, 0]],
+  [Easing.EaseOut_Expo, [0.16, 1, 0.3, 1]],
+  [Easing.EaseInOut_Expo, [0.87, 0, 0.13, 1]],
+  [Easing.Linear, [0, 0, 1, 1]],
+]);

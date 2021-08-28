@@ -820,10 +820,6 @@ export class NodeScene {
     }
 
     for (let item of this.nodes) {
-      // check for selection ( only do this when not dragging anything )
-      //if (item == this.selectedNode) nodeState.selected = true;
-      //else nodeState.selected = false;
-
       // check for hover
       if (item.isPointInside(mouseX, mouseY) && this.hitSocket == null)
         nodeState.hovered = true;
