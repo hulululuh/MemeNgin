@@ -61,6 +61,7 @@
   import Curve, { Handle } from "@/components/curveeditor/Curve.vue";
   import { Vector2 } from "@math.gl/core";
   import { clamp, Easing, EASING_FUNCTIONS } from "@/lib/utils";
+  import { plainToClass } from "class-transformer";
 
   const margin = 0.03;
   @Component({
@@ -104,8 +105,9 @@
     mounted() {
       this.isEditing = false;
       this.text = this.prop.value.toString();
+
       this.oldValue = {
-        value: this.prop.getValue().clone(),
+        value: plainToClass(CurveData, this.prop.getValue()).clone(),
         exposed: this.prop.getExposed(),
       };
       this.propertyName.name = this.prop.displayName;
@@ -159,7 +161,7 @@
 
     focus() {
       this.oldValue = {
-        value: this.prop.getValue().clone(),
+        value: plainToClass(CurveData, this.prop.getValue()).clone(),
         exposed: this.prop.getExposed(),
       };
     }
