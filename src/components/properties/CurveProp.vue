@@ -17,26 +17,33 @@
     />
 
     <v-row class="ma-0 pa-0">
-      <v-col class="pa-0 ma-0" v-for="(item, i) in easingFunctions" :key="i"
-        ><v-btn
-          class="ma-0 pa-0"
-          min-width="40px"
-          min-height="40px"
-          elevation="1"
-          @click="selectEasing(i)"
-        >
-          <v-flex class="ma-1">
-            <svg :viewBox="viewBox">
-              <path
-                fill="none"
-                stroke="black"
-                :d="curvify(item)"
-                :stroke-width="`10%`"
-                :transform="transformCurve"
-              />
-            </svg>
-          </v-flex>
-        </v-btn>
+      <v-col class="pa-0 ma-0" v-for="item in easingKeys" :key="item">
+        <v-tooltip bottom max-width="300">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              class="ma-0 pa-0"
+              min-width="48px"
+              min-height="48px"
+              elevation="1"
+              @click="selectEasing(item)"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-flex class="ma-1">
+                <svg :viewBox="viewBox">
+                  <path
+                    fill="none"
+                    stroke="black"
+                    :d="curvify(item)"
+                    :stroke-width="`6%`"
+                    :transform="transformCurve"
+                  />
+                </svg>
+              </v-flex>
+            </v-btn>
+          </template>
+          <span width>{{ item }}</span>
+        </v-tooltip>
       </v-col>
     </v-row>
   </v-container>
@@ -86,8 +93,8 @@
 
     isEditing: boolean;
 
-    get easingFunctions(): Map<Easing, number[]> {
-      return EASING_FUNCTIONS;
+    get easingKeys(): Array<Easing> {
+      return [...EASING_FUNCTIONS.keys()];
     }
 
     get propertyName() {
@@ -185,8 +192,6 @@
     onApplyCurve() {
       let data = this.prop.getValue();
       let curve = this.$refs.curve as Curve;
-      // const ptMin = new Vector2(curve.coordMin, curve.coordMin);
-      // const ptMax = new Vector2(curve.coordMax, curve.coordMax);
 
       const ptMin = new Vector2(Vector2.ZERO);
       const ptMax = new Vector2(1, 1);
@@ -204,7 +209,7 @@
 
     selectEasing(func: Easing) {
       this.focus();
-      const data = this.easingFunctions.get(func);
+      const data = EASING_FUNCTIONS.get(func);
       const curveData = new CurveData(
         new Vector2(data[0], data[1]),
         new Vector2(data[2], data[3])
@@ -213,9 +218,9 @@
       this.blur();
     }
 
-    curvify(data: Array<number>) {
-      const curveData = data[1];
-      const curve = `M0,0 C${curveData[0]},${curveData[1]} ${curveData[2]},${curveData[3]} 1,1`;
+    curvify(item: Easing) {
+      const data = EASING_FUNCTIONS.get(item);
+      const curve = `M0,0 C${data[0]},${data[1]} ${data[2]},${data[3]} 1,1`;
       return curve;
     }
 
