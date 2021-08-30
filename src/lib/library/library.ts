@@ -252,11 +252,11 @@ export function createLibrary() {
     NodeCategory.Logic
   );
 
-  lib.addNode("greater", "GreaterNode", GreaterNode, NodeCategory.Logic);
-  lib.addNode("greatereq", "GreaterEqNode", GreaterEqNode, NodeCategory.Logic);
-  lib.addNode("less", "LessNode", LessNode, NodeCategory.Logic);
-  lib.addNode("lesseq", "LessEqNode", LessEqNode, NodeCategory.Logic);
-  lib.addNode("curve", "CurveNode", CurveNode, NodeCategory.Logic);
+  lib.addNode("greater", "Greater", GreaterNode, NodeCategory.Logic);
+  lib.addNode("greatereq", "GreaterEq", GreaterEqNode, NodeCategory.Logic);
+  lib.addNode("less", "Less", LessNode, NodeCategory.Logic);
+  lib.addNode("lesseq", "LessEq", LessEqNode, NodeCategory.Logic);
+  lib.addNode("curve", "Curve", CurveNode, NodeCategory.Logic);
 
   lib.addNode("output", "Output", OutputNode, NodeCategory.Control);
   lib.addNode("copy", "Copy", CopyNode, NodeCategory.Control);
