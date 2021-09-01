@@ -16,6 +16,7 @@ import { ColorizeNode, ColorNode } from "./nodes/colornode";
 import { UvCoordNode } from "./nodes/uvcoordnode";
 import { ColorPropertyNode } from "./nodes/colorpropertynode";
 import { CopyNode } from "./nodes/copynode";
+import { TimeNode } from "./nodes/timenode";
 import { DetectNode } from "./nodes/detectnode";
 import { DirectionalWarpNode } from "./nodes/directionalwarpnode";
 import { FloatPropertyNode } from "./nodes/floatpropertynode";
@@ -64,6 +65,8 @@ import { XorGateNode } from "./nodes/xorgatenode";
 import { NotGateNode } from "./nodes/notgatenode";
 import { NumSelectorNode } from "./nodes/numselectornode";
 import { ImgSelectorNode } from "./nodes/imgselectornode";
+import { InterpolatorNode } from "./nodes/interpolatornode";
+import { RepeaterNode } from "./nodes/repeaternode";
 import { GreaterNode } from "./nodes/greaternode";
 import { GreaterEqNode } from "./nodes/greatereqnode";
 import { LessNode } from "./nodes/lessnode";
@@ -251,6 +254,13 @@ export function createLibrary() {
     ImgSelectorNode,
     NodeCategory.Logic
   );
+  lib.addNode(
+    "interpolator",
+    "Interpolator",
+    InterpolatorNode,
+    NodeCategory.Logic
+  );
+  lib.addNode("repeater", "Repeater", RepeaterNode, NodeCategory.Logic);
 
   lib.addNode("greater", "Greater", GreaterNode, NodeCategory.Logic);
   lib.addNode("greatereq", "GreaterEq", GreaterEqNode, NodeCategory.Logic);
@@ -259,6 +269,7 @@ export function createLibrary() {
   lib.addNode("curve", "Curve", CurveNode, NodeCategory.Logic);
 
   lib.addNode("output", "Output", OutputNode, NodeCategory.Control);
+  lib.addNode("time", "Time", TimeNode, NodeCategory.Control);
   lib.addNode("copy", "Copy", CopyNode, NodeCategory.Control);
 
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Experimental); // to be logic
