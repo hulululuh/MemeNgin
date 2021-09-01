@@ -4,6 +4,8 @@
 import {
   SocketGraphicsItem,
   SocketInOut,
+  DEFAULT_SOCKET_SIZE,
+  SMALL_SOSCKET_SIZE,
 } from "@/lib/scene/socketgraphicsitem";
 import { ImageCanvas } from "@/lib/designer/imagecanvas";
 import {
@@ -88,25 +90,53 @@ export class NodeGraphicsItem extends GraphicsItem {
   setupSockets() {
     // clear existing array
     let node = this.dNode;
+    const socketSize =
+      node instanceof LogicDesignerNode
+        ? SMALL_SOSCKET_SIZE
+        : DEFAULT_SOCKET_SIZE;
     this.sockets = [];
 
     if (this.dNode instanceof StringPropertyNode)
       this.dNode.updateVariableProperty();
 
     for (let input of node.getInputs()) {
-      this.addSocket(input, input, SocketInOut.In, PropertyType.Image);
+      this.addSocket(
+        input,
+        input,
+        SocketInOut.In,
+        PropertyType.Image,
+        socketSize
+      );
     }
 
     for (let prop of node.getExposedProperties()) {
-      this.addSocket(prop.name, prop.name, SocketInOut.In, prop.type);
+      this.addSocket(
+        prop.name,
+        prop.name,
+        SocketInOut.In,
+        prop.type,
+        socketSize
+      );
     }
 
     // Logic designer node
     if (node instanceof LogicDesignerNode) {
       let outputType = (node as LogicDesignerNode).outputType;
-      this.addSocket("output", "output", SocketInOut.Out, outputType);
+      this.addSocket(
+        "output",
+        "output",
+        SocketInOut.Out,
+        outputType,
+        socketSize
+      );
     } else {
-      this.addSocket("output", "output", SocketInOut.Out, PropertyType.Image);
+      this.addSocket(
+        "output",
+        "output",
+        SocketInOut.Out,
+        PropertyType.Image,
+        socketSize
+      );
     }
 
     this.sortSockets();
@@ -169,7 +199,6 @@ export class NodeGraphicsItem extends GraphicsItem {
       ctx.strokeStyle = "rgb(255, 255, 255)";
       ctx.beginPath();
       ctx.lineWidth = 8;
-      //ctx.rect(this.x, this.y, this.width, this.height);
       this.roundRect(ctx, this.x, this.y, this.width, this.height, 2);
       ctx.stroke();
     }
@@ -337,7 +366,7 @@ export class NodeGraphicsItem extends GraphicsItem {
 
   sortSockets() {
     // top and bottom padding for sockets
-    let pad = 10;
+    let pad = 2;
 
     // sort in sockets
     let socks = this.getInSockets();
@@ -436,12 +465,19 @@ export class NodeGraphicsItem extends GraphicsItem {
   }
 
   // adds socket to node
-  addSocket(name: string, id: string, type: SocketInOut, propType: any) {
+  addSocket(
+    name: string,
+    id: string,
+    type: SocketInOut,
+    propType: any,
+    radius: number = 8
+  ) {
     let sock = new SocketGraphicsItem(propType);
     sock.id = id;
     sock.title = name;
     sock.node = this;
     sock.socketInOut = type;
+    sock.radius = radius;
     this.sockets.push(sock);
     return sock;
   }

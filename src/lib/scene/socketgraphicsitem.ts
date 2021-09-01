@@ -23,6 +23,9 @@ import { ApplicationSettings } from "@/settings";
 
 const settings = ApplicationSettings.getInstance();
 
+export const SMALL_SOSCKET_SIZE = 7;
+export const DEFAULT_SOCKET_SIZE = 8;
+
 export enum SocketInOut {
   In,
   Out,
@@ -56,7 +59,7 @@ export class SocketGraphicsItem extends GraphicsItem {
   node!: NodeGraphicsItem;
   socketInOut!: SocketInOut;
   propertyType!: PropertyType;
-  radius: number = 8;
+  radius: number = DEFAULT_SOCKET_SIZE;
 
   // only in sockets store the connection
   // since outsockets can have multiple connections
