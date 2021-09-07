@@ -8206,7 +8206,7 @@ getpass@^0.1.1:
 
 gifwrap@^0.9.2:
   version "0.9.2"
-  resolved "https://registry.npmjs.org/gifwrap/-/gifwrap-0.9.2.tgz"
+  resolved "https://registry.yarnpkg.com/gifwrap/-/gifwrap-0.9.2.tgz#348e286e67d7cf57942172e1e6f05a71cee78489"
   integrity sha512-fcIswrPaiCDAyO8xnWvHSZdWChjKXUanKKpAiWWJ/UTkEi/aYKn5+90e7DE820zbEaVR9CE2y4z9bzhQijZ0BA==
   dependencies:
     image-q "^1.1.1"

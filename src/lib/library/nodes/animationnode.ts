@@ -2,15 +2,20 @@
 
 import { NodeCategory, NodeType } from "@/lib/designer/designernode";
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
-import { UpdateTexture } from "@/lib/utils";
+import { loadGif, UpdateTexture } from "@/lib/utils";
 import { Property, FileProperty } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
-import { loadImage } from "@/lib/utils";
+import { BitmapImage, GifFrame, GifUtil, GifCodec } from "gifwrap";
+//const { GifFrame, GifUtil, GifCodec } = require('gifwrap');
 
-export class TextureNode extends ImageDesignerNode {
+export class AnimationNode extends ImageDesignerNode {
   protected bmp: Uint8Array = null;
   protected imgWidth: number = 0;
   protected imgHeight: number = 0;
+  protected frameCount: number = 1;
+  protected currentFrameIndex: number = 0;
+  animation: any;
+  progressProp: Property;
 
   // constructor
   constructor() {
@@ -26,28 +31,70 @@ export class TextureNode extends ImageDesignerNode {
         if (this.texPath) {
           this.load();
         }
+      } else if (prop.name === "progress") {
+        const idx = this.frameIndex;
+        if (this.currentFrameIndex != idx) {
+          this.currentFrameIndex = idx;
+          this.imgWidth;
+          this.imgHeight;
+
+          this.bmp = this.getFrame(this.currentFrameIndex);
+          this.createTexture();
+          this.requestUpdate();
+        }
       }
     };
+  }
+
+  get progress() {
+    return this.getPropertyValueByName("progress");
+  }
+
+  get frameIndex() {
+    return Math.floor((this.frameCount - Number.EPSILON) * this.progress);
   }
 
   load() {
     let target = this.isDataUrl ? this.imgData : this.texPath;
     if (!target) return;
 
-    loadImage(target, this.isDataUrl).then((img) => {
-      if (!img) return;
-      this.bmp = img.getBitmap();
-      const size = img.getSize();
-      this.imgWidth = size.width;
-      this.imgHeight = size.height;
+    loadGif(target, this.isDataUrl).then((animation: any) => {
+      if (!animation) return;
 
-      if (!this.bmp) {
-        console.log("load image failed");
-      }
+      this.animation = animation;
+      this.frameCount = this.animation.frames.length;
+      this.imgWidth = this.animation.width;
+      this.imgHeight = this.animation.height;
+
+      this.animation.frames.forEach((frame) => {
+        if (this.imgWidth != frame.width || this.imgHeight != frame.height) {
+          frame.reframe(
+            -frame.xOffset,
+            -frame.yOffset,
+            this.imgWidth,
+            this.imgHeight,
+            "0x00000000"
+          );
+        }
+      });
+
       this.resize(this.imgWidth, this.imgHeight);
+
+      this.bmp = this.getFrame(this.currentFrameIndex);
+
       this.createTexture();
       this.requestUpdate();
     });
+  }
+
+  getFrame(idx: number) {
+    if (idx < 0 || idx >= this.animation.frames.length) {
+      console.warn("Invalid frame index");
+      // empty image
+      return null;
+    }
+
+    return this.animation.frames[idx].bitmap.data;
   }
 
   getImageData() {
@@ -109,7 +156,7 @@ export class TextureNode extends ImageDesignerNode {
       Uint8Array.from(this.bmp),
       NodeType.Texture,
       this.gl,
-      !this.isDataUrl,
+      false,
       true
     );
     this.isTextureReady = true;
@@ -117,13 +164,22 @@ export class TextureNode extends ImageDesignerNode {
   }
 
   init() {
-    this.title = "Image Texture";
-    let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);
+    this.title = "Animation";
+    let fileProp = this.addFileProperty("file", "path", "", ["gif", "webp"]);
 
     // this happens when we drop image file into canvas
     if (this.texPath !== "") {
       this.setProperty(fileProp.name, { value: this.texPath, exposed: false });
     }
+
+    this.progressProp = this.addFloatProperty(
+      "progress",
+      "Progress",
+      0.0,
+      0.0,
+      1.0,
+      0.0001
+    );
 
     let source = `
       vec4 process(vec2 uv)

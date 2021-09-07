@@ -97,13 +97,6 @@
           "Inputs"
         )
       );
-      // items.push(
-      // 	new LibraryItem(
-      // 		LibraryItemType.Navigation,
-      // 		"navigation",
-      // 		"Navigation"
-      // 	)
-      // );
 
       return items;
     }
@@ -141,7 +134,6 @@
       this.mouseX = x;
       this.mouseY = y;
 
-      //
       window.setTimeout((x) => {
         console.log(this.$refs["search"] as HTMLInputElement);
         (this.$refs["search"] as HTMLInputElement).focus();

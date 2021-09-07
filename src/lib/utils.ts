@@ -5,7 +5,9 @@ import path from "path";
 import { WorkshopManager } from "@/community/workshop";
 import { NodeType } from "@/lib/designer/designernode";
 import { Vector2 } from "@math.gl/core";
+import { GifUtil, GifCodec } from "gifwrap";
 const NativeImage = require("electron").nativeImage;
+const codec = new GifCodec();
 
 export const TEMP_PATH = path.join(path.resolve("."), "/projects/temp/");
 export const RESOURCE_PATH = path.join(path.resolve("."), "/resources/");
@@ -21,6 +23,50 @@ export class Guid {
         v = c == "x" ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
+  }
+}
+
+export async function loadGif(imgPath: string, isDataUrl: boolean) {
+  if (isDataUrl) {
+    console.log(imgPath);
+
+    // codec.decodeGif(path).then((sourceGif) => {
+    //   const edgeLength = Math.min(sourceGif.width, sourceGif.height);
+    //   sourceGif.frames.forEach((frame) => {
+    //     // Make each frame a centered square of size edgeLength x edgeLength.
+    //     // Note that frames may vary in size and that reframe() works even if
+    //     // the frame's image is smaller than the square. Should this happen,
+    //     // the space surrounding the original image will be transparent.
+
+    //     const xOffset = (frame.bitmap.width - edgeLength) / 2;
+    //     const yOffset = (frame.bitmap.height - edgeLength) / 2;
+    //     frame.reframe(xOffset, yOffset, edgeLength, edgeLength);
+    //   });
+
+    //   // The encoder determines GIF size from the frames, not the provided spec (sourceGif).
+    //   return GifUtil.write("modified.gif", sourceGif.frames, sourceGif).then(
+    //     (outputGif) => {
+    //       console.log("modified");
+    //     }
+    //   );
+    // });
+  } else {
+    const ext = path.extname(imgPath).toLowerCase();
+    if (ext === ".webp") {
+      console.warn("local webp image is not supported yet.");
+    } else if (ext === ".gif") {
+      let gif = await new Promise((resolve, reject) => {
+        try {
+          GifUtil.read(imgPath).then((gif) => {
+            resolve(gif);
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+
+      return gif;
+    }
   }
 }
 

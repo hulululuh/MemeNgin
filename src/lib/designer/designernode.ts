@@ -69,7 +69,7 @@ export enum NodeCategory {
 }
 
 export class DesignerNode implements IPropertyHolder {
-  id: string = Guid.newGuid();
+  id: string;
   texPath: string;
   imgData: string;
   isDataUrl: boolean;
@@ -113,6 +113,7 @@ export class DesignerNode implements IPropertyHolder {
 
   // constructor
   constructor() {
+    if (!this.id) this.id = Guid.newGuid();
     this.nodeType = NodeType.Procedural;
     this.nodeCategory = NodeCategory.Undefined;
   }
@@ -433,5 +434,24 @@ export class DesignerNode implements IPropertyHolder {
 
     this.properties.push(prop);
     return prop;
+  }
+
+  getPropertyValueByName(name: string): any {
+    const idx: number = this.properties.findIndex((item) => item.name == name);
+    if (idx == -1) return;
+    return this.getPropertyValue(idx);
+  }
+
+  getPropertyValue(idx: number = 0): any {
+    let inputNode = this.designer.findLeftNode(
+      this.id,
+      this.properties[idx].name
+    );
+
+    if (inputNode) {
+      return this.properties[idx].getParentValue();
+    } else {
+      return this.properties[idx].getValue();
+    }
   }
 }

@@ -48,6 +48,7 @@ import { StringPropertyNode } from "./nodes/stringpropertynode";
 import { StylizeNode } from "./nodes/stylizenode";
 import { TextNode } from "./nodes/textnode";
 import { TextureNode } from "./nodes/texturenode";
+import { AnimationNode } from "./nodes/animationnode";
 import { QrCodeNode } from "./nodes/qrcodenode";
 import { ThresholdNode } from "./nodes/thresholdnode";
 import { TileNode } from "./nodes/tilenode";
@@ -159,6 +160,7 @@ export function createLibrary() {
   );
 
   lib.addNode("texture", "Texture", TextureNode, NodeCategory.Create);
+  lib.addNode("animation", "Animation", AnimationNode, NodeCategory.Create);
   lib.addNode("text", "Text", TextNode, NodeCategory.Create);
   lib.addNode("polygon", "Polygon", PolygonNode, NodeCategory.Create);
   lib.addNode("circle", "Circle", CircleNode, NodeCategory.Create);

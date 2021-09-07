@@ -52,8 +52,8 @@ export class DesignerLibrary {
       }
     }
 
-    if (node instanceof TextureNode && isUrl !== undefined) {
-      (node as TextureNode).isDataUrl = isUrl;
+    if (node.isDataUrl != undefined && isUrl !== undefined) {
+      node.isDataUrl = isUrl;
     }
 
     node.typeName = name;

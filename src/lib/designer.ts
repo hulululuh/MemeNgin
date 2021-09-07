@@ -32,6 +32,8 @@ import { TextManager } from "@/assets/textmanager";
 import { TextureNode } from "@/lib/library/nodes/texturenode";
 import { OutputNode } from "./library/nodes/outputnode";
 import { MapFloatNode } from "./library/nodes/mapfloatnode";
+import { AnimationNode } from "./library/nodes/animationnode";
+import { GifCodec } from "gifwrap";
 
 const HALF = 0.5;
 
@@ -854,7 +856,7 @@ export class Designer {
     return this.variables.length;
   }
 
-  save(): any {
+  async save(): Promise<any> {
     let outputNode: OutputNode = null;
     let nodes = new Array();
     for (let node of this.nodes) {
@@ -865,11 +867,27 @@ export class Designer {
       n["nodeType"] = node.nodeType;
 
       if (node instanceof TextureNode) {
-        n["texPath"] = node.texPath;
-
         let imgCanvas = Editor.getScene().getNodeById(node.id).imageCanvas
           .canvas;
         n["imgDataURL"] = canvasToURL(imgCanvas);
+      } else if (node instanceof AnimationNode) {
+        const aNode = node as AnimationNode;
+        let buffer = await new Promise((resolve, reject) => {
+          const codec = new GifCodec();
+          try {
+            codec
+              .encodeGif(aNode.animation.frames, { loops: 0 })
+              .then((gif) => {
+                // byte encoding is now in gif.buffer
+                resolve(gif.buffer);
+              });
+          } catch (err) {
+            reject(err);
+          }
+        });
+        if (buffer) {
+          n["imgDataURL"] = buffer;
+        }
       }
 
       let props = {};
@@ -949,7 +967,7 @@ export class Designer {
       n.id = node["id"];
       n.nodeType = node["nodeType"];
 
-      if (n instanceof TextureNode) {
+      if (n instanceof TextureNode || n instanceof AnimationNode) {
         n.setImageData(node["imgDataURL"], true);
       }
 

@@ -28,19 +28,6 @@ export class LogicDesignerNode extends DesignerNode {
 
   calculated(): any {}
 
-  getPropertyValue(idx: number = 0): any {
-    let inputNode = this.designer.findLeftNode(
-      this.id,
-      this.properties[idx].name
-    );
-
-    if (inputNode && inputNode instanceof LogicDesignerNode) {
-      return this.properties[idx].getParentValue();
-    } else {
-      return this.properties[idx].getValue();
-    }
-  }
-
   connected(leftNode: DesignerNode, rightIndex: string) {
     this.requestUpdate();
   }

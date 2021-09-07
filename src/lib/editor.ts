@@ -54,6 +54,7 @@ function rgbToHex(r, g, b) {
 export enum FileType {
   Texture,
   LUT,
+  Animation,
 }
 
 export class Editor {
@@ -358,7 +359,7 @@ export class Editor {
         if (dataUrl) {
           const posX = offset[0] + x;
           const posY = offset[1] + y;
-          let n = self.createTextureNodeFromUrl(dataUrl, posX, posY);
+          let n = self.createFromUrl(dataUrl, posX, posY);
           offset = [offset[0] + 15, offset[1] + 15];
           nodes.push(n[0]);
           viewNodes.push(n[1]);
@@ -378,13 +379,15 @@ export class Editor {
       const getFileType = (filePath: string) => {
         const ext = path.extname(filePath).toLowerCase();
 
-        if (
-          ext === ".png" ||
-          ext === ".jpg" ||
-          ext === ".jpeg" ||
-          ext === ".webp"
-        ) {
+        if (ext === ".png" || ext === ".jpg" || ext === ".jpeg") {
           return FileType.Texture;
+        } else if (ext === ".webp" || ext === ".gif") {
+          let isAnimation = true;
+          if (isAnimation) {
+            return FileType.Animation;
+          } else {
+            return FileType.Texture;
+          }
         } else if (ext === ".cube") {
           return FileType.LUT;
         } else {
@@ -399,6 +402,8 @@ export class Editor {
           let node;
           if (fileType === FileType.Texture) {
             node = self.library.create("texture", file.path);
+          } else if (fileType === FileType.Animation) {
+            node = self.library.create("animation", file.path);
           } else if (fileType === FileType.LUT) {
             node = self.library.create("colorgrade", file.path);
           } else if (!fileType) {
@@ -636,6 +641,28 @@ export class Editor {
       });
       return dataUrl;
     }
+  }
+
+  createFromUrl(dataUrl: string, x: number, y: number) {
+    const type = dataUrl.substring(
+      dataUrl.indexOf(":") + 1,
+      dataUrl.indexOf(";")
+    );
+    // TODO: need to handle tihs if animated 'image/webp'
+    if (type == "image/gif") {
+      return this.createAnimationNodeFromUrl(dataUrl, x, y);
+    } else {
+      return this.createTextureNodeFromUrl(dataUrl, x, y);
+    }
+  }
+
+  createAnimationNodeFromUrl(dataUrl: string, x: number, y: number) {
+    let node;
+    node = this.library.create("animation", dataUrl, true);
+
+    let nodeView = this.addNode(node, 0, 0);
+    nodeView.setCenter(x, y);
+    return [node, nodeView];
   }
 
   createTextureNodeFromUrl(dataUrl: string, x: number, y: number) {
