@@ -823,8 +823,8 @@ export class Editor {
     this.nodeScene.setSelectedItems([this.nodeScene.outputNode]);
   }
 
-  save(): any {
-    let data = this.designer.save();
+  async save() {
+    let data = await this.designer.save();
     data["scene"] = this.nodeScene.save();
     data["libraryVersion"] = getCurrentLibraryVersion();
     data["item"] = store.state.metadata.save();

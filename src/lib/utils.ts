@@ -28,28 +28,40 @@ export class Guid {
 
 export async function loadGif(imgPath: string, isDataUrl: boolean) {
   if (isDataUrl) {
-    console.log(imgPath);
+    let decoded = null;
+    let mimeType;
+    let data = null;
+    if (typeof imgPath == "string") {
+      // base64 encoded data doesn't contain commas
+      let base64ContentArray = imgPath.split(",");
 
-    // codec.decodeGif(path).then((sourceGif) => {
-    //   const edgeLength = Math.min(sourceGif.width, sourceGif.height);
-    //   sourceGif.frames.forEach((frame) => {
-    //     // Make each frame a centered square of size edgeLength x edgeLength.
-    //     // Note that frames may vary in size and that reframe() works even if
-    //     // the frame's image is smaller than the square. Should this happen,
-    //     // the space surrounding the original image will be transparent.
+      // base64 content cannot contain whitespaces but nevertheless skip if there are!
+      mimeType = base64ContentArray[0].match(
+        /[^:\s*]\w+\/[\w-+\d.]+(?=[;| ])/
+      )[0];
+      if (mimeType == "image/gif") {
+        try {
+          // base64 encoded data - pure
+          let base64Data = base64ContentArray[1];
+          decoded = Buffer.from(base64Data, "base64");
+        } finally {
+          data = decoded;
+        }
+      }
+    } else {
+      data = Buffer.from(imgPath, "utf8");
+    }
 
-    //     const xOffset = (frame.bitmap.width - edgeLength) / 2;
-    //     const yOffset = (frame.bitmap.height - edgeLength) / 2;
-    //     frame.reframe(xOffset, yOffset, edgeLength, edgeLength);
-    //   });
-
-    //   // The encoder determines GIF size from the frames, not the provided spec (sourceGif).
-    //   return GifUtil.write("modified.gif", sourceGif.frames, sourceGif).then(
-    //     (outputGif) => {
-    //       console.log("modified");
-    //     }
-    //   );
-    // });
+    let gif = await new Promise((resolve, reject) => {
+      try {
+        codec.decodeGif(data).then((sourceGif) => {
+          resolve(sourceGif);
+        });
+      } catch (err) {
+        reject(err);
+      }
+    });
+    return gif;
   } else {
     const ext = path.extname(imgPath).toLowerCase();
     if (ext === ".webp") {

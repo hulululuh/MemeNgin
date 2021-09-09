@@ -617,7 +617,7 @@
         let sucess = await this.saveProjectAs();
         if (sucess) this.close();
       } else {
-        let data = this.editor.save();
+        let data = await this.editor.save();
         console.log(data);
         this.project.data = data;
         this.project.data["appVersion"] = this.version;
@@ -704,14 +704,14 @@
       this.edited = true;
     }
 
-    saveProject(force: boolean = false) {
+    async saveProject(force: boolean = false) {
       if (!(force || this.saveable)) return;
 
       // trying to save new project
       if (!this.project.path) {
-        this.saveProjectAs();
+        await this.saveProjectAs();
       } else {
-        let data = this.editor.save();
+        let data = await this.editor.save();
         console.log(data);
         this.project.data = data;
         this.project.data["appVersion"] = this.version;
@@ -740,7 +740,7 @@
 
         let filePath = result.filePath;
         if (!filePath) return false;
-        let data = this.editor.save();
+        let data = await this.editor.save();
         console.log(data);
         this.project.data = data;
         this.project.data["appVersion"] = this.version;

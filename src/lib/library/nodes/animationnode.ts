@@ -67,7 +67,12 @@ export class AnimationNode extends ImageDesignerNode {
       this.imgHeight = this.animation.height;
 
       this.animation.frames.forEach((frame) => {
-        if (this.imgWidth != frame.width || this.imgHeight != frame.height) {
+        if (
+          this.imgWidth != frame.width ||
+          this.imgHeight != frame.height ||
+          frame.xOffset > 0 ||
+          frame.yOffset > 0
+        ) {
           frame.reframe(
             -frame.xOffset,
             -frame.yOffset,
@@ -75,6 +80,8 @@ export class AnimationNode extends ImageDesignerNode {
             this.imgHeight,
             "0x00000000"
           );
+          frame.xOffset = 0;
+          frame.yOffset = 0;
         }
       });
 
@@ -106,8 +113,8 @@ export class AnimationNode extends ImageDesignerNode {
     return this.imgData;
   }
 
-  setImageData(imgDataURL: string, isUrl: boolean) {
-    this.imgData = imgDataURL.repeat(1);
+  setImageData(imgDataURL: any, isUrl: boolean) {
+    this.imgData = imgDataURL;
     this.isDataUrl = isUrl;
     this.load();
   }
