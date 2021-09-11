@@ -393,7 +393,7 @@ export class DesignerNode implements IPropertyHolder {
     id: string,
     displayName: string,
     defaultVal: string = "",
-    extensions: string[] = ["*"]
+    extensions: string = "*"
   ): FileProperty {
     let prop = new FileProperty(id, displayName, defaultVal, extensions);
 

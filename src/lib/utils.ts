@@ -1,6 +1,7 @@
 // [GPLv3] modified 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
 // [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
 
+import fs from "fs";
 import path from "path";
 import { WorkshopManager } from "@/community/workshop";
 import { NodeType } from "@/lib/designer/designernode";
@@ -47,6 +48,7 @@ export async function loadGif(imgPath: string, isDataUrl: boolean) {
         } finally {
           data = decoded;
         }
+      } else if (mimeType == "image/webp") {
       }
     } else {
       data = Buffer.from(imgPath, "utf8");
@@ -66,6 +68,7 @@ export async function loadGif(imgPath: string, isDataUrl: boolean) {
     const ext = path.extname(imgPath).toLowerCase();
     if (ext === ".webp") {
       console.warn("local webp image is not supported yet.");
+      //let buffer = fs.readFileSync(imgPath);
     } else if (ext === ".gif") {
       let gif = await new Promise((resolve, reject) => {
         try {

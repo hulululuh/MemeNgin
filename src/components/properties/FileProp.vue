@@ -7,7 +7,7 @@
         @onCancel="onCancel"
       />
     </v-subheader>
-    <v-file-input dense @change="updateValue" />
+    <v-file-input dense @change="updateValue" :accept="extensions" />
   </v-container>
 </template>
 
@@ -81,17 +81,19 @@
       }
     }
 
-    onclick() {
-      let result = dialog.showOpenDialog({
-        properties: ["openFile"],
-        filters: [{ name: "Images", extensions: this.prop.extensions }],
-        //filters: [{ name: "Images", extensions: ["jpg", "png"] }],
-      });
+    get extensions() {
+      return this.prop.extensions;
+    }
 
-      if (result && fs.existsSync(result[0])) {
-        this.propHolder.setProperty(this.prop.name, result[0]);
-        this.propertyChanged();
-      }
+    onclick() {
+      // let result = dialog.showOpenDialog({
+      //   properties: ["openFile"],
+      //   filters: [{ name: "Images", extensions: [...this.prop.extensions] }],
+      // });
+      // if (result && fs.existsSync(result[0])) {
+      //   this.propHolder.setProperty(this.prop.name, result[0]);
+      //   this.propertyChanged();
+      // }
     }
 
     focus() {

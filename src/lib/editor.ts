@@ -379,9 +379,14 @@ export class Editor {
       const getFileType = (filePath: string) => {
         const ext = path.extname(filePath).toLowerCase();
 
-        if (ext === ".png" || ext === ".jpg" || ext === ".jpeg") {
+        if (
+          ext === ".png" ||
+          ext === ".jpg" ||
+          ext === ".jpeg" ||
+          ext === ".webp"
+        ) {
           return FileType.Texture;
-        } else if (ext === ".webp" || ext === ".gif") {
+        } else if (ext === ".gif") {
           let isAnimation = true;
           if (isAnimation) {
             return FileType.Animation;

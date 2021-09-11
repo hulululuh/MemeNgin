@@ -137,7 +137,7 @@ export class ColorGradeNode extends ImageDesignerNode {
 
   init() {
     this.title = "Color Grade";
-    let fileProp = this.addFileProperty("file", "path", "", ["cube"]);
+    let fileProp = this.addFileProperty("file", "path", "", "cube");
 
     // this happens when we drop image file into canvas
     if (this.texPath !== "") {

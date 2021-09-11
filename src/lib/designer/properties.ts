@@ -467,12 +467,12 @@ export class StringProperty extends Property {
 
 export class FileProperty extends Property {
   value: string;
-  extensions: string[];
+  extensions: string;
   constructor(
     name: string,
     displayName: string,
     value: string = "",
-    extensions: string[] = ["*"]
+    extensions: string = "*"
   ) {
     super();
     this.name = name;

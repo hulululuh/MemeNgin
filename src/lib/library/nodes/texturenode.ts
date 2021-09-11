@@ -118,7 +118,12 @@ export class TextureNode extends ImageDesignerNode {
 
   init() {
     this.title = "Image Texture";
-    let fileProp = this.addFileProperty("file", "path", "", ["jpg", "png"]);
+    let fileProp = this.addFileProperty(
+      "file",
+      "path",
+      "",
+      "image/png, image/jpeg"
+    );
 
     // this happens when we drop image file into canvas
     if (this.texPath !== "") {

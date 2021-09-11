@@ -172,7 +172,7 @@ export class AnimationNode extends ImageDesignerNode {
 
   init() {
     this.title = "Animation";
-    let fileProp = this.addFileProperty("file", "path", "", ["gif", "webp"]);
+    let fileProp = this.addFileProperty("file", "path", "", "image/gif");
 
     // this happens when we drop image file into canvas
     if (this.texPath !== "") {
