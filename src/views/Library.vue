@@ -64,6 +64,7 @@
   import { AddItemsAction } from "../lib/actions/additemsaction";
   import { UndoStack } from "../lib/undostack";
   import { TextManager } from "@/assets/textmanager";
+  import { TimeNode } from "@/lib/library/nodes/timenode";
 
   declare let __static: any;
 
@@ -209,6 +210,10 @@
       if (nodeName == "output") {
         // only one output node is exists
         this.editor.nodeScene.onoutputnodecreationattempt();
+        return;
+      }
+      if (nodeName == "time" && this.editor.nodeScene.timeNode) {
+        this.editor.nodeScene.ontimenodecreationattempt();
         return;
       }
 

@@ -239,6 +239,10 @@
         this.editor.nodeScene.onoutputnodecreationattempt();
         return;
       }
+      if (nodeName == "time" && this.editor.nodeScene.timeNode) {
+        this.editor.nodeScene.ontimenodecreationattempt();
+        return;
+      }
 
       let action: AddItemsAction = null;
 

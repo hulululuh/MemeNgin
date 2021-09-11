@@ -497,6 +497,11 @@ export class Editor {
       self.nodeScene.zoomSelected(self.nodeScene.selectedItems);
     };
 
+    this.nodeScene.ontimenodecreationattempt = function() {
+      self.nodeScene.selectedItems = [self.nodeScene.timeNode];
+      self.nodeScene.zoomSelected(self.nodeScene.selectedItems);
+    };
+
     this.nodeScene.onitemsdeleting = function(
       frames: FrameGraphicsItem[],
       comments: CommentGraphicsItem[],

@@ -38,6 +38,7 @@ import { OutputNode } from "./library/nodes/outputnode";
 import { iWidget, WidgetType, implementsWidget } from "./scene/widget";
 import { TransformQuadWidget } from "./scene/transformquadwidget";
 import { Guid } from "./utils";
+import { TimeNode } from "./library/nodes/timenode";
 const settings = ApplicationSettings.getInstance();
 
 enum DragMode_Scene {
@@ -94,6 +95,7 @@ export class NodeScene {
   onwidgetselected?: (item: iWidget) => void;
   oninputnodecreationattempt?: () => void;
   onoutputnodecreationattempt?: () => void;
+  ontimenodecreationattempt?: () => void;
 
   onnodedeleted?: (item: NodeGraphicsItem) => void;
 
@@ -374,6 +376,11 @@ export class NodeScene {
   get outputNode(): NodeGraphicsItem {
     let output = this.nodes.find((item) => item.dNode instanceof OutputNode);
     return output;
+  }
+
+  get timeNode(): NodeGraphicsItem {
+    let time = this.nodes.find((item) => item.dNode instanceof TimeNode);
+    return time;
   }
 
   dispose() {
