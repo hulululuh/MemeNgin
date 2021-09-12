@@ -1,17 +1,47 @@
 // [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
 
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
-import { PropertyType } from "@/lib/designer/properties";
+import { Property, PropertyType } from "@/lib/designer/properties";
 
 export class TimeNode extends LogicDesignerNode {
+  propNumFrames: Property;
+
   init() {
     this.title = "Time";
     this.logicType = LogicType.Property;
     this.outputType = PropertyType.Float;
 
     this.addFloatProperty("progress", "Progress", 0.0, 0.0, 1.0, 0.0001);
-    this.addIntProperty("fps", "FPS", 24, 6, 60, 1);
-    this.addFloatProperty("duration", "Duration(s)", 3.0, 0.5, 10.0, 0.001);
+    this.addIntProperty("fps", "FPS", 24, 1, 60, 1);
+    this.addFloatProperty("duration", "Duration(s)", 3.0, 0.05, 10.0, 0.001);
+    this.propNumFrames = this.addFloatProperty(
+      "numFrames",
+      "NumFrames",
+      0,
+      0,
+      1,
+      0.001,
+      false
+    );
+    this.updateProps();
+
+    this.onnodepropertychanged = function(prop: Property) {
+      if (prop.name === "value") {
+        this.requestUpdate();
+      } else if (prop.name === "fps" || prop.name === "duration") {
+        this.updateProps();
+      }
+    };
+  }
+
+  get numFrames() {
+    const fps = this.getPropertyValueByName("fps");
+    const duration = this.getPropertyValueByName("duration");
+    return Math.max(Math.floor(fps * duration), 1);
+  }
+
+  updateProps() {
+    this.propNumFrames.setValue(this.numFrames);
   }
 
   calculated() {

@@ -312,9 +312,16 @@ export class DesignerNode implements IPropertyHolder {
     defaultVal: number = 1,
     minVal: number = 1,
     maxVal: number = 100,
-    increment: number = 1
+    increment: number = 1,
+    modifiable: boolean = true
   ): FloatProperty {
-    let prop = new FloatProperty(id, displayName, defaultVal);
+    let prop = new FloatProperty(
+      id,
+      displayName,
+      defaultVal,
+      increment,
+      modifiable
+    );
     prop.minValue = minVal;
     prop.maxValue = maxVal;
     prop.step = increment;

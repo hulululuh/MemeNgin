@@ -9,6 +9,7 @@
     </v-subheader>
     <v-input>
       <v-slider
+        v-if="prop.modifiable"
         :snap="true"
         :step="prop.step"
         :max="prop.maxValue"
@@ -46,6 +47,20 @@
           />
         </template>
       </v-slider>
+      <v-row class="ma-0 pa-0" v-if="!prop.modifiable">
+        <v-col class="ma-0 pa-0" cols="10" />
+        <v-col class="ma-0 pa-0" cols="2">
+          <v-text-field
+            class="ma-0 pa-0"
+            type="number"
+            style="width: 50px"
+            :value="prop.value.toString()"
+            :disabled="!prop.modifiable"
+            hide-details
+            single-line
+          />
+        </v-col>
+      </v-row>
     </v-input>
   </v-container>
 </template>

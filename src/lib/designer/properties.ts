@@ -40,11 +40,13 @@ export class Property {
   parentValue: any;
   connected: boolean;
   children: Property[];
+  modifiable: boolean;
 
-  constructor() {
+  constructor(modifiable: boolean = true) {
     this.exposed = false;
     this.connected = false;
     this.children = [];
+    this.modifiable = modifiable;
   }
 
   get hasChildren() {
@@ -99,9 +101,10 @@ export class FloatProperty extends Property {
     name: string,
     displayName: string,
     value: number,
-    step: number = 1
+    step: number = 1,
+    modifiable: boolean = true
   ) {
-    super();
+    super(modifiable);
     this.name = name;
     this.displayName = displayName;
     this.value = value;
