@@ -41,14 +41,16 @@ yarn electron:build
 ```
 
 ## Steam version
-The **[Steam version](https://store.steampowered.com/app/1632910/MemeNgin/)** includes a workshop and cloud feature, allowing you to share your works with other users. Consider checking it out.
+The **[Steam version](https://store.steampowered.com/app/1632910/MemeNgin/)** is not very different from the GitHub version, but if you purchase it, you can share it with users using the Steam Workshop function. Of course, it helps me to continue developing the project independently. Consider checking it out!
 
 ## Community
 You can communicate about this project on the **[Discord community](https://discord.gg/9vewbmkGHE)**.
 
 ## Feedback
-In **[Trello](https://trello.com/b/pOpnosx5/memengin-task-board)**, You can check the roadmap of MemeNgin in trello. You can vote for and reply to your favorite features.
-Got ideas, suggestions or feedback? Reach out to me on [e-mail](mailto:admin@memengin.com) or you can use feature-request on discord.
+
+Got ideas, suggestions or feedback? 
+ - You can check the roadmap of MemeNgin in **[Trello](https://trello.com/b/pOpnosx5/memengin-task-board)**. You can vote for and commen to your favorite features.
+ - If you can't find the feature you're looking for on the Trello board, Reach out to me on [e-mail](mailto:admin@memengin.com) or you can use feature-request on discord.
 
 ## Contribute to the project
 - I need help translating MemeNgin into your language, including english. If you're interested, take a look **[Translation Guidelines](https://github.com/hulululuh/MemeNginData/blob/main/translations/README.md)**.
