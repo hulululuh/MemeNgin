@@ -45,6 +45,15 @@ export class TimeNode extends LogicDesignerNode {
   }
 
   calculated() {
-    return this.getPropertyValue(0).toFixed(4);
+    let propVal = this.getPropertyValue(0);
+    return propVal ? propVal.toFixed(4) : 0;
+  }
+
+  setProgress(progress: number) {
+    const pProp = this.properties.find((item) => item.name == "progress");
+    this.setProperty("progress", {
+      value: progress,
+      exposed: pProp.getExposed(),
+    });
   }
 }

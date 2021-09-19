@@ -47,10 +47,11 @@
     setEditor(editor) {
       this.editor = editor;
       let self = this;
-      editor.onpreviewnode = (node, image) => {
+      editor.onpreviewnode = (item) => {
+        const node = item.dNode;
+        const image = item.imageCanvas.canvas;
         self.node = node;
         self.image = image;
-
         self.dragZoom.setImage(image);
 
         if (node instanceof ImageDesignerNode && this.$refs.canvas) {

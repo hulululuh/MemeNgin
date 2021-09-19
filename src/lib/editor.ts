@@ -77,7 +77,7 @@ export class Editor {
   onframeselected?: (item: FrameGraphicsItem) => void;
   onwidgetselected?: (item: iWidget) => void;
   onnavigationselected?: (item: NavigationGraphicsItem) => void;
-  onpreviewnode?: (item: DesignerNode, image: HTMLCanvasElement) => void;
+  onpreviewnode?: (item: NodeGraphicsItem) => void;
   onlibrarymenu?: () => void;
 
   constructor() {
@@ -183,11 +183,9 @@ export class Editor {
     // setup properties
     inputNode.setProperty("color", new Color(1, 1, 1, 1));
 
-    const dnode = this.designer.getNodeById(node.id);
-    const graphNode = this.nodeScene.getNodeById(dnode.id);
     // todo: move to double click
     if (this.onpreviewnode) {
-      this.onpreviewnode(dnode, graphNode.imageCanvas.canvas);
+      this.onpreviewnode(this.nodeScene.outputNode);
     }
   }
 
@@ -819,9 +817,7 @@ export class Editor {
 
     // todo: move to double click
     if (this.onpreviewnode) {
-      const item = this.nodeScene.outputNode;
-      const node = this.nodeScene.outputNode.dNode;
-      this.onpreviewnode(node, item.imageCanvas.canvas);
+      this.onpreviewnode(this.nodeScene.outputNode);
     }
 
     this.refreshWidget();

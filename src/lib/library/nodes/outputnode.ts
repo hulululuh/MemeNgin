@@ -1,5 +1,6 @@
 // [GPLv3] created 2021 by jaemoon choi as a part of MemeNgin(https://github.com/hulululuh/MemeNgin)
 
+import { NodeInput } from "@/lib/designer/designernode";
 import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 
 export class OutputNode extends ImageDesignerNode {
@@ -39,5 +40,12 @@ export class OutputNode extends ImageDesignerNode {
       `;
 
     this.buildShader(source);
+  }
+
+  render(inputs: NodeInput[], optional?: Function) {
+    super.render(inputs, optional);
+
+    document.dispatchEvent(new Event("frameRendered"));
+    //console.warn(`Frame updated`);
   }
 }

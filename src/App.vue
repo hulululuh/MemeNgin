@@ -69,6 +69,11 @@
         @click="saveTexture"
       />
       <tooltip-button
+        icon="mdi-image-multiple"
+        tooltip="Render frames"
+        @click="renderFrames"
+      />
+      <tooltip-button
         icon="mdi-fit-to-page-outline"
         tooltip="Center texture"
         @click="centerTexture"
@@ -125,6 +130,7 @@
       <tutorial-dialog ref="tutorialDialog" />
       <message-dialog ref="messageDialog" />
       <publish-dialog @onCancel="onCancelled" ref="publishDialog" />
+      <render-dialog ref="renderDialog" />
       <close-dialog
         ref="closeDialog"
         @onSave="saveAndClose"
@@ -178,6 +184,7 @@
   import CloseDialog from "@/views/CloseDialog.vue";
   import MessageDialog from "@/views/MessageDialog.vue";
   import PublishDialog from "@/views/PublishDialog.vue";
+  import RenderDialog from "@/views/RenderDialog.vue";
   import ProjectNameDialog from "@/views/ProjectNameDialog.vue";
   import { DesignerLibrary } from "./lib/designer/library";
   import { Project, ProjectManager } from "./lib/project";
@@ -229,6 +236,7 @@
       messageDialog: MessageDialog,
       tooltipButton: TooltipButton,
       publishDialog: PublishDialog,
+      RenderDialog: RenderDialog,
       projectNameDialog: ProjectNameDialog,
       tutorialDialog: TutorialDialog,
       languageDialog: LanguageDialog,
@@ -275,7 +283,9 @@
         (this.$refs.languageDialog as StartupMenu).dialog ||
         (this.$refs.closeDialog as CloseDialog).dialog ||
         (this.$refs.publishDialog as PublishDialog).dialog ||
-        (this.$refs.startupMenu as StartupMenu).dialog
+        (this.$refs.startupMenu as StartupMenu).dialog ||
+        (this.$refs.renderDialog as RenderDialog).dialog ||
+        (this.$refs.projectNameDialog as ProjectNameDialog).dialog
       );
     }
 
@@ -915,6 +925,11 @@
     saveTexture() {
       if (this.havePersistentDialog) return;
       (this.$refs.preview2d as Preview2D).saveTexture();
+    }
+
+    renderFrames() {
+      if (this.havePersistentDialog) return;
+      (this.$refs.renderDialog as RenderDialog).show();
     }
 
     centerTexture() {
