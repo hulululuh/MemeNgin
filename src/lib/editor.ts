@@ -77,7 +77,6 @@ export class Editor {
   onframeselected?: (item: FrameGraphicsItem) => void;
   onwidgetselected?: (item: iWidget) => void;
   onnavigationselected?: (item: NavigationGraphicsItem) => void;
-  onpreviewnode?: (item: NodeGraphicsItem) => void;
   onlibrarymenu?: () => void;
 
   constructor() {
@@ -182,11 +181,6 @@ export class Editor {
 
     // setup properties
     inputNode.setProperty("color", new Color(1, 1, 1, 1));
-
-    // todo: move to double click
-    if (this.onpreviewnode) {
-      this.onpreviewnode(this.nodeScene.outputNode);
-    }
   }
 
   set2DPreview(preview2D: HTMLCanvasElement) {
@@ -814,11 +808,6 @@ export class Editor {
     }
 
     this.nodeScene.view.reset();
-
-    // todo: move to double click
-    if (this.onpreviewnode) {
-      this.onpreviewnode(this.nodeScene.outputNode);
-    }
 
     this.refreshWidget();
 

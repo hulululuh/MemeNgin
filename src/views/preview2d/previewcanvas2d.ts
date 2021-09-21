@@ -345,8 +345,9 @@ export class DragZoom {
 
   // converts from canvas(screen) coords to the scene(world) coords
   canvasToScene(pos: Vector2): Vector2 {
+    const zoomFactor = Math.max(this.zoomFactor, Number.EPSILON);
     return new Vector2(pos[0], pos[1])
       .sub(this.offset)
-      .multiplyByScalar(1 / this.zoomFactor);
+      .multiplyByScalar(1 / zoomFactor);
   }
 }

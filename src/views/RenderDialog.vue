@@ -6,31 +6,36 @@
     max-height="800px"
     @keydown.esc="dialog = false"
   >
-    <v-card style="overflow-y: hidden !important;">
+    <v-card
+      style="overflow-x: hidden !important; overflow-y: hidden !important;"
+    >
       <v-card-title class="headline grey">
         {{ textTitle }}
       </v-card-title>
       <v-card-text block class="pa-0 ma-0">
-        <v-col cols="12" justify-center class="grey lighten-2 pa-1">
-          <tooltip-button
-            icon="mdi-content-save-outline"
-            tooltip="Render animation"
-            :disabled="working"
-            @click="renderToGif"
-          />
-          <tooltip-button
-            icon="mdi-cancel"
-            tooltip="Abort"
-            :disabled="aborted"
-            @click="abortRender"
-          />
-        </v-col>
-        <v-row justify="center">
-          <v-img
-            block
-            max-width="512px"
-            max-height="512px"
-            lazy-src="assets/icons/image.svg"
+        <v-row class="ma-0 pa-0">
+          <v-col cols="12" justify-center class="grey lighten-2 pa-1">
+            <tooltip-button
+              icon="mdi-vhs"
+              tooltip="Render animation"
+              :disabled="working"
+              @click="renderToGif"
+            />
+            <tooltip-button
+              icon="mdi-cancel"
+              tooltip="Abort"
+              :disabled="aborted"
+              @click="abortRender"
+            />
+          </v-col>
+        </v-row>
+        <v-row class="ma-0 pa-0" justify="center" ref="frame">
+          <preview2d
+            class="ma-0 pa-0"
+            align="center"
+            justify="center"
+            ref="preview2d"
+            style="height:512px !important;"
           />
         </v-row>
       </v-card-text>
@@ -59,6 +64,8 @@
   import { Editor } from "@/lib/editor";
   import { GifCodec } from "gifwrap";
   import { TimeNode } from "@/lib/library/nodes/timenode";
+  import { NodeGraphicsItem } from "@/lib/scene/nodegraphicsitem";
+  import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
   const codec = new GifCodec();
 
   @Component({
@@ -72,6 +79,11 @@
     aborted: boolean = true;
     frameRendering: boolean = false;
     working: boolean = false;
+    initialized: boolean = false;
+
+    onPreviewNode(item: NodeGraphicsItem): void {
+      (this.$refs.preview2d as Preview2D).onFrameRendered(item);
+    }
 
     show() {
       this.dialog = true;
@@ -81,14 +93,24 @@
       this.dialog = false;
     }
 
+    updated() {
+      this.initPreview();
+    }
+
+    async initPreview() {
+      const preview = this.$refs.preview2d as Preview2D;
+      const frame = this.$refs.frame as HTMLElement;
+      if (preview && !this.initialized) {
+        await this.delay(1);
+        preview.reset();
+        preview.resize(frame.clientWidth, frame.clientHeight);
+        this.onPreviewNode(Editor.getInstance().nodeScene.outputNode);
+        this.initialized = true;
+      }
+    }
+
     mounted() {
       document.addEventListener("frameRendered", this.onFrameRendered);
-
-      const preview = this.$refs.preview2d as Preview2D;
-      if (preview) {
-        preview.reset();
-        preview.setEditor(Editor.getInstance());
-      }
     }
 
     destroyed() {
@@ -131,7 +153,6 @@
 
         const numFrames = tNode.getPropertyValueByName("numFrames");
         const valFrame = 1 / numFrames;
-        let frames;
 
         // sample frame by frame
         for (let i = 0; i < numFrames; i++) {

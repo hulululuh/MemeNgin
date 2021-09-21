@@ -459,7 +459,6 @@
       };
       this.editor.onframeselected = (frame) => {};
       this.editor.onlibrarymenu = this.showLibraryMenu;
-      (this.$refs.preview2d as any).setEditor(this.editor);
 
       this.newProject();
 

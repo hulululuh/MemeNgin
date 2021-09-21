@@ -6,29 +6,53 @@
   </v-container>
 </template>
 
-<script>
+<style scoped>
+  .btn {
+    text-align: center;
+    height: 1.6em;
+    /* width: 1.6em; */
+    border-radius: 2px;
+    line-height: 1.6em;
+    display: block;
+    float: left;
+    padding: 0.4em 0.4em 0.3em 0.4em;
+    margin: 0.1em;
+    text-decoration: none;
+    background: #666;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .btn:hover {
+    background: #999;
+  }
+
+  .toggled {
+    background: #444;
+  }
+</style>
+
+<script lang="ts">
   import { Component, Vue } from "vue-property-decorator";
   import { DragZoom } from "./preview2d/previewcanvas2d";
   const electron = require("electron");
   const remote = electron.remote;
   const { dialog } = remote;
   import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+  import { DesignerNode } from "@/lib/designer/designernode";
+  import { Editor } from "@/lib/editor";
+  import { NodeGraphicsItem } from "@/lib/scene/nodegraphicsitem";
 
   @Component
   export default class Preview2D extends Vue {
-    data() {
-      return {
-        node: null,
-        // HtmlCanvasElement...it will auto update when the node's image changes
-        image: null,
-        canvas: null,
-        dragZoom: null,
-        flex: null,
-      };
-    }
+    node: DesignerNode = null;
+    // HtmlCanvasElement...it will auto update when the node's image changes
+    image: HTMLCanvasElement = null;
+    dragZoom: DragZoom = null;
+    flex: any = null;
 
     mounted() {
-      let dragZoom = new DragZoom(this.$refs.canvas);
+      const canvas = this.$refs.canvas as HTMLCanvasElement;
+      let dragZoom = new DragZoom(canvas);
       const draw = () => {
         dragZoom.draw();
         requestAnimationFrame(draw);
@@ -37,43 +61,48 @@
       requestAnimationFrame(draw);
       this.dragZoom = dragZoom;
 
-      document.addEventListener("resizeImage", (event) => {
-        this.dragZoom.width = event.detail.width;
-        this.dragZoom.height = event.detail.height;
+      document.addEventListener("resizeImage", (event: CustomEvent) => {
+        // this.dragZoom.canvas.width = event.detail.width;
+        // this.dragZoom.canvas.height = event.detail.height;
         this.resizeImage(event.detail.width, event.detail.height);
+        this.centerTexture();
       });
+
+      document.addEventListener("frameRendered", () =>
+        this.onFrameRendered(Editor.getInstance().nodeScene.outputNode)
+      );
     }
 
-    setEditor(editor) {
-      this.editor = editor;
-      let self = this;
-      editor.onpreviewnode = (item) => {
-        const node = item.dNode;
-        const image = item.imageCanvas.canvas;
-        self.node = node;
-        self.image = image;
-        self.dragZoom.setImage(image);
+    onFrameRendered(item: NodeGraphicsItem) {
+      //let item = Editor.getInstance().nodeScene.outputNode;
+      const node = item.dNode;
+      const image = item.imageCanvas.canvas;
+      this.node = node;
+      this.image = image;
+      this.dragZoom.setImage(image);
+      const canvas = this.$refs.canvas as HTMLCanvasElement;
 
-        if (node instanceof ImageDesignerNode && this.$refs.canvas) {
-          const margin = 0.1;
-          const ratioW =
-            ((1.0 - margin) * this.$refs.canvas.width) / node.getWidth();
-          const ratioH =
-            ((1.0 - margin) * this.$refs.canvas.height) / node.getHeight();
+      if (node instanceof ImageDesignerNode && canvas) {
+        const margin = 0.1;
+        const ratioW = ((1.0 - margin) * canvas.width) / node.getWidth();
+        const ratioH = ((1.0 - margin) * canvas.height) / node.getHeight();
 
-          const zoomFactor = Math.min(1.0, Math.min(ratioW, ratioH));
-          self.dragZoom.centerImage(zoomFactor);
-        }
-      };
-    }
-
-    resize(width, height) {
-      width = this.$refs.flex.clientWidth;
-      height = this.$refs.flex.clientHeight;
-      fitCanvasToContainer(this.$refs.canvas);
-      if (!this.dragZoom) {
-        this.dragZoom = new DragZoom(this.$refs.canvas);
+        const zoomFactor = Math.min(1.0, Math.min(ratioW, ratioH));
+        this.dragZoom.centerImage(zoomFactor);
       }
+    }
+
+    resize(width: number, height: number) {
+      const canvas = this.$refs.canvas as HTMLCanvasElement;
+
+      fitCanvasToContainer(canvas);
+      if (!this.dragZoom) {
+        this.dragZoom = new DragZoom(canvas);
+      }
+      // this.dragZoom.canvas.width = width;
+      // this.dragZoom.canvas.height = height;
+      // canvas.width = width;
+      // canvas.height = height;
 
       // TODO: I don't think its best
       setTimeout(() => {
@@ -82,12 +111,13 @@
     }
 
     resizeImage(width, height) {
-      if (!this.$refs.canvas) return;
-      fitCanvasToContainer(this.$refs.canvas);
+      const canvas = this.$refs.canvas as HTMLCanvasElement;
+      if (canvas) return;
+      fitCanvasToContainer(canvas);
 
       const margin = 0.1;
-      const ratioW = ((1.0 - margin) * this.$refs.canvas.width) / width;
-      const ratioH = ((1.0 - margin) * this.$refs.canvas.height) / height;
+      const ratioW = ((1.0 - margin) * canvas.width) / width;
+      const ratioH = ((1.0 - margin) * canvas.height) / height;
 
       const zoomFactor = Math.min(1.0, Math.min(ratioW, ratioH));
       this.dragZoom.centerImage(zoomFactor);
@@ -96,7 +126,7 @@
     paint() {
       if (!this.image) return;
 
-      let canvas = this.$refs.canvas;
+      const canvas = this.$refs.canvas as HTMLCanvasElement;
       let ctx = canvas.getContext("2d");
 
       ctx.drawImage(this.image, 0, 0, canvas.width, canvas.height);
@@ -141,9 +171,13 @@
     }
 
     centerTexture() {
-      if (this.$refs.canvas && this.node) {
-        const w = this.$refs.canvas.width / this.node.getWidth();
-        const h = this.$refs.canvas.height / this.node.getHeight();
+      const imageNode = this.node as ImageDesignerNode;
+      let canvas = this.$refs.canvas as HTMLCanvasElement;
+      if (canvas && imageNode) {
+        const w = canvas.width / imageNode.getWidth();
+        const h = canvas.height / imageNode.getHeight();
+        // const w = this.dragZoom.canvas.width / imageNode.getWidth();
+        // const h = this.dragZoom.canvas.height / imageNode.getHeight();
         let zoomFactor = w > h ? h : w;
 
         // todo: center texture in canvas
@@ -179,28 +213,3 @@
     canvas.style.height = "auto";
   }
 </script>
-
-<style scoped>
-  .btn {
-    text-align: center;
-    height: 1.6em;
-    /* width: 1.6em; */
-    border-radius: 2px;
-    line-height: 1.6em;
-    display: block;
-    float: left;
-    padding: 0.4em 0.4em 0.3em 0.4em;
-    margin: 0.1em;
-    text-decoration: none;
-    background: #666;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .btn:hover {
-    background: #999;
-  }
-
-  .toggled {
-    background: #444;
-  }
-</style>
