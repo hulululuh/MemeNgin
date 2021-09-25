@@ -21,7 +21,7 @@ git submodule update --init
 ```
 
 1. Prepare to materials to build **[greenworks fork](https://github.com/hulululuh/greenworks)** for MemeNgin.
-  - Download lastest **[Steamworks SDK](https://partner.steamgames.com/downloads/list)** (v1.51)
+  - Download latest **[Steamworks SDK](https://partner.steamgames.com/downloads/list)** (v1.51)
   - Extract root folder 'sdk' from zip, then rename this folder to 'steamworks_sdk'
   - Move 'steamworks_sdk' folder into /[PROJECT_ROOT]/external_deps
 
