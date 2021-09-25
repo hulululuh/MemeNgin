@@ -21,6 +21,9 @@ export default new Vuex.Store({
     currentProjectAuthorAvatar: null,
     currentProjectAuthorName: "",
     undoStack: null,
+    progress: 0,
+    stepSize: 100,
+    currentFrame: 0,
   },
   mutations: {
     setMetadata(state, data) {

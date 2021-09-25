@@ -2,6 +2,7 @@
 
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
 import { Property, PropertyType } from "@/lib/designer/properties";
+import store from "../../../store";
 
 export class TimeNode extends LogicDesignerNode {
   propNumFrames: Property;
@@ -40,8 +41,14 @@ export class TimeNode extends LogicDesignerNode {
     return Math.max(Math.floor(fps * duration), 1);
   }
 
+  get timePerFrame() {
+    const fps = this.getPropertyValueByName("fps");
+    return 1 / fps;
+  }
+
   updateProps() {
     this.propNumFrames.setValue(this.numFrames);
+    store.state.stepSize = 100 / this.numFrames;
   }
 
   calculated() {

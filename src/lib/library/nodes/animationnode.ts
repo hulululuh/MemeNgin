@@ -5,8 +5,7 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { loadGif, UpdateTexture } from "@/lib/utils";
 import { Property, FileProperty } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
-import { BitmapImage, GifFrame, GifUtil, GifCodec } from "gifwrap";
-//const { GifFrame, GifUtil, GifCodec } = require('gifwrap');
+import store from "@/store";
 
 export class AnimationNode extends ImageDesignerNode {
   protected bmp: Uint8Array = null;
@@ -51,7 +50,7 @@ export class AnimationNode extends ImageDesignerNode {
   }
 
   get frameIndex() {
-    return Math.floor((this.frameCount - Number.EPSILON) * this.progress);
+    return Math.floor((this.frameCount + Number.EPSILON) * this.progress);
   }
 
   load() {
