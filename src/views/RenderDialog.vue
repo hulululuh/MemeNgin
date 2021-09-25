@@ -37,7 +37,7 @@
             />
             <tooltip-button
               icon="mdi-content-save-outline"
-              tooltip="Abort"
+              tooltip="Save as gif"
               :disabled="!gif"
               @click="saveGif"
             />
@@ -294,7 +294,7 @@
             .canvas;
           const w = canvas.width;
           const h = canvas.height;
-          let frame = new GifFrame(w, h, { delayCentisecs: tpf / 10.0 });
+          let frame = new GifFrame(w, h, { delayCentisecs: tpf * 100.0 });
           const ctx = canvas.getContext("2d");
           frame.bitmap.data = Buffer.from(ctx.getImageData(0, 0, w, h).data);
           const indexCount = frame.getPalette().indexCount;
