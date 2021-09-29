@@ -41,20 +41,20 @@ yarn electron:build
 ```
 
 ## Steam version
-The **[Steam version](https://store.steampowered.com/app/1632910/MemeNgin/)** is not very different from the GitHub version, but if you purchase it, you can share it with users using the Steam Workshop function. Of course, it helps me to continue developing the project independently. Consider checking it out!
+The **[Steam version](https://store.steampowered.com/app/1632910/MemeNgin/)** is not much different from the GitHub version, but if you purchase it, you can share your work with other users using the Steam Workshop. Of course, it helps me to continue developing the project independently. Consider checking it out!
 
 ## Community
-You can communicate about this project on the **[Discord community](https://discord.gg/9vewbmkGHE)**.
+We can communicate about this project on the **[Discord community](https://discord.gg/9vewbmkGHE)**.
 
 ## Feedback
 
 Got ideas, suggestions or feedback? 
- - You can check the roadmap of MemeNgin in **[Trello](https://trello.com/b/pOpnosx5/memengin-task-board)**. You can vote for and commen to your favorite features.
+ - You can check the roadmap of MemeNgin in **[Trello](https://trello.com/b/pOpnosx5/memengin-task-board)**. You can vote for and comment on your favorite features.
  - If you can't find the feature you're looking for on the Trello board, Reach out to me on [e-mail](mailto:admin@memengin.com) or you can use feature-request on discord.
 
 ## Contribute to the project
 - I need help translating MemeNgin into your language, including english. If you're interested, take a look **[Translation Guidelines](https://github.com/hulululuh/MemeNginData/blob/main/translations/README.md)**.
-- Currently, i didn't thought about accepting pull requests, before current milestone is finished. if you would like to contribute to the project, please DM me in discord.
+- Currently, I didn't really think much about accepting a pull requests, because I had so many things going on in my head. before current milestone is finished. if you would like to contribute to the project, please DM me in discord.
 
 ## Related Projects
 - This project started by forking **[TextureLab](https://github.com/njbrown/texturelab)**, which allowed me to focus on my goals. If you are looking for a procedural texture generator, I definitely recommend checking out texturelab. Thanks to **[njbrown](https://github.com/njbrown)** for open sourcing his work.
