@@ -64,7 +64,6 @@
   import { AddItemsAction } from "../lib/actions/additemsaction";
   import { UndoStack } from "../lib/undostack";
   import { TextManager } from "@/assets/textmanager";
-  import { TimeNode } from "@/lib/library/nodes/timenode";
 
   declare let __static: any;
 

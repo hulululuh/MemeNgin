@@ -363,14 +363,7 @@ export class NodeScene {
   }
 
   get inputNode(): GraphicsItem {
-    let input = this.frames[0];
-
-    // for (let item of this.nodes) {
-    //   const box = BoundingBox.fromRect(item.getRect());
-    //   //isInside.
-    // }
-
-    return input;
+    return this.frames[0];
   }
 
   get outputNode(): NodeGraphicsItem {
@@ -378,9 +371,18 @@ export class NodeScene {
     return output;
   }
 
-  get timeNode(): NodeGraphicsItem {
+  get timeNodeItem(): NodeGraphicsItem {
     let time = this.nodes.find((item) => item.dNode instanceof TimeNode);
     return time;
+  }
+
+  get timeNode(): TimeNode {
+    let time = this.nodes.find((item) => item.dNode instanceof TimeNode);
+    return time ? (time.dNode as TimeNode) : null;
+  }
+
+  get isAnimated(): boolean {
+    return this.timeNodeItem ? true : false;
   }
 
   dispose() {

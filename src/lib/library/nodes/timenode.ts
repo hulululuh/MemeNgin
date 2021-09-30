@@ -14,7 +14,7 @@ export class TimeNode extends LogicDesignerNode {
 
     this.addFloatProperty("progress", "Progress", 0.0, 0.0, 1.0, 0.0001);
     this.addIntProperty("fps", "FPS", 24, 1, 60, 1);
-    this.addFloatProperty("duration", "Duration(s)", 3.0, 0.05, 10.0, 0.001);
+    this.addFloatProperty("duration", "Duration(s)", 1.0, 0.05, 10.0, 0.001);
     this.propNumFrames = this.addFloatProperty(
       "numFrames",
       "NumFrames",

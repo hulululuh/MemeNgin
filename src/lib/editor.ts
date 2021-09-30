@@ -490,7 +490,7 @@ export class Editor {
     };
 
     this.nodeScene.ontimenodecreationattempt = function() {
-      self.nodeScene.selectedItems = [self.nodeScene.timeNode];
+      self.nodeScene.selectedItems = [self.nodeScene.timeNodeItem];
       self.nodeScene.zoomSelected(self.nodeScene.selectedItems);
     };
 

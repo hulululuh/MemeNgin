@@ -233,7 +233,7 @@ export class TextGeometry {
   }
 
   async requestSetupFont(fontId: string, interval: number = TIMER_INTERVAL) {
-    console.warn("font setup");
+    console.log("font setup");
     // interval for skip duplicated requests
     clearTimeout(this.fontSetupTimer);
 

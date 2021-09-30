@@ -87,7 +87,7 @@
   import { GifCodec, GifUtil, Gif } from "gifwrap";
   import { TimeNode } from "@/lib/library/nodes/timenode";
   import { NodeGraphicsItem } from "@/lib/scene/nodegraphicsitem";
-  import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
+  import { canvasToThumbnailBitmap } from "@/lib/designer";
   const { dialog } = require("electron").remote;
   const { GifFrame } = require("gifwrap");
   const codec = new GifCodec();
@@ -116,6 +116,7 @@
     }
 
     hide() {
+      this.aborted = true;
       this.dialog = false;
     }
 
@@ -155,8 +156,7 @@
       this.$store.state.progress;
       this.$store.state.currentFrame;
       if (!Editor.getInstance().nodeScene) return 0;
-      const timeNode = Editor.getInstance().nodeScene.timeNode
-        .dNode as TimeNode;
+      const timeNode = Editor.getInstance().nodeScene.timeNode;
       if (timeNode) {
         return `${this.$store.state.currentFrame}/${timeNode.numFrames - 1}`;
       }
@@ -179,16 +179,15 @@
       if (!Editor.getInstance().nodeScene) return;
       const timeNode = Editor.getInstance().nodeScene.timeNode;
       if (timeNode) {
-        const tNode = timeNode.dNode as TimeNode;
-        let prop = tNode.properties.find((x) => {
+        let prop = timeNode.properties.find((x) => {
           return x.name == "progress";
         });
 
         const v = val / 100;
-        tNode.setProperty("progress", { value: v, exposed: prop.exposed });
+        timeNode.setProperty("progress", { value: v, exposed: prop.exposed });
         this.$store.state.progress = val;
         this.$store.state.currentFrame = Math.floor(
-          (v + Number.EPSILON) * tNode.numFrames
+          (v + Number.EPSILON) * timeNode.numFrames
         );
       }
     }
@@ -205,24 +204,23 @@
 
     async playAnimation() {
       if (this.working) return;
-      const scene = Editor.getInstance().nodeScene;
-      const timeNode = scene.timeNode;
-
+      const timeNode = Editor.getInstance().nodeScene.timeNode;
       if (timeNode == null) {
         this.aborted = true;
         return;
       } else {
-        //const frames = [];
         this.frames = [];
         this.working = true;
         this.aborted = false;
-        let tNode = timeNode.dNode as TimeNode;
+
+        const tpf = timeNode.timePerFrame;
+
         // goto first frame
-        tNode.setProgress(0);
+        timeNode.setProgress(0);
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
 
-        const numFrames = tNode.getPropertyValueByName("numFrames");
+        const numFrames = timeNode.getPropertyValueByName("numFrames");
         const valFrame = 1 / numFrames;
 
         // sample frame by frame
@@ -231,16 +229,20 @@
           let value = i * valFrame;
 
           this.frameRendering = true;
-          tNode.setProgress(value);
+          timeNode.setProgress(value);
           this.$store.state.progress = value * 100;
           this.$store.state.currentFrame = i;
 
           // wait until frame is rendered
+          let delayRemained = tpf * 1000;
           while (this.frameRendering) {
             await this.delay(1);
+            delayRemained--;
           }
+
+          if (delayRemained > 0) await this.delay(delayRemained);
         }
-        tNode.setProgress(0);
+        timeNode.setProgress(0);
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
         this.working = false;
@@ -248,7 +250,7 @@
       this.aborted = true;
     }
 
-    async renderToGif() {
+    async renderToGif(isDrawingThumbnail: boolean = false) {
       if (this.working) return;
       this.gif = null;
       const scene = Editor.getInstance().nodeScene;
@@ -259,17 +261,16 @@
         this.aborted = true;
         return;
       } else {
-        //const frames = [];
         this.frames = [];
         this.working = true;
         this.aborted = false;
-        let tNode = timeNode.dNode as TimeNode;
+
         // goto first frame
-        tNode.setProgress(0);
+        timeNode.setProgress(0);
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
 
-        const numFrames = tNode.getPropertyValueByName("numFrames");
+        const numFrames = timeNode.getPropertyValueByName("numFrames");
         const valFrame = 1 / numFrames;
 
         // sample frame by frame
@@ -278,7 +279,7 @@
           let value = i * valFrame;
 
           this.frameRendering = true;
-          tNode.setProgress(value);
+          timeNode.setProgress(value);
           this.$store.state.progress = value * 100;
           this.$store.state.currentFrame = i;
 
@@ -288,15 +289,27 @@
           }
 
           // timePerFrame
-          const tpf = (Editor.getInstance().nodeScene.timeNode
-            .dNode as TimeNode).timePerFrame;
+          const tpf = timeNode.timePerFrame;
           const canvas = Editor.getInstance().nodeScene.outputNode.imageCanvas
             .canvas;
           const w = canvas.width;
           const h = canvas.height;
-          let frame = new GifFrame(w, h, { delayCentisecs: tpf * 100.0 });
           const ctx = canvas.getContext("2d");
-          frame.bitmap.data = Buffer.from(ctx.getImageData(0, 0, w, h).data);
+          let frame;
+
+          if (isDrawingThumbnail) {
+            const scale = 256 / h;
+            frame = new GifFrame(w * scale, 256, {
+              delayCentisecs: tpf * 100.0,
+            });
+            frame.bitmap.data = Buffer.from(
+              canvasToThumbnailBitmap(canvas).data
+            );
+          } else {
+            frame = new GifFrame(w, h, { delayCentisecs: tpf * 100.0 });
+            frame.bitmap.data = Buffer.from(ctx.getImageData(0, 0, w, h).data);
+          }
+          //let imgData: ImageData = ctx.getImageData(0, 0, w, h);
           const indexCount = frame.getPalette().indexCount;
 
           if (indexCount > 256) {
@@ -304,6 +317,14 @@
           }
           this.frames.push(frame);
         }
+
+        // // quantize frames
+        // this.frames.forEach((frame) => {
+        //   const indexCount = frame.getPalette().indexCount;
+        //   if (indexCount > 256) {
+        //     GifUtil.quantizeDekker(frame, 256);
+        //   }
+        // });
 
         // encode gif
         this.gif = await new Promise((resolve) => {
@@ -316,7 +337,7 @@
         // swap canvas to encoded gif
         const gifAsString = `data:image/gif;base64,${this.gif.buffer.toString()}`;
 
-        tNode.setProgress(0);
+        timeNode.setProgress(0);
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
         this.working = false;

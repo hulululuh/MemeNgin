@@ -34,6 +34,7 @@ import { OutputNode } from "./library/nodes/outputnode";
 import { MapFloatNode } from "./library/nodes/mapfloatnode";
 import { AnimationNode } from "./library/nodes/animationnode";
 import { GifCodec } from "gifwrap";
+import store from "../store";
 
 const HALF = 0.5;
 
@@ -55,31 +56,74 @@ enum FitMode {
 }
 const fitMode: FitMode = FitMode.Height;
 
-export function canvasToThumbnailURL(img: HTMLCanvasElement) {
-  let canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 256;
-  let ctx = canvas.getContext("2d");
+export function canvasResizedToThumbnail(
+  src: HTMLCanvasElement,
+  dst: HTMLCanvasElement
+) {
+  //let canvas = document.createElement("canvas");
+  let ctx = dst.getContext("2d");
   let scale = 1;
 
   switch (fitMode) {
     case FitMode.Height:
-      scale = canvas.height / img.height;
+      scale = dst.height / src.height;
       break;
     case FitMode.Width:
-      scale = canvas.width / img.width;
+      scale = dst.width / src.width;
       break;
     case FitMode.Long:
-      scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+      scale = Math.min(dst.width / src.width, dst.height / src.height);
       break;
   }
 
-  let x = canvas.width / 2 - (img.width / 2) * scale;
-  let y = canvas.height / 2 - (img.height / 2) * scale;
-  ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+  let x = dst.width / 2 - (src.width / 2) * scale;
+  let y = dst.height / 2 - (src.height / 2) * scale;
+  ctx.drawImage(src, x, y, src.width * scale, src.height * scale);
+  return ctx;
+}
 
-  const url = canvas.toDataURL("image/webp", 1.0);
+export function canvasToThumbnailBitmap(img: HTMLCanvasElement) {
+  let dst = document.createElement("canvas");
+  dst.width = 256;
+  dst.height = 256;
+  let ctx = canvasResizedToThumbnail(img, dst);
+  return ctx.getImageData(0, 0, img.width, img.height);
+}
+
+export function canvasToThumbnailURL(img: HTMLCanvasElement) {
+  let dst = document.createElement("canvas");
+  dst.width = 256;
+  dst.height = 256;
+  let ctx = canvasResizedToThumbnail(img, dst);
+  const url = dst.toDataURL("image/webp", 1.0);
   return url;
+}
+
+export function getThumbnail() {
+  // 1. if animated and gif thumbnail is update - gif
+  // 2. if animated but gif thumbnail is outdated
+  // 2-1 update requested - gif
+  // 2-2 update skipped
+  // 2-2-1 gif is existing - gif
+  // 2-2-2 gif is not existing - png
+  // 3. if not animated - png
+
+  const isOutdated = true;
+  const renderAnim = false;
+  const outputCanvas = Editor.getScene().outputNode.imageCanvas.canvas;
+  if (isOutdated) {
+    const scene = Editor.getScene();
+    if (scene.isAnimated) {
+      if (renderAnim) {
+      } else {
+        store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
+      }
+    } else {
+      store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
+    }
+  }
+
+  return store.state.thumbnail;
 }
 
 export class Designer {
@@ -949,7 +993,7 @@ export class Designer {
       .canvas;
 
     let data = {};
-    data["thumbnail"] = canvasToThumbnailURL(outputCanvas);
+    data["thumbnail"] = getThumbnail();
     data["nodes"] = nodes;
     data["connections"] = connections;
     data["variables"] = variables;
@@ -1058,18 +1102,6 @@ export class Designer {
     console.log(nodes.length + " nodes");
     console.log(connections.length + " connections");
     return d;
-  }
-
-  getThumbnail() {
-    let outputNode = this.nodes.find((item) => item instanceof OutputNode);
-    if (!outputNode) {
-      console.error("Can not find output node, this sould not happen");
-      return;
-    } else {
-      let outputCanvas = Editor.getScene().getNodeById(outputNode.id)
-        .imageCanvas.canvas;
-      return canvasToThumbnailURL(outputCanvas);
-    }
   }
 
   findLeftNode(rightNodeId: string, rightNodeInput: string): DesignerNode {

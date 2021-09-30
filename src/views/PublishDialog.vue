@@ -155,7 +155,7 @@
   import { Vue, Component, Emit } from "vue-property-decorator";
   import { AGE_RATING, TAGS_TEST } from "@/userdata";
   import { Editor } from "@/lib/editor";
-  import { canvasToThumbnailURL } from "@/lib/designer";
+  import { getThumbnail } from "@/lib/designer";
   import { WorkshopManager } from "@/community/workshop";
   import { TextManager } from "@/assets/textmanager";
   import AgeDialog from "@/views/AgeDialog.vue";
@@ -412,9 +412,9 @@
     }
 
     prepareModel() {
-      let outputCanvas = Editor.getScene().outputNode.imageCanvas.canvas;
-      this.$store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
-      Editor.getMetadata().thumbnail = canvasToThumbnailURL(outputCanvas);
+      this.$store.state.thumbnail = getThumbnail();
+      // copy thumbnail url
+      Editor.getMetadata().thumbnail = `${this.$store.state.thumbnail}`;
       this.$store.dispatch("changeMetadata", Editor.getMetadata());
       this.$forceUpdate();
     }
