@@ -110,8 +110,9 @@
       (this.$refs.preview2d as Preview2D)?.onFrameRendered(item);
     }
 
-    show() {
+    async show() {
       this.dialog = true;
+      await this.delay(5);
       this.initPreview();
     }
 
