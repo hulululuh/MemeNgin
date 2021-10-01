@@ -74,7 +74,6 @@
     }
 
     onFrameRendered(item: NodeGraphicsItem) {
-      //let item = Editor.getInstance().nodeScene.outputNode;
       const node = item.dNode;
       const image = item.imageCanvas.canvas;
       this.node = node;
@@ -99,10 +98,6 @@
       if (!this.dragZoom) {
         this.dragZoom = new DragZoom(canvas);
       }
-      // this.dragZoom.canvas.width = width;
-      // this.dragZoom.canvas.height = height;
-      // canvas.width = width;
-      // canvas.height = height;
 
       // TODO: I don't think its best
       setTimeout(() => {
@@ -112,7 +107,7 @@
 
     resizeImage(width, height) {
       const canvas = this.$refs.canvas as HTMLCanvasElement;
-      if (canvas) return;
+      if (!canvas) return;
       fitCanvasToContainer(canvas);
 
       const margin = 0.1;

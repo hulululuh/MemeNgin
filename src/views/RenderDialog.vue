@@ -85,7 +85,6 @@
   import TooltipButton from "@/views/TooltipButton.vue";
   import { Editor } from "@/lib/editor";
   import { GifCodec, GifUtil, Gif } from "gifwrap";
-  import { TimeNode } from "@/lib/library/nodes/timenode";
   import { NodeGraphicsItem } from "@/lib/scene/nodegraphicsitem";
   import { canvasToThumbnailBitmap } from "@/lib/designer";
   const { dialog } = require("electron").remote;
@@ -108,11 +107,12 @@
     gif: Gif = null;
 
     onPreviewNode(item: NodeGraphicsItem): void {
-      (this.$refs.preview2d as Preview2D).onFrameRendered(item);
+      (this.$refs.preview2d as Preview2D)?.onFrameRendered(item);
     }
 
     show() {
       this.dialog = true;
+      this.initPreview();
     }
 
     hide() {
@@ -122,6 +122,10 @@
 
     updated() {
       this.initPreview();
+    }
+
+    reset() {
+      this.initialized = false;
     }
 
     async initPreview() {

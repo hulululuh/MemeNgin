@@ -415,6 +415,8 @@
       if (scene) {
         scene.resetView();
       }
+
+      (this.$refs.renderDialog as RenderDialog).reset();
     }
 
     onProjectSaved() {
@@ -837,6 +839,8 @@
       if (isInsideReservedPath(project.localPath)) {
         this.isReadOnly = true;
       }
+
+      (this.$refs.renderDialog as RenderDialog).reset();
     }
 
     async updatePublisherInfo(publisherId) {
