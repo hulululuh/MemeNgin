@@ -231,7 +231,11 @@ export class DesignerNode implements IPropertyHolder {
           index = value["value"];
         }
         prop.setValue(index);
-      } else if (prop instanceof StringProperty) {
+      } else if (
+        prop instanceof StringProperty ||
+        prop instanceof FloatProperty ||
+        prop instanceof IntProperty
+      ) {
         // search for variable property
         prop.setValue(value["value"]);
         if (this.onnodepropertychanged) this.onnodepropertychanged(prop);

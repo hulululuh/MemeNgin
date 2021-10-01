@@ -120,10 +120,6 @@
       this.dialog = false;
     }
 
-    updated() {
-      this.initPreview();
-    }
-
     reset() {
       this.initialized = false;
     }

@@ -24,6 +24,7 @@ export class TimeNode extends LogicDesignerNode {
       0.001,
       false
     );
+
     this.updateProps();
 
     this.onnodepropertychanged = function(prop: Property) {
