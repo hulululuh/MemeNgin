@@ -97,10 +97,8 @@ export class DragZoom {
   panning: boolean;
   panStart: SVGPoint;
 
-  rect: Rect;
+  //rect: Rect;
   image: HTMLCanvasElement;
-
-  drawMode: DrawMode;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -158,15 +156,14 @@ export class DragZoom {
       { capture: true, passive: false }
     );
 
-    this.drawMode = DrawMode.Single;
     this.zoomFactor = 0.4;
 
     this.mousePos = new Vector2(0, 0);
     this.prevMousePos = new Vector2(0, 0);
     this.mouseDownPos = new Vector2(0, 0);
 
-    this.rect = new Rect();
-    this.rect.setSize(50, 50);
+    // this.rect = new Rect();
+    // this.rect.setSize(50, 50);
 
     // offset to put center(0,0) in middle of view
     this.offset = new Vector2(canvas.width * 0.5, canvas.height * 0.5);
@@ -290,8 +287,11 @@ export class DragZoom {
     const ctx = this.context;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = "rgb(50,50,50)";
+
+    ctx.fillStyle = "rgba(0,0,0,0)";
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
     ctx.setTransform(
       this.zoomFactor,
       0,
@@ -302,34 +302,17 @@ export class DragZoom {
     );
 
     // highlight rect if mouse over
-    let scenePos = this.canvasToScene(this.mousePos);
+    //let scenePos = this.canvasToScene(this.mousePos);
 
     //console.log(scenePos);
-    if (this.rect.isPointInside(scenePos.x, scenePos.y)) {
-      this.rect.color = "rgb(0, 255, 255)";
-    } else {
-      this.rect.color = "rgb(255, 50, 50)";
-    }
+    // if (this.rect.isPointInside(scenePos.x, scenePos.y)) {
+    //   this.rect.color = "rgb(0, 255, 255)";
+    // } else {
+    //   this.rect.color = "rgb(255, 50, 50)";
+    // }
 
     if (this.image) {
-      if (this.drawMode == DrawMode.Single) {
-        this.drawImage(0, 0);
-      } else {
-        // top
-        this.drawImage(-1, -1);
-        this.drawImage(0, -1);
-        this.drawImage(1, -1);
-
-        // middle
-        this.drawImage(-1, 0);
-        this.drawImage(0, 0);
-        this.drawImage(1, 0);
-
-        // bottom
-        this.drawImage(-1, 1);
-        this.drawImage(0, 1);
-        this.drawImage(1, 1);
-      }
+      this.drawImage(0, 0);
     }
   }
 

@@ -171,8 +171,6 @@
       if (canvas && imageNode) {
         const w = canvas.width / imageNode.getWidth();
         const h = canvas.height / imageNode.getHeight();
-        // const w = this.dragZoom.canvas.width / imageNode.getWidth();
-        // const h = this.dragZoom.canvas.height / imageNode.getHeight();
         let zoomFactor = w > h ? h : w;
 
         // todo: center texture in canvas

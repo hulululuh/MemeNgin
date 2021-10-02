@@ -38,7 +38,7 @@
             <tooltip-button
               icon="mdi-content-save-outline"
               tooltip="Save as gif"
-              :disabled="!gif"
+              :disabled="!encoded"
               @click="saveGif"
             />
           </v-col>
@@ -84,12 +84,10 @@
   import Preview2D from "@/views/Preview2D.vue";
   import TooltipButton from "@/views/TooltipButton.vue";
   import { Editor } from "@/lib/editor";
-  import { GifCodec, GifUtil, Gif } from "gifwrap";
   import { NodeGraphicsItem } from "@/lib/scene/nodegraphicsitem";
-  import { canvasToThumbnailBitmap } from "@/lib/designer";
+  import fs from "fs";
   const { dialog } = require("electron").remote;
-  const { GifFrame } = require("gifwrap");
-  const codec = new GifCodec();
+  const GIFEncoder = require("gif-encoder-2");
 
   @Component({
     components: {
@@ -104,7 +102,9 @@
     working: boolean = false;
     initialized: boolean = false;
     frames: any[] = null;
-    gif: Gif = null;
+    //gif: Gif = null;
+    encoder: any = null;
+    encoded: boolean = false;
 
     onPreviewNode(item: NodeGraphicsItem): void {
       (this.$refs.preview2d as Preview2D)?.onFrameRendered(item);
@@ -253,7 +253,7 @@
 
     async renderToGif(isDrawingThumbnail: boolean = false) {
       if (this.working) return;
-      this.gif = null;
+      //this.gif = null;
       const scene = Editor.getInstance().nodeScene;
       const outputNode = scene.outputNode;
       const timeNode = scene.timeNode;
@@ -262,6 +262,21 @@
         this.aborted = true;
         return;
       } else {
+        const canvas = Editor.getInstance().nodeScene.outputNode.imageCanvas
+          .canvas;
+        const w = canvas.width;
+        const h = canvas.height;
+        const numFrames = timeNode.getPropertyValueByName("numFrames");
+        const fps = timeNode.getPropertyValueByName("fps");
+        const valFrame = 1 / numFrames;
+        this.encoder = new GIFEncoder(w, h, "neuquant", true, numFrames);
+        if (!this.encoder) return;
+        //this.encoder.setFramesPerSecond(fps);
+        // 1 is best quality and slowest
+        this.encoder.setQuality(1);
+        this.encoder.setTransparent(true);
+        this.encoder.start();
+
         this.frames = [];
         this.working = true;
         this.aborted = false;
@@ -271,8 +286,7 @@
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
 
-        const numFrames = timeNode.getPropertyValueByName("numFrames");
-        const valFrame = 1 / numFrames;
+        this.encoded = false;
 
         // sample frame by frame
         for (let i = 0; i < numFrames; i++) {
@@ -291,57 +305,20 @@
 
           // timePerFrame
           const tpf = timeNode.timePerFrame;
-          const canvas = Editor.getInstance().nodeScene.outputNode.imageCanvas
-            .canvas;
-          const w = canvas.width;
-          const h = canvas.height;
           const ctx = canvas.getContext("2d");
-          let frame;
-
-          if (isDrawingThumbnail) {
-            const scale = 256 / h;
-            frame = new GifFrame(w * scale, 256, {
-              delayCentisecs: tpf * 100.0,
-            });
-            frame.bitmap.data = Buffer.from(
-              canvasToThumbnailBitmap(canvas).data
-            );
-          } else {
-            frame = new GifFrame(w, h, { delayCentisecs: tpf * 100.0 });
-            frame.bitmap.data = Buffer.from(ctx.getImageData(0, 0, w, h).data);
-          }
-          //let imgData: ImageData = ctx.getImageData(0, 0, w, h);
-          const indexCount = frame.getPalette().indexCount;
-
-          if (indexCount > 256) {
-            GifUtil.quantizeDekker(frame, 256);
-          }
-          this.frames.push(frame);
+          this.encoder.setDelay(tpf * 1000.0);
+          this.encoder.addFrame(ctx);
         }
 
-        // // quantize frames
-        // this.frames.forEach((frame) => {
-        //   const indexCount = frame.getPalette().indexCount;
-        //   if (indexCount > 256) {
-        //     GifUtil.quantizeDekker(frame, 256);
-        //   }
-        // });
-
-        // encode gif
-        this.gif = await new Promise((resolve) => {
-          codec.encodeGif(this.frames, { loops: 0 }).then((gif) => {
-            // byte encoding is now in gif.buffer
-            resolve(gif);
-          });
-        });
-
         // swap canvas to encoded gif
-        const gifAsString = `data:image/gif;base64,${this.gif.buffer.toString()}`;
+        //const gifAsString = `data:image/gif;base64,${this.gif.buffer.toString()}`;
 
         timeNode.setProgress(0);
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
         this.working = false;
+        this.encoder.finish();
+        this.encoded = this.encoder.out && this.encoder.out.data.length > 0;
       }
       this.aborted = true;
     }
@@ -363,9 +340,12 @@
 
       if (result.canceled) return;
 
-      // save to Image/Gif Url
-      if (this.gif) {
-        GifUtil.write(result.filePath, this.frames);
+      if (this.encoder) {
+        const buffer = this.encoder.out.getData();
+        fs.writeFile(result.filePath, buffer, (error) => {
+          // gif drawn or error
+          if (error) console.error(error);
+        });
       }
     }
   }
