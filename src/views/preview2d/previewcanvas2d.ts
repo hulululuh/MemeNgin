@@ -16,76 +16,88 @@ export enum DrawMode {
   Nine,
 }
 
-class Rect {
-  private x: number;
-  private y: number;
-  private width: number;
-  private height: number;
+// class Rect {
+//   private x: number;
+//   private y: number;
+//   private width: number;
+//   private height: number;
 
-  color: string;
+//   white: string = "rgb(255, 255, 255)";
+//   grey: string = "rgb(200, 200, 200)";
 
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.width = 1;
-    this.height = 1;
-    this.color = "rgb(255, 50, 50)";
-  }
+//   constructor() {
+//     this.x = 0;
+//     this.y = 0;
+//     this.width = 1;
+//     this.height = 1;
+//   }
 
-  setSize(w: number, h: number) {
-    this.width = w;
-    this.height = h;
-  }
+//   setSize(w: number, h: number) {
+//     this.width = w;
+//     this.height = h;
+//   }
 
-  isPointInside(px: number, py: number): boolean {
-    if (
-      px >= this.x &&
-      px <= this.x + this.width &&
-      py >= this.y &&
-      py <= this.y + this.height
-    )
-      return true;
-    return false;
-  }
+//   isPointInside(px: number, py: number): boolean {
+//     if (
+//       px >= this.x &&
+//       px <= this.x + this.width &&
+//       py >= this.y &&
+//       py <= this.y + this.height
+//     )
+//       return true;
+//     return false;
+//   }
 
-  setCenter(x: number, y: number) {
-    this.x = x - this.width / 2;
-    this.y = y - this.height / 2;
-  }
+//   setCenter(x: number, y: number) {
+//     this.x = x - this.width / 2;
+//     this.y = y - this.height / 2;
+//   }
 
-  centerX(): number {
-    return this.x + this.width / 2;
-  }
+//   centerX(): number {
+//     return this.x + this.width / 2;
+//   }
 
-  centerY(): number {
-    return this.y + this.height / 2;
-  }
+//   centerY(): number {
+//     return this.y + this.height / 2;
+//   }
 
-  move(dx: number, dy: number) {
-    this.x += dx;
-    this.y += dy;
-  }
+//   move(dx: number, dy: number) {
+//     this.x += dx;
+//     this.y += dy;
+//   }
 
-  // to be overriden
-  draw(ctx: CanvasRenderingContext2D) {
-    // background
-    ctx.beginPath();
+//   // to be overriden
+//   draw(ctx: CanvasRenderingContext2D, color: string) {
+//     // background
+//     ctx.beginPath();
+//     ctx.fillStyle = color;
+//     ctx.rect(this.x, this.y, this.width, this.height);
+//     ctx.fill();
+
+//     // border
+//     ctx.beginPath();
+//     ctx.lineWidth = 4;
+//     ctx.strokeStyle = "rgb(0, 0, 0)";
+//     ctx.rect(this.x, this.y, this.width, this.height);
+//     ctx.stroke();
+//   }
+// }
+
+function Rectangle(x, y, width, height, color, ctx) {
+  this.x = x;
+  this.y = y;
+  this.width = width;
+  this.height = height;
+  this.color = color;
+  this.draw = function() {
     ctx.fillStyle = this.color;
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.fill();
-
-    // border
-    ctx.beginPath();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "rgb(0, 0, 0)";
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.stroke();
-  }
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  };
 }
 
 export class DragZoom {
-  canvas: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
+  canvases: Array<HTMLCanvasElement>;
+  //context: CanvasRenderingContext2D;
 
   mousePos: Vector2;
   prevMousePos: Vector2;
@@ -100,73 +112,87 @@ export class DragZoom {
   //rect: Rect;
   image: HTMLCanvasElement;
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
-    this.context = this.canvas.getContext("2d");
+  constructor(canvases: Array<HTMLCanvasElement>) {
+    this.canvases = canvases;
     this.image = null;
 
-    let self = this;
-    canvas.addEventListener(
-      "mousemove",
-      function(evt: MouseEvent) {
-        self.onMouseMove(evt);
-      },
-      { capture: true, passive: false }
-    );
-    canvas.addEventListener(
-      "mousedown",
-      function(evt: MouseEvent) {
-        self.onMouseDown(evt);
-      },
-      { capture: true, passive: false }
-    );
-    canvas.addEventListener(
-      "mouseup",
-      function(evt: MouseEvent) {
-        self.onMouseUp(evt);
-      },
-      { capture: true, passive: false }
-    );
-    canvas.addEventListener(
-      "mouseout",
-      function(evt: MouseEvent) {
-        self.onMouseOut(evt);
-      },
-      { capture: true, passive: false }
-    );
-    canvas.addEventListener(
-      "mousewheel",
-      function(evt: WheelEvent) {
-        self.onMouseScroll(evt);
-      },
-      { capture: true, passive: false }
-    );
-    canvas.addEventListener(
-      "contextmenu",
-      function(evt: MouseEvent) {
-        evt.preventDefault();
-      },
-      { capture: true, passive: false }
-    );
-    canvas.addEventListener(
-      "resize",
-      function(evt: MouseEvent) {
-        console.log("2d canvas resized");
-      },
-      { capture: true, passive: false }
-    );
+    for (let canvas of this.canvases) {
+      let self = this;
+      canvas.addEventListener(
+        "mousemove",
+        function(evt: MouseEvent) {
+          self.onMouseMove(evt);
+        },
+        { capture: true, passive: false }
+      );
+      canvas.addEventListener(
+        "mousedown",
+        function(evt: MouseEvent) {
+          self.onMouseDown(evt);
+        },
+        { capture: true, passive: false }
+      );
+      canvas.addEventListener(
+        "mouseup",
+        function(evt: MouseEvent) {
+          self.onMouseUp(evt);
+        },
+        { capture: true, passive: false }
+      );
+      canvas.addEventListener(
+        "mouseout",
+        function(evt: MouseEvent) {
+          self.onMouseOut(evt);
+        },
+        { capture: true, passive: false }
+      );
+      canvas.addEventListener(
+        "mousewheel",
+        function(evt: WheelEvent) {
+          self.onMouseScroll(evt);
+        },
+        { capture: true, passive: false }
+      );
+      canvas.addEventListener(
+        "contextmenu",
+        function(evt: MouseEvent) {
+          evt.preventDefault();
+        },
+        { capture: true, passive: false }
+      );
+      canvas.addEventListener(
+        "resize",
+        function(evt: MouseEvent) {
+          console.log("2d canvas resized");
+        },
+        { capture: true, passive: false }
+      );
 
-    this.zoomFactor = 0.4;
+      this.zoomFactor = 0.4;
 
-    this.mousePos = new Vector2(0, 0);
-    this.prevMousePos = new Vector2(0, 0);
-    this.mouseDownPos = new Vector2(0, 0);
+      this.mousePos = new Vector2(0, 0);
+      this.prevMousePos = new Vector2(0, 0);
+      this.mouseDownPos = new Vector2(0, 0);
 
-    // this.rect = new Rect();
-    // this.rect.setSize(50, 50);
+      // this.rect = new Rect();
+      // this.rect.setSize(50, 50);
 
-    // offset to put center(0,0) in middle of view
-    this.offset = new Vector2(canvas.width * 0.5, canvas.height * 0.5);
+      // offset to put center(0,0) in middle of view
+      this.offset = new Vector2(canvas.width * 0.5, canvas.height * 0.5);
+    }
+  }
+
+  get background() {
+    return this.canvases[1];
+  }
+
+  get canvas() {
+    return this.canvases[0];
+  }
+
+  get context() {
+    const ctx = this.canvas.getContext("2d");
+    return ctx;
   }
 
   onResize(width: number, height: number) {
@@ -176,22 +202,21 @@ export class DragZoom {
 
   // puts image in center and set appropriate zoom level
   centerImage(zoomFactor = 0.4) {
-    this.offset = new Vector2(
-      this.canvas.width * 0.5,
-      this.canvas.height * 0.5
-    );
-    this.zoomFactor = zoomFactor;
+    for (let canvas of this.canvases) {
+      this.offset = new Vector2(canvas.width * 0.5, canvas.height * 0.5);
+      this.zoomFactor = zoomFactor;
 
-    const ctx = this.context;
+      const ctx = canvas.getContext("2d");
 
-    ctx.setTransform(
-      this.zoomFactor,
-      0,
-      0,
-      this.zoomFactor,
-      this.offset[0],
-      this.offset[1]
-    );
+      ctx.setTransform(
+        this.zoomFactor,
+        0,
+        0,
+        this.zoomFactor,
+        this.offset[0],
+        this.offset[1]
+      );
+    }
   }
 
   setImage(image: HTMLCanvasElement) {
@@ -284,14 +309,13 @@ export class DragZoom {
   }
 
   draw() {
-    const ctx = this.context;
+    this.drawBackground();
 
+    const ctx = this.canvas.getContext("2d");
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-
     ctx.fillStyle = "rgba(0,0,0,0)";
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
     ctx.setTransform(
       this.zoomFactor,
       0,
@@ -300,16 +324,6 @@ export class DragZoom {
       this.offset[0],
       this.offset[1]
     );
-
-    // highlight rect if mouse over
-    //let scenePos = this.canvasToScene(this.mousePos);
-
-    //console.log(scenePos);
-    // if (this.rect.isPointInside(scenePos.x, scenePos.y)) {
-    //   this.rect.color = "rgb(0, 255, 255)";
-    // } else {
-    //   this.rect.color = "rgb(255, 50, 50)";
-    // }
 
     if (this.image) {
       this.drawImage(0, 0);
@@ -323,7 +337,8 @@ export class DragZoom {
     const x = -w * 0.5 + offsetX * w;
     const y = -h * 0.5 + offsetY * h;
 
-    this.context.drawImage(this.image, x, y, w, h);
+    const ctx = this.context;
+    ctx.drawImage(this.image, x, y, w, h);
   }
 
   // converts from canvas(screen) coords to the scene(world) coords
@@ -332,5 +347,44 @@ export class DragZoom {
     return new Vector2(pos[0], pos[1])
       .sub(this.offset)
       .multiplyByScalar(1 / zoomFactor);
+  }
+
+  drawBackground() {
+    const background = this.background;
+    let ctx = background.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = "rgba(0,0,0,0)";
+    ctx.clearRect(0, 0, background.width, background.height);
+    ctx.fillRect(0, 0, background.width, background.height);
+
+    const gridSize = 12;
+    const rows = Math.ceil(background.height / gridSize);
+    const cols = Math.ceil(background.width / gridSize);
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        const skip = ((i % 2) + (j % 2)) % 2 == 0;
+        if (skip) continue;
+
+        const x = j * gridSize;
+        const y = i * gridSize;
+        let rectangle = new Rectangle(
+          x,
+          y,
+          gridSize,
+          gridSize,
+          "rgb(200, 200, 200)",
+          ctx
+        );
+        rectangle.draw();
+      }
+    }
+    ctx.setTransform(
+      this.zoomFactor,
+      0,
+      0,
+      this.zoomFactor,
+      this.offset[0],
+      this.offset[1]
+    );
   }
 }

@@ -272,7 +272,7 @@
         this.encoder = new GIFEncoder(w, h, "neuquant", true, numFrames);
         if (!this.encoder) return;
         //this.encoder.setFramesPerSecond(fps);
-        // 1 is best quality and slowest
+        // 1 is best quality and slowest to 30
         this.encoder.setQuality(1);
         this.encoder.setTransparent(true);
         this.encoder.start();

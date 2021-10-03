@@ -1,9 +1,28 @@
 <template>
-  <v-container>
-    <v-flex fill-height justify-center v-resize="resize" ref="flex">
-      <canvas id="_2dpreview" ref="canvas"></canvas>
+  <v-flex
+    class="ma-0 pa-0"
+    id="container"
+    v-resize="resize"
+    fill-width
+    fill-height
+    ref="flex"
+  >
+    <canvas
+      class="ma-0 pa-0"
+      id="_2dpreview"
+      ref="canvas"
+      style="left: 0; top: 0; z-index: 1; background-color: transparent;"
+    >
+    </canvas>
+    <v-flex class="ma-0 pa-0" id="overlay" fill-width fill-height ref="overlay">
+      <canvas
+        id="_background"
+        ref="backgroundLayer"
+        style="left: 0; top: 0; z-index: 0; background-color: transparent;"
+      >
+      </canvas>
     </v-flex>
-  </v-container>
+  </v-flex>
 </template>
 
 <style scoped>
@@ -29,6 +48,18 @@
   .toggled {
     background: #444;
   }
+
+  #container {
+    position: relative;
+  }
+  #container canvas,
+  #overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+  }
 </style>
 
 <script lang="ts">
@@ -50,9 +81,16 @@
     dragZoom: DragZoom = null;
     flex: any = null;
 
+    get canvas() {
+      return this.$refs.canvas as HTMLCanvasElement;
+    }
+
+    get background() {
+      return this.$refs.backgroundLayer as HTMLCanvasElement;
+    }
+
     mounted() {
-      const canvas = this.$refs.canvas as HTMLCanvasElement;
-      let dragZoom = new DragZoom(canvas);
+      let dragZoom = new DragZoom([this.canvas, this.background]);
       const draw = () => {
         dragZoom.draw();
         requestAnimationFrame(draw);
@@ -92,11 +130,10 @@
     }
 
     resize(width: number, height: number) {
-      const canvas = this.$refs.canvas as HTMLCanvasElement;
-
-      fitCanvasToContainer(canvas);
+      fitCanvasToContainer(this.canvas);
+      fitCanvasToContainer(this.background);
       if (!this.dragZoom) {
-        this.dragZoom = new DragZoom(canvas);
+        this.dragZoom = new DragZoom([this.canvas, this.background]);
       }
 
       // TODO: I don't think its best
@@ -106,25 +143,15 @@
     }
 
     resizeImage(width, height) {
-      const canvas = this.$refs.canvas as HTMLCanvasElement;
-      if (!canvas) return;
-      fitCanvasToContainer(canvas);
+      fitCanvasToContainer(this.canvas);
+      fitCanvasToContainer(this.background);
 
       const margin = 0.1;
-      const ratioW = ((1.0 - margin) * canvas.width) / width;
-      const ratioH = ((1.0 - margin) * canvas.height) / height;
+      const ratioW = ((1.0 - margin) * this.canvas.width) / width;
+      const ratioH = ((1.0 - margin) * this.canvas.height) / height;
 
       const zoomFactor = Math.min(1.0, Math.min(ratioW, ratioH));
       this.dragZoom.centerImage(zoomFactor);
-    }
-
-    paint() {
-      if (!this.image) return;
-
-      const canvas = this.$refs.canvas as HTMLCanvasElement;
-      let ctx = canvas.getContext("2d");
-
-      ctx.drawImage(this.image, 0, 0, canvas.width, canvas.height);
     }
 
     saveTexture() {
