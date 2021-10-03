@@ -100,8 +100,6 @@
       this.dragZoom = dragZoom;
 
       document.addEventListener("resizeImage", (event: CustomEvent) => {
-        // this.dragZoom.canvas.width = event.detail.width;
-        // this.dragZoom.canvas.height = event.detail.height;
         this.resizeImage(event.detail.width, event.detail.height);
         this.centerTexture();
       });
@@ -120,7 +118,7 @@
       const canvas = this.$refs.canvas as HTMLCanvasElement;
 
       if (node instanceof ImageDesignerNode && canvas) {
-        const margin = 0.1;
+        const margin = 0.0;
         const ratioW = ((1.0 - margin) * canvas.width) / node.getWidth();
         const ratioH = ((1.0 - margin) * canvas.height) / node.getHeight();
 

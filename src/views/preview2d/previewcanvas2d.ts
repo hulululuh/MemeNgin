@@ -10,79 +10,6 @@ function _getMousePos(canvas, evt) {
   return new Vector2(evt.clientX - rect.left, evt.clientY - rect.top);
 }
 
-/* eslint-disable */
-export enum DrawMode {
-  Single,
-  Nine,
-}
-
-// class Rect {
-//   private x: number;
-//   private y: number;
-//   private width: number;
-//   private height: number;
-
-//   white: string = "rgb(255, 255, 255)";
-//   grey: string = "rgb(200, 200, 200)";
-
-//   constructor() {
-//     this.x = 0;
-//     this.y = 0;
-//     this.width = 1;
-//     this.height = 1;
-//   }
-
-//   setSize(w: number, h: number) {
-//     this.width = w;
-//     this.height = h;
-//   }
-
-//   isPointInside(px: number, py: number): boolean {
-//     if (
-//       px >= this.x &&
-//       px <= this.x + this.width &&
-//       py >= this.y &&
-//       py <= this.y + this.height
-//     )
-//       return true;
-//     return false;
-//   }
-
-//   setCenter(x: number, y: number) {
-//     this.x = x - this.width / 2;
-//     this.y = y - this.height / 2;
-//   }
-
-//   centerX(): number {
-//     return this.x + this.width / 2;
-//   }
-
-//   centerY(): number {
-//     return this.y + this.height / 2;
-//   }
-
-//   move(dx: number, dy: number) {
-//     this.x += dx;
-//     this.y += dy;
-//   }
-
-//   // to be overriden
-//   draw(ctx: CanvasRenderingContext2D, color: string) {
-//     // background
-//     ctx.beginPath();
-//     ctx.fillStyle = color;
-//     ctx.rect(this.x, this.y, this.width, this.height);
-//     ctx.fill();
-
-//     // border
-//     ctx.beginPath();
-//     ctx.lineWidth = 4;
-//     ctx.strokeStyle = "rgb(0, 0, 0)";
-//     ctx.rect(this.x, this.y, this.width, this.height);
-//     ctx.stroke();
-//   }
-// }
-
 function Rectangle(x, y, width, height, color, ctx) {
   this.x = x;
   this.y = y;
@@ -97,7 +24,6 @@ function Rectangle(x, y, width, height, color, ctx) {
 
 export class DragZoom {
   canvases: Array<HTMLCanvasElement>;
-  //context: CanvasRenderingContext2D;
 
   mousePos: Vector2;
   prevMousePos: Vector2;
@@ -168,14 +94,11 @@ export class DragZoom {
         { capture: true, passive: false }
       );
 
-      this.zoomFactor = 0.4;
+      this.zoomFactor = 0.5;
 
       this.mousePos = new Vector2(0, 0);
       this.prevMousePos = new Vector2(0, 0);
       this.mouseDownPos = new Vector2(0, 0);
-
-      // this.rect = new Rect();
-      // this.rect.setSize(50, 50);
 
       // offset to put center(0,0) in middle of view
       this.offset = new Vector2(canvas.width * 0.5, canvas.height * 0.5);
@@ -201,7 +124,7 @@ export class DragZoom {
   }
 
   // puts image in center and set appropriate zoom level
-  centerImage(zoomFactor = 0.4) {
+  centerImage(zoomFactor = 0.5) {
     for (let canvas of this.canvases) {
       this.offset = new Vector2(canvas.width * 0.5, canvas.height * 0.5);
       this.zoomFactor = zoomFactor;
