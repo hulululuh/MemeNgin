@@ -335,30 +335,48 @@ export class WorkshopManager {
       let stats = exists && (await fs.statSync(projectPath));
       let isFile = exists && stats.isFile();
 
+      const data = Editor.getMetadata();
+      const thumbnail = data.thumbnail;
+      let base64ContentArray = thumbnail.split(",");
+
+      // base64 content cannot contain whitespaces but nevertheless skip if there are!
+      const mimeType = base64ContentArray[0].match(
+        /[^:\s*]\w+\/[\w-+\d.]+(?=[;| ])/
+      )[0];
+
+      const isGif = mimeType == "image/gif";
+      const ext: string = isGif ? ".gif" : ".png";
+      const mime: string = isGif ? "image/gif" : "image/png";
       // save file if not exists in local repository
       if (exists && isFile) {
-        const data = Editor.getMetadata();
         const localPath = path.parse(projectPath).dir;
         const parsedPath = path.parse(projectPath);
         const thumbnailPathLocal = path.join(
           parsedPath.dir,
-          `${parsedPath.name}.png`
+          `${parsedPath.name}${ext}`
         );
 
-        let img = new Image();
-        img.src = data.thumbnail;
-        await img.decode();
+        if (isGif) {
+          const base64Data = base64ContentArray[1];
+          const decoded = Buffer.from(base64Data, "base64");
+          fs.writeFileSync(thumbnailPathLocal, decoded);
+        } else {
+          // isPNG
+          let img = new Image();
+          img.src = data.thumbnail;
+          await img.decode();
 
-        let canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        let ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
+          let canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          let ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
 
-        const url = canvas.toDataURL("image/png", 1);
-        const nativeImage = electron.nativeImage.createFromDataURL(url);
-        const buffer = nativeImage.toPNG();
-        fs.writeFileSync(thumbnailPathLocal, buffer);
+          const url = canvas.toDataURL(mime, 1);
+          const nativeImage = electron.nativeImage.createFromDataURL(url);
+          const buffer = nativeImage.toPNG();
+          fs.writeFileSync(thumbnailPathLocal, buffer);
+        }
 
         await greenworks.ugcCreateWorkshopItem(
           { "app_id": APP_ID, "tags": data.tagsCalculated },

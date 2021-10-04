@@ -35,6 +35,7 @@ import { MapFloatNode } from "./library/nodes/mapfloatnode";
 import { AnimationNode } from "./library/nodes/animationnode";
 import { GifCodec } from "gifwrap";
 import store from "../store";
+import { AnimationEncoder } from "@/utils/animationencoder";
 
 const HALF = 0.5;
 
@@ -99,7 +100,7 @@ export function canvasToThumbnailURL(img: HTMLCanvasElement) {
   return url;
 }
 
-export function getThumbnail() {
+export async function getThumbnail() {
   // 1. if animated and gif thumbnail is update - gif
   // 2. if animated but gif thumbnail is outdated
   // 2-1 update requested - gif
@@ -108,22 +109,28 @@ export function getThumbnail() {
   // 2-2-2 gif is not existing - png
   // 3. if not animated - png
 
-  const isOutdated = true;
-  const renderAnim = false;
+  const isOutdated = AnimationEncoder.getInstance().isDirty;
+  const renderAnim = true;
   const outputCanvas = Editor.getScene().outputNode.imageCanvas.canvas;
   if (isOutdated) {
     const scene = Editor.getScene();
     if (scene.isAnimated) {
       if (renderAnim) {
+        AnimationEncoder.getInstance().encoded = false;
+        document.dispatchEvent(new Event("requestThumbnail"));
+        while (AnimationEncoder.getInstance().encoded == false) {
+          await new Promise((resolve) => setTimeout(resolve, 1));
+        }
+        store.state.metadata.thumbnail = await AnimationEncoder.getInstance().getGifAsString();
       } else {
-        store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
+        store.state.metadata.thumbnail = canvasToThumbnailURL(outputCanvas);
       }
     } else {
-      store.state.thumbnail = canvasToThumbnailURL(outputCanvas);
+      store.state.metadata.thumbnail = canvasToThumbnailURL(outputCanvas);
     }
   }
 
-  return store.state.thumbnail;
+  return store.state.metadata.thumbnail;
 }
 
 export class Designer {
@@ -645,7 +652,6 @@ export class Designer {
     let node = dnode as ImageDesignerNode;
     let gl = this.gl;
 
-    //gl.clearColor(1, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // bind shader
@@ -653,16 +659,11 @@ export class Designer {
 
     // bind mesh
     let posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
-    //let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-    // gl.enableVertexAttribArray(texCoordLoc);
-    // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
 
     // send texture
     gl.uniform1i(gl.getUniformLocation(this.thumbnailProgram, "tex"), 0);
@@ -677,18 +678,8 @@ export class Designer {
 
     // cleanup
     gl.disableVertexAttribArray(posLoc);
-    //gl.disableVertexAttribArray(texCoordLoc);
 
     return null;
-
-    //let img:HTMLImageElement = <HTMLImageElement>document.createElement("image");
-    //let img:HTMLImageElement = new Image(this.width, this.height);
-    //img.src = this.canvas.toDataURL("image/png");
-
-    // note: this called right after clears the image for some reason
-    //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    //return img;
-    //return null;
   }
 
   // render's node's texture then draws it on the given canvas
@@ -705,16 +696,11 @@ export class Designer {
 
     // bind mesh
     let posLoc = gl.getAttribLocation(this.thumbnailProgram, "a_pos");
-    //let texCoordLoc = gl.getAttribLocation(this.thumbnailProgram, "a_texCoord");
 
     // provide texture coordinates for the rectangle.
     gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-    // gl.enableVertexAttribArray(texCoordLoc);
-    // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
 
     // send texture
     gl.uniform1i(gl.getUniformLocation(this.thumbnailProgram, "tex"), 0);
@@ -989,11 +975,8 @@ export class Designer {
       console.log(v);
     }
 
-    let outputCanvas = Editor.getScene().getNodeById(outputNode.id).imageCanvas
-      .canvas;
-
     let data = {};
-    data["thumbnail"] = getThumbnail();
+    data["thumbnail"] = await getThumbnail();
     data["nodes"] = nodes;
     data["connections"] = connections;
     data["variables"] = variables;
@@ -1133,5 +1116,9 @@ export class Designer {
     return this.conns.filter(
       (con) => con.leftNode == node || con.rightNode == node
     );
+  }
+
+  delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

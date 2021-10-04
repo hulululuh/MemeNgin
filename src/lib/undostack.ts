@@ -32,6 +32,8 @@ export class UndoStack {
       const event = new UndoStackEvent("editStarted");
       document.dispatchEvent(event);
     }
+
+    document.dispatchEvent(new Event("editing"));
   }
 
   undo() {

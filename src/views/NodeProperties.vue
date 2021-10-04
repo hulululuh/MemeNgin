@@ -111,6 +111,8 @@
       } else if (this.node.onnodepropertychanged) {
         this.node.onnodepropertychanged(prop);
       }
+
+      document.dispatchEvent(new Event("editing"));
     }
 
     propertyExposeChanged(prop: Property, holder: IPropertyHolder) {

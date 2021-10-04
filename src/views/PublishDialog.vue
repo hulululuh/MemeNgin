@@ -218,7 +218,7 @@
     ];
 
     get img() {
-      return this.$store.state.thumbnail;
+      return this.$store.state.metadata.thumbnail;
     }
 
     get title() {
@@ -411,10 +411,9 @@
       this.dialog = false;
     }
 
-    prepareModel() {
-      this.$store.state.thumbnail = getThumbnail();
+    async prepareModel() {
       // copy thumbnail url
-      Editor.getMetadata().thumbnail = `${this.$store.state.thumbnail}`;
+      Editor.getMetadata().thumbnail = `${await getThumbnail()}`;
       this.$store.dispatch("changeMetadata", Editor.getMetadata());
       this.$forceUpdate();
     }

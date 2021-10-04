@@ -81,11 +81,12 @@
 <script lang="ts">
   import { Vue, Component } from "vue-property-decorator";
   import { TextManager } from "@/assets/textmanager";
-  import Preview2D from "@/views/Preview2D.vue";
-  import TooltipButton from "@/views/TooltipButton.vue";
   import { Editor } from "@/lib/editor";
   import { NodeGraphicsItem } from "@/lib/scene/nodegraphicsitem";
+  import { AnimationEncoder } from "@/utils/animationencoder";
   import fs from "fs";
+  import Preview2D from "@/views/Preview2D.vue";
+  import TooltipButton from "@/views/TooltipButton.vue";
   const { dialog } = require("electron").remote;
   const GIFEncoder = require("gif-encoder-2");
 
@@ -102,9 +103,9 @@
     working: boolean = false;
     initialized: boolean = false;
     frames: any[] = null;
-    //gif: Gif = null;
-    encoder: any = null;
     encoded: boolean = false;
+
+    thumbnailCanvas: HTMLCanvasElement = null;
 
     onPreviewNode(item: NodeGraphicsItem): void {
       (this.$refs.preview2d as Preview2D)?.onFrameRendered(item);
@@ -139,10 +140,17 @@
 
     mounted() {
       document.addEventListener("frameRendered", this.onFrameRendered);
+      document.addEventListener("requestThumbnail", this.renderThumbnail);
+      this.thumbnailCanvas = document.createElement("canvas");
+    }
+
+    renderThumbnail() {
+      this.renderToGif(true);
     }
 
     destroyed() {
       document.removeEventListener("frameRendered", this.onFrameRendered);
+      document.removeEventListener("frameRendered", this.renderThumbnail);
     }
 
     get textTitle() {
@@ -258,24 +266,27 @@
       const outputNode = scene.outputNode;
       const timeNode = scene.timeNode;
 
+      const canvas = Editor.getInstance().nodeScene.outputNode.imageCanvas
+        .canvas;
+      const w = isDrawingThumbnail ? 256 : canvas.width;
+      const h = isDrawingThumbnail ? 256 : canvas.height;
+
+      if (isDrawingThumbnail) {
+        this.thumbnailCanvas.width = w;
+        this.thumbnailCanvas.height = h;
+      }
+
       if (timeNode == null) {
         this.aborted = true;
         return;
       } else {
-        const canvas = Editor.getInstance().nodeScene.outputNode.imageCanvas
-          .canvas;
-        const w = canvas.width;
-        const h = canvas.height;
         const numFrames = timeNode.getPropertyValueByName("numFrames");
         const fps = timeNode.getPropertyValueByName("fps");
         const valFrame = 1 / numFrames;
-        this.encoder = new GIFEncoder(w, h, "neuquant", true, numFrames);
-        if (!this.encoder) return;
-        //this.encoder.setFramesPerSecond(fps);
-        // 1 is best quality and slowest to 30
-        this.encoder.setQuality(1);
-        this.encoder.setTransparent(true);
-        this.encoder.start();
+
+        const encoder = AnimationEncoder.getInstance();
+        encoder.init(w, h, "neuquant", true, numFrames);
+        encoder.start();
 
         this.frames = [];
         this.working = true;
@@ -286,7 +297,7 @@
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
 
-        this.encoded = false;
+        this.encoded = encoder.encoded;
 
         // sample frame by frame
         for (let i = 0; i < numFrames; i++) {
@@ -305,9 +316,30 @@
 
           // timePerFrame
           const tpf = timeNode.timePerFrame;
-          const ctx = canvas.getContext("2d");
-          this.encoder.setDelay(tpf * 1000.0);
-          this.encoder.addFrame(ctx);
+          let ctx = canvas.getContext("2d");
+
+          if (isDrawingThumbnail) {
+            ctx = this.thumbnailCanvas.getContext("2d");
+
+            const sw = w / canvas.width;
+            const sh = h / canvas.height;
+            //let zoomFactor = sw > sh ? sh : sw;
+            let zoomFactor = sh;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, 256, 256);
+            ctx.setTransform(
+              zoomFactor,
+              0,
+              0,
+              zoomFactor,
+              (256 - canvas.width * zoomFactor) / 2,
+              0
+            );
+
+            ctx.drawImage(canvas, 0, 0);
+          }
+          encoder.setDelay(tpf * 1000.0);
+          encoder.addFrame(ctx);
         }
 
         // swap canvas to encoded gif
@@ -317,8 +349,8 @@
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
         this.working = false;
-        this.encoder.finish();
-        this.encoded = this.encoder.out && this.encoder.out.data.length > 0;
+        encoder.finish();
+        this.encoded = encoder.encoded;
       }
       this.aborted = true;
     }
@@ -340,13 +372,33 @@
 
       if (result.canceled) return;
 
-      if (this.encoder) {
-        const buffer = this.encoder.out.getData();
+      const encoder = AnimationEncoder.getInstance();
+      if (encoder.encoded) {
+        const buffer = encoder.getData();
         fs.writeFile(result.filePath, buffer, (error) => {
           // gif drawn or error
           if (error) console.error(error);
         });
       }
+
+      // if (this.encoder) {
+      //   const buffer = this.encoder.out.getData();
+      //   fs.writeFile(result.filePath, buffer, (error) => {
+      //     // gif drawn or error
+      //     if (error) console.error(error);
+      //   });
+      // }
     }
+
+    // gifAsString() {
+    //   if (this.encoded) {
+    //     const gifAsString = `data:image/gif;base64,${this.encoder.out
+    //       .getData()
+    //       .toString()}`;
+    //     return gifAsString;
+    //   } else {
+    //     return "";
+    //   }
+    // }
   }
 </script>

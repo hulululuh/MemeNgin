@@ -12,7 +12,6 @@ export default new Vuex.Store({
   state: {
     userData: UserData.getInstance(),
     cloudData: CloudData.getInstance(),
-    thumbnail: "",
     metadata: ProjectItemData.fromNothing(),
     selectedProject: null,
     selectedProjectState: null,

@@ -5,7 +5,6 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { loadGif, UpdateTexture } from "@/lib/utils";
 import { Property, FileProperty } from "@/lib/designer/properties";
 import { Editor } from "@/lib/editor";
-import store from "@/store";
 
 export class AnimationNode extends ImageDesignerNode {
   protected bmp: Uint8Array = null;
