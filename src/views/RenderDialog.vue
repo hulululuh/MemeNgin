@@ -88,7 +88,10 @@
   import Preview2D from "@/views/Preview2D.vue";
   import TooltipButton from "@/views/TooltipButton.vue";
   const { dialog } = require("electron").remote;
-  const GIFEncoder = require("gif-encoder-2");
+
+  export function cmdLine(str) {
+    process.stdout.write(`${str}\n`);
+  }
 
   @Component({
     components: {
@@ -139,7 +142,10 @@
     }
 
     mounted() {
-      document.addEventListener("frameRendered", this.onFrameRendered);
+      document.addEventListener("frameRendered", () => {
+        this.frameRendering = false;
+      });
+      //document.addEventListener("frameRendered", this.onFrameRendered);
       document.addEventListener("requestThumbnail", this.renderThumbnail);
       this.thumbnailCanvas = document.createElement("canvas");
     }
@@ -149,8 +155,8 @@
     }
 
     destroyed() {
-      document.removeEventListener("frameRendered", this.onFrameRendered);
-      document.removeEventListener("frameRendered", this.renderThumbnail);
+      //document.removeEventListener("frameRendered", this.onFrameRendered);
+      document.removeEventListener("requestThumbnail", this.renderThumbnail);
     }
 
     get textTitle() {
@@ -265,9 +271,7 @@
       const scene = Editor.getInstance().nodeScene;
       const outputNode = scene.outputNode;
       const timeNode = scene.timeNode;
-
-      const canvas = Editor.getInstance().nodeScene.outputNode.imageCanvas
-        .canvas;
+      const canvas = outputNode.imageCanvas.canvas;
       const w = isDrawingThumbnail ? 256 : canvas.width;
       const h = isDrawingThumbnail ? 256 : canvas.height;
 
@@ -278,6 +282,7 @@
 
       if (timeNode == null) {
         this.aborted = true;
+        console.warn("rendering aborted");
         return;
       } else {
         const numFrames = timeNode.getPropertyValueByName("numFrames");
@@ -285,7 +290,7 @@
         const valFrame = 1 / numFrames;
 
         const encoder = AnimationEncoder.getInstance();
-        encoder.init(w, h, "neuquant", true, numFrames);
+        encoder.init(w, h, "neuquant", false, numFrames);
         encoder.start();
 
         this.frames = [];
@@ -296,14 +301,13 @@
         timeNode.setProgress(0);
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
-
         this.encoded = encoder.encoded;
 
         // sample frame by frame
         for (let i = 0; i < numFrames; i++) {
           if (this.aborted) break;
-          let value = i * valFrame;
 
+          let value = i * valFrame;
           this.frameRendering = true;
           timeNode.setProgress(value);
           this.$store.state.progress = value * 100;
@@ -316,11 +320,10 @@
 
           // timePerFrame
           const tpf = timeNode.timePerFrame;
-          let ctx = canvas.getContext("2d");
+          let ctx: CanvasRenderingContext2D = null;
 
           if (isDrawingThumbnail) {
             ctx = this.thumbnailCanvas.getContext("2d");
-
             const sw = w / canvas.width;
             const sh = h / canvas.height;
             //let zoomFactor = sw > sh ? sh : sw;
@@ -337,19 +340,23 @@
             );
 
             ctx.drawImage(canvas, 0, 0);
+          } else {
+            ctx = outputNode.imageCanvas.canvas.getContext("2d");
           }
           encoder.setDelay(tpf * 1000.0);
-          encoder.addFrame(ctx);
+          try {
+            encoder.encoder.addFrame(ctx);
+          } catch (err) {
+            cmdLine(`[err]${err}`);
+          }
         }
-
-        // swap canvas to encoded gif
-        //const gifAsString = `data:image/gif;base64,${this.gif.buffer.toString()}`;
 
         timeNode.setProgress(0);
         this.$store.state.progress = 0;
         this.$store.state.currentFrame = 0;
         this.working = false;
         encoder.finish();
+        cmdLine(`animation rendered`);
         this.encoded = encoder.encoded;
       }
       this.aborted = true;
@@ -380,25 +387,6 @@
           if (error) console.error(error);
         });
       }
-
-      // if (this.encoder) {
-      //   const buffer = this.encoder.out.getData();
-      //   fs.writeFile(result.filePath, buffer, (error) => {
-      //     // gif drawn or error
-      //     if (error) console.error(error);
-      //   });
-      // }
     }
-
-    // gifAsString() {
-    //   if (this.encoded) {
-    //     const gifAsString = `data:image/gif;base64,${this.encoder.out
-    //       .getData()
-    //       .toString()}`;
-    //     return gifAsString;
-    //   } else {
-    //     return "";
-    //   }
-    // }
   }
 </script>

@@ -36,9 +36,12 @@ export class AnimationNode extends ImageDesignerNode {
           this.imgWidth;
           this.imgHeight;
 
-          this.bmp = this.getFrame(this.currentFrameIndex);
-          this.createTexture();
-          this.requestUpdate();
+          const bmp = this.getFrame(this.currentFrameIndex);
+          if (bmp) {
+            this.bmp = bmp;
+            this.createTexture();
+            this.requestUpdate();
+          }
         }
       }
     };
@@ -49,7 +52,9 @@ export class AnimationNode extends ImageDesignerNode {
   }
 
   get frameIndex() {
-    return Math.floor((this.frameCount + Number.EPSILON) * this.progress);
+    const idx = Math.floor((this.frameCount + Number.EPSILON) * this.progress);
+    const max = this.animation ? this.animation.frames.length - 1 : 1;
+    return Math.min(idx, max);
   }
 
   load() {

@@ -44,8 +44,6 @@ export class OutputNode extends ImageDesignerNode {
 
   render(inputs: NodeInput[], optional?: Function) {
     super.render(inputs, optional);
-
     document.dispatchEvent(new Event("frameRendered"));
-    //console.warn(`Frame updated`);
   }
 }
