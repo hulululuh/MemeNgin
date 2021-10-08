@@ -190,6 +190,7 @@ export class AnimationNode extends ImageDesignerNode {
       1.0,
       0.0001
     );
+    this.progressProp.setExposed(true);
 
     let source = `
       vec4 process(vec2 uv)
