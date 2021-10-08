@@ -1,6 +1,3 @@
-import { GifCodec, Gif } from "gifwrap";
-const codec = new GifCodec();
-
 const GIFEncoder = require("gif-encoder-2");
 
 export class AnimationEncoder {

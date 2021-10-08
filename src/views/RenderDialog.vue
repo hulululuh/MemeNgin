@@ -344,11 +344,7 @@
             ctx = outputNode.imageCanvas.canvas.getContext("2d");
           }
           encoder.setDelay(tpf * 1000.0);
-          try {
-            encoder.encoder.addFrame(ctx);
-          } catch (err) {
-            cmdLine(`[err]${err}`);
-          }
+          encoder.encoder.addFrame(ctx);
         }
 
         timeNode.setProgress(0);
@@ -356,7 +352,6 @@
         this.$store.state.currentFrame = 0;
         this.working = false;
         encoder.finish();
-        cmdLine(`animation rendered`);
         this.encoded = encoder.encoded;
       }
       this.aborted = true;
