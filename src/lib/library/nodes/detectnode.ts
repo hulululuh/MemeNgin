@@ -127,51 +127,11 @@ export class DetectNode extends ImageDesignerNode {
       // abort - no connected input yet
       return;
     }
-
-    // tinyyolov2-7.onnx - [0, 3, 416, 416]
-    const texW = leftNode.getWidth();
-    const texH = leftNode.getHeight();
-
-    let readPixelBuffer = new Uint8Array(texW * texH * 4);
-    let readPixelCompleted = false;
-    let fb = gl.createFramebuffer();
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-    gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
-      gl.COLOR_ATTACHMENT0,
-      gl.TEXTURE_2D,
-      leftNode.getBaseTexture(),
-      0
-    );
-
-    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) {
-      gl.readPixels(
-        0,
-        0,
-        texW,
-        texH,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        readPixelBuffer
-      );
-      readPixelCompleted = true;
-    }
-
-    if (!readPixelCompleted) {
-      return;
-    }
-
-    let img = NativeImage.createFromBuffer(
-      Buffer.from(readPixelBuffer.buffer),
-      { width: texW, height: texH }
-    );
-
-    const imageData: ImageData = new ImageData(
-      Uint8ClampedArray.from(img.getBitmap()),
-      texW,
-      texH
-    );
+    const canvas = Editor.getScene().getNodeById(leftNode.id).imageCanvas
+      .canvas;
+    const imageData = canvas
+      .getContext("2d")
+      .getImageData(0, 0, this.width, this.height);
 
     // *********** deeplab ***********
     let output = await this.doSegmentation(imageData);
@@ -232,7 +192,7 @@ export class DetectNode extends ImageDesignerNode {
             NodeType.Texture,
             this.gl,
             false,
-            false
+            true
           );
 
           this.isTextureReady = true;
