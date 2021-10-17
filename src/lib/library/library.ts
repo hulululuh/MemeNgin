@@ -18,6 +18,7 @@ import { ColorPropertyNode } from "./nodes/colorpropertynode";
 import { CopyNode } from "./nodes/copynode";
 import { TimeNode } from "./nodes/timenode";
 import { DetectNode } from "./nodes/detectnode";
+import { DetectHumanNode } from "./nodes/detecthumannode";
 import { DirectionalWarpNode } from "./nodes/directionalwarpnode";
 import { FloatPropertyNode } from "./nodes/floatpropertynode";
 import { CurveNode } from "./nodes/curvenode";
@@ -275,6 +276,12 @@ export function createLibrary() {
   lib.addNode("copy", "Copy", CopyNode, NodeCategory.Control);
 
   lib.addNode("detect", "Detect", DetectNode, NodeCategory.Experimental); // to be logic
+  lib.addNode(
+    "detecthuman",
+    "Detect Human",
+    DetectHumanNode,
+    NodeCategory.Experimental
+  ); // to be logic
   lib.addNode("stylize", "Stylize", StylizeNode, NodeCategory.Experimental); // to be logic
 
   // TODO: need to support 16 bit texture in order to convey texCoord details

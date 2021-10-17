@@ -232,11 +232,7 @@ export class ProjectItemData {
       }
     }
 
-    if (item.localItem.isValid) {
-      // try parse workshop data
-    }
-
-    return item.localItem.isValid ? item : null;
+    return item.localItem && item.localItem.isValid ? item : null;
   }
 
   static fromMetadata(data: any): ProjectItemData {
