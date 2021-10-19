@@ -75,8 +75,8 @@
       />
       <tooltip-button
         icon="mdi-fit-to-page-outline"
-        tooltip="Center texture"
-        @click="centerTexture"
+        tooltip="Zoom to fit"
+        @click="zoomToFit"
       />
     </v-app-bar>
 
@@ -935,9 +935,9 @@
       (this.$refs.renderDialog as RenderDialog).show();
     }
 
-    centerTexture() {
+    zoomToFit() {
       if (this.havePersistentDialog) return;
-      (this.$refs.preview2d as Preview2D).centerTexture();
+      (this.$refs.preview2d as Preview2D).zoomToFit();
     }
 
     showMessage(title: string, message: string, close: string) {

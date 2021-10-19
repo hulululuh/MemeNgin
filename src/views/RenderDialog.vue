@@ -13,35 +13,39 @@
         {{ textTitle }}
       </v-card-title>
       <v-card-text block class="pa-0 ma-0">
-        <v-row class="ma-0 pa-0">
-          <v-col cols="12" justify-center class="grey lighten-2 pa-1">
-            <tooltip-button
-              icon="mdi-play"
-              tooltip="Play animation"
-              :disabled="working"
-              @click="playAnimation"
-            />
-            <tooltip-button
-              v-if="!working"
-              icon="mdi-vhs"
-              tooltip="Render animation"
-              :disabled="working"
-              @click="renderToGif"
-            />
-            <tooltip-button
-              v-if="!aborted"
-              icon="mdi-cancel"
-              tooltip="Abort"
-              :disabled="aborted"
-              @click="abortRender"
-            />
-            <tooltip-button
-              icon="mdi-content-save-outline"
-              tooltip="Save as gif"
-              :disabled="!encoded"
-              @click="saveGif"
-            />
-          </v-col>
+        <v-row class="ma-0 grey lighten-2 pa-1">
+          <tooltip-button
+            icon="mdi-play"
+            tooltip="Play animation"
+            :disabled="working"
+            @click="playAnimation"
+          />
+          <tooltip-button
+            v-if="!working"
+            icon="mdi-vhs"
+            tooltip="Render animation"
+            :disabled="working"
+            @click="renderToGif"
+          />
+          <tooltip-button
+            v-if="!aborted"
+            icon="mdi-cancel"
+            tooltip="Abort"
+            :disabled="aborted"
+            @click="abortRender"
+          />
+          <tooltip-button
+            icon="mdi-content-save-outline"
+            tooltip="Save as gif"
+            :disabled="!encoded"
+            @click="saveGif"
+          />
+          <v-spacer />
+          <tooltip-button
+            icon="mdi-fit-to-page-outline"
+            tooltip="Zoom to fit"
+            @click="zoomToFit"
+          />
         </v-row>
         <v-row class="ma-0 pa-0" justify="center" ref="frame">
           <preview2d
@@ -208,6 +212,10 @@
     }
 
     saveResult() {}
+
+    zoomToFit() {
+      (this.$refs.preview2d as Preview2D).zoomToFit();
+    }
 
     abortRender() {
       this.aborted = true;

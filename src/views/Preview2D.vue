@@ -101,7 +101,7 @@
 
       document.addEventListener("resizeImage", (event: CustomEvent) => {
         this.resizeImage(event.detail.width, event.detail.height);
-        this.centerTexture();
+        this.zoomToFit();
       });
 
       document.addEventListener("frameRendered", () =>
@@ -136,7 +136,7 @@
 
       // TODO: I don't think its best
       setTimeout(() => {
-        this.centerTexture();
+        this.zoomToFit();
       }, 1);
     }
 
@@ -190,7 +190,7 @@
         });
     }
 
-    centerTexture() {
+    zoomToFit() {
       const imageNode = this.node as ImageDesignerNode;
       let canvas = this.$refs.canvas as HTMLCanvasElement;
       if (canvas && imageNode) {
