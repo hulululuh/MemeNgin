@@ -86,7 +86,7 @@ export class SplatNode extends ImageDesignerNode {
             vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
             for(int i = 0; i<MAX_ITER; i++)
             {
-                if (i >= prop_count)
+                if (i >= int(prop_count))
                     break;
 
                 float x = randomFloatRange(i*10 + 1, -0.5, 0.5);

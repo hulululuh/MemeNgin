@@ -109,7 +109,7 @@ export class FractalNoiseNode extends ImageDesignerNode {
             //int startBand = 3;
             //int endBand = 12;
             for(int i = 1; i <=20; i++) {
-                if (i >= prop_startBand && i <= prop_endBand) {
+                if (i >= int(prop_startBand) && i <= int(prop_endBand)) {
                 total += (pnoise(uv*scale, scale)) * scale_value;
                 scale_value *= persistence;
                 }
