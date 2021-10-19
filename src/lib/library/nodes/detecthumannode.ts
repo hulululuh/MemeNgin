@@ -5,7 +5,8 @@ import { ImageDesignerNode } from "@/lib/designer/imagedesignernode";
 import { UpdateTexture } from "@/lib/utils";
 import { DesignerNode, NodeType } from "@/lib/designer/designernode";
 import { Editor } from "@/lib/editor";
-import * as tf from "@tensorflow/tfjs";
+//import * as tf from "@tensorflow/tfjs";
+const tf = require("@tensorflow/tfjs");
 
 export class DetectHumanNode extends ImageDesignerNode {
   static verticesBuffer: WebGLBuffer;
@@ -204,7 +205,19 @@ export class DetectHumanNode extends ImageDesignerNode {
 
   async draw(inputCanvas: HTMLCanvasElement): Promise<any> {
     try {
-      const model = DetectHumanNode.model;
+      let model = DetectHumanNode.model;
+      const tickInMs = 5;
+      let waited = 0;
+
+      // wait for model to be initialized
+      while (!model) {
+        if (tickInMs > 5000) {
+          return null;
+        }
+        await this.delay(tickInMs);
+        model = DetectHumanNode.model;
+        waited += tickInMs;
+      }
 
       // Set initial recurrent state
       let [r1i, r2i, r3i, r4i] = [
@@ -306,5 +319,9 @@ export class DetectHumanNode extends ImageDesignerNode {
     canvas.height = height;
     canvas.getContext("2d").putImageData(imageData, 0, 0);
     rgba.dispose();
+  }
+
+  delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
