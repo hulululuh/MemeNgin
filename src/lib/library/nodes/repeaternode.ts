@@ -27,9 +27,9 @@ export class RepeaterNode extends LogicDesignerNode {
   }
 
   calculated() {
-    const input = this.getPropertyValue(0);
-    const repeat = this.getPropertyValue(1);
-    const once = this.getPropertyValue(2);
+    const input: number = parseFloat(this.getPropertyValue(0));
+    const repeat: number = parseFloat(this.getPropertyValue(1));
+    const once: boolean = this.getPropertyValue(2);
     let stretched = input * repeat;
 
     let calculated = stretched;
