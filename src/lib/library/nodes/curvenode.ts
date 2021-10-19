@@ -39,7 +39,7 @@ export class CurveNode extends LogicDesignerNode {
       curveData.cpEnd[1]
     );
 
-    let value = this.getPropertyValue(1);
+    let value = parseFloat(this.getPropertyValue(1));
 
     return easing(value).toFixed(3);
   }

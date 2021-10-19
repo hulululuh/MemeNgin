@@ -14,6 +14,7 @@ export class NotGateNode extends LogicDesignerNode {
   }
 
   calculated() {
-    return !this.getPropertyValue(0);
+    const val: boolean = this.getPropertyValue(0);
+    return !val;
   }
 }

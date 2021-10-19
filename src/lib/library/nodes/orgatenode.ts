@@ -18,8 +18,8 @@ export class OrGateNode extends LogicDesignerNode {
   }
 
   calculated() {
-    let valA = this.getPropertyValue(0);
-    let valB = this.getPropertyValue(1);
+    const valA: boolean = this.getPropertyValue(0);
+    const valB: boolean = this.getPropertyValue(1);
     return valA || valB;
   }
 }

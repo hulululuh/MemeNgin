@@ -18,8 +18,8 @@ export class GreaterEqNode extends LogicDesignerNode {
   }
 
   calculated() {
-    let valA = this.getPropertyValue(0);
-    let valB = this.getPropertyValue(1);
+    const valA: number = this.getPropertyValue(0);
+    const valB: number = this.getPropertyValue(1);
     return valA >= valB ? true : false;
   }
 }

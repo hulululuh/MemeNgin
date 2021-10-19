@@ -7,12 +7,12 @@ export class IntPropertyNode extends LogicDesignerNode {
   init() {
     this.title = "IntProperty";
     this.logicType = LogicType.Property;
-    this.outputType = PropertyType.Int;
+    this.outputType = PropertyType.Float;
 
     this.addIntProperty("value", "Value");
   }
 
   calculated() {
-    return this.getPropertyValue(0);
+    return Math.trunc(this.getPropertyValue(0));
   }
 }

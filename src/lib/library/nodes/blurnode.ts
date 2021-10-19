@@ -30,9 +30,9 @@ export class BlurNode extends ImageDesignerNode {
             vec2 offset;
 
             float sigma = float(prop_samples) * 0.25;
-            
-            for (int x = -prop_samples / 2; x < prop_samples / 2; ++x) {
-                for (int y = -prop_samples / 2; y < prop_samples / 2; ++y) {
+            int samplesInt = int(prop_samples);
+            for (int x = -samplesInt / 2; x < samplesInt / 2; ++x) {
+                for (int y = -samplesInt / 2; y < samplesInt / 2; ++y) {
                     offset = vec2(x, y);
                     weight = gaussian(offset, sigma);
                     col += texture(sp, uv + scale * offset).rgb * weight;
@@ -50,9 +50,10 @@ export class BlurNode extends ImageDesignerNode {
             vec2 offset;
 
             float sigma = float(prop_samples) * 0.25;
+            int samplesInt = int(prop_samples);
             
-            for (int x = -prop_samples / 2; x < prop_samples / 2; ++x) {
-                for (int y = -prop_samples / 2; y < prop_samples / 2; ++y) {
+            for (int x = -samplesInt / 2; x < samplesInt / 2; ++x) {
+                for (int y = -samplesInt / 2; y < samplesInt / 2; ++y) {
                     offset = vec2(x, y);
                     vec4 texel = texture(sp, uv + scale * offset);
                     weight = gaussian(offset, sigma);
