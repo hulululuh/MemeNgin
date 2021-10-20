@@ -12,6 +12,7 @@ export class DetectHumanNode extends ImageDesignerNode {
   static verticesBuffer: WebGLBuffer;
   static vertices: number[];
   static model: any = null;
+  isDrawing: boolean = false;
 
   constructor() {
     super();
@@ -112,11 +113,12 @@ export class DetectHumanNode extends ImageDesignerNode {
     const canvas = Editor.getScene().getNodeById(leftNode.id).imageCanvas
       .canvas;
 
-    let resultImg: ImageData = await this.draw(canvas);
-
     // create texture for debug
-    if (resultImg) {
-      if (!this.isTextureReady) {
+    if (!this.isTextureReady && !this.isDrawing) {
+      this.isDrawing = true;
+      let resultImg: ImageData = await this.draw(canvas);
+      this.isDrawing = false;
+      if (resultImg) {
         const w = resultImg.width;
         const h = resultImg.height;
         this.tex = UpdateTexture(
