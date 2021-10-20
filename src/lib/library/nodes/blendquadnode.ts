@@ -13,8 +13,7 @@ import { WidgetType } from "@/lib/scene/widget";
 import { UndoStack } from "@/lib/undostack";
 import { PropertyChangeAction } from "@/lib/actions/propertychangeaction";
 
-export class OverlayQuadNode extends ImageDesignerNode
-  implements ITransformable {
+export class BlendQuadNode extends ImageDesignerNode implements ITransformable {
   inputASize: Vector2;
   inputBSize: Vector2;
   relPos: Vector2;
@@ -73,7 +72,7 @@ export class OverlayQuadNode extends ImageDesignerNode
   }
 
   init() {
-    this.title = "Overlay Quad";
+    this.title = "Blend Quad";
     this.parentIndex = "background";
     this.isEditing = true;
     this.inputASize = new Vector2(100, 100);

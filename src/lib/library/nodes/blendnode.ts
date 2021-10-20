@@ -171,17 +171,22 @@ export class BlendNode extends ImageDesignerNode implements ITransformable {
     this.addBoolProperty("flipX", "FlipX", false);
     this.addBoolProperty("flipY", "FlipY", false);
 
-    this.addEnumProperty("type", "Type", [
-      "Multiply",
-      "Add",
-      "Subtract",
-      "Divide",
-      "Max",
-      "Min",
-      "Switch",
-      "Overlay",
-      "Screen",
-    ]);
+    this.addEnumProperty(
+      "type",
+      "Type",
+      [
+        "Multiply",
+        "Add",
+        "Subtract",
+        "Divide",
+        "Max",
+        "Min",
+        "Switch",
+        "Overlay",
+        "Screen",
+      ],
+      7
+    );
     this.addEnumProperty("border", "Border", ["Clamp", "Stretch", "Repeat"]);
 
     this.addTransform2DProperty(

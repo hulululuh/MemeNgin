@@ -4,6 +4,7 @@
 import { NodeCategory } from "../designer/designernode";
 import { DesignerLibrary } from "../designer/library";
 import { BlendNode } from "./nodes/blendnode";
+import { BlendQuadNode } from "./nodes/blendquadnode";
 import { BlurNode } from "./nodes/blurnode";
 import { BoolPropertyNode } from "./nodes/boolpropertynode";
 import { BrickGeneratorNode } from "./nodes/brickgeneratornode";
@@ -36,8 +37,6 @@ import { MaskNode } from "./nodes/masknode";
 import { MirrorNode } from "./nodes/mirrornode";
 import { NormalMapNode } from "./nodes/normalmapnode";
 import { OutputNode } from "./nodes/outputnode";
-import { OverlayNode } from "./nodes/overlaynode";
-import { OverlayQuadNode } from "./nodes/overlayquadnode";
 import { OpacityOverrideNode } from "./nodes/opacityoverridenode";
 import { Perlin3DNode } from "./nodes/perlin3dnode";
 import { CircleNode, PolygonNode } from "./nodes/shapesnodes";
@@ -76,7 +75,7 @@ import { LessNode } from "./nodes/lessnode";
 import { LessEqNode } from "./nodes/lesseqnode";
 
 export const libraryMajorVersion = 0;
-export const libraryMinorVersion = 1;
+export const libraryMinorVersion = 2;
 
 export function getCurrentLibraryVersion() {
   return libraryMajorVersion.toString() + "." + libraryMinorVersion.toString();
@@ -144,14 +143,8 @@ export function createLibrary() {
   );
   // colorgrade will come here
 
-  lib.addNode("overlay", "Overlay", OverlayNode, NodeCategory.Composite);
   lib.addNode("blend", "Blend", BlendNode, NodeCategory.Composite);
-  lib.addNode(
-    "overlayquad",
-    "Overlay Quad",
-    OverlayQuadNode,
-    NodeCategory.Composite
-  );
+  lib.addNode("blendquad", "Blend Quad", BlendQuadNode, NodeCategory.Composite);
   lib.addNode("splat", "Splat", SplatNode, NodeCategory.Composite);
   lib.addNode("mask", "Mask", MaskNode, NodeCategory.Composite);
   lib.addNode(

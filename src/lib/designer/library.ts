@@ -2,7 +2,12 @@
 // [GPLv3] created 2020 by nicolas brown for texturelab(https://github.com/njbrown/texturelab)
 
 import { DesignerNode, NodeCategory } from "./designernode";
-import { TextureNode } from "@/lib/library/nodes/texturenode";
+
+// TODO: Will need generalized converter here.
+export const mappingFunc = new Map<string, string>([
+  ["overlay", "blend"],
+  ["overlayquad", "blendquad"],
+]);
 
 export class DesignerNodeFactory {
   name: string;
@@ -40,10 +45,14 @@ export class DesignerLibrary {
   }
 
   create(name: string, path?: string, isUrl?: boolean): DesignerNode {
-    //if (this.nodes.indexOf(name) == -1)
-    //    return null;
+    let target = name;
+    if (!this.nodes[name]) {
+      target = mappingFunc.get(name);
 
-    let node = this.nodes[name].create();
+      if (!this.nodes[target]) return null;
+    }
+
+    let node = this.nodes[target].create();
     if (path) {
       if (isUrl) {
         node.imgData = path;

@@ -755,10 +755,14 @@ export class Editor {
   load(data: any) {
     // clear texture channels
     let library;
-    if (!data["libraryVersion"]) {
+    const dataLibVersion = data["libraryVersion"];
+    if (!dataLibVersion) {
       library = createLibrary();
     } else {
-      // library = this.createLibrary(data["libraryVersion"]);
+      // if (dataLibVersion < getCurrentLibraryVersion()) {
+      //   // convert to newer project.
+      // } else {
+      // }
       library = createLibrary();
     }
     // load scene
