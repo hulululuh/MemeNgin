@@ -7,6 +7,9 @@ export class Perlin3DNode extends ImageDesignerNode {
   init() {
     this.title = "Perlin 3D";
 
+    this.addFloatProperty("height", "Height", 0.0, 0.0, 1.0, 0.001);
+    this.addFloatProperty("scale", "Scale", 10.0, 0.1, 100.0, 0.001);
+
     let source = `
         vec3 mod289(vec3 x)
         {
@@ -174,8 +177,8 @@ export class Perlin3DNode extends ImageDesignerNode {
 
         vec4 process(vec2 uv)
         {
-            float c = pnoise(vec3(uv * 10.0,10.0), vec3(10.0,10.0,10.0));
-
+            float s = prop_scale;
+            float c = pnoise(vec3(uv * s, s * prop_height), vec3(s,s,s));
             return vec4(vec3(c), 1.0);
         }
         `;
