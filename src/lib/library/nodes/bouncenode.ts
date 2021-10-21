@@ -3,12 +3,12 @@
 import { LogicDesignerNode, LogicType } from "@/lib/designer/logicdesignernode";
 import { Property, PropertyType } from "@/lib/designer/properties";
 
-export class OscillatorNode extends LogicDesignerNode {
+export class BounceNode extends LogicDesignerNode {
   inputProp: Property;
   outputType = PropertyType.Float;
 
   init() {
-    this.title = "Oscillator";
+    this.title = "Bounce";
     this.logicType = LogicType.Operator;
 
     this.inputProp = this.addFloatProperty("input", "Input", 0.0, 0.0, 1.0);

@@ -69,7 +69,7 @@ import { NumSelectorNode } from "./nodes/numselectornode";
 import { ImgSelectorNode } from "./nodes/imgselectornode";
 import { InterpolatorNode } from "./nodes/interpolatornode";
 import { RepeaterNode } from "./nodes/repeaternode";
-import { OscillatorNode } from "./nodes/oscillatornode";
+import { BounceNode } from "./nodes/bouncenode";
 import { GreaterNode } from "./nodes/greaternode";
 import { GreaterEqNode } from "./nodes/greatereqnode";
 import { LessNode } from "./nodes/lessnode";
@@ -260,7 +260,7 @@ export function createLibrary() {
     NodeCategory.Logic
   );
   lib.addNode("repeater", "Repeater", RepeaterNode, NodeCategory.Logic);
-  lib.addNode("oscillator", "Oscillator", OscillatorNode, NodeCategory.Logic);
+  lib.addNode("bounce", "Bounce", BounceNode, NodeCategory.Logic);
 
   lib.addNode("greater", "Greater", GreaterNode, NodeCategory.Logic);
   lib.addNode("greatereq", "GreaterEq", GreaterEqNode, NodeCategory.Logic);
