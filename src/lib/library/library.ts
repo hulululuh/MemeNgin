@@ -22,6 +22,7 @@ import { DetectNode } from "./nodes/detectnode";
 import { DetectHumanNode } from "./nodes/detecthumannode";
 import { DirectionalWarpNode } from "./nodes/directionalwarpnode";
 import { FloatPropertyNode } from "./nodes/floatpropertynode";
+import { MultiplyNode } from "./nodes/multiplynode";
 import { CurveNode } from "./nodes/curvenode";
 import { Vector2PropertyNode } from "./nodes/vector2propertynode";
 import { FractalNoiseNode } from "./nodes/fractalnoisenode";
@@ -234,6 +235,7 @@ export function createLibrary() {
     Vector2PropertyNode,
     NodeCategory.Logic
   );
+  lib.addNode("multiply", "Multiply", MultiplyNode, NodeCategory.Logic);
   lib.addNode("mapfloat", "MapFloat", MapFloatNode, NodeCategory.Logic);
   lib.addNode("andgate", "AndGate", AndGateNode, NodeCategory.Logic);
   lib.addNode("orgate", "OrGate", OrGateNode, NodeCategory.Logic);
