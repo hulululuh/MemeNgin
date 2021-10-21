@@ -11,7 +11,14 @@ export class BounceNode extends LogicDesignerNode {
     this.title = "Bounce";
     this.logicType = LogicType.Operator;
 
-    this.inputProp = this.addFloatProperty("input", "Input", 0.0, 0.0, 1.0);
+    this.inputProp = this.addFloatProperty(
+      "input",
+      "Input",
+      0.0,
+      0.0,
+      1.0,
+      0.001
+    );
     this.inputProp.setExposed(true);
   }
 
