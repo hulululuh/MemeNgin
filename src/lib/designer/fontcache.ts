@@ -10,8 +10,10 @@ import {
   ASSET_FOLDER,
   getAllFiles,
 } from "@/assets/assetmanager";
+import getSystemFonts from "get-system-fonts";
 
 const fontPath = "assets/fonts/fallback/NotoSansCJKjp-Regular.otf";
+export let SystemFonts = null;
 
 export function CalcFontPath(pathToFont: string) {
   //return `./assets/nodes/${node}.png`;
@@ -30,8 +32,13 @@ export class FontCache {
   private static _instance: FontCache = new FontCache();
   private _fonts: Dictionary<any> = {};
   private _fallbackFont: any;
+  static systemFonts: Array<string> = null;
 
   constructor() {
+    if (!FontCache.systemFonts) {
+      FontCache.listSystemFonts();
+    }
+
     let self = this;
     opentype.load(fontPath, function(err, font) {
       if (err) {
@@ -41,6 +48,12 @@ export class FontCache {
       } else {
         self._fallbackFont = font;
       }
+    });
+  }
+
+  static async listSystemFonts() {
+    FontCache.systemFonts = await new Promise((resolve) => {
+      resolve(getSystemFonts());
     });
   }
 
@@ -66,18 +79,25 @@ export class FontCache {
     if (!fontAsset) {
       fontAsset = await AssetManager.getInstance().findForeignFont(id);
     }
-    const fontUrl = fontAsset.assetPath;
+
+    // not foreign font? then it might be a system font
+    let fontUrl = id;
+    if (fontAsset) fontUrl = fontAsset.assetPath;
     const key = id;
 
     // use if font exits on the cache
     if (this._fonts[key]) {
       return this._fonts[key];
     } else {
-      let font = await loadFont(fontUrl);
-      if (font) {
-        this._fonts[key] = font;
-        return this._fonts[key];
-      } else {
+      try {
+        let font = await loadFont(fontUrl);
+        if (font) {
+          this._fonts[key] = font;
+          return this._fonts[key];
+        } else {
+          return this._fallbackFont;
+        }
+      } catch {
         return this._fallbackFont;
       }
     }

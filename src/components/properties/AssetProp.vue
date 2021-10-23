@@ -1,5 +1,6 @@
 <template>
   <v-container class="field ma-0 pa-0">
+    <font-info-dialog ref="fontInfoDialog" />
     <v-subheader class="ma-0 pa-0">
       <property-name
         ref="propertyName"
@@ -20,17 +21,35 @@
       </template>
       <v-select
         v-model="selected"
+        :key="selected"
         :items="prop.values"
         @change="updateValue"
         dense
       >
         <template v-slot:item="{ item }" :active="false">
-          <v-img :src="iconPath(item)" max-height="48" max-width="192" />
+          <font-item :id="item" />
         </template>
         <template v-slot:selection="{ item }">
-          <v-img :src="iconPath(item)" max-height="48" max-width="192" />
+          <font-item :id="item" />
         </template>
       </v-select>
+
+      <template>
+        <v-btn
+          class="mx-2"
+          fab
+          dark
+          x-small
+          color="primary"
+          @click="showFontInfoDialog"
+          max-height="24px"
+          max-width="24px"
+        >
+          <v-icon dark>
+            mdi-help
+          </v-icon>
+        </v-btn>
+      </template>
     </v-input>
   </v-container>
 </template>
@@ -47,17 +66,21 @@
   import { UndoStack } from "@/lib/undostack";
   import { AssetManager } from "@/assets/assetmanager";
   import PropertyName from "@/components/properties/PropertyName.vue";
+  import FontItem from "@/components/FontItem.vue";
+  import FontInfoDialog from "@/views/FontInfoDialog.vue";
 
   @Component({
     components: {
       propertyName: PropertyName,
+      fontItem: FontItem,
+      fontInfoDialog: FontInfoDialog,
     },
   })
   export default class AssetPropertyView extends Vue {
     @Prop()
     // AssetProperty
     prop: any;
-    selected: any;
+    //selected: any;
 
     @Prop()
     designer: Designer;
@@ -77,8 +100,18 @@
       return this.prop.name;
     }
 
-    created() {
-      this.selected = this.prop.getValue();
+    get selectedItem() {
+      return this.prop.getValue();
+    }
+
+    get selected() {
+      return this.prop.getValue();
+    }
+
+    set selected(val) {}
+
+    showFontInfoDialog() {
+      (this.$refs.fontInfoDialog as FontInfoDialog).dialog = true;
     }
 
     mounted() {

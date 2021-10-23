@@ -67,8 +67,12 @@ export class TextNode extends ImageDesignerNode {
           AssetType.Font
         );
 
-        if (asset && this.selectedFontId != asset.id) {
-          this.selectedFontId = asset.id;
+        const selectingId = asset
+          ? asset.id
+          : AssetManager.getInstance().getSystemFontPathById(value);
+
+        if (this.selectedFontId != selectingId) {
+          this.selectedFontId = selectingId;
           this.textGeom.requestSetupFont(this.selectedFontId);
         }
       } else if (prop.name === "text" && value != this.textGeom.text) {

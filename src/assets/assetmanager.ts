@@ -14,6 +14,7 @@ import { Color } from "@/lib/designer/color";
 import { UpdateTexture } from "@/lib/utils";
 import { buildShaderProgram } from "@/lib/designer/gl";
 import { UserData } from "@/userdata";
+import getSystemFonts from "get-system-fonts";
 const electron = require("electron");
 
 declare let __static: any;
@@ -360,6 +361,7 @@ export class AssetManager {
   private static _instance: AssetManager = new AssetManager();
   assets: Map<string, Map<string, Asset>>;
   factories: Map<string, any>;
+  static systemFonts: Array<string> = null;
 
   addFactory<T extends Asset>(name, type: { new (): T }) {
     let factory = new AssetFactory();
@@ -385,12 +387,22 @@ export class AssetManager {
       this.assets.set(value, new Map<string, any>());
     }
 
+    if (!AssetManager.systemFonts) {
+      AssetManager.listSystemFonts();
+    }
+
     this.addFactory("font", FontAsset);
     this.addFactory("lut", LutAsset);
     this.addFactory("icon", IconAsset);
 
     UserData.serialize();
     this.initialize();
+  }
+
+  static async listSystemFonts() {
+    AssetManager.systemFonts = await new Promise((resolve) => {
+      resolve(getSystemFonts());
+    });
   }
 
   async initialize() {
@@ -480,7 +492,10 @@ export class AssetManager {
   }
 
   get fontIds(): string[] {
-    return [...this.assets.get(AssetType.Font).keys()];
+    return [
+      ...this.assets.get(AssetType.Font).keys(),
+      ...AssetManager.systemFonts,
+    ];
   }
 
   getAssetLists(type: AssetType) {
@@ -504,5 +519,14 @@ export class AssetManager {
 
     console.log("no item found");
     return null;
+  }
+
+  // we do this because font's local path can be different from each devices
+  getSystemFontPathById(id: string): string {
+    let val = AssetManager.systemFonts.find(
+      (item) => path.parse(item).name == path.parse(id).name
+    );
+
+    return val ? val : "";
   }
 }
