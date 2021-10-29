@@ -30,7 +30,11 @@ export class AnimationNode extends ImageDesignerNode {
           this.load();
         }
       } else if (prop.name === "progress") {
-        const idx = this.frameIndex;
+        if (!this.animation) return;
+        const idx = Math.max(
+          Math.min(this.frameIndex, this.animation.frames.length - 2),
+          0
+        );
         if (this.currentFrameIndex != idx) {
           this.currentFrameIndex = idx;
           this.imgWidth;
@@ -69,7 +73,11 @@ export class AnimationNode extends ImageDesignerNode {
       this.imgWidth = this.animation.width;
       this.imgHeight = this.animation.height;
 
-      this.animation.frames.forEach((frame) => {
+      this.animation.frames.forEach((frame, idx) => {
+        const wSize = frame.bitmap.width;
+        const hSize = frame.bitmap.height;
+        const xOffset = frame.xOffset;
+        const yOffset = frame.yOffset;
         if (
           this.imgWidth != frame.width ||
           this.imgHeight != frame.height ||
@@ -86,12 +94,60 @@ export class AnimationNode extends ImageDesignerNode {
           frame.xOffset = 0;
           frame.yOffset = 0;
         }
+
+        if (idx > 0) {
+          if (frame.disposalMethod == 3 || frame.disposalMethod == 0) {
+          } else if (frame.disposalMethod == 2) {
+            //do not dispose
+            let bgFrame = this.animation.frames[idx - 1];
+            const bufFrame = frame.bitmap.data;
+            const bufBgFrame = bgFrame.bitmap.data;
+
+            frame.scanAllCoords((x, y, bi) => {
+              const isInside =
+                x >= xOffset &&
+                x < xOffset + wSize &&
+                y >= yOffset &&
+                y < yOffset + hSize;
+              // if transparent, then get pixel from prev
+              if (!isInside || (isInside && bufFrame[bi + 3] == 0)) {
+                bufFrame[bi] = 0;
+                bufFrame[bi + 1] = 0;
+                bufFrame[bi + 2] = 0;
+                bufFrame[bi + 3] = 0;
+              }
+            });
+          } else if (frame.disposalMethod == 1) {
+            //do not dispose
+            let bgFrame = this.animation.frames[idx - 1];
+            const bufFrame = frame.bitmap.data;
+            const bufBgFrame = bgFrame.bitmap.data;
+
+            frame.scanAllCoords((x, y, bi) => {
+              const isInside =
+                x >= xOffset &&
+                x < xOffset + wSize &&
+                y >= yOffset &&
+                y < yOffset + hSize;
+              // if transparent, then get pixel from prev
+              if (!isInside) {
+                bufFrame[bi] = bufBgFrame[bi];
+                bufFrame[bi + 1] = bufBgFrame[bi + 1];
+                bufFrame[bi + 2] = bufBgFrame[bi + 2];
+                bufFrame[bi + 3] = bufBgFrame[bi + 3];
+              } else if (bufFrame[bi + 3] == 0) {
+                bufFrame[bi] = bufBgFrame[bi];
+                bufFrame[bi + 1] = bufBgFrame[bi + 1];
+                bufFrame[bi + 2] = bufBgFrame[bi + 2];
+                bufFrame[bi + 3] = bufBgFrame[bi + 3];
+              }
+            });
+          }
+        }
       });
 
       this.resize(this.imgWidth, this.imgHeight);
-
       this.bmp = this.getFrame(this.currentFrameIndex);
-
       this.createTexture();
       this.requestUpdate();
     });
