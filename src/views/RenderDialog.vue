@@ -129,19 +129,13 @@
       this.dialog = false;
     }
 
-    reset() {
-      this.initialized = false;
-    }
-
     async initPreview() {
       const preview = this.$refs.preview2d as Preview2D;
       const frame = this.$refs.frame as HTMLElement;
-      if (preview && !this.initialized) {
+      if (preview) {
         await this.delay(1);
-        preview.reset();
         preview.resize(frame.clientWidth, frame.clientHeight);
         this.onPreviewNode(Editor.getInstance().nodeScene.outputNode);
-        this.initialized = true;
       }
     }
 
@@ -179,11 +173,6 @@
       if (timeNode) {
         return `${this.$store.state.currentFrame}/${timeNode.numFrames - 1}`;
       }
-    }
-
-    set frameIndex(value) {
-      // it's a read only property
-      //this.$store.state.progress = value;
     }
 
     get step() {
