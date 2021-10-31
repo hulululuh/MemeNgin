@@ -143,7 +143,6 @@
       document.addEventListener("frameRendered", () => {
         this.frameRendering = false;
       });
-      //document.addEventListener("frameRendered", this.onFrameRendered);
       document.addEventListener("requestThumbnail", this.renderThumbnail);
       this.thumbnailCanvas = document.createElement("canvas");
     }
@@ -153,7 +152,6 @@
     }
 
     destroyed() {
-      //document.removeEventListener("frameRendered", this.onFrameRendered);
       document.removeEventListener("requestThumbnail", this.renderThumbnail);
     }
 
@@ -341,6 +339,21 @@
             ctx = outputNode.imageCanvas.canvas.getContext("2d");
           }
           encoder.setDelay(tpf * 1000.0);
+
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const pixelCount = canvas.width * canvas.height;
+
+          // detect transparent pixel for encoder settings
+          let isTransparent = false;
+          for (let idx = 0; idx < pixelCount; idx++) {
+            if (imgData.data[idx * 4 + 3] == 0) {
+              isTransparent = true;
+              break;
+            }
+          }
+          if (isTransparent) {
+            encoder.encoder.setTransparent("#00000000");
+          }
           encoder.encoder.addFrame(ctx);
         }
 

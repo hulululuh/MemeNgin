@@ -36,11 +36,9 @@ export class AnimationEncoder {
       this.encoder = null;
       this.encoded = false;
     }
-
-    this.encoder = new GIFEncoder(width, height, algorithm, opt, numFrames);
     // 1 is best quality and slowest to 30 is fastest
+    this.encoder = new GIFEncoder(width, height, algorithm, opt, numFrames);
     this.encoder.setQuality(1);
-    this.encoder.setTransparent(true);
   }
 
   start() {

@@ -32,6 +32,10 @@ export class OutputNode extends ImageDesignerNode {
         vec4 col;
         if (image_connected) {
           col = texture(image, uv);
+          // doing this for gif transparency
+          if (col.a < 1.0 / 256.0) {
+            col = vec4(0, 0, 0, 0);
+          }
         } else {
           col = vec4(1, 1, 1, 1);
         }
