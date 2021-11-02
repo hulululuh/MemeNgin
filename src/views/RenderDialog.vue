@@ -317,6 +317,8 @@
           const tpf = timeNode.timePerFrame;
           let ctx: CanvasRenderingContext2D = null;
 
+          let targetCanvas = null;
+
           if (isDrawingThumbnail) {
             ctx = this.thumbnailCanvas.getContext("2d");
             const sw = w / canvas.width;
@@ -335,13 +337,20 @@
             );
 
             ctx.drawImage(canvas, 0, 0);
+            targetCanvas = this.thumbnailCanvas;
           } else {
-            ctx = outputNode.imageCanvas.canvas.getContext("2d");
+            ctx = canvas.getContext("2d");
+            targetCanvas = canvas;
           }
           encoder.setDelay(tpf * 1000.0);
 
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const pixelCount = canvas.width * canvas.height;
+          const imgData = ctx.getImageData(
+            0,
+            0,
+            targetCanvas.width,
+            targetCanvas.height
+          );
+          const pixelCount = targetCanvas.width * targetCanvas.height;
 
           // detect transparent pixel for encoder settings
           let isTransparent = false;
