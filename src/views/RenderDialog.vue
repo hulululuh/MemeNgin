@@ -92,6 +92,7 @@
   import Preview2D from "@/views/Preview2D.vue";
   import TooltipButton from "@/views/TooltipButton.vue";
   const { dialog } = require("electron").remote;
+  const THUMBNAIL_MAX_FRAMES = 16;
 
   export function cmdLine(str) {
     process.stdout.write(`${str}\n`);
@@ -280,7 +281,11 @@
         console.warn("rendering aborted");
         return;
       } else {
-        const numFrames = timeNode.getPropertyValueByName("numFrames");
+        const frames = timeNode.getPropertyValueByName("numFrames");
+        const numFrames =
+          isDrawingThumbnail && frames > THUMBNAIL_MAX_FRAMES
+            ? THUMBNAIL_MAX_FRAMES
+            : frames;
         const fps = timeNode.getPropertyValueByName("fps");
         const valFrame = 1 / numFrames;
 
