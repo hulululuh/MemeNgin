@@ -5,6 +5,17 @@
       <v-spacer />
       {{ this.title }}
       <v-spacer />
+      <v-btn
+        fab
+        icon
+        x-small
+        class="system-bar-button"
+        @click="showVideoTutorials"
+      >
+        <v-icon large color="black">
+          mdi-youtube
+        </v-icon>
+      </v-btn>
       <v-btn fab icon x-small class="system-bar-button" @click="showTutorials">
         <v-img :src="tutorialIcon"> </v-img>
       </v-btn>
@@ -859,6 +870,12 @@
 
     showLanguages() {
       (this.$refs.languageDialog as LanguageDialog).dialog = true;
+    }
+
+    showVideoTutorials() {
+      require("electron").shell.openExternal(
+        "https://www.youtube.com/watch?v=X5Q5PcDc1Qk&list=PLUl0FSv7RLSaYMLXaEqfDlvqLgNbX2_dM"
+      );
     }
 
     showTutorials() {
