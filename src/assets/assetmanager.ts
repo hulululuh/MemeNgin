@@ -15,6 +15,7 @@ import { UpdateTexture } from "@/lib/utils";
 import { buildShaderProgram } from "@/lib/designer/gl";
 import { UserData } from "@/userdata";
 import getSystemFonts from "get-system-fonts";
+import { LOCAL_FONT_PATH } from "@/lib/utils";
 const electron = require("electron");
 
 declare let __static: any;
@@ -401,7 +402,7 @@ export class AssetManager {
 
   static async listSystemFonts() {
     AssetManager.systemFonts = await new Promise((resolve) => {
-      resolve(getSystemFonts());
+      resolve(getSystemFonts({ additionalFolders: [LOCAL_FONT_PATH] }));
     });
   }
 

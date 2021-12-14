@@ -360,3 +360,7 @@ export const EASING_FUNCTIONS = new Map<Easing, Array<number>>([
   [Easing.EaseInOut_Expo, [0.87, 0, 0.13, 1]],
   [Easing.Linear, [0, 0, 1, 1]],
 ]);
+
+export const LOCAL_FONT_PATH = path.join(
+  require("process").env.LOCALAPPDATA + `/MICROSOFT/Windows/Fonts/`
+);

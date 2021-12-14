@@ -11,6 +11,7 @@ import {
   getAllFiles,
 } from "@/assets/assetmanager";
 import getSystemFonts from "get-system-fonts";
+import { LOCAL_FONT_PATH } from "@/lib/utils";
 
 const fontPath = "assets/fonts/fallback/NotoSansCJKjp-Regular.otf";
 export let SystemFonts = null;
@@ -24,7 +25,15 @@ export function CalcFontPath(pathToFont: string) {
 
 async function loadFont(url): Promise<any> {
   return await new Promise((resolve, reject) =>
-    opentype.load(url, (err, font) => (err ? reject(err) : resolve(font)))
+    opentype.load(url, (err, font) => {
+      if (err) {
+        alert(
+          `Your font is too powerful for MemeNgin to handle. please try similar fonts :( \n - ${err}`
+        );
+      } else {
+        resolve(font);
+      }
+    })
   );
 }
 
@@ -43,7 +52,7 @@ export class FontCache {
     opentype.load(fontPath, function(err, font) {
       if (err) {
         alert(
-          `[${path.parse(fontPath).name}] Font could not be loaded - ${err}`
+          `Your font is too powerful for MemeNgin to handle. please try similar fonts :( \n [error] ${err}`
         );
       } else {
         self._fallbackFont = font;
@@ -53,7 +62,7 @@ export class FontCache {
 
   static async listSystemFonts() {
     FontCache.systemFonts = await new Promise((resolve) => {
-      resolve(getSystemFonts());
+      resolve(getSystemFonts({ additionalFolders: [LOCAL_FONT_PATH] }));
     });
   }
 
