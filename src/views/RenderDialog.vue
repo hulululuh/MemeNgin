@@ -2,7 +2,7 @@
   <v-dialog
     v-model="dialog"
     persistent
-    max-width="960px"
+    width="960px"
     max-height="800px"
     @keydown.esc="dialog = false"
   >
