@@ -1,6 +1,6 @@
 {
   "name": "memengin",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "MemeNgin is a node-based image engine developed for meme creators.",
   "author": "Jaemoon Choi <admin@memengin.com>",
   "license": "GPLv3",
